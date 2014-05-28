@@ -11,10 +11,7 @@ var express = require('express')
   , http = require('http')
   , path = require('path')
   , config = require('./config')
-  , util = require('util')
-  , spawn = require('child_process').spawn
-  , carrier = require('carrier')
-  , pl_proc = require('perl');
+  , util = require('util');
 
 
 var app = module.exports = express();
