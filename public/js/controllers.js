@@ -49,17 +49,26 @@ angular.module('dimsDemo.controllers', [])
     // $scope.upload = $upload.http({...})  see 88#issuecomment-31366487 for sample code.
   };
 }).
-  controller('IpgrepController', function ($scope, $location, $routeParams) {
+  controller('IpgrepController', function ($scope, $http, $location, $routeParams) {
     // write Ctrl here
     console.log($routeParams);
+    
 
   }).
   controller('MainController', function ($scope, $location, $routeParams) {
     // write Ctrl here
 
   }).
-  controller('AnonController', function ($scope, $location, $routeParams) {
+  controller('AnonController', function ($scope, $http, $location, $routeParams) {
     // write Ctrl here;
+    console.log("In anon controller");
+    $scope.callClient = function() {
+      $http.get('/anon')
+      .success(function() {
+        console.log("Anon was called successfully");
+      })
+    }
+
 }).
   controller('CifbulkController', function ($scope, $location, $routeParams) {
     // write Ctrl here;
