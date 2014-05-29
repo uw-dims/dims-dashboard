@@ -10,6 +10,7 @@ exports.anon = function(req, res) {
   var output = '';
   python.stdout.on('data', function() {
     output += data
+    console.log(data);
   });
   python.on('close', function(code) {
     if (code !== 0) {
