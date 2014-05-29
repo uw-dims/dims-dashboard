@@ -3,6 +3,20 @@ var carrier = require('carrier');
 
 exports.anon = function(req, res) {
   console.log('In anon server call');
+  var python = spawn(
+    'python',
+    ['anon_client --debug --verbose --server rabbitmq.prisem.washington.edu --queue-base anon --stats --file data/rwfind_201210011617_8428.txt']
+    );
+  var output = '';
+  python.stdout.on('data', function() {
+    output += data
+  });
+  python.on('close', function(code) {
+    if (code !== 0) {
+      return res.send(500, code);
+    }
+    return res.send(200, output);
+  })
 };
 
 exports.ipgrep = function(req,res) {
