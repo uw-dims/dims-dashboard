@@ -2,5 +2,6 @@
 .bowerrc
 .jshintrc
 node_modules/
-tmp/
+tmp/*
+upload/*
 
