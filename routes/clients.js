@@ -38,7 +38,7 @@ exports.rwfind = function(req,res) {
 
 };
 
-var processPython = function(req, res) {
+var processPython = function(python, req, res) {
   var output = '';
   python.stdout.on('data', function(data) {
     output += data
