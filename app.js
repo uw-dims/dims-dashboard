@@ -45,6 +45,7 @@ app.get('/ipgrep', clients.ipgrep);
 app.get('/cifbulk', clients.cifbulk);
 app.get('/crosscor', clients.crosscor);
 app.get('/anon', clients.anon);
+app.get('/rwfind', clients.rwfind);
 app.get('*', routes.index);
 
 // Handle cross-domain requests
