@@ -59,7 +59,7 @@ angular.module('dimsDemo.controllers', [])
     // write Ctrl here
 
   }).
-  controller('AnonController', function ($scope, $http, $location, $routeParams) {
+  controller('AnonController', function ($scope, AnonService, $http, $location, $routeParams) {
     console.log("In anon controller");
     AnonService.callClient();
 

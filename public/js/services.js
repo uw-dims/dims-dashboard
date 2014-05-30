@@ -1,5 +1,5 @@
-
-dimsDemo.service('AnonService', function($http){
+angular.module('dimsDemo.services', [])
+  .service('AnonService', function($http){
 
   this.callClient = function() {
      return $http.get('/anon', {

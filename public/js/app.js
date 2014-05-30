@@ -39,6 +39,6 @@ var dimsDemoConfig = function($routeProvider, $locationProvider) {
   $locationProvider.html5Mode(true);
 }
 
-var dimsDemo = angular.module('dimsDemo', ['ngRoute','angularFileUpload','dimsDemo.controllers']).config(dimsDemoConfig);
+var dimsDemo = angular.module('dimsDemo', ['ngRoute','angularFileUpload','dimsDemo.controllers','dimsDemo.services']).config(dimsDemoConfig);
 
 
