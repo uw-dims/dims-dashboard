@@ -82,13 +82,13 @@ angular.module('dimsDemo.controllers', [])
     }
 
 }).
-  controller('CifbulkController', function ($scope, $location, $routeParams) {
+  controller('CifbulkController', function ($scope, $http, $location, $routeParams) {
     // write Ctrl here;
 }).
-  controller('CrosscorController', function ($scope, $location, $routeParams) {
+  controller('CrosscorController', function ($scope, $http, $location, $routeParams) {
     // write Ctrl here;
 }).
-  controller('RwfindController', function ($scope, $location, $routeParams) {
+  controller('RwfindController', function ($scope, $http, $location, $routeParams) {
     console.log("In rwfind controller");
     $scope.callClient = function() {
       $http.get('/rwfind', {
