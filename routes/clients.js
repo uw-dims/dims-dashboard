@@ -8,7 +8,7 @@ exports.anon = function(req, res) {
     ['/opt/dims/bin/anon_client', '--debug', '--verbose', '--server', 'rabbitmq.prisem.washington.edu',
         '--queue-base', 'anon', '--stats', '--file', 'data/rwfind_201210011617_8428.txt']
     );
-  processPython(req,res);
+  processPython(python, req,res);
 };
 
 exports.ipgrep = function(req,res) {
@@ -34,7 +34,7 @@ exports.rwfind = function(req,res) {
         '--queue-base', 'rwfind', '--topn', '100', '--json', '--start-date',
          '2014/01/03:00', '--end-date', '2014/01/04:00', '--searchfile', 'data/ipsrw6.txt']
     );
-  processPython(req,res);
+  processPython(python, req, res);
 
 };
 
