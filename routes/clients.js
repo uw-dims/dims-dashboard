@@ -8,21 +8,7 @@ exports.anon = function(req, res) {
     ['/opt/dims/bin/anon_client', '--debug', '--verbose', '--server', 'rabbitmq.prisem.washington.edu',
         '--queue-base', 'anon', '--stats', '--file', 'data/rwfind_201210011617_8428.txt']
     );
-  var output = '';
-  python.stdout.on('data', function(data) {
-    output += data
-    console.log('stdout: '+ data);
-  });
-
-  python.stderr.on('data', function(data) {
-    console.log('stderr: ' + data);
-  });
-  python.on('close', function(code) {
-    if (code !== 0) {
-      return res.send(500, code, output);
-    }
-    return res.send(200, output);
-  })
+  processPython(req,res);
 };
 
 exports.ipgrep = function(req,res) {
@@ -38,3 +24,34 @@ exports.cifbulk = function(req,res) {
 exports.crosscor = function(req,res) {
   console.log('In crosscor server call');
 };
+
+exports.rwfind = function(req,res) {
+  console.log('In rwfind server call');
+
+  var python = spawn(
+    'python',
+    ['/opt/dims/bin/rwfind_client', '--debug', '--verbose', '--server', 'rabbitmq.prisem.washington.edu',
+        '--queue-base', 'rwfind', '--topn', '100', '--json', '--start-date',
+         '2014/01/03:00', '--end-date', '2014/01/04:00', '--searchfile', 'data/ipsrw6.txt']
+    );
+  processPython(req,res);
+
+};
+
+var processPython = function(req, res) {
+  var output = '';
+  python.stdout.on('data', function(data) {
+    output += data
+    console.log('stdout: '+ data);
+  });
+
+  python.stderr.on('data', function(data) {
+    console.log('stderr: ' + data);
+  });
+  python.on('close', function(code) {
+    if (code !== 0) {
+      return res.send(500, code, output);
+    }
+    return res.send(200, output);
+  })
+}
