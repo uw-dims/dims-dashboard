@@ -29,6 +29,9 @@ var dimsDemoConfig = function($routeProvider, $locationProvider) {
   }).when('/cifbulk_client', {
     controller: 'CifbulkController',
     templateUrl: 'partials/cifbulk_client.html'
+  }).when('/rwfind_client', {
+    controller: 'RwfindController',
+    templateUrl: 'partials/rwfind_client.html'
   }).
   otherwise({
     redirectTo: '/'

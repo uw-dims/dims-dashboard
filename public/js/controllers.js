@@ -60,7 +60,6 @@ angular.module('dimsDemo.controllers', [])
 
   }).
   controller('AnonController', function ($scope, $http, $location, $routeParams) {
-    // write Ctrl here;
     console.log("In anon controller");
     $scope.callClient = function() {
       $http.get('/anon', {
@@ -88,4 +87,25 @@ angular.module('dimsDemo.controllers', [])
 }).
   controller('CrosscorController', function ($scope, $location, $routeParams) {
     // write Ctrl here;
+}).
+  controller('RwfindController', function ($scope, $location, $routeParams) {
+    console.log("In rwfind controller");
+    $scope.callClient = function() {
+      $http.get('/rwfind', {
+        'debug':'true',
+        'verbose':'true',
+        'json': 'true'
+      }).
+        success(function(data, status, headers, config) {
+          console.log("rwfind was called successfully");
+          console.log(data);
+          console.log(status);
+          console.log(config);
+        }).
+        error(function(data, status, headers, config) {
+          console.log("Error");
+          console.log(data);
+          console.log(status);
+        });
+    }
 });
