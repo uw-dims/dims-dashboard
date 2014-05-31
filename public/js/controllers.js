@@ -318,6 +318,8 @@ console.log("In UploadController");
           console.log(status);
           console.log(config);
           $scope.result = data;
+          $scope.showResults = true;
+          console.log('showResults is '+$scope.showResults);
         }).
         error(function(data, status, headers, config) {
           console.log("rwfind Error");
