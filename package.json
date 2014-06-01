@@ -12,6 +12,7 @@
     "fileupload": "*",
     "carrier": "*",
     "async": "*",
-    "xml2js": "*"
+    "xml2js": "*",
+    "tmp": "*"
   }
 }

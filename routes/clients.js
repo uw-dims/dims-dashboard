@@ -1,5 +1,6 @@
 var spawn =  require('child_process').spawn;
 var carrier = require('carrier');
+var tmp = require('tmp');
 
 exports.anon = function(req, res) {
   console.log('In anon server call');
@@ -53,6 +54,14 @@ exports.rwfind = function(req,res) {
     inputArray.push('-r');
     inputArray.push(req.query.fileName);
   }
+  if (req.query.ips !== undefined) {
+    tmp.file(function _tempFileCreated(err, path, fd) {
+      if (err) throw err;
+      console.log('File: ', path);
+      console.log('Filedescriptor: ', fd);
+    });
+  }
+
 
   console.log(inputArray);
 

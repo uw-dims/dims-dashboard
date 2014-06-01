@@ -49,6 +49,7 @@ angular.module('dimsDemo.controllers').
     // Other setup
     $scope.showResults = false;
     $scope.result = null;
+    $scope.resultsMsg = 'Raw Results';
 
     $scope.callClient = function() {
 
@@ -97,7 +98,7 @@ angular.module('dimsDemo.controllers').
 
       console.log(clientConfig);
       console.log("Now sending http get request");
-
+      $scope.resultsMsg = 'Raw Results - Waiting...';
       $http(
         { method: 'GET',
           url: '/rwfind', 
@@ -109,6 +110,7 @@ angular.module('dimsDemo.controllers').
           console.log(status);
           $scope.result = data;
           $scope.showResults = true;
+          $scope.resultsMsg = 'Raw Results';
         }).
         error(function(data, status, headers, config) {
           console.log("rwfind Error");
@@ -116,6 +118,7 @@ angular.module('dimsDemo.controllers').
           console.log(status);
           $scope.showFormError = true;
           $scope.formErrorMsg = 'Your request did not get a result. Status: '+status;
+          $scope.resultsMsg = 'Raw Results';
         });
       }
 });
