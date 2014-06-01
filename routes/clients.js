@@ -1,6 +1,8 @@
 var spawn =  require('child_process').spawn;
 var carrier = require('carrier');
 var tmp = require('tmp');
+var async = require('async');
+var fs = require('fs');
 
 exports.anon = function(req, res) {
   console.log('In anon server call');
@@ -55,19 +57,28 @@ exports.rwfind = function(req,res) {
     inputArray.push(req.query.fileName);
   }
 
-  async.series([
+  async.waterfall([
       function(callback) {
-        if (req.query.ips !== undefined) {
           tmp.file(function _tempFileCreated(err, path, fd) {
-            if (err) throw err;
+           
             console.log('File: ', path);
             console.log('Filedescriptor: ', fd);
-            callback();
+            callback(err,path,fd);
           });
-        }
-        callback();
-      },
-      function(callback) {
+   
+      },function(path, fd, callback) {
+          if (req.query.ips !== undefined) {
+            fs.writeFile(path, req.query.ips, function(err) {
+		if (err == undefined) {
+                   inputArray.push('-r');
+                   inputArray.push(path);
+                }
+             callback(err);
+            });
+          }
+     }, function(callback) {  
+          
+        console.log('In last callback, inputArray is: ');
         console.log(inputArray);
 
         // var python = spawn(
@@ -81,16 +92,11 @@ exports.rwfind = function(req,res) {
           inputArray
           );
         processPython(python, req, res);
-        callback();
-      }, function(err) {
-        console.log('Both tasks done');
+        callback(null, 'done');
+      }, function(err,result) {
+        console.log('In final callback, tasks are '+ result);
       }
-    ])
-
-  
-
-  
-
+    ])  
 };
 
 var processPython = function(python, req, res) {
@@ -98,11 +104,10 @@ var processPython = function(python, req, res) {
   console.log('Spawned child pid: ' + python.pid);
   python.stdout.on('data', function(data) {
     output += data
-    console.log('stdout: '+ data);
   });
 
   python.stderr.on('data', function(data) {
-    console.log('stderr: ' + data);
+    console.log('stderr: '+ data);
   });
   python.on('close', function(code) {
     console.log("python closed");

@@ -90,12 +90,14 @@ angular.module('dimsDemo.controllers').
       Utils.setConfig(clientConfig, startTime, 'startTime');
       Utils.setConfig(clientConfig, endTime, 'endTime');
       Utils.setConfig(clientConfig, $scope.formData.outputType, 'outputType');
-      Utils.setConfig(clientConfig, $scope.filePath+$scope.formData.fileName, 'fileName');
       Utils.setConfig(clientConfig, $scope.formData.numDays, 'numDays');
       Utils.setConfig(clientConfig, $scope.formData.hitLimit, 'hitLimit');
       Utils.setConfig(clientConfig, $scope.formData.ips, 'ips');
       Utils.setConfig(clientConfig, $scope.formData.header, 'header');
 
+      if (Utils.inputPresent($scope.formData.fileName)) {
+        Utils.setconfig(clientConfig, $scope.filePath+$scope.formData.fileName, 'fileName');
+      }
       console.log(clientConfig);
       console.log("Now sending http get request");
       $scope.resultsMsg = 'Raw Results - Waiting...';

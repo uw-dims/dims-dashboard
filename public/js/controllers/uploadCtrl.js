@@ -1,5 +1,5 @@
 angular.module('dimsDemo.controllers').
-  controller ('UploadCtrl', function($scope, $upload) {
+  controller ('UploadCtrl', function($scope, $upload, Utils) {
 console.log("In UploadController");
   // Setup form data
     $scope.formData = {};
@@ -16,8 +16,8 @@ console.log("In UploadController");
     console.log("in onformsubmit");
     console.log($scope.files);
     var uploadData = {};
-    setConfig(uploadData, $scope.formData.fileName, 'fileName');
-    setConfig(uploadData, $scope.formData.destination, 'destination');
+    Utils.setConfig(uploadData, $scope.formData.fileName, 'fileName');
+    Utils.setConfig(uploadData, $scope.formData.destination, 'destination');
 
     //$files: an array of files selected, each file has name, size, and type.
     for (var i = 0; i < $scope.files.length; i++) {
