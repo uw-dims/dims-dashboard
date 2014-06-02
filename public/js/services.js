@@ -1,15 +1,8 @@
 
 dimsDemo.service('AnonService', function($http){
 
-	return 
-})
-
-
-
-
-
-$scope.callClient = function() {
-      $http.get('/anon', {
+  this.callClient = function() {
+     return $http.get('/anon', {
         'debug':'true',
         'verbose':'true',
         'json': 'false',
@@ -26,4 +19,5 @@ $scope.callClient = function() {
           console.log(data);
           console.log(status);
         });
-    }
+    } 
+})
