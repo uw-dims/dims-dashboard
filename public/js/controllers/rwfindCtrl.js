@@ -51,7 +51,9 @@ angular.module('dimsDemo.controllers').
     $scope.showJsonResults = false;
     $scope.result = null;
     $scope.resultsMsg = 'Results';
-    $scope.gridOptions = {};
+    $scope.flows = [];
+    $scope.gridOptions = {
+	data: 'flows'};
     
     $scope.callClient = function() {
 
@@ -113,12 +115,12 @@ angular.module('dimsDemo.controllers').
           console.log("rwfind returned data");
           console.log(status);
            if ($scope.formData.outputType == 'json') {
-              $scope.result = angular.fromJson(data);
+              $scope.result = data;
               $scope.flows = $scope.result.flows;
-              $scope.gridOptions = {
-                data: "flows"
-              }
+
+	console.log($scope.flows);
               $scope.showJsonResults = true;
+             
           } else {
               $scope.result = data;
           }
