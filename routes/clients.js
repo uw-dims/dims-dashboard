@@ -103,7 +103,7 @@ var processPython = function(python, req, res) {
   var output = '';
   console.log('Spawned child pid: ' + python.pid);
   python.stdout.on('data', function(data) {
-    output += data
+    output += data;
   });
 
   python.stderr.on('data', function(data) {
@@ -114,9 +114,7 @@ var processPython = function(python, req, res) {
     if (code !== 0) {
       return res.json(500, {code: code, pid: python.pid, data: output});
     }
-    // For now, change result labels that clients can't handle
-    output = output.replace('%_of_total', 'Percent');
-    output = output.replace('cumul_%', 'Cumulative');
+ 
     return res.send(200, output);
   })
 }

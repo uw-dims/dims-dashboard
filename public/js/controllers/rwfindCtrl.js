@@ -119,6 +119,24 @@ angular.module('dimsDemo.controllers').
               $scope.result = data;
               $scope.flows = $scope.result.flows;
               $scope.flowStats = $scope.result.flow_stats;
+              for (var i=0; i< $scope.flowStats.length; i++ ) {
+
+              for (key in $scope.flowStats[i]) {
+                if($scope.flowStats[i].hasOwnProperty(key)) {
+                var newKey = key;
+                  if (key == '%_of_total') {
+                     newKey = 'Percent_of_total';
+                  } else if (key == 'cumul_%') {
+                     newKey = 'Cumulative_Percent';
+                  }
+                  if (key !== newKey) {
+                     $scope.flowStats[i][newKey] = $scope.flowStats[i][key];
+                     delete($scope.flowStats[i][key]);
+                  }
+                }
+              }
+              }  
+                     
               $scope.showJsonResults = true;
              
           } else {

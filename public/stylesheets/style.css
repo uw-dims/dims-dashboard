@@ -101,4 +101,6 @@ body {
     height: 400px;
     overflow: visible;
 }
-
+.statsGridStyle {
+    height: 150px;
+} 
