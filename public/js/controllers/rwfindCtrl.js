@@ -48,7 +48,7 @@ angular.module('dimsDemo.controllers').
 
     // Other setup
     $scope.showResults = false;
-    $scope.showJsonResults = false;
+    $scope.showJsonResults = true;
     $scope.result = null;
     $scope.resultsMsg = 'Results';
     $scope.flows = [];
@@ -136,6 +136,8 @@ angular.module('dimsDemo.controllers').
           $scope.showFormError = true;
           $scope.formErrorMsg = 'Your request did not get a result. Status: '+status;
           $scope.resultsMsg = 'Results';
+          
+              $scope.showResults = true;
         });
       }
 });
