@@ -6,7 +6,7 @@
  * @name app
  * @type {angular.Module}
  */
-var dimsDemoConfig = function($routeProvider, $locationProvider) {
+var dimsDemoConfig = function($routeProvider, $locationProvider, datepickerConfig, datepickerPopupConfig) {
   $routeProvider
   .when('/', {
     controller: 'MainController',
@@ -37,10 +37,18 @@ var dimsDemoConfig = function($routeProvider, $locationProvider) {
     redirectTo: '/'
   });
   $locationProvider.html5Mode(true);
+  datepickerConfig.minDate = '1960-01-01';
+  datepickerConfig.showWeeks = false;
+  datepickerPopupConfig.datepickerPopup = 'MM-dd-yyyy';
 }
 
 var dimsDemo = angular.module('dimsDemo', 
-  ['ngRoute','angularFileUpload','dimsDemo.controllers'])
+  ['ngRoute','angularFileUpload','ui.bootstrap','ui.bootstrap.showErrors','dimsDemo.controllers', 'dimsDemo.directives', 'dimsDemo.services'])
   .config(dimsDemoConfig);
 
+dimsDemo.factory('dimsConfig', function() {
+  var dimsConfig = {
+
+  };
+})
 

@@ -1,59 +1,19 @@
-<!-- <div ng-controller="UploadController"> -->
-            <h2 class="sub-header">Upload</h2>
-            <div class="span6">
-              <input type="text" ng-model="myModelObj">
-              <input type="file" ng-file-select="onFileSelect($files)" >
-              <input type="file" ng-file-select="onFileSelect($files)" multiple>
-              <div ng-file-drop="onFileSelect($files)" ng-file-drag-over-class="optional-css-class"
-                                ng-show="dropSupported">drop files here</div>
-              <div ng-file-drop-available="dropSupported=true" 
-                                ng-show="!dropSupported">HTML5 Drop File is not supported!</div>
-              <button ng-click="upload.abort()">Cancel Upload</button>
-                  <div class="table-responsive">
-              <h2>Transfers:</h2>
+<h2 class="sub-header">Upload</h2>
+<div class="span6">
 
-                <!-- <table class="table table-striped">
-                  <tr ng-repeat="file in $flow.files">
-                    <td>{{$index+1}}</td>
-                    <td>{{file.name}}</td>
-                    <td>{{file.msg}}</td>
-                  </tr>
-                </table> -->
-            <!-- <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Header</th>
-                  <th>Header</th>
-                  <th>Header</th>
-                  <th>Header</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>1,001</td>
-                  <td>Lorem</td>
-                  <td>ipsum</td>
-                  <td>dolor</td>
-                  <td>sit</td>
-                </tr>
-                <tr>
-                  <td>1,002</td>
-                  <td>amet</td>
-                  <td>consectetur</td>
-                  <td>adipiscing</td>
-                  <td>elit</td>
-                </tr>
-                <tr>
-                  <td>1,003</td>
-                  <td>Integer</td>
-                  <td>nec</td>
-                  <td>odio</td>
-                  <td>Praesent</td>
-                </tr>
-                
-              </tbody>
-            </table> -->
-              </div> <!-- table-responsive -->
-            </div> <!-- span6 -->
-         <!--  </div> --> <!-- flow init -->
+<form role="form">
+  <div class="form-group">
+    <label for="inputOneFile">Choose one file</label>
+    <input type="file" ng-file-select="onFileSelect($files)" id="inputOneFile">
+    <label for "inputMultipleFiles">Choose multiple files</label>
+    <input type="file" ng-file-select="onFileSelect($files)" multiple>
+    <label for "dragDropFiles">Drag and drop files</label>
+    <div ng-file-drop="onFileSelect($files)" ng-file-drag-over-class="optional-css-class"
+                    ng-show="dropSupported" id="dragDropFiles">drop files here</div>
+    <div ng-file-drop-available="dropSupported=true" 
+                    ng-show="!dropSupported">HTML5 Drop File is not supported!</div>
+    <!-- <button ng-click="upload.abort()">Cancel Upload</button> -->
+   </div>
+</form>
+
+</div> 

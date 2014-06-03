@@ -1,3 +1,86 @@
 <h2 class="subheader">rwfind</h2>
 
-<button type="button" class="btn btn-primary" ng-click="callClient()">Call rwfind client</button>
+<form class="form-horizontal" role="form" name="rwfindForm">
+  <div class="form-group">
+    <label for="startDate" class="col-sm-2 control-label">Start Date</label>
+    <div class="col-sm-3"><div class="input-group">
+      <input type="text" class="form-control"  datepicker-popup={{dateFormat}} ng-model="formData.startDate" is-open="dateConfig.startOpened" 
+          datepicker-options="dateConfig.dateOptions" max-date="dateConfig.tomorrow" ng-required="true" close-text="Close" />
+      <span class="input-group-btn">
+          <button type="button" class="btn btn-default" ng-click="open($event, 'startOpened')"><i class="glyphicon glyphicon-calendar"></i></button>
+      </span>
+    </div></div>
+    <label  class="col-sm-2 col-sm-offset-1 control-label">Show Stats?</label>
+    <div class="col-sm-1">
+      <input type="checkbox" ng-model="formData.stats" name="stats" class="form-control"  />
+    </div>
+    
+  </div>
+
+  <div class="form-group" >
+    <label for="endDate" class="col-sm-2 control-label">End Date</label>
+    <div class="col-sm-3"><div class="input-group">
+      <input type="text" class="form-control"  datepicker-popup={{dateFormat}} ng-model="formData.endDate" is-open="dateConfig.endOpened" 
+          datepicker-options="dateConfig.dateOptions" max-date="dateConfig.tomorrow" ng-required="true" close-text="Close" />
+      <span class="input-group-btn">
+          <button type="button" class="btn btn-default" ng-click="open($event,'endOpened')"><i class="glyphicon glyphicon-calendar"></i></button>
+      </span>
+    </div></div>
+   <label  class="col-sm-2 col-sm-offset-1 control-label">Show Header?</label>
+    <div class="col-sm-1">
+      <input type="checkbox" ng-model="formData.header" name="header" class="form-control"  />
+    </div>
+  </div>
+
+  <div class="form-group" show-errors>
+    <label class="col-sm-2 control-label">Number of Days</label>
+    <div class="col-sm-2">
+      <input type="number" class="form-control" ng-model="formData.numDays" name="numDays" min="1" integer/>
+    </div>
+    <p class="help-block">Optional: Number of days, greater than 0. 
+    <span ng-if="rwfindForm.numDays.$error.integer">Must be an integer.</span></p>
+  </div>
+
+  <div class="form-group" show-errors>
+     <label class="col-sm-2 control-label">Hit Limit</label>
+    <div class="col-sm-2">
+      <input type="number" class="form-control" ng-model="formData.hitLimit" name="hitLimit" min="1" integer />
+    </div>
+    <p class="help-block">Optional: Number of hits returned, greater than 0 (default is 100). <span ng-if="rwfindForm.numDays.$error.integer">Must be an integer.</span></p>
+  </div>
+
+  <div class="form-group">
+  <label  class="col-sm-2 control-label">IP Addresses</label>
+    <div class="col-sm-3">
+      <textarea class="form-control" rows="5" ng-model="formData.ips" id="ipsId"></textarea>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-sm-2" for="inputOneFile">Or Choose a file to upload</label>
+    <div class="col-sm-3">
+      <input type="file" ng-file-select="onFileSelect($files)" id="inputOneFile" class="form-control">
+    </div>
+  </div>
+
+  <div class="form-group">
+  <label  class="col-sm-2 control-label">Output Type</label>
+    <div class="col-sm-5">
+      <select class="form-control" ng-model="formData.outputType" ng-options="f for f in outputTypes" >
+        <option></option>
+      </select>
+    </div>
+  </div>
+  
+  <div class="form-group">
+  <div class="col-sm-3 col-sm-offset-2">
+  <button type="button" class="btn btn-primary" ng-click="callClient()">Call rwfind client</button>
+  </div></div>
+</form>
+
+<!-- 
+<script type="text/javascript">
+$(document).ready(function() {
+  $('#sd1').datepicker();
+});
+</script> -->
