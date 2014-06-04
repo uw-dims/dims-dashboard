@@ -41,6 +41,7 @@ app.get('/', routes.index);
 app.get('/partials/:name', routes.partials);
 app.get('/users', user.list);
 app.post('/upload', files.upload);
+app.get('/files', files.files);
 app.get('/ipgrep', clients.ipgrep);
 app.get('/cifbulk', clients.cifbulk);
 app.get('/crosscor', clients.crosscor);

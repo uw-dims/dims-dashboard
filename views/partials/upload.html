@@ -1,19 +1,48 @@
 <h2 class="sub-header">Upload</h2>
 <div class="span6">
 
-<form role="form">
+<form role="form" class="form-horizontal" name="uploadForm">
+
   <div class="form-group">
-    <label for="inputOneFile">Choose one file</label>
-    <input type="file" ng-file-select="onFileSelect($files)" id="inputOneFile">
-    <label for "inputMultipleFiles">Choose multiple files</label>
-    <input type="file" ng-file-select="onFileSelect($files)" multiple>
+  <label class="col-sm-2 control-label">New File Name</label>
+    <div class="col-sm-5">
+      <input type="text" class="form-control" ng-model="formData.fileName" name="fileName"  />
+    </div>
+    <p class="help-block">Optional: Enter a new name for the file you are uploading.</p>
+  </div>
+
+  <div class="form-group">
+  <label  class="col-sm-2 control-label">Target File Locations</label>
+    <div class="col-sm-5">
+      <select class="form-control" ng-model="formData.destination" ng-options="f for f in destinations" >
+        <option></option>
+      </select>
+    </div>
+  </div>
+
+
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="inputOneFile">Choose one file</label>
+    <div class="col-sm-5">
+    <input type="file" ng-file-select="onFileSelect($files)" id="inputOneFile" class="form-control">
+    <!-- <label for "inputMultipleFiles">Choose multiple files</label> -->
+    <!-- <input type="file" ng-file-select="onFileSelect($files)" multiple>
     <label for "dragDropFiles">Drag and drop files</label>
     <div ng-file-drop="onFileSelect($files)" ng-file-drag-over-class="optional-css-class"
                     ng-show="dropSupported" id="dragDropFiles">drop files here</div>
     <div ng-file-drop-available="dropSupported=true" 
-                    ng-show="!dropSupported">HTML5 Drop File is not supported!</div>
+                    ng-show="!dropSupported">HTML5 Drop File is not supported!</div> -->
     <!-- <button ng-click="upload.abort()">Cancel Upload</button> -->
+    </div>
    </div>
+
+   <div class="form-group">
+    <div class="col-sm-3 col-sm-offset-2">
+        <button type="submit" class="btn btn-primary" ng-click="onFormSubmit()">Upload File</button>
+    </div></div>
+
 </form>
 
 </div> 
+
+

@@ -1,0 +1,42 @@
+<h2 class="sub-header">View Files</h2>
+<div class="span6">
+
+<form role="form" class="form-horizontal">
+
+
+  <div class="form-group">
+  <label  class="col-sm-2 control-label">Choose a list</label>
+    <div class="col-sm-5">
+      <select class="form-control" ng-model="formData.source" ng-options="f for f in sources" >
+        <option></option>
+      </select>
+    </div>
+  </div>
+
+   <div class="form-group">
+    <div class="col-sm-3 col-sm-offset-2">
+        <button type="button" class="btn btn-primary" ng-click="getFiles()">View Files</button>
+    </div></div>
+
+</form>
+
+<!-- <div class="gridStyle" ng-grid="gridOptions">
+ -->  
+<div class="row">
+<div class="col-sm-4">
+<div class="table-responsive">
+  <table class="table table-striped" >
+    <thead><tr><th>File Name</th></tr></thead>
+    <tbody>
+    <tr ng-repeat="file in files" ng-click="tableClicked(file)"><td>{{file}}</td>
+    </tr>
+    </tbody>
+  </table>
+</div> 
+</div><!-- left col -->
+<div class="col-sm-8 well" ng-show="showData">
+<strong>File Contents</strong>
+<pre>{{singleFile}}</pre>
+</div>
+</div>
+</div>
