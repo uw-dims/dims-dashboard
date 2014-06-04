@@ -311,7 +311,11 @@ console.log("In UploadController");
 
       console.log(clientConfig);
 
-      $http.get('/rwfind', params: clientConfig ).
+      $http(
+        { method: 'GET',
+          url: '/rwfind', 
+          params: clientConfig
+        } ).
         success(function(data, status, headers, config) {
           console.log("rwfind was called successfully");
           console.log(data);
