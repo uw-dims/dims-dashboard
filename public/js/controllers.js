@@ -100,8 +100,8 @@ console.log("In UploadController");
           console.log(status);
           console.log(config);
 
-          var len = data.length;
-          $scope.files = data;
+          $scope.files = data.result;
+          $scope.filePath = data.path;
           $scope.fileSource = config.params.source;
 
         }).
@@ -271,7 +271,8 @@ console.log("In UploadController");
           action: $scope.action = 'list' 
         }
       }).success(function(data,status,headers,config){
-        $scope.fileNames = data;
+        $scope.fileNames = data.result;
+        $scope.filePath = data.path;
         $scope.showFiles = true;
       }).
         error(function(data,status,headers,config) {
@@ -303,7 +304,7 @@ console.log("In UploadController");
       setConfig(clientConfig, startTime, 'startTime');
       setConfig(clientConfig, endTime, 'endTime');
       setConfig(clientConfig, $scope.formData.outputType, 'outputType');
-      setConfig(clientConfig, $scope.formData.fileName, 'fileName');
+      setConfig(clientConfig, $scope.filePath+'/'+$scope.formData.fileName, 'fileName');
       setConfig(clientConfig, $scope.formData.numDays, 'numDays');
       setConfig(clientConfig, $scope.formData.hitLimit, 'hitLimit');
       setConfig(clientConfig, $scope.formData.ips, 'ips');

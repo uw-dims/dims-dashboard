@@ -134,7 +134,10 @@ exports.files = function(req,res) {
                     }
 
                 }
-                return res.send(200, result);
+                var data = {};
+                data.path = directory;
+                data.result = result;
+                return res.send(200, data);
             });
 
         } else {
