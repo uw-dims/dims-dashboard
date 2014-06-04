@@ -30,6 +30,7 @@ exports.rwfind = function(req,res) {
   var inputArray = ['/opt/dims/bin/rwfind_client', '--debug', '--verbose', '--server', 'rabbitmq.prisem.washington.edu',
         '--queue-base', 'rwfind'];
   
+  console.log(req.query);
 
   var python = spawn(
     'python',
