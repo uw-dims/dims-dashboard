@@ -54,7 +54,7 @@ exports.rwfind = function(req,res) {
     inputArray.push(req.query.fileName);
   }
 
-  console.output(inputArray);
+  console.log(inputArray);
 
   var python = spawn(
     'python',
