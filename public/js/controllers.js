@@ -297,6 +297,7 @@ console.log("In UploadController");
     $scope.callClient = function() {
 
       console.log($scope.formData);
+      $scope.showResults = false;
 
       var clientConfig = {};
       var startTime = (($scope.formData.startDate !== null) && ($scope.formData.startDate !== undefined)) ? $scope.formData.startDate.getTime()/1000 : null;
