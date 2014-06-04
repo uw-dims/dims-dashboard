@@ -304,7 +304,7 @@ console.log("In UploadController");
       setConfig(clientConfig, startTime, 'startTime');
       setConfig(clientConfig, endTime, 'endTime');
       setConfig(clientConfig, $scope.formData.outputType, 'outputType');
-      setConfig(clientConfig, $scope.filePath+'/'+$scope.formData.fileName, 'fileName');
+      setConfig(clientConfig, $scope.filePath+$scope.formData.fileName, 'fileName');
       setConfig(clientConfig, $scope.formData.numDays, 'numDays');
       setConfig(clientConfig, $scope.formData.hitLimit, 'hitLimit');
       setConfig(clientConfig, $scope.formData.ips, 'ips');

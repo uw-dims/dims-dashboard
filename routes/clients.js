@@ -56,11 +56,15 @@ exports.rwfind = function(req,res) {
 
   console.log(inputArray);
 
+  // var python = spawn(
+  //   'python',
+  //   ['/opt/dims/bin/rwfind_client', '--debug', '--verbose', '--server', 'rabbitmq.prisem.washington.edu',
+  //       '--queue-base', 'rwfind', '--topn', '100', '--json', '--start-date',
+  //        '2014/01/03:00', '--end-date', '2014/01/04:00', '--searchfile', 'data/ipsrw6.txt']
+  //   );
   var python = spawn(
     'python',
-    ['/opt/dims/bin/rwfind_client', '--debug', '--verbose', '--server', 'rabbitmq.prisem.washington.edu',
-        '--queue-base', 'rwfind', '--topn', '100', '--json', '--start-date',
-         '2014/01/03:00', '--end-date', '2014/01/04:00', '--searchfile', 'data/ipsrw6.txt']
+    inputArray
     );
   processPython(python, req, res);
 
