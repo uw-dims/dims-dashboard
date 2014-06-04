@@ -31,6 +31,30 @@ exports.rwfind = function(req,res) {
         '--queue-base', 'rwfind'];
   
   console.log(req.query);
+  req.query.header !== undefined ? inputArray.push('-H') : "";
+  if (req.query.hitLimit !== undefined) {
+    inputArray.push('-T')
+    inputArray.push(req.query.hitLimit);
+  } 
+  if (req.query.numDays !== undefined) {
+    inputArray.push('-D')
+    inputArray.push(req.query.numDays);
+  } 
+  if (req.query.outputType == 'json') inputArray.push('-J');
+  if (req.query.startTime !== undefined) {
+    inputArray.push('--stime');
+    inputArray.push(req.query.startTime);
+  }
+  if (req.query.endTime !== undefined) {
+    inputArray.push('--etime');
+    inputArray.push(req.query.endTime);
+  }
+  if (req.query.fileName !== undefined) {
+    inputArray.push('-r');
+    inputArray.push(req.query.fileName);
+  }
+
+  console.output(inputArray);
 
   var python = spawn(
     'python',
