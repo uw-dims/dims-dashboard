@@ -86,6 +86,6 @@ var processPython = function(python, req, res) {
     if (code !== 0) {
       return res.json(500, {code: code, pid: python.pid, data: output});
     }
-    return res.json(200, output);
+    return res.send(200, output);
   })
 }
