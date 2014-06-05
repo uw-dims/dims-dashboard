@@ -84,8 +84,8 @@ var processPython = function(python, req, res) {
   python.on('close', function(code) {
     console.log("python closed");
     if (code !== 0) {
-      return res.send(500, code, output, python.pid);
+      return res.json(500, {code: code, pid: python.pid, data: output});
     }
-    return res.send(200, output, python.pid);
+    return res.send(200, {pid: python.pid, output: output});
   })
 }
