@@ -10,14 +10,6 @@
           <button type="button" class="btn btn-default" ng-click="open($event, 'startOpened')"><i class="glyphicon glyphicon-calendar"></i></button>
       </span>
     </div></div>
-    <label  class="col-sm-2 col-sm-offset-1 control-label">Show Stats?</label>
-    <div class="col-sm-1">
-      <input type="checkbox" ng-model="formData.stats" name="stats" class="form-control"  />
-    </div>
-    
-  </div>
-
-  <div class="form-group" >
     <label for="endDate" class="col-sm-2 control-label">End Date</label>
     <div class="col-sm-3"><div class="input-group">
       <input type="text" class="form-control"  datepicker-popup={{dateFormat}} ng-model="formData.endDate" is-open="dateConfig.endOpened" 
@@ -26,10 +18,6 @@
           <button type="button" class="btn btn-default" ng-click="open($event,'endOpened')"><i class="glyphicon glyphicon-calendar"></i></button>
       </span>
     </div></div>
-   <label  class="col-sm-2 col-sm-offset-1 control-label">Show Header?</label>
-    <div class="col-sm-1">
-      <input type="checkbox" ng-model="formData.header" name="header" class="form-control"  />
-    </div>
   </div>
 
   <div class="form-group" show-errors>
@@ -65,10 +53,14 @@
 
   <div class="form-group">
   <label  class="col-sm-2 control-label">Output Type</label>
-    <div class="col-sm-5">
+    <div class="col-sm-3">
       <select class="form-control" ng-model="formData.outputType" ng-options="f for f in outputTypes" >
         <option></option>
       </select>
+    </div>
+    <label  class="col-sm-2 control-label">Show Header?</label>
+    <div class="col-sm-1">
+      <input type="checkbox" ng-model="formData.header" name="header" class="form-control"  />
     </div>
   </div>
   

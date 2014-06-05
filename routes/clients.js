@@ -72,6 +72,7 @@ exports.rwfind = function(req,res) {
 
 var processPython = function(python, req, res) {
   var output = '';
+  console.log('Spawned child pid: ' + python.pid);
   python.stdout.on('data', function(data) {
     output += data
     console.log('stdout: '+ data);
@@ -82,8 +83,8 @@ var processPython = function(python, req, res) {
   });
   python.on('close', function(code) {
     if (code !== 0) {
-      return res.send(500, code, output);
+      return res.send(500, code, output, python.pid);
     }
-    return res.send(200, output);
+    return res.send(200, output, python.pid);
   })
 }

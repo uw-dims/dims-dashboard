@@ -10,6 +10,8 @@
     "ejs": "*",
     "python-shell": "0.0.2",
     "fileupload": "*",
-    "carrier": "*"
+    "carrier": "*",
+    "async": "*",
+    "xml2js": "*"
   }
 }
