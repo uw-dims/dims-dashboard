@@ -82,6 +82,7 @@ var processPython = function(python, req, res) {
     console.log('stderr: ' + data);
   });
   python.on('close', function(code) {
+    console.log("python closed");
     if (code !== 0) {
       return res.send(500, code, output, python.pid);
     }

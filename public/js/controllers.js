@@ -312,6 +312,7 @@ console.log("In UploadController");
       setConfig(clientConfig, $scope.formData.header, 'header');
 
       console.log(clientConfig);
+      console.log("Now sending http get request");
 
       $http(
         { method: 'GET',
