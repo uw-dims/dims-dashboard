@@ -27,7 +27,7 @@ exports.crosscor = function(req,res) {
 
 exports.rwfind = function(req,res) {
   console.log('In rwfind server call');
-  var inputArray = ['/opt/dims/bin/rwfind_client', '--debug', '--verbose', '--server', 'rabbitmq.prisem.washington.edu',
+  var inputArray = ['/opt/dims/bin/rwfind_client', '--server', 'rabbitmq.prisem.washington.edu',
         '--queue-base', 'rwfind'];
   
   console.log(req.query);
