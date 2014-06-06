@@ -3,12 +3,15 @@
 /* Controllers */
 
 var setConfig = function(config, data, property) {
-    if ((data !== null) && (data !== undefined)) {
+    if (inputPresent(data)) {
       config[property] = data;
     }
 };
 
-var EPOCH_DAY = 24*60*60*1000;
+var inputPresent = function(data) {
+    if (data !== null && data !== undefined && data !== "") return true;
+    else return false;
+}
 
 angular.module('dimsDemo.controllers', [])
   
@@ -190,8 +193,8 @@ console.log("In UploadController");
       console.log($scope.formData);
 
       var clientConfig = {};
-      var startTime = (($scope.formData.startDate !== null) && ($scope.formData.startDate !== undefined)) ? $scope.formData.startDate.getTime()/1000 : null;
-      var endTime = (($scope.formData.endDate !== null) && ($scope.formData.endDate !== undefined)) ? $scope.formData.endDate.getTime()/1000 : null;
+      var startTime = (inputPresent($scope.formData.startDate)) ? $scope.formData.startDate.getTime()/1000 : null;
+      var endTime = (inputPresent($scope.formData.endDate)) ? $scope.formData.endDate.getTime()/1000 : null;
       setConfig(clientConfig, startTime, 'startTime');
       setConfig(clientConfig, endTime, 'endTime');
       setConfig(clientConfig, $scope.formData.numDays, 'numDays');
@@ -254,8 +257,14 @@ console.log("In UploadController");
 
     // Setup form data
     $scope.formData = {};
-    $scope.outputTypes = ['json', 'text'];
-    $scope.formData.outputType = $scope.outputTypes[0];
+    $scope.outputTypes = [{
+      value: 'json',
+      label: 'JSON'
+    },{
+      value: 'text',
+      label: 'TEXT'
+    }];
+    $scope.formData.outputType = $scope.outputTypes[0].value;
 
     // Setup file picker
     $scope.source = 'ip_lists';
@@ -298,10 +307,27 @@ console.log("In UploadController");
 
       console.log($scope.formData);
       $scope.showResults = false;
+      $scope.showFormError = false;
+      $scope.formErrorMsg = "";
+
+      if (!inputPresent($scope.formData.ips) && !inputPresent($scope.formData.fileName)) {
+        $scope.showFormError = true;
+        $scope.formErrorMsg = 'You have to either choose a file or enter the ips/CIDR/domains to search for.';
+        return;
+      }
+      if (inputPresent($scope.formData.ips) && inputPresent($scope.formData.fileName)) {
+        $scope.showFormError = true;
+        $scope.formErrorMsg = 'You have to either choose a file or enter the ips/CIDR/domains to search for. You cannot do both';
+        return;
+      }
 
       var clientConfig = {};
-      var startTime = (($scope.formData.startDate !== null) && ($scope.formData.startDate !== undefined)) ? $scope.formData.startDate.getTime()/1000 : null;
-      var endTime = (($scope.formData.endDate !== null) && ($scope.formData.endDate !== undefined)) ? $scope.formData.endDate.getTime()/1000 : null;
+      var startTime = (inputPresent($scope.formData.startDate)) ? $scope.formData.startDate.getTime()/1000 : null;
+      var endTime = (inputPresent($scope.formData.endDate)) ? $scope.formData.endDate.getTime()/1000 : null;      
+      startTime = (($scope.formData.startHour !== null) && ($scope.formData.startHour !== undefined)) ? 
+          startTime + $scope.formData.startHour*60*60 : startTime;
+      endTime = (($scope.formData.endHour !== null) && ($scope.formData.endHour !== undefined)) ? 
+          endTime + $scope.formData.endHour*60*60 : endTime;
       setConfig(clientConfig, startTime, 'startTime');
       setConfig(clientConfig, endTime, 'endTime');
       setConfig(clientConfig, $scope.formData.outputType, 'outputType');

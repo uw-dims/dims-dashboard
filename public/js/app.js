@@ -8,35 +8,35 @@
  */
 var dimsDemoConfig = function($routeProvider, $locationProvider, datepickerConfig, datepickerPopupConfig) {
   $routeProvider.when('/', {
-    controller: 'MainController',
+    controller: 'MainCtrl',
     templateUrl: 'partials/main.html'
   }).
   when('/uploadfile', {
-    controller: 'UploadController',
+    controller: 'UploadCtrl',
     templateUrl: 'partials/upload.html'
   }).
   when('/datafiles', {
-    controller: 'DataFilesController',
+    controller: 'DataFilesCtrl',
     templateUrl: 'partials/data_files.html'
   }).
   when('/ipgrep_client', {
-    controller:'IpgrepController',
+    controller:'IpgrepCtrl',
     templateUrl: 'partials/ipgrep.html'
   }).
   when('/anon_client', {
-    controller: 'AnonController',
+    controller: 'AnonCtrl',
     templateUrl: 'partials/anon_client.html'
   }).
   when('/crosscor_client', {
-    controller: 'CrosscorController',
+    controller: 'CrosscorCtrl',
     templateUrl: 'partials/crosscor_client.html'
   }).
   when('/cifbulk_client', {
-    controller: 'CifbulkController',
+    controller: 'CifbulkCtrl',
     templateUrl: 'partials/cifbulk_client.html'
   }).
   when('/rwfind_client', {
-    controller: 'RwfindController',
+    controller: 'RwfindCtrl',
     templateUrl: 'partials/rwfind_client.html'
   }).
   otherwise({

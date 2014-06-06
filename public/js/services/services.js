@@ -41,11 +41,21 @@ angular.module('dimsDemo.services', [])
 
 })
 
-  .factory('RPCService', function() {
+  .factory('Utils', function() {
 
-      return true;
+    var root = {};
 
-  })
+    root.setConfig = function(config, data, property) {
+      if (root.inputPresent(data)) {
+        config[property] = data;
+      }
+    };
 
-;
+    root.inputPresent = function(data) {
+      if (data !== null && data !== undefined && data !== "") return true;
+      else return false;
+    }
+
+    return root;
+  });
 
