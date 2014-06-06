@@ -57,5 +57,23 @@ angular.module('dimsDemo.services', [])
     }
 
     return root;
-  });
+  })
+
+    .factory('FileService', function($http) {
+      var root = {};
+
+      root.getFileList = function(source) {
+        var result = {},
+            fileNames = [];
+        $http ({
+          method: 'GET',
+          url: '/files',
+          params: {
+            source: source,
+            action: 'action'
+          }
+        })
+
+      }
+    });
 
