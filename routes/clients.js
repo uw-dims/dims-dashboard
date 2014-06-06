@@ -54,28 +54,42 @@ exports.rwfind = function(req,res) {
     inputArray.push('-r');
     inputArray.push(req.query.fileName);
   }
-  if (req.query.ips !== undefined) {
-    tmp.file(function _tempFileCreated(err, path, fd) {
-      if (err) throw err;
-      console.log('File: ', path);
-      console.log('Filedescriptor: ', fd);
-    });
-  }
 
+  async.series([
+      function(callback) {
+        if (req.query.ips !== undefined) {
+          tmp.file(function _tempFileCreated(err, path, fd) {
+            if (err) throw err;
+            console.log('File: ', path);
+            console.log('Filedescriptor: ', fd);
+            callback();
+          });
+        }
+        callback();
+      },
+      function(callback) {
+        console.log(inputArray);
 
-  console.log(inputArray);
+        // var python = spawn(
+        //   'python',
+        //   ['/opt/dims/bin/rwfind_client', '--debug', '--verbose', '--server', 'rabbitmq.prisem.washington.edu',
+        //       '--queue-base', 'rwfind', '--topn', '100', '--json', '--start-date',
+        //        '2014/01/03:00', '--end-date', '2014/01/04:00', '--searchfile', 'data/ipsrw6.txt']
+        //   );
+        var python = spawn(
+          'python',
+          inputArray
+          );
+        processPython(python, req, res);
+        callback();
+      }, function(err) {
+        console.log('Both tasks done');
+      }
+    ])
 
-  // var python = spawn(
-  //   'python',
-  //   ['/opt/dims/bin/rwfind_client', '--debug', '--verbose', '--server', 'rabbitmq.prisem.washington.edu',
-  //       '--queue-base', 'rwfind', '--topn', '100', '--json', '--start-date',
-  //        '2014/01/03:00', '--end-date', '2014/01/04:00', '--searchfile', 'data/ipsrw6.txt']
-  //   );
-  var python = spawn(
-    'python',
-    inputArray
-    );
-  processPython(python, req, res);
+  
+
+  
 
 };
 

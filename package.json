@@ -13,6 +13,7 @@
     "carrier": "*",
     "async": "*",
     "xml2js": "*",
-    "tmp": "*"
+    "tmp": "*",
+    "async": "*"
   }
 }
