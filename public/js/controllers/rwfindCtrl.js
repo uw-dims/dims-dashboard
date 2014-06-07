@@ -48,6 +48,7 @@ angular.module('dimsDemo.controllers').
 
     // Other setup
     $scope.showResults = false;
+    $scope.showJsonResults = false;
     $scope.result = null;
     $scope.resultsMsg = 'Results';
     $scope.gridOptions = {};
@@ -57,6 +58,7 @@ angular.module('dimsDemo.controllers').
       console.log($scope.formData);
       $scope.showResults = false;
       $scope.showFormError = false;
+      $scope.showJsonResults = false;
       $scope.formErrorMsg = "";
 
       if (!Utils.inputPresent($scope.formData.ips) && !Utils.inputPresent($scope.formData.fileName)) {
@@ -111,19 +113,18 @@ angular.module('dimsDemo.controllers').
           console.log("rwfind returned data");
           console.log(status);
            if ($scope.formData.outputType == 'json') {
-            $scope.result = angular.fromJson(data);
-            $scope.flows = $scope.result.flows;
-             $scope.gridOptions = {
+              $scope.result = angular.fromJson(data);
+              $scope.flows = $scope.result.flows;
+              $scope.gridOptions = {
                 data: "flows"
               }
+              $scope.showJsonResults = true;
           } else {
-            $scope.result = data;
+              $scope.result = data;
           }
          
           $scope.showResults = true;
-          $scope.resultsMsg = 'Results';
-          // $scope.gridOptions = { data: $scope.result.flows};
-         
+          $scope.resultsMsg = 'Results';         
           
         }).
         error(function(data, status, headers, config) {
