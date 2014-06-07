@@ -82,14 +82,10 @@
   </div></div>
 </form>
 
-<div class="gridStyle" ng-grid="gridOptions"></div>
-<style .gridStyle {
-  border: 1px solid rgb(212,212,212);
-  width: 100%;
-}
-
 <div class="col-sm-12 well  well-sm" >
 <strong>{{ resultsMsg }}</strong>
 <pretty-json  ng-show="showResults" json="result"></pre>
 </div>
+
+<div class="gridStyle" ng-grid="gridOptions"></div>
 
