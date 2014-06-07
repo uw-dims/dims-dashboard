@@ -107,16 +107,18 @@ angular.module('dimsDemo.controllers').
           params: clientConfig
         } ).
         success(function(data, status, headers, config) {
-          console.log("rwfind was called successfully");
+          console.log("rwfind returned data");
           console.log(status);
-          $scope.result = data;
+           if ($scope.formData.outputType == 'json') {
+            $scope.result = angular.fromJson(data);
+          } else {
+            $scope.result = data;
+          }
+        
           $scope.showResults = true;
           $scope.resultsMsg = 'Raw Results';
-          if ($scope.formData.outputType == 'json') {
-            $scope.dataObject = angular.fromJson(data);
-          } else {
-            $scope.dataObject = {};
-          }
+          $scope.gridOptions = { data: $scope.result.flows};
+         
           
         }).
         error(function(data, status, headers, config) {
