@@ -81,11 +81,11 @@
   <button type="button" class="btn btn-primary btn-sm" ng-click="callClient()"><span class="glyphicon glyphicon-flash"></span>Call rwfind client</button>
   </div></div>
 </form>
-
+<div class="row">
 <div class="col-sm-12 well  well-sm" >
 <strong>{{ resultsMsg }}</strong>
 <pretty-json  ng-show="showResults" json="result"></pre>
-</div>
-
-<div class="gridStyle" ng-grid="gridOptions"></div>
+</div></div>
+<div class="row"><div class="col-sm-12">
+<div class="gridStyle" ng-grid="gridOptions"></div></div></div>
 
