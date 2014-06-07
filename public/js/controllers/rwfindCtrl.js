@@ -108,11 +108,16 @@ angular.module('dimsDemo.controllers').
         } ).
         success(function(data, status, headers, config) {
           console.log("rwfind was called successfully");
-          console.log(data);
           console.log(status);
           $scope.result = data;
           $scope.showResults = true;
           $scope.resultsMsg = 'Raw Results';
+          if ($scope.formData.outputType == 'json') {
+            $scope.dataObject = angular.fromJson(data);
+          } else {
+            $scope.dataObject = {};
+          }
+          
         }).
         error(function(data, status, headers, config) {
           console.log("rwfind Error");
