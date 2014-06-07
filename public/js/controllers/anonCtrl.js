@@ -1,6 +1,7 @@
 angular.module('dimsDemo.controllers').
   controller('AnonCtrl', function ($scope, $http, $location, $routeParams) {
     console.log("In anon controller");
+    
     $scope.callClient = function() {
      return $http.get('/anon', {
         'debug':'true',

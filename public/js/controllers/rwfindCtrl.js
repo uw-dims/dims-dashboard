@@ -49,9 +49,8 @@ angular.module('dimsDemo.controllers').
     // Other setup
     $scope.showResults = false;
     $scope.result = null;
-    $scope.resultsMsg = 'Raw Results';
-    $scope.gridOptions = {};
-
+    $scope.resultsMsg = 'Results';
+    
     $scope.callClient = function() {
 
       console.log($scope.formData);
@@ -101,7 +100,7 @@ angular.module('dimsDemo.controllers').
       }
       console.log(clientConfig);
       console.log("Now sending http get request");
-      $scope.resultsMsg = 'Raw Results - Waiting...';
+      $scope.resultsMsg = 'Results - Waiting...';
       $http(
         { method: 'GET',
           url: '/rwfind', 
@@ -115,10 +114,12 @@ angular.module('dimsDemo.controllers').
           } else {
             $scope.result = data;
           }
-        
+          $scope.gridOptions = {
+            data: "result"
+          }
           $scope.showResults = true;
-          $scope.resultsMsg = 'Raw Results';
-          $scope.gridOptions = { data: $scope.result.flows};
+          $scope.resultsMsg = 'Results';
+          // $scope.gridOptions = { data: $scope.result.flows};
          
           
         }).
@@ -128,7 +129,7 @@ angular.module('dimsDemo.controllers').
           console.log(status);
           $scope.showFormError = true;
           $scope.formErrorMsg = 'Your request did not get a result. Status: '+status;
-          $scope.resultsMsg = 'Raw Results';
+          $scope.resultsMsg = 'Results';
         });
       }
 });
