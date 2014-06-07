@@ -50,6 +50,7 @@ angular.module('dimsDemo.controllers').
     $scope.showResults = false;
     $scope.result = null;
     $scope.resultsMsg = 'Raw Results';
+    $scope.gridOptions = {};
 
     $scope.callClient = function() {
 
