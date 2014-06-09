@@ -54,19 +54,17 @@ angular.module('dimsDemo.controllers').
 
     // Setup grid
     $scope.flows = [];
-    $scope.dateTemplate = '<div class="ngCellText colt{{$index}}">{{row.getProperty(col.field) | date : "MM-dd-yyyy HH Z"}}</div>'
     $scope.flowGridOptions = { data: 'flows',
-        columnDefs: [{field: 'sIP', displayName: 'Source IP', width:"auto"},
-          {field: 'sIP', displayName: 'Source IP', width:"auto"},
-          {field: 'dIP', displayName: 'Destination IP',width:"auto"},
-          {field: 'sPort', displayName: 'Source Port', width:"auto"},
-          {field: 'dPort', displayName: 'Destination Port', width:"auto"},
-          {field: 'pro', displayName: 'Protocol', width:"auto"},
-          {field: 'packets', displayName: 'Packets', width:"auto"},
-          {field: 'bytes', displayName: 'Bytes', width:"auto"},
-          {field: 'flags', displayName: 'Flags', width:"auto"},
-          {field: 'sTime', displayName: 'Start Time', width:"auto"},
-          {field: 'duration', displayName: 'Duration', width:"auto"}
+        columnDefs: [{field: 'sIP', displayName: 'Source IP', width:"20%"},
+          {field: 'dIP', displayName: 'Destination IP',width:"20%"},
+          {field: 'sPort', displayName: 'Source Port', width:"10"},
+          {field: 'dPort', displayName: 'Destination Port', width:"10"},
+          {field: 'pro', displayName: 'Protocol', width:"10"},
+          {field: 'packets', displayName: 'Packets', width:"10"},
+          {field: 'bytes', displayName: 'Bytes', width:"10"},
+          {field: 'flags', displayName: 'Flags', width:"10"},
+          {field: 'sTime', displayName: 'Start Time', width:"30%"},
+          {field: 'duration', displayName: 'Duration', width:"10"}
         ]};
     $scope.flowStats = [];
     $scope.flowStatsGridOptions = { data: 'flowStats' };
