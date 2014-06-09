@@ -137,36 +137,39 @@ angular.module('dimsDemo.controllers').
         success(function(data, status, headers, config) {
           console.log("rwfind returned data");
           console.log(status);
+          var flowsFound = -1;
            if ($scope.formData.outputType == 'json') {
               $scope.result = data;
-              $scope.flows = $scope.result.flows;
-              $scope.flowStats = $scope.result.flow_stats;
-              // Massage flow_stats data so it can be displayed. TODO: Remove % returned by client
-              for (var i=0; i< $scope.flowStats.length; i++ ) {
-                for (key in $scope.flowStats[i]) {
-                  if($scope.flowStats[i].hasOwnProperty(key)) {
-                  var newKey = key;
-                    if (key == '%_of_total') {
-                       newKey = 'Percent_of_total';
-                    } else if (key == 'cumul_%') {
-                       newKey = 'Cumulative_Percent';
-                    }
-                    if (key !== newKey) {
-                       $scope.flowStats[i][newKey] = $scope.flowStats[i][key];
-                       delete($scope.flowStats[i][key]);
+              flowsFound = $scope.result.flows_found;
+              if (flowsFound > 0) {
+                $scope.flows = $scope.result.flows;
+                $scope.flowStats = $scope.result.flow_stats;
+                // Massage flow_stats data so it can be displayed. TODO: Remove % returned by client
+                for (var i=0; i< $scope.flowStats.length; i++ ) {
+                  for (key in $scope.flowStats[i]) {
+                    if($scope.flowStats[i].hasOwnProperty(key)) {
+                    var newKey = key;
+                      if (key == '%_of_total') {
+                         newKey = 'Percent_of_total';
+                      } else if (key == 'cumul_%') {
+                         newKey = 'Cumulative_Percent';
+                      }
+                      if (key !== newKey) {
+                         $scope.flowStats[i][newKey] = $scope.flowStats[i][key];
+                         delete($scope.flowStats[i][key]);
+                      }
                     }
                   }
-                }
-              }  
-                     
-              $scope.showJsonResults = true;
+                }                 
+                $scope.showJsonResults = true;
+              }          
              
           } else {
               $scope.result = data;
           }
          
           $scope.showResults = true;
-          $scope.resultsMsg = 'Results';         
+          $scope.resultsMsg = (flowsFound >=0) ? 'Results - ' + flowsFound : 'Results';         
           
         }).
         error(function(data, status, headers, config) {
