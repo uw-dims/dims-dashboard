@@ -55,16 +55,16 @@ angular.module('dimsDemo.controllers').
     // Setup grid
     $scope.flows = [];
     $scope.flowGridOptions = { data: 'flows',
-        columnDefs: [{field: 'sIP', displayName: 'Source IP', width:"20%"},
-          {field: 'dIP', displayName: 'Destination IP',width:"20%"},
-          {field: 'sPort', displayName: 'Source Port', width:"10"},
-          {field: 'dPort', displayName: 'Destination Port', width:"10"},
-          {field: 'pro', displayName: 'Protocol', width:"10"},
-          {field: 'packets', displayName: 'Packets', width:"10"},
-          {field: 'bytes', displayName: 'Bytes', width:"10"},
-          {field: 'flags', displayName: 'Flags', width:"10"},
-          {field: 'sTime', displayName: 'Start Time', width:"30%"},
-          {field: 'duration', displayName: 'Duration', width:"10"}
+        columnDefs: [{field: 'sIP', displayName: 'Source IP', width:"**"},
+          {field: 'dIP', displayName: 'Destination IP',width:"**"},
+          {field: 'sPort', displayName: 'Source Port', width:"*"},
+          {field: 'dPort', displayName: 'Destination Port', width:"*"},
+          {field: 'pro', displayName: 'Protocol', width:"*"},
+          {field: 'packets', displayName: 'Packets', width:"*"},
+          {field: 'bytes', displayName: 'Bytes', width:"*"},
+          {field: 'flags', displayName: 'Flags', width:"*"},
+          {field: 'sTime', displayName: 'Start Time', width:"**"},
+          {field: 'duration', displayName: 'Duration', width:"*"}
         ]};
     $scope.flowStats = [];
     $scope.flowStatsGridOptions = { data: 'flowStats' };
