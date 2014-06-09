@@ -52,8 +52,9 @@ angular.module('dimsDemo.controllers').
     $scope.result = null;
     $scope.resultsMsg = 'Results';
     $scope.flows = [];
-    $scope.gridOptions = {
-	data: 'flows'};
+    $scope.flowGridOptions = { data: 'flows'};
+    $scope.flowStats = [];
+    $scope.flowStatsGridOptions = { data: 'flowStats' };
     
     $scope.callClient = function() {
 
@@ -117,8 +118,7 @@ angular.module('dimsDemo.controllers').
            if ($scope.formData.outputType == 'json') {
               $scope.result = data;
               $scope.flows = $scope.result.flows;
-
-	console.log($scope.flows);
+              $scope.flowStats = $scope.result.flow_stats;
               $scope.showJsonResults = true;
              
           } else {
