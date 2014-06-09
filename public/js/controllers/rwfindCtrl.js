@@ -51,19 +51,27 @@ angular.module('dimsDemo.controllers').
     $scope.showJsonResults = false;
     $scope.result = null;
     $scope.resultsMsg = 'Results';
+
+    // Setup grid
     $scope.flows = [];
     $scope.flowGridOptions = { data: 'flows'};
     $scope.flowStats = [];
     $scope.flowStatsGridOptions = { data: 'flowStats' };
     
+
+    /**
+     *  callClient function
+     */
     $scope.callClient = function() {
 
       console.log($scope.formData);
+      // Initialize/reset when calling a client
       $scope.showResults = false;
       $scope.showFormError = false;
       $scope.showJsonResults = false;
       $scope.formErrorMsg = "";
 
+      // Catch some input errors
       if (!Utils.inputPresent($scope.formData.ips) && !Utils.inputPresent($scope.formData.fileName)) {
         $scope.showFormError = true;
         $scope.formErrorMsg = 'You have to either choose a file or enter the ips/CIDR/domains to search for.';
@@ -88,6 +96,7 @@ angular.module('dimsDemo.controllers').
         return;
       }
 
+      // Setup the config to send to the server
       var clientConfig = {};
       var startTime = (Utils.inputPresent($scope.formData.startDate)) ? $scope.formData.startDate.getTime()/1000 : null;
       var endTime = (Utils.inputPresent($scope.formData.endDate)) ? $scope.formData.endDate.getTime()/1000 : null;      
@@ -100,13 +109,15 @@ angular.module('dimsDemo.controllers').
       Utils.setConfig(clientConfig, $scope.formData.hitLimit, 'hitLimit');
       Utils.setConfig(clientConfig, $scope.formData.ips, 'ips');
       Utils.setConfig(clientConfig, $scope.formData.header, 'header');
-
       if (Utils.inputPresent($scope.formData.fileName)) {
         Utils.setConfig(clientConfig, $scope.filePath+$scope.formData.fileName, 'fileName');
       }
+
       console.log(clientConfig);
       console.log("Now sending http get request");
+
       $scope.resultsMsg = 'Results - Waiting...';
+      
       $http(
         { method: 'GET',
           url: '/rwfind', 
@@ -119,22 +130,22 @@ angular.module('dimsDemo.controllers').
               $scope.result = data;
               $scope.flows = $scope.result.flows;
               $scope.flowStats = $scope.result.flow_stats;
+              // Massage flow_stats data so it can be displayed. TODO: Remove % returned by client
               for (var i=0; i< $scope.flowStats.length; i++ ) {
-
-              for (key in $scope.flowStats[i]) {
-                if($scope.flowStats[i].hasOwnProperty(key)) {
-                var newKey = key;
-                  if (key == '%_of_total') {
-                     newKey = 'Percent_of_total';
-                  } else if (key == 'cumul_%') {
-                     newKey = 'Cumulative_Percent';
-                  }
-                  if (key !== newKey) {
-                     $scope.flowStats[i][newKey] = $scope.flowStats[i][key];
-                     delete($scope.flowStats[i][key]);
+                for (key in $scope.flowStats[i]) {
+                  if($scope.flowStats[i].hasOwnProperty(key)) {
+                  var newKey = key;
+                    if (key == '%_of_total') {
+                       newKey = 'Percent_of_total';
+                    } else if (key == 'cumul_%') {
+                       newKey = 'Cumulative_Percent';
+                    }
+                    if (key !== newKey) {
+                       $scope.flowStats[i][newKey] = $scope.flowStats[i][key];
+                       delete($scope.flowStats[i][key]);
+                    }
                   }
                 }
-              }
               }  
                      
               $scope.showJsonResults = true;
@@ -154,8 +165,7 @@ angular.module('dimsDemo.controllers').
           $scope.showFormError = true;
           $scope.formErrorMsg = 'Your request did not get a result. Status: '+status;
           $scope.resultsMsg = 'Results';
-          
-              $scope.showResults = true;
+          $scope.showResults = false;
         });
       }
 });

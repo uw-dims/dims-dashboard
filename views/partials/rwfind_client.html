@@ -82,13 +82,15 @@
   </div></div>
 </form>
 
-<div class="row"><div class="col-sm-12 well  well-sm"><strong>{{ resultsMsg }}</strong>
+<div class="row"><div class="col-sm-12 well  well-sm"><strong>{{ resultsMsg }}</strong></div></div>
+
+<div class="row" ng-show="showJsonResults"><div class="col-sm-12 well well-sm"><strong>Stats</strong>
 <div class="gridStyle statsGridStyle" ng-grid="flowStatsGridOptions" ng-show="showJsonResults"></div></div></div>
-<div class="row" ng-show="showJsonResults"><div class="col-sm-12 well well-sm">
+
+<div class="row" ng-show="showJsonResults"><div class="col-sm-12 well well-sm"><strong>Flows</strong>
 <div class="gridStyle" ng-grid="flowGridOptions"></div></div></div>
 
-<div class="row">
-<div class="col-sm-12 well  well-sm" ng-show="showResults">
+<div class="row"><div class="col-sm-12 well  well-sm" ng-show="showResults">
 <strong>Raw Results</strong>
 <pretty-json  ng-show="showResults" json="result" />
 </div></div>
