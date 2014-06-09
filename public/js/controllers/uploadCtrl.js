@@ -38,6 +38,7 @@ console.log("In UploadController");
       }).success(function(data, status, headers, config) {
         // file is uploaded successfully
         console.log(data);
+        console.log(status);
 
       });
       //.error(...)

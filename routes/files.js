@@ -123,7 +123,11 @@ exports.files = function(req,res) {
         }
         if (directory !== -1) {
             fs.readdir(directory, function(err, files) {
-                if (err) throw err;
+                if (err) {
+                    console.log('fs.readdir error');
+                    console.log(err);
+                    return res.send(500, err);
+                }
                 var len = files.length;
                 var result = [];
                 var k = 0;
