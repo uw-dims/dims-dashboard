@@ -48,7 +48,7 @@ angular.module('dimsDemo.controllers').
 
     // Other setup
     $scope.showResults = false;
-    $scope.showJsonResults = true;
+    $scope.showJsonResults = false;
     $scope.result = null;
     $scope.resultsMsg = 'Results';
     $scope.flows = [];
@@ -102,7 +102,7 @@ angular.module('dimsDemo.controllers').
       Utils.setConfig(clientConfig, $scope.formData.header, 'header');
 
       if (Utils.inputPresent($scope.formData.fileName)) {
-        Utils.setconfig(clientConfig, $scope.filePath+$scope.formData.fileName, 'fileName');
+        Utils.setConfig(clientConfig, $scope.filePath+$scope.formData.fileName, 'fileName');
       }
       console.log(clientConfig);
       console.log("Now sending http get request");
