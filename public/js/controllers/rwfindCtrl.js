@@ -64,7 +64,7 @@ angular.module('dimsDemo.controllers').
           {field: 'bytes', displayName: 'Bytes', width:"*"},
           {field: 'flags', displayName: 'Flags', width:"*"},
           {field: 'sTime', displayName: 'Start Time', width:"**"},
-          {field: 'duration', displayName: 'Duration', width:"*"}
+          {field: 'dur', displayName: 'Duration', width:"*"}
         ]};
     $scope.flowStats = [];
     $scope.flowStatsGridOptions = { data: 'flowStats' };
@@ -169,7 +169,7 @@ angular.module('dimsDemo.controllers').
           }
          
           $scope.showResults = true;
-          $scope.resultsMsg = (flowsFound >=0) ? 'Results - ' + flowsFound : 'Results';         
+          $scope.resultsMsg = (flowsFound >=0) ? 'Results - ' + flowsFound + ' flows found': 'Results';         
           
         }).
         error(function(data, status, headers, config) {

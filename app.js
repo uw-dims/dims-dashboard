@@ -7,12 +7,15 @@ var express = require('express')
   , routes = require('./routes')
   , user = require('./routes/user')
   , files = require('./routes/files')
-  , clients = require('./routes/clients')
+  , rwfind = require('./routes/rwfind')
+  , cifbulk = require('./routes/cifbulk')
+  , crosscor = require('./routes/crosscor')
+  , anon = require('./routes/anon')
+  // , ipgrep = require('./routes/ipgrep')
+  , utils = require('./util')
   , http = require('http')
   , path = require('path')
-  , config = require('./config')
-  , util = require('util');
-
+  , config = require('./config');
 
 var app = module.exports = express();
 
@@ -42,11 +45,11 @@ app.get('/partials/:name', routes.partials);
 app.get('/users', user.list);
 app.post('/upload', files.upload);
 app.get('/files', files.files);
-app.get('/ipgrep', clients.ipgrep);
-app.get('/cifbulk', clients.cifbulk);
-app.get('/crosscor', clients.crosscor);
-app.get('/anon', clients.anon);
-app.get('/rwfind', clients.rwfind);
+// app.get('/ipgrep', ipgrep.call);
+app.get('/cifbulk', cifbulk.list);
+app.get('/crosscor', crosscor.list);
+app.get('/anon', anon.list);
+app.get('/rwfind', rwfind.list);
 app.get('*', routes.index);
 
 // Handle cross-domain requests
