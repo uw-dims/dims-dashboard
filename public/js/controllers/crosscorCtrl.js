@@ -55,14 +55,12 @@ angular.module('dimsDemo.controllers').
        columnDefs: [{field: 'ip4', displayName: 'IP Address'},
           {field: 'site', displayName: 'site'}
         ]};
-    };
     $scope.stats = [];
     $scope.statsGridOptions = { data: 'nonMatching' ,
        columnDefs: [{field: 'site', displayName: 'Site'},
           {field: 'count', displayName: 'Count'},
           {field: 'percent', displayName:'Percent'}
         ]};
-    };
     
 
     /**
