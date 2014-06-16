@@ -1,68 +1,89 @@
 <h2 class="subheader">cifbulk</h2>
 
-<form class="form-horizontal" role="form" name="rwfindForm">
-  <div class="form-group">
-    <label for="startDate" class="col-sm-2 control-label">Start Date</label>
-    <div class="col-sm-3"><div class="input-group">
+<form class="form-horizontal" role="form" name="cifbulkForm">
+  <div class="alert alert-danger form-group" ng-show="showFormError">{{formErrorMsg}}</div>
+  <div class="form-group" show-errors>
+    <label for="startDate" class="col-sm-2 control-label">Start Date/Hour</label>
+    <div class="col-sm-3"><div class="input-group input-group-sm">
       <input type="text" class="form-control"  datepicker-popup={{dateFormat}} ng-model="formData.startDate" is-open="dateConfig.startOpened" 
-          datepicker-options="dateConfig.dateOptions" max-date="dateConfig.tomorrow" ng-required="true" close-text="Close" />
+          datepicker-options="dateConfig.dateOptions" max-date="dateConfig.tomorrow" ng-required="true" close-text="Close" type="date"/>
       <span class="input-group-btn">
           <button type="button" class="btn btn-default" ng-click="open($event, 'startOpened')"><i class="glyphicon glyphicon-calendar"></i></button>
       </span>
     </div></div>
-    <label for="endDate" class="col-sm-2 control-label">End Date</label>
-    <div class="col-sm-3"><div class="input-group">
+    <div class="col-sm-2"><input type="number" class="form-control input-sm" ng-model="formData.startHour" name="startHour" min="00" max="24" integer /></div>
+  </div>
+  <div class="form-group"><div class="col-sm-10 col-sm-offset-1 help-block">
+    Optional if number of days is entered below. Hours are from 0 to 24. Default is 0 (midnight). 
+  </div></div>
+
+  <div class="form-group" show-errors>
+    <label for="endDate" class="col-sm-2 control-label">End Date/Hour</label>
+    <div class="col-sm-3"><div class="input-group input-group-sm">
       <input type="text" class="form-control"  datepicker-popup={{dateFormat}} ng-model="formData.endDate" is-open="dateConfig.endOpened" 
           datepicker-options="dateConfig.dateOptions" max-date="dateConfig.tomorrow" ng-required="true" close-text="Close" />
       <span class="input-group-btn">
           <button type="button" class="btn btn-default" ng-click="open($event,'endOpened')"><i class="glyphicon glyphicon-calendar"></i></button>
       </span>
     </div></div>
+    <div class="col-sm-2"><input type="number" class="form-control input-sm" ng-model="formData.endHour" name="endHour" min="00" max="24" integer /></div>
   </div>
+  <div class="form-group"><div class="col-sm-10 col-sm-offset-1 help-block">
+    Optional if number of days is entered below or if a start date is specified. Default end date is today. Hours are from 0 to 24. Default is 0 (midnight). 
+  </div></div>
 
   <div class="form-group" show-errors>
     <label class="col-sm-2 control-label">Number of Days</label>
     <div class="col-sm-2">
-      <input type="number" class="form-control" ng-model="formData.numDays" name="numDays" min="1" integer/>
+      <input type="number" class="form-control input-sm" ng-model="formData.numDays" name="numDays" min="1" integer/>
     </div>
-    <p class="help-block">Optional: Number of days, greater than 0. 
+    <p class="help-block">Optional: Use to specify date range as a certain number of days up to now. 
     <span ng-if="rwfindForm.numDays.$error.integer">Must be an integer.</span></p>
   </div>
 
-
   <div class="form-group">
-  
-    <label  class="col-sm-2 control-label">Show Header?</label>
-    <div class="col-sm-1">
-      <input type="checkbox" ng-model="formData.header" name="header" class="form-control"  />
-    </div>
-    <label  class="col-sm-2 col-sm-offset-2 control-label">Show Stats?</label>
-    <div class="col-sm-1">
-      <input type="checkbox" ng-model="formData.stats" name="stats" class="form-control"  />
-  </div>
-  </div>
-
-  <div class="form-group">
-    <label  class="col-sm-2 control-label">IP Addresses</label>
+    <label  class="col-sm-2 control-label">IP/CIDR/Domains</label>
     <div class="col-sm-3">
-      <textarea class="form-control" rows="5" ng-model="formData.ips" id="ipsId"></textarea>
+      <textarea class="form-control input-sm" rows="3" ng-model="formData.ips" id="ipsId"></textarea>
     </div>
     
     <label  class="col-sm-2 control-label">Or Choose File</label>
     <div class="col-sm-3" ng-show="showFiles">
-      <select class="form-control" ng-model="formData.fileName" ng-options="n for n in fileNames" >
+      <select class="form-control input-sm" ng-model="formData.fileName" ng-options="n for n in fileNames" >
         <option></option>
       </select>
     </div>
   </div>
 
   <div class="form-group">
+  <label  class="col-sm-2 control-label">Show Stats?</label>
+    <div class="col-sm-1">
+      <input type="checkbox" ng-model="formData.stats" name="stats" class="form-control input-sm"  />
+    </div>
+    <label  class="col-sm-2 control-label">Show Header?</label>
+    <div class="col-sm-1">
+      <input type="checkbox" ng-model="formData.header" name="header" class="form-control input-sm"  />
+    </div>
+  </div>
+
+  
+  <div class="form-group">
   <div class="col-sm-3 col-sm-offset-2">
-  <button type="button" class="btn btn-primary" ng-click="callClient()">Call cifbulk client</button>
+  <button type="button" class="btn btn-primary btn-sm" ng-click="callClient()"><span class="glyphicon glyphicon-flash"></span>Call cifbulk client</button>
   </div></div>
 </form>
 
-<div class="col-sm-12 well-sm" ng-show="showResults" >
-<strong>Results</strong>
-<pre>{{result}}</pre>
-</div>
+<div class="row"><div class="col-sm-12 well  well-sm"><strong>{{ resultsMsg }}</strong></div></div>
+
+<!-- <div class="row" ng-show="showJsonResults"><div class="col-sm-12 well well-sm"><strong>Stats - {{ result.flows_found }} flows found </strong>
+<div class="gridStyle statsGridStyle" ng-grid="flowStatsGridOptions" ng-show="showJsonResults"></div></div></div>
+
+<div class="row" ng-show="showJsonResults"><div class="col-sm-12 well well-sm"><strong>Flows</strong>
+<div class="gridStyle" ng-grid="flowGridOptions"></div></div></div> -->
+
+<div class="row"><div class="col-sm-12 well  well-sm" ng-show="showResults">
+<strong>Raw Results</strong>
+<pretty-json  ng-show="showResults" json="result" />
+</div></div>
+
+
