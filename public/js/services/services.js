@@ -59,21 +59,39 @@ angular.module('dimsDemo.services', [])
     return root;
   })
 
-    .factory('FileService', function($http) {
-      var root = {};
+  .factory('FileService', function($http, $q) {
 
-      root.getFileList = function(source) {
+      var getFileList = function(source) {
         var result = {},
-            fileNames = [];
+            fileNames = [],
+            filePath="",
+            showFiles=false,
+            deferred = $q.defer();
         $http ({
           method: 'GET',
           url: '/files',
           params: {
             source: source,
-            action: 'action'
+            action: 'list'
           }
-        })
-
-      }
+        }).success(function(data,status,headers,config){
+              var result = {
+                success: true,
+                fileNames: data.result,
+                filePath: data.path
+              } 
+              deferred.resolve(result)
+        }).error(function(data,status,headers,config) {
+              var result = {
+                success: false,
+                data: data
+              }
+              deferred.reject(result);
+        });
+        return deferred.promise;
+      };
+      return {
+        getFileList: getFileList
+      };
     });
 

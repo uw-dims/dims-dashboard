@@ -1,5 +1,5 @@
 angular.module('dimsDemo.controllers').
-  controller('CifbulkCtrl', function ($scope, Utils, $http, DateService, $location, $routeParams) {
+  controller('CifbulkCtrl', function ($scope, Utils, FileService, $http, DateService, $location, $routeParams) {
     console.log("In cifbulk controller");
 
     // Set up form data
@@ -8,24 +8,16 @@ angular.module('dimsDemo.controllers').
     // Set up file picker
     $scope.fileNames = [];
     $scope.showFiles = false;
-    $scope.getFiles = function(action,source,fileNames,filePath,showFiles) {
-      return $http ({
-        method: 'GET',
-        url: '/files',
-        params: {
-          source: source,
-          action: action 
-        }
-      }).success(function(data,status,headers,config){
-        fileNames = data.result;
-        filePath = data.path;
-        showFiles = true;
-      }).
-        error(function(data,status,headers,config) {
-          showFiles = false;
-        })
-    };
-    $scope.getFiles('list','ip_lists', $scope.fileNames, $scope.filePath, $scope.showFiles);
+
+    FileService.getFileList('ip_lists').then(function(result) {
+      console.log(result);
+      if (result.success) {
+        $scope.fileNames = result.fileNames;
+        $scope.filePath = result.filePath;
+        $scope.showFiles = true;
+      }
+    });
+    
 
     // Setup date
     $scope.dateConfig = DateService.dateConfig;
@@ -183,7 +175,7 @@ angular.module('dimsDemo.controllers').
       Utils.setConfig(clientConfig, endTime, 'endTime');
       Utils.setConfig(clientConfig, $scope.formData.ips, 'ips');
       Utils.setConfig(clientConfig, $scope.formData.stats, 'stats');
-      Utils.setConfig(clientConfig, $scope.formData.stats, 'header');
+      Utils.setConfig(clientConfig, $scope.formData.header, 'header');
       if (Utils.inputPresent($scope.formData.fileName)) {
         Utils.setConfig(clientConfig, $scope.filePath+$scope.formData.fileName, 'fileName');
       }
