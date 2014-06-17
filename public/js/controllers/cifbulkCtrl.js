@@ -191,6 +191,22 @@ angular.module('dimsDemo.controllers').
         success(function(data, status, headers, config) {
           console.log("cifbulk returned data");
           console.log(status);
+          $scope.result = data;
+          if ($scope.result.results instanceof Array) {
+            for (var i=0; i<$scope.result.results.length; i++){
+               $scope['search'+i] = $scope.result.results[i].searchitem;
+               $scope['resultdata'+i] = $scope.result.results[i].results;
+               $scope['resultdataoptions'+i] = { data: 'resultdata'+i,
+                       columnDefs: $scope.columnDefs
+               };
+               console.log('search'+i);
+               console.log($scope['search'+i]);
+               console.log('resultdata'+i);
+               console.log($scope['resultdata'+i]);
+               console.log('resultdataoptions'+i);
+               console.log($scope['resultdataoptions'+i]);
+            };
+          };
           // var flowsFound = -1;
           //  if ($scope.formData.outputType == 'json') {
           //     $scope.result = data;
