@@ -1,34 +1,38 @@
 angular.module('dimsDemo.controllers').
-  controller('CrosscorCtrl', function ($scope, Utils, $http, DateService, $location, $routeParams) {
+  controller('CrosscorCtrl', function ($scope, Utils, FileService, $http, DateService, $location, $routeParams) {
     console.log("In cifbulk controller");
 
     // Set up form data
     $scope.formData = {};
+    $scope.iffs = [{
+      value: 'friend',
+      label: 'Friend'
+    },{
+      value: 'foe',
+      label: 'Foe'
+    }];
+    $scope.formData.iff = $scope.iffs[0].value;
 
     // Set up file picker
     $scope.fileNames = [];
     $scope.mapNames = [];
     $scope.showFiles = false;
-    $scope.showMaps = false
-    $scope.getFiles = function(action,source,fileNames,filePath,showFiles) {
-      return $http ({
-        method: 'GET',
-        url: '/files',
-        params: {
-          source: source,
-          action: action 
-        }
-      }).success(function(data,status,headers,config){
-        fileNames = data.result;
-        filePath = data.path;
-        showFiles = true;
-      }).
-        error(function(data,status,headers,config) {
-          showFiles = false;
-        })
-    };
-    $scope.getFiles('ip_lists', $scope.fileNames, $scope.filePath, $scope.showFiles);
-    $scope.getFiles('map_files', $scope.mapNames, $scope.mapPath, $scope.showMaps);
+    $scope.showMaps = false;
+
+    FileService.getFileList('ip_lists').then(function(result) {
+      console.log(result);
+        $scope.fileNames = result.fileNames;
+        $scope.filePath = result.filePath;
+        $scope.showFiles = true;
+    });
+
+    FileService.getFileList('map_files').then(function(result) {
+      console.log(result);
+        $scope.mapNames = result.fileNames;
+        $scope.mapPath = result.filePath;
+        $scope.showMaps = true;
+    });
+    
 
     // Setup date
     $scope.dateConfig = DateService.dateConfig;

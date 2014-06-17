@@ -11,13 +11,10 @@ angular.module('dimsDemo.controllers').
 
     FileService.getFileList('ip_lists').then(function(result) {
       console.log(result);
-      if (result.success) {
         $scope.fileNames = result.fileNames;
         $scope.filePath = result.filePath;
         $scope.showFiles = true;
-      }
     });
-    
 
     // Setup date
     $scope.dateConfig = DateService.dateConfig;

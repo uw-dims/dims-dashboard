@@ -1,5 +1,5 @@
 angular.module('dimsDemo.controllers').
-  controller('RwfindCtrl', function ($scope, Utils, $http, DateService, $location, $routeParams) {
+  controller('RwfindCtrl', function ($scope, Utils, $http, FileService, DateService, $location, $routeParams) {
     console.log("In rwfind controller");
 
     // Set up form data
@@ -14,28 +14,14 @@ angular.module('dimsDemo.controllers').
     $scope.formData.outputType = $scope.outputTypes[0].value;
 
     // Set up file picker
-    $scope.source = 'ip_lists';
-    $scope.action = 'list';
     $scope.fileNames = [];
     $scope.showFiles = false;
-    $scope.getFiles = function() {
-      return $http ({
-        method: 'GET',
-        url: '/files',
-        params: {
-          source: $scope.source,
-          action: $scope.action = 'list' 
-        }
-      }).success(function(data,status,headers,config){
-        $scope.fileNames = data.result;
-        $scope.filePath = data.path;
+    FileService.getFileList('ip_lists').then(function(result) {
+      console.log(result);
+        $scope.fileNames = result.fileNames;
+        $scope.filePath = result.filePath;
         $scope.showFiles = true;
-      }).
-        error(function(data,status,headers,config) {
-          $scope.showFiles = false;
-        })
-    };
-    $scope.getFiles();
+    });
 
     // Setup date
     $scope.dateConfig = DateService.dateConfig;

@@ -62,11 +62,8 @@ angular.module('dimsDemo.services', [])
   .factory('FileService', function($http, $q) {
 
       var getFileList = function(source) {
-        var result = {},
-            fileNames = [],
-            filePath="",
-            showFiles=false,
-            deferred = $q.defer();
+        var deferred = $q.defer();
+        
         $http ({
           method: 'GET',
           url: '/files',
@@ -76,22 +73,18 @@ angular.module('dimsDemo.services', [])
           }
         }).success(function(data,status,headers,config){
               var result = {
-                success: true,
                 fileNames: data.result,
                 filePath: data.path
               } 
               deferred.resolve(result)
         }).error(function(data,status,headers,config) {
-              var result = {
-                success: false,
-                data: data
-              }
-              deferred.reject(result);
+              deferred.reject("No results. Status: "+ status);
         });
         return deferred.promise;
       };
+      
       return {
-        getFileList: getFileList
+        getFileList: getFileList,
       };
     });
 

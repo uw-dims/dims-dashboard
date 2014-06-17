@@ -5,7 +5,7 @@
   <div class="form-group">
   <label  class="col-sm-2 control-label">Friend or Foe</label>
     <div class="col-sm-3">
-      <select class="form-control" ng-model="formData.iff" ng-options="f for f in iffs" >
+      <select class="form-control" ng-model="formData.iff" ng-options="f.value as f.label for f in iffs" >
         <option></option>
       </select>
     </div>
