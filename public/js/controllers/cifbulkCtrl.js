@@ -5,15 +5,24 @@ angular.module('dimsDemo.controllers').
     // Set up form data
     $scope.formData = {};
 
-    // Set up file picker
+    // Set up file pickers
     $scope.fileNames = [];
     $scope.showFiles = false;
+    $scope.demoNames = [];
+    $scope.showDemoFiles = false;
 
     FileService.getFileList('ip_lists').then(function(result) {
       console.log(result);
-        $scope.fileNames = result.fileNames;
-        $scope.filePath = result.filePath;
-        $scope.showFiles = true;
+      $scope.fileNames = result.fileNames;
+      $scope.filePath = result.filePath;
+      $scope.showFiles = true;
+    });
+
+    FileService.getDemoList('cifbulk').then(function(result) {
+      console.log(result);
+      $scope.demoPath = result.filePath;
+      $scope.demoNames = result.fileNames;
+      $scope.showDemoFiles = true;
     });
 
     // Setup date
@@ -30,86 +39,8 @@ angular.module('dimsDemo.controllers').
     $scope.result = null;
     $scope.resultsMsg = 'Results';
 
-    var demoJson = {
-    "iff": "foe", 
-    "program": "cifbulk", 
-    "results": [
-        {
-            "results": [
-                {
-                    "address": "1.93.24.12/32", 
-                    "alternativeid": "http://www.spamhaus.org/query/bl?ip=1.93.24.12", 
-                    "asn": "17964", 
-                    "asn_desc": "DXTNET Beijing Dian-Xin-Tong Network Technologies Co., Ltd.", 
-                    "cc": "CN", 
-                    "confidence": "95", 
-                    "created": "1391354659", 
-                    "description": "direct ube sources, spam operations & spam services", 
-                    "detecttime": "1391299200", 
-                    "id": "3511366", 
-                    "severity": "medium", 
-                    "subnet_end": "22878220", 
-                    "subnet_start": "22878220", 
-                    "weight": "1502"
-                }, 
-                {
-                    "address": "1.93.24.12/32", 
-                    "alternativeid": "http://www.spamhaus.org/query/bl?ip=1.93.24.12", 
-                    "asn": "17964", 
-                    "asn_desc": "DXTNET Beijing Dian-Xin-Tong Network Technologies Co., Ltd.", 
-                    "cc": "CN", 
-                    "confidence": "85", 
-                    "created": "1391354660", 
-                    "description": "direct ube sources, spam operations & spam services", 
-                    "detecttime": "1391299200", 
-                    "id": "3511371", 
-                    "severity": "medium", 
-                    "subnet_end": "22878220", 
-                    "subnet_start": "22878220", 
-                    "weight": "1502"
-                }], 
-            "searchitem": "1.93.24.12"
-        }, 
-        {
-            "results": [
-                {
-                    "address": "1.93.24.19/32", 
-                    "alternativeid": "http://www.spamhaus.org/query/bl?ip=1.93.24.19", 
-                    "asn": "17964", 
-                    "asn_desc": "DXTNET Beijing Dian-Xin-Tong Network Technologies Co., Ltd.", 
-                    "cc": "CN", 
-                    "confidence": "95", 
-                    "created": "1391354938", 
-                    "description": "direct ube sources, spam operations & spam services", 
-                    "detecttime": "1391299200", 
-                    "id": "3512806", 
-                    "severity": "medium", 
-                    "subnet_end": "22878227", 
-                    "subnet_start": "22878227", 
-                    "weight": "1502"
-                }, 
-                {
-                    "address": "1.93.24.19/32", 
-                    "alternativeid": "http://www.spamhaus.org/query/bl?ip=1.93.24.19", 
-                    "asn": "17964", 
-                    "asn_desc": "DXTNET Beijing Dian-Xin-Tong Network Technologies Co., Ltd.", 
-                    "cc": "CN", 
-                    "confidence": "85", 
-                    "created": "1391354938", 
-                    "description": "direct ube sources, spam operations & spam services", 
-                    "detecttime": "1391299200", 
-                    "id": "3512807", 
-                    "severity": "medium", 
-                    "subnet_end": "22878227", 
-                    "subnet_start": "22878227", 
-                    "weight": "1502"
-                }], 
-            "searchitem": "1.93.24.19"
-        } ], 
-    "time": 1397151933.373606
-    };
     // Setup grid
-    $scope.cifData = [];
+    $scope.data = [];
     $scope.columnDefs =  [
           {field: 'address', displayName: 'CIDR'},
           {field: 'alternativeid', displayName: 'Alt ID'},
@@ -126,6 +57,38 @@ angular.module('dimsDemo.controllers').
           {field: 'subnet_end', displayName: 'Subnet End'},
           {field: 'weight', displayName: 'Weight'}
         ];
+
+    var prepareData = function(data, status, headers, config) {
+      console.log(data);
+      $scope.data = data;
+      $scope.showResults = true;
+      for (var i=0; i < $scope.data.results.length; i++) {
+        for (var j=0; j < $scope.data.results[i].results.length; j++) {
+          var detectDate = new Date($scope.data.results[i].results[j].detecttime*1000);
+          var createdDate = new Date($scope.data.results[i].results[j].created*1000);
+          $scope.data.results[i].results[j].detecttime = detectDate;
+          $scope.data.results[i].results[j].created = createdDate;
+        }
+      }
+    };
+
+    $scope.getDemo = function() {
+      $scope.showResults = false;
+      return $http({
+        method: 'GET',
+        url: '/files',
+        params: {
+          action: 'read',
+          file: 'cifbulk_results.txt',
+          source: 'default_data'
+        }
+
+      }).success(prepareData)
+        .error(function(data, status, headers, config) {
+          console.log(data);
+          console.log(status);
+        });
+    }
 
     /**
      *  callClient function
@@ -187,62 +150,11 @@ angular.module('dimsDemo.controllers').
         { method: 'GET',
           url: '/cifbulk', 
           params: clientConfig
-        } ).
-        success(function(data, status, headers, config) {
-          console.log("cifbulk returned data");
-          console.log(status);
-          $scope.result = data;
-          if ($scope.result.results instanceof Array) {
-            for (var i=0; i<$scope.result.results.length; i++){
-               $scope['search'+i] = $scope.result.results[i].searchitem;
-               $scope['resultdata'+i] = $scope.result.results[i].results;
-               $scope['resultdataoptions'+i] = { data: 'resultdata'+i,
-                       columnDefs: $scope.columnDefs
-               };
-               console.log('search'+i);
-               console.log($scope['search'+i]);
-               console.log('resultdata'+i);
-               console.log($scope['resultdata'+i]);
-               console.log('resultdataoptions'+i);
-               console.log($scope['resultdataoptions'+i]);
-            };
-          };
-          // var flowsFound = -1;
-          //  if ($scope.formData.outputType == 'json') {
-          //     $scope.result = data;
-          //     flowsFound = $scope.result.flows_found;
-          //     if (flowsFound > 0) {
-          //       $scope.flows = $scope.result.flows;
-          //       $scope.flowStats = $scope.result.flow_stats;
-          //       // Massage flow_stats data so it can be displayed. TODO: Remove % returned by client
-          //       for (var i=0; i< $scope.flowStats.length; i++ ) {
-          //         for (key in $scope.flowStats[i]) {
-          //           if($scope.flowStats[i].hasOwnProperty(key)) {
-          //           var newKey = key;
-          //             if (key == '%_of_total') {
-          //                newKey = 'Percent_of_total';
-          //             } else if (key == 'cumul_%') {
-          //                newKey = 'Cumulative_Percent';
-          //             }
-          //             if (key !== newKey) {
-          //                $scope.flowStats[i][newKey] = $scope.flowStats[i][key];
-          //                delete($scope.flowStats[i][key]);
-          //             }
-          //           }
-          //         }
-          //       }                 
-          //       $scope.showJsonResults = true;
-          //     }          
-             
-          // } else {
-          //     $scope.result = data;
-          // }
-         
-          $scope.showResults = true;
-          $scope.resultsMsg = 'Results';         
-          
-        }).
-        error(function(data, status, headers, config) {
+        } )
+
+        .success(prepareData)
+
+        .error(function(data, status, headers, config) {
           console.log("cifbulk Error");
           console.log(data);
           console.log(status);

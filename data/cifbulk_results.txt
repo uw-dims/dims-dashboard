@@ -1,0 +1,78 @@
+{
+    "iff": "foe", 
+    "program": "cifbulk", 
+    "results": [
+        {
+            "results": [
+                {
+                    "address": "1.93.24.12/32", 
+                    "alternativeid": "http://www.spamhaus.org/query/bl?ip=1.93.24.12", 
+                    "asn": "17964", 
+                    "asn_desc": "DXTNET Beijing Dian-Xin-Tong Network Technologies Co., Ltd.", 
+                    "cc": "CN", 
+                    "confidence": "95", 
+                    "created": "1391354659", 
+                    "description": "direct ube sources, spam operations & spam services", 
+                    "detecttime": "1391299200", 
+                    "id": "3511366", 
+                    "severity": "medium", 
+                    "subnet_end": "22878220", 
+                    "subnet_start": "22878220", 
+                    "weight": "1502"
+                }, 
+                {
+                    "address": "1.93.24.12/32", 
+                    "alternativeid": "http://www.spamhaus.org/query/bl?ip=1.93.24.12", 
+                    "asn": "17964", 
+                    "asn_desc": "DXTNET Beijing Dian-Xin-Tong Network Technologies Co., Ltd.", 
+                    "cc": "CN", 
+                    "confidence": "85", 
+                    "created": "1391354660", 
+                    "description": "direct ube sources, spam operations & spam services", 
+                    "detecttime": "1391299200", 
+                    "id": "3511371", 
+                    "severity": "medium", 
+                    "subnet_end": "22878220", 
+                    "subnet_start": "22878220", 
+                    "weight": "1502"
+                }], 
+            "searchitem": "1.93.24.12"
+        }, 
+        {
+            "results": [
+                {
+                    "address": "1.93.24.19/32", 
+                    "alternativeid": "http://www.spamhaus.org/query/bl?ip=1.93.24.19", 
+                    "asn": "17964", 
+                    "asn_desc": "DXTNET Beijing Dian-Xin-Tong Network Technologies Co., Ltd.", 
+                    "cc": "CN", 
+                    "confidence": "95", 
+                    "created": "1391354938", 
+                    "description": "direct ube sources, spam operations & spam services", 
+                    "detecttime": "1391299200", 
+                    "id": "3512806", 
+                    "severity": "medium", 
+                    "subnet_end": "22878227", 
+                    "subnet_start": "22878227", 
+                    "weight": "1502"
+                }, 
+                {
+                    "address": "1.93.24.19/32", 
+                    "alternativeid": "http://www.spamhaus.org/query/bl?ip=1.93.24.19", 
+                    "asn": "17964", 
+                    "asn_desc": "DXTNET Beijing Dian-Xin-Tong Network Technologies Co., Ltd.", 
+                    "cc": "CN", 
+                    "confidence": "85", 
+                    "created": "1391354938", 
+                    "description": "direct ube sources, spam operations & spam services", 
+                    "detecttime": "1391299200", 
+                    "id": "3512807", 
+                    "severity": "medium", 
+                    "subnet_end": "22878227", 
+                    "subnet_start": "22878227", 
+                    "weight": "1502"
+                }], 
+            "searchitem": "1.93.24.19"
+        } ], 
+    "time": 1397151933.373606
+    }

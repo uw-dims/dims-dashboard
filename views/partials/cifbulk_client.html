@@ -60,29 +60,70 @@
     <div class="col-sm-1">
       <input type="checkbox" ng-model="formData.stats" name="stats" class="form-control input-sm"  />
     </div>
-    <label  class="col-sm-2 control-label">Show Header?</label>
+    <label  class="col-sm-2 col-sm-offset-2 control-label">Show Header?</label>
     <div class="col-sm-1">
       <input type="checkbox" ng-model="formData.header" name="header" class="form-control input-sm"  />
     </div>
   </div>
 
+  <div class="form-group">
+  <label  class="col-sm-2 control-label">Use Demo Data?:</label>
+  <div class="col-sm-3" ng-show="showDemoFiles">
+      <select class="form-control input-sm" ng-model="formData.demoName" ng-options="n for n in demoNames" >
+      <option></option>
+    </select>
+  </div>
+  </div>
   
   <div class="form-group">
   <div class="col-sm-3 col-sm-offset-2">
-  <button type="button" class="btn btn-primary btn-sm" ng-click="callClient()"><span class="glyphicon glyphicon-flash"></span>Call cifbulk client</button>
-  </div></div>
+  <button type="button" class="btn btn-primary btn-sm" ng-click="callClient()"><span class="glyphicon glyphicon-flash"></span>Get CIF Data</button>
+  </div>
+  </div>
 </form>
 
 <div class="row"><div class="col-sm-12 well  well-sm"><strong>{{ resultsMsg }}</strong></div></div>
 
- <div class="row" ng-show="showResults"><div class="col-sm-12 well well-sm"><strong>{{ search0 }} </strong></div></div>
-
-<div class="row" ng-show="showResults"><div class="col-sm-12 well well-sm"><strong>Data</strong>
-<div class="gridStyle" ng-grid="resultdataoptions0"></div></div></div> 
+<div class="table-repsonsive" ng-repeat="d in data.results">
+<table class="table table-striped table-hover table-bordered" ><tbody>
+<tr><th>{{ d.searchitem}}</th>
+<th>Alt ID</th>
+<th>ASN</th>
+<th>ASN Desc</th>
+<th>CC</th>
+<th>Conf</th>
+<th>ID</th>
+<th>Created</th>
+<th>Detected</th>
+<th>Desc</th>
+<th>Severity</th>
+<th>Start</th>
+<th>End</th>
+<th>Weight</th>
+</tr>
+<tr ng-repeat="r in d.results">
+<td>{{ r.address }}</td>
+<td>{{ r.alternativeid }}</td>
+<td>{{ r.asn }}</td>
+<td>{{ r.asn_desc }}</td>
+<td>{{ r.cc }}</td>
+<td>{{ r.confidence }}</td>
+<td>{{ r.id }}</td>
+<td>{{ r.created | date:'MM/dd/yyyy HH:mm:ss Z' }}</td>
+<td>{{ r.detecttime | date:'MM/dd/yyyy HH:mm:ss Z'}}</td>
+<td>{{ r.description }}</td>
+<!-- <td>{{ r.detecttime }}</td> -->
+<td>{{ r.severity }}</td>
+<td>{{ r.subnet_start }}</td>
+<td>{{ r.subnet_end }}</td>
+<td>{{ r.weight }}</td>
+</tr>
+</tbody></table>
+</div>
 
 <div class="row"><div class="col-sm-12 well  well-sm" ng-show="showResults">
 <strong>Raw Results</strong>
-<pretty-json  ng-show="showResults" json="result" />
+<pretty-json  ng-show="showResults" json="data" />
 </div></div>
 
 
