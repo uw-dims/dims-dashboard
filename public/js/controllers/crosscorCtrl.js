@@ -26,7 +26,7 @@ angular.module('dimsDemo.controllers').
         $scope.showFiles = true;
     });
 
-    FileService.getFileList('map_files').then(function(result) {
+    FileService.getFileList('data_files').then(function(result) {
       console.log(result);
         $scope.mapNames = result.fileNames;
         $scope.mapPath = result.filePath;
