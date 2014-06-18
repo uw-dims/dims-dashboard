@@ -36,13 +36,14 @@ exports.list = function(req,res) {
 
     async.waterfall([
         function(callback) {
+          if (req.query.ips !== undefined) {
             tmp.file(function _tempFileCreated(err, path, fd) {
              
               console.log('File: ', path);
               console.log('Filedescriptor: ', fd);
               callback(err,path,fd);
             });
-     
+          }
         },function(path, fd, callback) {
             if (req.query.ips !== undefined) {
               fs.writeFile(path, req.query.ips, function(err) {

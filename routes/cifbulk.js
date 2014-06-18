@@ -32,7 +32,7 @@ exports.list = function(req,res) {
     }
     if (req.query.mapName !== undefined) {
       inputArray.push('-r');
-      inputArray.push(req.query.fileName);
+      inputArray.push(req.query.mapName);
     }
 
     async.waterfall([

@@ -27,6 +27,8 @@ exports.list = function(req,res) {
       inputArray.push(req.query.mapFile);
     }
 
+    console.log(inputArray);
+
     async.waterfall([
         function(callback) {
             tmp.file(function _tempFileCreated(err, path, fd) {

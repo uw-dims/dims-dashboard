@@ -1,6 +1,6 @@
 angular.module('dimsDemo.controllers').
   controller('CrosscorCtrl', function ($scope, Utils, FileService, $http, DateService, $location, $routeParams) {
-    console.log("In cifbulk controller");
+    console.log("In crosscor controller");
 
     // Set up form data
     $scope.formData = {};
@@ -19,14 +19,14 @@ angular.module('dimsDemo.controllers').
     $scope.showFiles = false;
     $scope.showMaps = false;
 
-    FileService.getFileList('ip_lists').then(function(result) {
+    FileService.getFileList('data_files').then(function(result) {
       console.log(result);
         $scope.fileNames = result.fileNames;
         $scope.filePath = result.filePath;
         $scope.showFiles = true;
     });
 
-    FileService.getFileList('data_files').then(function(result) {
+    FileService.getFileList('map_files').then(function(result) {
       console.log(result);
         $scope.mapNames = result.fileNames;
         $scope.mapPath = result.filePath;
@@ -36,26 +36,26 @@ angular.module('dimsDemo.controllers').
 
     // Other setup
     $scope.showResults = false;
-    $scope.result = null;
+    $scope.data = null;
     $scope.resultsMsg = 'Results';
 
     // Setup grid
-    $scope.matching = [];
-    $scope.matchGridOptions = { data: 'matching',
-        columnDefs: [{field: 'ip4', displayName: 'IP Address'},
-          {field: 'site', displayName: 'site'}
-        ]};
-    $scope.nonMatching = [];
-    $scope.nonMatchingGridOptions = { data: 'nonMatching' ,
-       columnDefs: [{field: 'ip4', displayName: 'IP Address'},
-          {field: 'site', displayName: 'site'}
-        ]};
-    $scope.stats = [];
-    $scope.statsGridOptions = { data: 'nonMatching' ,
-       columnDefs: [{field: 'site', displayName: 'Site'},
-          {field: 'count', displayName: 'Count'},
-          {field: 'percent', displayName:'Percent'}
-        ]};
+    // $scope.matching = [];
+    // $scope.matchGridOptions = { data: 'matching',
+    //     columnDefs: [{field: 'ip4', displayName: 'IP Address'},
+    //       {field: 'site', displayName: 'site'}
+    //     ]};
+    // $scope.nonMatching = [];
+    // $scope.nonMatchingGridOptions = { data: 'nonMatching' ,
+    //    columnDefs: [{field: 'ip4', displayName: 'IP Address'},
+    //       {field: 'site', displayName: 'site'}
+    //     ]};
+    // $scope.stats = [];
+    // $scope.statsGridOptions = { data: 'nonMatching' ,
+    //    columnDefs: [{field: 'site', displayName: 'Site'},
+    //       {field: 'count', displayName: 'Count'},
+    //       {field: 'percent', displayName:'Percent'}
+    //     ]};
     
 
     /**
@@ -70,26 +70,9 @@ angular.module('dimsDemo.controllers').
       $scope.formErrorMsg = "";
 
       // Catch some input errors
-      if (!Utils.inputPresent($scope.formData.ips) && !Utils.inputPresent($scope.formData.fileName)) {
+      if (!Utils.inputPresent($scope.formData.fileName)) {
         $scope.showFormError = true;
-        $scope.formErrorMsg = 'You have to either choose a file or enter ips/CIDR/domains to correlate.';
-        return;
-      }
-      if (Utils.inputPresent($scope.formData.ips) && Utils.inputPresent($scope.formData.fileName)) {
-        $scope.showFormError = true;
-        $scope.formErrorMsg = 'You have to either choose a file or enter ips/CIDR/domains. You cannot do both';
-        return;
-      }
-      if (!Utils.inputPresent($scope.formData.startDate) && !Utils.inputPresent($scope.formData.endDate) && 
-          !Utils.inputPresent($scope.formData.numDays)) {
-        $scope.showFormError = true;
-        $scope.formErrorMsg = 'Either enter number of days, or enter a start time and (optionally) end time.';
-        return;
-      }
-      if ((!Utils.inputPresent($scope.formData.startDate) && Utils.inputPresent($scope.formData.startHour))
-        ||(!Utils.inputPresent($scope.formData.endDate) && Utils.inputPresent($scope.formData.endHour))) {
-        $scope.showFormError = true;
-        $scope.formErrorMsg = 'If you enter a value for the hour, also enter a value for the date.';
+        $scope.formErrorMsg = 'You have to choose a file to correlate.';
         return;
       }
 
@@ -97,11 +80,11 @@ angular.module('dimsDemo.controllers').
       var clientConfig = {};
      
       Utils.setConfig(clientConfig, $scope.formData.stats, 'stats');
-      Utils.setConfig(clientConfig, $scope.formData.stats, 'iff');
+      Utils.setConfig(clientConfig, $scope.formData.iff, 'iff');
       if (Utils.inputPresent($scope.formData.mapName)) {
         Utils.setConfig(clientConfig, $scope.mapPath+$scope.formData.mapName, 'mapName');
       }
-      if (Utils.inputPresent($scope.formData.mapFile)) {
+      if (Utils.inputPresent($scope.formData.fileName)) {
         Utils.setConfig(clientConfig, $scope.filePath+$scope.formData.fileName, 'fileName');
       }
 
