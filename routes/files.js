@@ -6,7 +6,7 @@ exports.upload = function(req, res){
         i,
         file_extension,
         extensionAllowed = [".txt", ".json"],
-        maxSizeOfFile = 200,
+        maxSizeOfFile = 2000,
         myDirectory = './mydata/',
         target_path = './upload/',
         directoryMapping = {
