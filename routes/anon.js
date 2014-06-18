@@ -24,6 +24,8 @@ exports.list = function(req,res) {
       inputArray.push(req.query.mapName);
     }
 
+    console.log(inputArray);
+
           var python = spawn(
             'python',
             inputArray
