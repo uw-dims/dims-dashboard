@@ -41,8 +41,11 @@
   <div class="col-sm-3 col-sm-offset-2">
   <button type="button" class="btn btn-primary" ng-click="callClient()">Call crosscor</button>
   </div></div>
-</form
-<div class="col-sm-12 well-sm" ng-show="showResults" >
-<strong>Results</strong>
-<pre>{{result}}</pre>
-</div>
+</form>
+
+<div class="row"><div class="col-sm-12 well  well-sm"><strong>{{ resultsMsg }}</strong></div></div>
+
+<div class="row"><div class="col-sm-12 well  well-sm" ng-show="showResults">
+<strong>Raw Results</strong>
+<pretty-json  ng-show="showResults" json="data" />
+</div></div>
