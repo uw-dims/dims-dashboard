@@ -11,7 +11,7 @@ exports.list = function(req,res) {
           '--queue-base', 'rwfind'];
     
     console.log(req.query);
-    req.query.header !== undefined ? inputArray.push('-H') : "";
+    req.query.header == 'true' ? inputArray.push('-H') : "";
     if (req.query.hitLimit !== undefined) {
       inputArray.push('-T')
       inputArray.push(req.query.hitLimit);

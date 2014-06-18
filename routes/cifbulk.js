@@ -11,8 +11,8 @@ exports.list = function(req,res) {
           '--queue-base', 'cifbulk'];
     
     console.log(req.query);
-    req.query.header !== undefined ? inputArray.push('-H') : "";
-    req.query.stats !== undefined ? inputArray.push('-s') : "";
+    req.query.header == 'true' ? inputArray.push('-H') : "";
+    req.query.stats == 'true' ? inputArray.push('-s') : "";
     if (req.query.numDays !== undefined) {
       inputArray.push('-D')
       inputArray.push(req.query.numDays);

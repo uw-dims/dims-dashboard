@@ -11,7 +11,7 @@ exports.list = function(req,res) {
           '--queue-base', 'anon'];
     
     console.log(req.query);
-    req.query.stats !== undefined ? inputArray.push('-s') : "";
+    req.query.stats == 'true' ? inputArray.push('-s') : "";
     if (req.query.outputType == 'json') inputArray.push('-J');
     
     if (req.query.fileName !== undefined) {

@@ -10,7 +10,7 @@ exports.list = function(req,res) {
           '--queue-base', 'crosscor'];
     
     console.log(req.query);
-    req.query.stats !== undefined ? inputArray.push('-s') : "";
+    req.query.stats == 'true' ? inputArray.push('-s') : "";
     
     if (req.query.fileName !== undefined) {
       inputArray.push('-r');
@@ -29,7 +29,6 @@ exports.list = function(req,res) {
 
     console.log(inputArray);
     console.log('ready to spawn python process');
-
           var python = spawn(
             'python',
             inputArray
