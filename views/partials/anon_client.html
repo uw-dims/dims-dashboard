@@ -1,13 +1,16 @@
 <h2 class="subheader">anon</h2>
 
-<form class="form-horizontal" role="form" name="cifbulkForm">
-<div class="form-group">
-    <label  class="col-sm-2 control-label">File to be anonymized</label>
+<form class="form-horizontal" role="form" name="anonForm">
+<div class="alert alert-danger form-group" ng-show="showFormError">{{formErrorMsg}}</div>
+ <div class="form-group">
+    
+    <label  class="col-sm-2 control-label">File to anonymize</label>
     <div class="col-sm-3" ng-show="showFiles">
       <select class="form-control" ng-model="formData.fileName" ng-options="n for n in fileNames" >
         <option></option>
       </select>
     </div>
+    <p class="help-block">Choose a file from your data_files directory. If it isn't there already, upload it using the upload page. </p>
   </div>
 
   <div class="form-group">
@@ -20,8 +23,7 @@
     </div>
     <p class="help-block">Choose a map file if you don't want to use the default. </p>
   </div>
-
-
+  
 <div class="form-group">
   <label  class="col-sm-2 control-label">Output Type</label>
     <div class="col-sm-3">
@@ -37,10 +39,15 @@
 
 <div class="form-group">
   <div class="col-sm-3 col-sm-offset-2">
-  <button type="button" class="btn btn-primary" ng-click="callClient()">Call rwfind client</button>
+  <button type="button" class="btn btn-primary" ng-click="callClient()">Call anon</button>
   </div></div>
 </form>
-<div class="col-sm-12 well-sm" ng-show="showResults" >
-<strong>Results</strong>
-<pre>{{result}}</pre>
-</div>
+
+<div class="row"><div class="col-sm-12 well  well-sm"><strong>{{ resultsMsg }}</strong></div></div>
+<div class="row" ng-show="showJsonResults"><div class="col-sm-12">
+</div></div>
+
+<div class="row"><div class="col-sm-12 well  well-sm" ng-show="showResults">
+<strong>Raw Results</strong>
+<pretty-json  ng-show="showResults" json="result" />
+</div></div>
