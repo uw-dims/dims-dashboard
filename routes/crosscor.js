@@ -24,7 +24,7 @@ exports.list = function(req,res) {
 
     if (req.query.mapName !== undefined) {
       inputArray.push('-m');
-      inputArray.push(req.query.mapFile);
+      inputArray.push(req.query.mapName);
     }
 
     console.log(inputArray);
