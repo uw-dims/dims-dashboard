@@ -1,7 +1,7 @@
 <h2 class="subheader">crosscor</h2>
 
-<form class="form-horizontal" role="form" name="cifbulkForm">
-
+<form class="form-horizontal" role="form" name="crosscorForm">
+  <div class="alert alert-danger form-group" ng-show="showFormError">{{formErrorMsg}}</div>
   <div class="form-group">
   <label  class="col-sm-2 control-label">Friend or Foe</label>
     <div class="col-sm-3">
@@ -16,17 +16,14 @@
   </div>
 
   <div class="form-group">
-    <label  class="col-sm-2 control-label">IPs/CIDR/Domains</label>
-    <div class="col-sm-3">
-      <textarea class="form-control" rows="5" ng-model="formData.ips" id="ipsId"></textarea>
-    </div>
     
-    <label  class="col-sm-2 control-label">Or Choose File</label>
+    <label  class="col-sm-2 control-label">File to correlate</label>
     <div class="col-sm-3" ng-show="showFiles">
       <select class="form-control" ng-model="formData.fileName" ng-options="n for n in fileNames" >
         <option></option>
       </select>
     </div>
+    <p class="help-block">Choose a file from your data_files directory. If it isn't there already, upload it using the upload page. </p>
   </div>
 
   <div class="form-group">
@@ -42,7 +39,7 @@
   
   <div class="form-group">
   <div class="col-sm-3 col-sm-offset-2">
-  <button type="button" class="btn btn-primary" ng-click="callClient()">Call cifbulk client</button>
+  <button type="button" class="btn btn-primary" ng-click="callClient()">Call crosscor</button>
   </div></div>
 </form
 <div class="col-sm-12 well-sm" ng-show="showResults" >

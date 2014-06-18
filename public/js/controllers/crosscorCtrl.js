@@ -34,15 +34,6 @@ angular.module('dimsDemo.controllers').
     });
     
 
-    // Setup date
-    $scope.dateConfig = DateService.dateConfig;
-
-    $scope.open = function($event, datePicker) {
-      var result = DateService.open($event, datePicker);
-      $scope.dateConfig.startOpened = result[0];
-      $scope.dateConfig.endOpened = result[1];
-    };
-
     // Other setup
     $scope.showResults = false;
     $scope.result = null;
@@ -104,15 +95,9 @@ angular.module('dimsDemo.controllers').
 
       // Setup the config to send to the server
       var clientConfig = {};
-      var startTime = (Utils.inputPresent($scope.formData.startDate)) ? $scope.formData.startDate.getTime()/1000 : null;
-      var endTime = (Utils.inputPresent($scope.formData.endDate)) ? $scope.formData.endDate.getTime()/1000 : null;      
-      startTime = (Utils.inputPresent($scope.formData.startHour)) ? startTime + $scope.formData.startHour*60*60 : startTime;
-      endTime = (Utils.inputPresent($scope.formData.endHour)) ? endTime + $scope.formData.endHour*60*60 : endTime;
-      Utils.setConfig(clientConfig, startTime, 'startTime');
-      Utils.setConfig(clientConfig, endTime, 'endTime');
-      Utils.setConfig(clientConfig, $scope.formData.ips, 'ips');
+     
       Utils.setConfig(clientConfig, $scope.formData.stats, 'stats');
-      Utils.setConfig(clientConfig, $scope.formData.stats, 'header');
+      Utils.setConfig(clientConfig, $scope.formData.stats, 'iff');
       if (Utils.inputPresent($scope.formData.mapName)) {
         Utils.setConfig(clientConfig, $scope.mapPath+$scope.formData.mapName, 'mapName');
       }
@@ -127,45 +112,16 @@ angular.module('dimsDemo.controllers').
       
       $http(
         { method: 'GET',
-          url: '/rwfind', 
+          url: '/crosscor', 
           params: clientConfig
         } ).
         success(function(data, status, headers, config) {
-          console.log("rwfind returned data");
+          console.log("crosscor returned data");
           console.log(status);
-          var flowsFound = -1;
-           if ($scope.formData.outputType == 'json') {
-              $scope.result = data;
-              flowsFound = $scope.result.flows_found;
-              if (flowsFound > 0) {
-                $scope.flows = $scope.result.flows;
-                $scope.flowStats = $scope.result.flow_stats;
-                // Massage flow_stats data so it can be displayed. TODO: Remove % returned by client
-                for (var i=0; i< $scope.flowStats.length; i++ ) {
-                  for (key in $scope.flowStats[i]) {
-                    if($scope.flowStats[i].hasOwnProperty(key)) {
-                    var newKey = key;
-                      if (key == '%_of_total') {
-                         newKey = 'Percent_of_total';
-                      } else if (key == 'cumul_%') {
-                         newKey = 'Cumulative_Percent';
-                      }
-                      if (key !== newKey) {
-                         $scope.flowStats[i][newKey] = $scope.flowStats[i][key];
-                         delete($scope.flowStats[i][key]);
-                      }
-                    }
-                  }
-                }                 
-                $scope.showJsonResults = true;
-              }          
-             
-          } else {
-              $scope.result = data;
-          }
+          $scope.data = data;
          
           $scope.showResults = true;
-          $scope.resultsMsg = (flowsFound >=0) ? 'Results - ' + flowsFound + ' flows found': 'Results';         
+          $scope.resultsMsg = 'Results';         
           
         }).
         error(function(data, status, headers, config) {
