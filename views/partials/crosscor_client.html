@@ -56,7 +56,7 @@
 <td>{{ m.ip4 }}</td>
 <td>{{ m.site }}</td>
 </tr></tbody></table>
-</div></div>
+</div></div></div>
 
 <div class="row" ng-show="showResults"><div class="col-sm-12">
 <strong>Non-Matching</strong>
@@ -69,7 +69,7 @@
 <td>{{ n.ip4 }}</td>
 <td>{{ n.site }}</td>
 </tr></tbody></table>
-</div></div>
+</div></div></div>
 
 <div class="row" ng-show="showResults"><div class="col-sm-12">
 <strong>Matching Stats</strong>
@@ -79,12 +79,12 @@
 <th>Percent</th>
 <th>Site</th>
 </tr>
-<tr ng-repeat="s in data.matchingStats">
+<tr ng-repeat="s in data.matching_stats">
 <td>{{ s.count }}</td>
 <td>{{ s.percent }}</td>
 <td>{{ s.site }}</td>
 </tr></tbody></table>
-</div></div>
+</div></div></div>
 
 <div class="row"><div class="col-sm-12 well  well-sm" ng-show="showResults">
 <strong>Raw Results</strong>
