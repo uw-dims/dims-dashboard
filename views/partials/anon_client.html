@@ -27,8 +27,7 @@
 <div class="form-group">
   <label  class="col-sm-2 control-label">Output Type</label>
     <div class="col-sm-3">
-      <select class="form-control" ng-model="formData.outputType" ng-options="f for f in outputTypes" >
-        <option></option>
+       <select class="form-control input-sm" ng-model="formData.outputType" ng-options="o.value as o.label for o in outputTypes"> 
       </select>
     </div>
     <label  class="col-sm-2 col-sm-offset-2 control-label">Show Stats?</label>
@@ -49,5 +48,5 @@
 
 <div class="row"><div class="col-sm-12 well  well-sm" ng-show="showResults">
 <strong>Raw Results</strong>
-<pretty-json  ng-show="showResults" json="result" />
+<pretty-json  ng-show="showResults" json="data" />
 </div></div>
