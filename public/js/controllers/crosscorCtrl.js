@@ -101,6 +101,7 @@ angular.module('dimsDemo.controllers').
         success(function(data, status, headers, config) {
           console.log("crosscor returned data");
           console.log(status);
+          console.log(data);
           $scope.data = data;
          
           $scope.showResults = true;
