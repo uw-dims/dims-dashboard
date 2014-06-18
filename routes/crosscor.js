@@ -22,46 +22,19 @@ exports.list = function(req,res) {
       inputArray.push(req.query.iff);
     }
 
-    if (req.query.mapFile !== undefined) {
+    if (req.query.mapName !== undefined) {
       inputArray.push('-m');
       inputArray.push(req.query.mapFile);
     }
 
     console.log(inputArray);
-
-    async.waterfall([
-        function(callback) {
-            tmp.file(function _tempFileCreated(err, path, fd) {
-             
-              console.log('File: ', path);
-              console.log('Filedescriptor: ', fd);
-              callback(err,path,fd);
-            });
-     
-        },function(path, fd, callback) {
-            if (req.query.ips !== undefined) {
-              fs.writeFile(path, req.query.ips, function(err) {
-                  if (err == undefined) {
-                     inputArray.push('-r');
-                     inputArray.push(path);
-                  }
-               callback(err);
-              });
-            }
-       }, function(callback) {  
-            
-          console.log('In last crosscor callback, inputArray is: ');
-          console.log(inputArray);
+    console.log('ready to spawn python process');
 
           var python = spawn(
             'python',
             inputArray
             );
           util.processPython(python, req, res);
-          callback(null, 'done');
-        }, function(err,result) {
-          console.log('In final crosscor callback, result is '+ result);
-        }
-      ])  
+          
   };
 
