@@ -15,6 +15,7 @@
     "xml2js": "*",
     "tmp": "*",
     "async": "*",
-    "ng-prettyjson": "*"
+    "ng-prettyjson": "*",
+    "underscore": "1.6.0"
   }
 }

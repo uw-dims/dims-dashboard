@@ -50,7 +50,7 @@ var dimsDemoConfig = function($routeProvider, $locationProvider, datepickerConfi
 }
 
 var dimsDemo = angular.module('dimsDemo', 
-  ['ngRoute','angularFileUpload','ui.bootstrap','ui.bootstrap.showErrors','ngGrid','ngPrettyJson','dimsDemo.controllers', 'dimsDemo.directives', 'dimsDemo.services'])
+  ['ngRoute','angularFileUpload','ui.bootstrap','ui.bootstrap.showErrors','ngGrid','ngPrettyJson','truncate','dimsDemo.controllers', 'dimsDemo.directives', 'dimsDemo.services'])
   .config(dimsDemoConfig);
 
 dimsDemo.factory('dimsConfig', function() {

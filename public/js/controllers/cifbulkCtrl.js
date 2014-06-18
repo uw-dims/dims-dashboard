@@ -39,47 +39,61 @@ angular.module('dimsDemo.controllers').
     $scope.result = null;
     $scope.resultsMsg = 'Results';
 
-    // Setup grid
-    $scope.data = [];
-    $scope.columnDefs =  [
-          {field: 'address', displayName: 'CIDR'},
-          {field: 'alternativeid', displayName: 'Alt ID'},
-          {field: 'asn', displayName: 'ASN'},
-          {field: 'asn_desc', displayName: 'ASN Description'},
-          {field: 'cc', displayName: 'CC'},
-          {field: 'confidence', displayName: 'Confidence'},
-          {field: 'created', displayName: 'Date Created'},
-          {field: 'description', displayName: 'Description'},
-          {field: 'detecttime', displayName: 'Detection Time'},
-          {field: 'id', displayName: 'ID'},
-          {field: 'severity', displayName: 'Severity'},
-          {field: 'subnet_start', displayName: 'Subnet Start'},
-          {field: 'subnet_end', displayName: 'Subnet End'},
-          {field: 'weight', displayName: 'Weight'}
-        ];
+    $scope.data = {};
+    // Set up ng-grid - currently this has been superseded but may be used later
+    // $scope.columnDefs =  [
+    //       {field: 'address', displayName: 'CIDR'},
+    //       {field: 'alternativeid', displayName: 'Alt ID'},
+    //       {field: 'asn', displayName: 'ASN'},
+    //       {field: 'asn_desc', displayName: 'ASN Description'},
+    //       {field: 'cc', displayName: 'CC'},
+    //       {field: 'confidence', displayName: 'Confidence'},
+    //       {field: 'created', displayName: 'Date Created'},
+    //       {field: 'description', displayName: 'Description'},
+    //       {field: 'detecttime', displayName: 'Detection Time'},
+    //       {field: 'id', displayName: 'ID'},
+    //       {field: 'severity', displayName: 'Severity'},
+    //       {field: 'subnet_start', displayName: 'Subnet Start'},
+    //       {field: 'subnet_end', displayName: 'Subnet End'},
+    //       {field: 'weight', displayName: 'Weight'}
+    //     ];
 
+    // Prepare incoming data
     var prepareData = function(data, status, headers, config) {
       console.log(data);
-      $scope.data = data;
+      // $scope.data = data;
+      $scope.noResults = [];
       $scope.showResults = true;
-      for (var i=0; i < $scope.data.results.length; i++) {
-        for (var j=0; j < $scope.data.results[i].results.length; j++) {
-          var detectDate = new Date($scope.data.results[i].results[j].detecttime*1000);
-          var createdDate = new Date($scope.data.results[i].results[j].created*1000);
-          $scope.data.results[i].results[j].detecttime = detectDate;
-          $scope.data.results[i].results[j].created = createdDate;
+      $scope.resultsMsg = 'Results';
+      $scope.data = {};
+      $scope.data.iff = data.iff;
+      $scope.data.program = data.program;
+      $scope.data.time = data.time;
+      $scope.data.results=[];
+      for (var i=0; i < data.results.length; i++) {
+        if (data.results[i].results.length == 0) {
+          $scope.noResults.push({searchitem: data.results[i].searchitem});
+        } else {
+          for (var j=0; j < data.results[i].results.length; j++) {
+            var detectDate = new Date(data.results[i].results[j].detecttime*1000);
+            var createdDate = new Date(data.results[i].results[j].created*1000);
+            data.results[i].results[j].detecttime = detectDate;
+            data.results[i].results[j].created = createdDate;
+          }
+          $scope.data.results.push(data.results[i]);
         }
       }
     };
 
-    $scope.getDemo = function() {
+    var getDemo = function(file) {
       $scope.showResults = false;
+      $scope.data = {};
       return $http({
         method: 'GET',
         url: '/files',
         params: {
           action: 'read',
-          file: 'cifbulk_results.txt',
+          file: file,
           source: 'default_data'
         }
 
@@ -96,10 +110,18 @@ angular.module('dimsDemo.controllers').
     $scope.callClient = function() {
 
       console.log($scope.formData);
+      
       // Initialize/reset when calling a client
       $scope.showResults = false;
       $scope.showFormError = false;
       $scope.formErrorMsg = "";
+
+      // User wants demo data - get data and return
+      if ($scope.formData.demoName !== null) {
+        $scope.resultsMsg = 'Results - Waiting...';
+        getDemo($scope.formData.demoName);
+        return;
+      }
 
       // Catch some input errors
       if (!Utils.inputPresent($scope.formData.ips) && !Utils.inputPresent($scope.formData.fileName)) {
@@ -140,7 +162,6 @@ angular.module('dimsDemo.controllers').
         Utils.setConfig(clientConfig, $scope.filePath+$scope.formData.fileName, 'fileName');
       }
     
-
       console.log(clientConfig);
       console.log("Now sending http get request");
 

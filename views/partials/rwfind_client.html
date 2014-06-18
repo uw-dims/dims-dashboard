@@ -75,6 +75,15 @@
     </div>
   </div>
 
+  <div class="form-group">
+  <label  class="col-sm-2 control-label">Use Demo Data?</label>
+  <div class="col-sm-3" ng-show="showDemoFiles">
+      <select class="form-control input-sm" ng-model="formData.demoName" ng-options="n for n in demoNames" >
+      <option></option>
+    </select>
+  </div>
+  </div>
+
   
   <div class="form-group">
   <div class="col-sm-3 col-sm-offset-2">
@@ -84,11 +93,62 @@
 
 <div class="row"><div class="col-sm-12 well  well-sm"><strong>{{ resultsMsg }}</strong></div></div>
 
-<div class="row" ng-show="showJsonResults"><div class="col-sm-12 well well-sm"><strong>Stats - {{ result.flows_found }} flows found </strong>
+<div class="row" ng-show="showJsonResults"><div class="col-sm-12"><strong>Stats - {{ result.flows_found }} flows found </strong>
+<div class="table-responsive" >
+<table class="table table-striped table-hover table-bordered" ><tbody>
+<tr><th>Source IP</th>
+<th>Destination IP</th>
+<th>Bytes</th>
+<th>Percent of Total</th>
+<th>Cumulative Percent</th>
+</tr>
+<tr ng-repeat="s in flowStats">
+<td>{{ s.sIP }}</td>
+<td>{{ s.dIP }}</td>
+<td>{{ s.Bytes }}</td>
+<td>{{ s.Percent_of_total }}</td>
+<td>{{ s.Cumulative_Percent }}</td>
+</tr></tbody></table>
+</div></div>
+
+<div class="row" ng-show="showJsonResults"><div class="col-sm-12"><strong>Flows</strong>
+<div class="table-responsive">
+<table class="table table-striped table-hover table-bordered" ><tbody>
+<tr><th>Source IP</th>
+<th>Destination IP</th>
+<th>Source Port</th>
+<th>Destination Port</th>
+<th>Protocol</th>
+<th>Packets</th>
+<th>Bytes</th>
+<th>Flags</th>
+<th>Start Time</th>
+<th>Duration</th>
+</tr>
+<tr ng-repeat="f in flows">
+<td>{{ f.sIP }}</td>
+<td>{{ f.dIP }}</td>
+<td>{{ f.sPort }}</td>
+<td>{{ f.dPort }}</td>
+<td>{{ f.pro }}</td>
+<td>{{ f.packets }}</td>
+<td>{{ f.bytes }}</td>
+<td>{{ f.flags }}</td>
+<td>{{ f.sTime }}</td>
+<td>{{ f.dur }}</td>
+
+</tr>
+</tbody></table>
+</div></div>
+
+
+
+
+<!-- <div class="row" ng-show="showJsonResults"><div class="col-sm-12 well well-sm"><strong>Stats - {{ result.flows_found }} flows found </strong>
 <div class="gridStyle statsGridStyle" ng-grid="flowStatsGridOptions" ng-show="showJsonResults"></div></div></div>
 
 <div class="row" ng-show="showJsonResults"><div class="col-sm-12 well well-sm"><strong>Flows</strong>
-<div class="gridStyle" ng-grid="flowGridOptions"></div></div></div>
+<div class="gridStyle" ng-grid="flowGridOptions"></div></div></div> -->
 
 <div class="row"><div class="col-sm-12 well  well-sm" ng-show="showResults">
 <strong>Raw Results</strong>

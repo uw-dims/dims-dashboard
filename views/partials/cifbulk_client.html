@@ -67,7 +67,7 @@
   </div>
 
   <div class="form-group">
-  <label  class="col-sm-2 control-label">Use Demo Data?:</label>
+  <label  class="col-sm-2 control-label">Use Demo Data?</label>
   <div class="col-sm-3" ng-show="showDemoFiles">
       <select class="form-control input-sm" ng-model="formData.demoName" ng-options="n for n in demoNames" >
       <option></option>
@@ -84,7 +84,7 @@
 
 <div class="row"><div class="col-sm-12 well  well-sm"><strong>{{ resultsMsg }}</strong></div></div>
 
-<div class="table-repsonsive" ng-repeat="d in data.results">
+<div class="table-responsive" ng-repeat="d in data.results">
 <table class="table table-striped table-hover table-bordered" ><tbody>
 <tr><th>{{ d.searchitem}}</th>
 <th>Alt ID</th>
@@ -102,8 +102,8 @@
 <th>Weight</th>
 </tr>
 <tr ng-repeat="r in d.results">
-<td>{{ r.address }}</td>
-<td>{{ r.alternativeid }}</td>
+<td>{{ r.address | characters:25 }}</td>
+<td>{{ r.alternativeid  | characters:25 }}</td>
 <td>{{ r.asn }}</td>
 <td>{{ r.asn_desc }}</td>
 <td>{{ r.cc }}</td>

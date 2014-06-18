@@ -13,14 +13,24 @@ angular.module('dimsDemo.controllers').
     }];
     $scope.formData.outputType = $scope.outputTypes[0].value;
 
-    // Set up file picker
+    // Set up file pickers
     $scope.fileNames = [];
     $scope.showFiles = false;
+    $scope.demoNames = [];
+    $scope.showDemoFiles = false;
+
     FileService.getFileList('ip_lists').then(function(result) {
       console.log(result);
         $scope.fileNames = result.fileNames;
         $scope.filePath = result.filePath;
         $scope.showFiles = true;
+    });
+
+    FileService.getDemoList('rwfind').then(function(result) {
+      console.log(result);
+      $scope.demoPath = result.filePath;
+      $scope.demoNames = result.fileNames;
+      $scope.showDemoFiles = true;
     });
 
     // Setup date
@@ -40,20 +50,80 @@ angular.module('dimsDemo.controllers').
 
     // Setup grid
     $scope.flows = [];
-    $scope.flowGridOptions = { data: 'flows',
-        columnDefs: [{field: 'sIP', displayName: 'Source IP', width:"**"},
-          {field: 'dIP', displayName: 'Destination IP',width:"**"},
-          {field: 'sPort', displayName: 'Source Port', width:"*"},
-          {field: 'dPort', displayName: 'Destination Port', width:"*"},
-          {field: 'pro', displayName: 'Protocol', width:"*"},
-          {field: 'packets', displayName: 'Packets', width:"*"},
-          {field: 'bytes', displayName: 'Bytes', width:"*"},
-          {field: 'flags', displayName: 'Flags', width:"*"},
-          {field: 'sTime', displayName: 'Start Time', width:"**"},
-          {field: 'dur', displayName: 'Duration', width:"*"}
-        ]};
+    // Set up ng-grid - currently this has been superseded but may be used later
+    // $scope.flowGridOptions = { data: 'flows',
+    //     columnDefs: [{field: 'sIP', displayName: 'Source IP', width:"**"},
+    //       {field: 'dIP', displayName: 'Destination IP',width:"**"},
+    //       {field: 'sPort', displayName: 'Source Port', width:"*"},
+    //       {field: 'dPort', displayName: 'Destination Port', width:"*"},
+    //       {field: 'pro', displayName: 'Protocol', width:"*"},
+    //       {field: 'packets', displayName: 'Packets', width:"*"},
+    //       {field: 'bytes', displayName: 'Bytes', width:"*"},
+    //       {field: 'flags', displayName: 'Flags', width:"*"},
+    //       {field: 'sTime', displayName: 'Start Time', width:"**"},
+    //       {field: 'dur', displayName: 'Duration', width:"*"}
+    //     ]};
     $scope.flowStats = [];
-    $scope.flowStatsGridOptions = { data: 'flowStats' };
+    // $scope.flowStatsGridOptions = { data: 'flowStats' };
+
+    var prepareData = function(data,status,headers,config) {
+      console.log("rwfind returned data");
+      console.log(status);
+      var flowsFound = -1;
+       if ($scope.formData.outputType == 'json') {
+          $scope.result = data;
+          flowsFound = $scope.result.flows_found;
+          if (flowsFound > 0) {
+            $scope.flows = $scope.result.flows;
+            $scope.flowStats = $scope.result.flow_stats;
+            // Massage flow_stats data so it can be displayed. TODO: Remove % returned by client
+            for (var i=0; i< $scope.flowStats.length; i++ ) {
+              for (key in $scope.flowStats[i]) {
+                if($scope.flowStats[i].hasOwnProperty(key)) {
+                var newKey = key;
+                  if (key == '%_of_total') {
+                     newKey = 'Percent_of_total';
+                  } else if (key == 'cumul_%') {
+                     newKey = 'Cumulative_Percent';
+                  }
+                  if (key !== newKey) {
+                     $scope.flowStats[i][newKey] = $scope.flowStats[i][key];
+                     delete($scope.flowStats[i][key]);
+                  }
+                }
+              }
+            }                 
+            $scope.showJsonResults = true;
+          }          
+         
+      } else {
+          $scope.result = data;
+      }
+     
+      $scope.showResults = true;
+      $scope.resultsMsg = (flowsFound >=0) ? 'Results - ' + flowsFound + ' flows found': 'Results';         
+
+    };
+
+    var getDemo = function(file) {
+      $scope.showResults = false;
+      $scope.showJsonResults = false;
+      $scope.data = {};
+      return $http({
+        method: 'GET',
+        url: '/files',
+        params: {
+          action: 'read',
+          file: file,
+          source: 'default_data'
+        }
+
+      }).success(prepareData)
+        .error(function(data, status, headers, config) {
+          console.log(data);
+          console.log(status);
+        });
+    }
     
 
     /**
@@ -67,6 +137,13 @@ angular.module('dimsDemo.controllers').
       $scope.showFormError = false;
       $scope.showJsonResults = false;
       $scope.formErrorMsg = "";
+
+      // User wants demo data - get data and return
+      if ($scope.formData.demoName !== null) {
+        $scope.resultsMsg = 'Results - Waiting...';
+        getDemo($scope.formData.demoName);
+        return;
+      }
 
       // Catch some input errors
       if (!Utils.inputPresent($scope.formData.ips) && !Utils.inputPresent($scope.formData.fileName)) {
@@ -120,44 +197,7 @@ angular.module('dimsDemo.controllers').
           url: '/rwfind', 
           params: clientConfig
         } ).
-        success(function(data, status, headers, config) {
-          console.log("rwfind returned data");
-          console.log(status);
-          var flowsFound = -1;
-           if ($scope.formData.outputType == 'json') {
-              $scope.result = data;
-              flowsFound = $scope.result.flows_found;
-              if (flowsFound > 0) {
-                $scope.flows = $scope.result.flows;
-                $scope.flowStats = $scope.result.flow_stats;
-                // Massage flow_stats data so it can be displayed. TODO: Remove % returned by client
-                for (var i=0; i< $scope.flowStats.length; i++ ) {
-                  for (key in $scope.flowStats[i]) {
-                    if($scope.flowStats[i].hasOwnProperty(key)) {
-                    var newKey = key;
-                      if (key == '%_of_total') {
-                         newKey = 'Percent_of_total';
-                      } else if (key == 'cumul_%') {
-                         newKey = 'Cumulative_Percent';
-                      }
-                      if (key !== newKey) {
-                         $scope.flowStats[i][newKey] = $scope.flowStats[i][key];
-                         delete($scope.flowStats[i][key]);
-                      }
-                    }
-                  }
-                }                 
-                $scope.showJsonResults = true;
-              }          
-             
-          } else {
-              $scope.result = data;
-          }
-         
-          $scope.showResults = true;
-          $scope.resultsMsg = (flowsFound >=0) ? 'Results - ' + flowsFound + ' flows found': 'Results';         
-          
-        }).
+        success(prepareData).
         error(function(data, status, headers, config) {
           console.log("rwfind Error");
           console.log(data);
