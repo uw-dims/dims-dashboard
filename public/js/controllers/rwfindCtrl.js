@@ -106,6 +106,7 @@ angular.module('dimsDemo.controllers').
     };
 
     var getDemo = function(file) {
+      console.log("in getDemo");
       $scope.showResults = false;
       $scope.showJsonResults = false;
       $scope.data = {};
@@ -130,7 +131,7 @@ angular.module('dimsDemo.controllers').
      *  callClient function
      */
     $scope.callClient = function() {
-
+      console.log("in callClient");
       console.log($scope.formData);
       // Initialize/reset when calling a client
       $scope.showResults = false;
@@ -139,7 +140,9 @@ angular.module('dimsDemo.controllers').
       $scope.formErrorMsg = "";
 
       // User wants demo data - get data and return
-      if ($scope.formData.demoName !== null) {
+      if ($scope.formData.demoName !== null && $scope.formData.demoName !== undefined) {
+        console.log("looking for demo data");
+        console.log($scope.formData.demoName);
         $scope.resultsMsg = 'Results - Waiting...';
         getDemo($scope.formData.demoName);
         return;

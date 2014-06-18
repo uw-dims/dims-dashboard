@@ -30,19 +30,20 @@ exports.list = function(req,res) {
       inputArray.push('-r');
       inputArray.push(req.query.fileName);
     }
-    if (req.query.mapName !== undefined) {
-      inputArray.push('-r');
-      inputArray.push(req.query.mapName);
-    }
+    
 
     async.waterfall([
         function(callback) {
+           if (req.query.ips !== undefined) {
             tmp.file(function _tempFileCreated(err, path, fd) {
              
-              console.log('File: ', path);
-              console.log('Filedescriptor: ', fd);
+              console.log('Tmp File: ', path);
+              console.log('Tmp Filedescriptor: ', fd);
               callback(err,path,fd);
             });
+          } else {
+            callback(null, null, null);
+          }
      
         },function(path, fd, callback) {
             if (req.query.ips !== undefined) {
@@ -53,6 +54,8 @@ exports.list = function(req,res) {
                   }
                callback(err);
               });
+            } else {
+              callback(null);
             }
        }, function(callback) {  
             

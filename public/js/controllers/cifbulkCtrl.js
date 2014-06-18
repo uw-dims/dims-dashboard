@@ -117,7 +117,7 @@ angular.module('dimsDemo.controllers').
       $scope.formErrorMsg = "";
 
       // User wants demo data - get data and return
-      if ($scope.formData.demoName !== null) {
+      if ($scope.formData.demoName !== null && $scope.formData.demoName !== undefined) {
         $scope.resultsMsg = 'Results - Waiting...';
         getDemo($scope.formData.demoName);
         return;
