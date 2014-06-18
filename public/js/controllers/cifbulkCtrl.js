@@ -134,12 +134,7 @@ angular.module('dimsDemo.controllers').
         $scope.formErrorMsg = 'You have to either choose a file or enter ips/CIDR/domains. You cannot do both';
         return;
       }
-      if (!Utils.inputPresent($scope.formData.startDate) && !Utils.inputPresent($scope.formData.endDate) && 
-          !Utils.inputPresent($scope.formData.numDays)) {
-        $scope.showFormError = true;
-        $scope.formErrorMsg = 'Either enter number of days, or enter a start time and (optionally) end time.';
-        return;
-      }
+      
       if ((!Utils.inputPresent($scope.formData.startDate) && Utils.inputPresent($scope.formData.startHour))
         ||(!Utils.inputPresent($scope.formData.endDate) && Utils.inputPresent($scope.formData.endHour))) {
         $scope.showFormError = true;
@@ -155,6 +150,7 @@ angular.module('dimsDemo.controllers').
       endTime = (Utils.inputPresent($scope.formData.endHour)) ? endTime + $scope.formData.endHour*60*60 : endTime;
       Utils.setConfig(clientConfig, startTime, 'startTime');
       Utils.setConfig(clientConfig, endTime, 'endTime');
+      Utils.setConfig(clientConfig, $scope.formData.numDays, 'numDays');
       Utils.setConfig(clientConfig, $scope.formData.ips, 'ips');
       Utils.setConfig(clientConfig, $scope.formData.stats, 'stats');
       Utils.setConfig(clientConfig, $scope.formData.header, 'header');
