@@ -27,6 +27,7 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'html');
 app.use(express.favicon());
 app.use(express.logger('dev'));
+// For handling uploads
 app.use(express.bodyParser({
   keepExtensions: true,
   uploadDir: (path.join(__dirname,'/tmp'))

@@ -104,3 +104,15 @@ body {
 .statsGridStyle {
     height: 150px;
 } 
+
+.uploadDropzone {
+  background: #ddd;
+    width: 150px;
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+    font-weight: bold;
+}
+.uploadDropzone-hover {
+  background: #bbb;
+}

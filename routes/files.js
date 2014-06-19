@@ -14,18 +14,17 @@ exports.upload = function(req, res){
             'map_files': 'mapFiles/',
             'data_files': 'dataFiles/'
         },
-        msg = "";
+        data = {};
 
     console.log("req.body.fileName " + req.body.fileName);
     console.log("req.files.file.name" + req.files.file.name);
     filename = (req.body.fileName !== null && req.body.fileName !== undefined) ? req.body.fileName : req.files.file.name;
     i = filename.lastIndexOf('.');
     file_extension = (i < 0) ? '' : filename.substr(i);      
-    
     tmp_path = req.files.file.path;
 
     console.log("destination is " + req.body.destination);
-
+    // Get target path
     if (req.body.destination !== null && req.body.destination !== undefined) {
         for (key in directoryMapping) {
             if (key == req.body.destination) {
@@ -54,17 +53,25 @@ exports.upload = function(req, res){
                 if (err) throw err;
             });
         });
-        msg="File uploaded sucessfully" 
+        data.msg = "File uploaded sucessfully";
+        data.path = target_path;
+        data.success = false;
+        console.log("data sent back is");
+        console.log(data);
 
     }  else{
     // delete the temporary file, so that the explicitly set temporary upload dir does not get filled with unwanted files 
         fs.unlink(tmp_path, function(err) {
             if (err) throw err;
         });
-        msg="File upload failed.File extension not allowed and size must be less than "+maxSizeOfFile; 
+        data.msg = "File upload failed. File extension not allowed and size must be less than "+maxSizeOfFile;
+        data.success = false;
+        data.path = "";
+        console.log(data)
+        res.send(400, data);
+        // return res.send(200, "File upload failed.File extension not allowed and size must be less than "+maxSizeOfFile);
     }
-
-    res.end(msg);
+    return res.send(200, data);
 };
 
 function oc(a){

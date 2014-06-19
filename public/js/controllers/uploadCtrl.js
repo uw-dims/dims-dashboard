@@ -5,18 +5,22 @@ console.log("In UploadController");
     $scope.formData = {};
     $scope.destinations = ['ip_lists', 'map_files', 'data_files'];
     $scope.formData.destination = $scope.destinations[0];
+    $scope.showFilesToUpload = false;
 
   $scope.onFileSelect = function($files) {
     $scope.files =  $files;
     console.log("set files");
     console.log($scope.files);
+    $scope.showFilesToUpload = true;
   };
 
   $scope.onFormSubmit = function() {
     console.log("in onformsubmit");
     console.log($scope.files);
     var uploadData = {};
-    Utils.setConfig(uploadData, $scope.formData.fileName, 'fileName');
+    if ($scope.files.length == 1) {
+      Utils.setConfig(uploadData, $scope.formData.fileName, 'fileName');
+    }
     Utils.setConfig(uploadData, $scope.formData.destination, 'destination');
 
     //$files: an array of files selected, each file has name, size, and type.
@@ -40,6 +44,10 @@ console.log("In UploadController");
         console.log(data);
         console.log(status);
 
+      }).error(function(data,status,headers,config) {
+        console.log("error");
+        console.log(data);
+        console.log(status);
       });
       //.error(...)
       //.then(success, error, progress); 
