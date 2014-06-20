@@ -128,7 +128,10 @@ exports.files = function(req,res) {
 
     // Request: Get directory listing
     } else {
-        fs.readFile(directory+'index.yml', 'utf8', function(err, data) {
+        fs.readFile(directory+'index.yml', 'utf8', function(err, content) {
+            // Setup return data
+            var data = {};
+            data.path = directory;
             // If error, means that index.yml does not exist
             // Just read the directory and return file names and directory name
             if (err) {
@@ -139,33 +142,26 @@ exports.files = function(req,res) {
                         return res.send(500, err);
                     }
                     var len = files.length;
-                    var result = [];
+                    data.result = [];
                     var k = 0;
                     for (var i=0; i<len; i++) {
                         if (files[i].indexOf('.') !== 0) {
-                            result[k] = files[i];
+                            data.result[k] = { name: files[i], type: null, desc: null }
                             k++;
                         }
-                    }
-                    var data = {};
-                    data.path = directory;
-                    data.result = result;
+                    }    
                     return res.send(200, data);
                 });
 
             } else {
                 // Use yaml file for file contents
-                console.log(data);
-                try {
-                    var yamlData = yaml.safeLoad(data);
-                    console.log(yamlData);
-                    return res.send(200,yamlData);
+                try {                
+                    data.result = yaml.safeLoad(content);
+                    return res.send(200,data);
                 } catch (e) {
                     console.log(e);
                     return res.send(500,e);
-                }
-                
-
+                }              
             }
         })
         
