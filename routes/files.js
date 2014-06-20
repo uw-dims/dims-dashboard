@@ -1,5 +1,8 @@
 
 var fs = require('fs');
+var config = require('../config');
+var yaml = require('js-yaml');
+
 exports.upload = function(req, res){
     var filename, 
         tmp_path,
@@ -82,78 +85,89 @@ function oc(a){
     return o; 
 }
 
+/**
+ * 
+ */
 exports.files = function(req,res) {
-    console.log("In files route");
-    console.log("dir is " + req.query.source);
-    var myDirectory = './mydata/',
-        directoryMapping = {
-            'ip_lists': myDirectory+'ipFiles/',
-            'map_files': myDirectory+'mapFiles/',
-            'data_files': myDirectory+'dataFiles/',
-            'default_data': './data/'
-        },
-        msg = '',
-        directory = -1;
+    
+    var directory = -1;
+    // Get the directory requested
+    if (req.query.source !== null && req.query.source !== undefined) {
+        for (key in config.directoryMapping) {
+            if (key == req.query.source) {
+                directory = config.directoryMapping[key];
+            }
+        }
+        // Not in user data directories, check default data directory
+        if (directory == -1) {
+            for (key in config.defaultMapping) {
+                if (key == req.query.source) {
+                    directory = config.defaultMapping[key];
+                }
+            }
+        }
+    }
+
+    if (directory == -1) {
+        // bad input
+        return res.send(400, 'Bad source directory specified.');
+    } 
+
+    // Request: read a file
     if (req.query.action == 'read') {
-
-        console.log(req.query.file);
-        console.log(req.query.source);
-
-        if (req.query.source !== null && req.query.source !== undefined) {
-            for (key in directoryMapping) {
-                if (key == req.query.source) {
-                    directory = directoryMapping[key]+req.query.file;
-                }
+        directory = directory + req.query.file;
+        fs.readFile(directory, 'utf8', function(err, data) {
+            if (err) {
+                console.log('fs.readFile error');
+                console.log(err);
+                return res.send(500, err);
             }
-        }
-        if (directory != -1) {
+            console.log('File read: ' + directory);
+            return res.send(200, data);
+        })
 
-            fs.readFile(directory, 'utf8', function(err, data) {
-                if (err) throw err;
-                console.log('File read: ' + directory);
-                return res.send(200, data);
-            })
-
-        } else {
-            // bad input
-            return res.send(500, -1, 'Bad source directory specified.');
-        }
-
+    // Request: Get directory listing
     } else {
-
-        if (req.query.source !== null && req.query.source !== undefined) {
-            for (key in directoryMapping) {
-                if (key == req.query.source) {
-                    directory = directoryMapping[key];
-                }
-            }
-        }
-        if (directory !== -1) {
-            fs.readdir(directory, function(err, files) {
-                if (err) {
-                    console.log('fs.readdir error');
-                    console.log(err);
-                    return res.send(500, err);
-                }
-                var len = files.length;
-                var result = [];
-                var k = 0;
-                for (var i=0; i<len; i++) {
-                    if (files[i].indexOf('.') !== 0) {
-                        result[k] = files[i];
-                        k++;
+        fs.readFile(directory+'index.yml', 'utf8', function(err, data) {
+            // If error, means that index.yml does not exist
+            // Just read the directory and return file names and directory name
+            if (err) {
+                fs.readdir(directory, function(err, files) {
+                    if (err) {
+                        console.log('fs.readdir error');
+                        console.log(err);
+                        return res.send(500, err);
                     }
+                    var len = files.length;
+                    var result = [];
+                    var k = 0;
+                    for (var i=0; i<len; i++) {
+                        if (files[i].indexOf('.') !== 0) {
+                            result[k] = files[i];
+                            k++;
+                        }
+                    }
+                    var data = {};
+                    data.path = directory;
+                    data.result = result;
+                    return res.send(200, data);
+                });
 
+            } else {
+                // Use yaml file for file contents
+                console.log(data);
+                try {
+                    var yamlData = yaml.safeLoad(data);
+                    console.log(yamlData);
+                    return res.send(200,yamlData);
+                } catch (e) {
+                    console.log(e);
+                    return res.send(500,e);
                 }
-                var data = {};
-                data.path = directory;
-                data.result = result;
-                return res.send(200, data);
-            });
+                
 
-        } else {
-            // bad input
-            return res.send(500, -1, 'Bad source directory specified.');
-        }
+            }
+        })
+        
     }
 };

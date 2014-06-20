@@ -15,6 +15,7 @@
     "xml2js": "*",
     "tmp": "*",
     "ng-prettyjson": "*",
-    "underscore": "1.6.0"
+    "underscore": "1.6.0",
+    "js-yaml": "3.0.2"
   }
 }

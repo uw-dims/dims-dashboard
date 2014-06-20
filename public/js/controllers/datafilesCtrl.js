@@ -15,6 +15,7 @@ angular.module('dimsDemo.controllers').
 
     $scope.getFiles = function() {
       console.log("In getFiles");
+      console.log($scope.formData.source);
      return $http({
         method: 'GET',
         url: '/files', 

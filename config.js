@@ -14,4 +14,19 @@ config.inputdir = '/opt/dims/srv/input';
 
 config.outputdir = '/opt/dims/srv/output';
 
+config.data = '../data/'
+
+config.userDataDir = './mydata/'
+
+config.directoryMapping = {
+  'ip_lists': config.userDataDir+'ipFiles/',
+  'map_files': config.userDataDir+'mapFiles/',
+  'data_files': config.userDataDir+'dataFiles/'
+};
+
+config.defaultMapping = {
+	'default_data': config.data
+}
+
+
 module.exports = config;
