@@ -20,9 +20,12 @@
 
 </form>
 
-<!-- <div class="gridStyle" ng-grid="gridOptions">
- -->  
 <div class="row">
+<div class="col-sm-12">
+<div class="gridStyle" ng-grid="gridOptions">
+</div></div></div>
+  
+<!-- <div class="row">
 <div class="col-sm-4">
 <div class="table-responsive">
   <table class="table table-striped" >
@@ -33,10 +36,11 @@
     </tbody>
   </table>
 </div> 
-</div><!-- left col -->
-<div class="col-sm-8 well" ng-show="showData">
+</div> -->
+<div class="row">
+<div class="col-sm-12 well" ng-show="showData">
 <strong>File Contents</strong>
 <pre>{{singleFile}}</pre>
 </div>
-</div>
+</div></div>
 </div>

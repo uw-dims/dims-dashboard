@@ -44,18 +44,14 @@ var dimsDemoConfig = function($routeProvider, $locationProvider, datepickerConfi
   });
   $locationProvider.html5Mode(true);
   // Datepicker configurations
-  // datepickerConfig.minDate = '1960-01-01';
-  // datepickerConfig.showWeeks = false;
-  // datepickerPopupConfig.datepickerPopup = 'MM-dd-yyyy';
+  datepickerConfig.minDate = '1960-01-01';
+  datepickerConfig.showWeeks = false;
+  datepickerPopupConfig.datepickerPopup = 'MM-dd-yyyy';
 }
 
 var constants = {
-  // Datepicker configurations
-  datepickerConfig: {
-    minDate: '1960-01-01',
-    showWeeks: false,
-    datepickerPopup: 'MM-dd-yyyy'
-  }
+  'fileSources': ['ip_lists', 'map_files', 'data_files', 'default_data'] 
+  
 }
 
 var dimsDemo = angular.module('dimsDemo', 

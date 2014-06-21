@@ -19,14 +19,11 @@ exports.upload = function(req, res){
         },
         data = {};
 
-    console.log("req.body.fileName " + req.body.fileName);
-    console.log("req.files.file.name" + req.files.file.name);
     filename = (req.body.fileName !== null && req.body.fileName !== undefined) ? req.body.fileName : req.files.file.name;
     i = filename.lastIndexOf('.');
     file_extension = (i < 0) ? '' : filename.substr(i);      
     tmp_path = req.files.file.path;
 
-    console.log("destination is " + req.body.destination);
     // Get target path
     if (req.body.destination !== null && req.body.destination !== undefined) {
         for (key in directoryMapping) {
@@ -35,16 +32,6 @@ exports.upload = function(req, res){
             }
         }
     }
-
-    console.log("tmp_path is " + tmp_path);
-    console.log("target_path is " + target_path);
-    console.log("file_extension is " + file_extension);
-    console.log("size");
-    console.log(req.files.file.size);
-    console.log("body");
-    console.log(req.body);
-    console.log("type " + req.files.file.type);
-    // console.log(req.files.file.toJSON());
 
     if((file_extension in oc(extensionAllowed)) && ((req.files.file.size /1024 ) < maxSizeOfFile)) { 
         
