@@ -10,15 +10,23 @@ angular.module('dimsDemo.controllers').
     // Set up ng-grid
     $scope.gridData = {};
     var columnDefs = [
-      {field: 'name', displayName: 'Name'},
-      {field: 'type', displayName: 'Type'},
-      {field: 'desc', displayName: 'Description'}
+      {field: 'name', displayName: 'Name', enableCellEdit: false},
+      {field: 'type', displayName: 'Type', enableCellEdit: true},
+      {field: 'desc', displayName: 'Description', enableCellEdit: true}
     ]
     $scope.fileSelections = [];
     $scope.gridOptions = {data: 'gridData', 
         columnDefs: columnDefs,
-        selectedItems: $scope.mySelections,
-        multiSelect: false};
+        selectedItems: $scope.fileSelections,
+        multiSelect: false, 
+        enableCellEdit: true,
+        afterSelectionChange: function(rowitem, event){
+          console.log("afterselectionchange, rowitem is");
+          console.log(rowitem);
+          console.log($scope.fileSelections);
+          // if ($scope.fileSelections[0] !== undefined)
+          $scope.tableClicked(rowitem.entity.name);
+        }};
     $scope.files=[];
     $scope.singleFile="";
 
