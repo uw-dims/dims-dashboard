@@ -1,13 +1,12 @@
 <h2 class="sub-header">View Files</h2>
-<div class="span6">
 
 <form role="form" class="form-horizontal">
 
 
   <div class="form-group">
-  <label  class="col-sm-2 control-label">Choose a list</label>
+  <label  class="col-sm-3 control-label">Choose a Directory</label>
     <div class="col-sm-5">
-      <select class="form-control" ng-model="formData.source" ng-options="f for f in sources" >
+      <select class="form-control" ng-model="formData.source" ng-options="f.value as f.label for f in sourceMap" >
         <option></option>
       </select>
     </div>
@@ -20,10 +19,12 @@
 
 </form>
 
-<div class="row">
-<div class="col-sm-12">
-<div class="gridStyle" ng-grid="gridOptions">
-</div></div></div>
+<!-- <div class="panel panel-default"><div class="panel-body" ng-show="showFiles"> -->
+<!-- <div class="row" ng-show="showFiles">
+<div class="col-sm-12"> -->
+<!-- <div ng-show="showFiles">
+ --><div class="gridStyle gridStyle-short" ng-grid="gridOptions"></div><!-- </div> -->
+<!-- </div></div> -->
   
 <!-- <div class="row">
 <div class="col-sm-4">
@@ -37,10 +38,10 @@
   </table>
 </div> 
 </div> -->
-<div class="row">
-<div class="col-sm-12 well" ng-show="showData">
-<strong>File Contents</strong>
-<pre>{{singleFile}}</pre>
-</div>
-</div></div>
+<!-- <div class="row" ng-show="showData">
+<div class="col-sm-12" > -->
+<div class="dataPanel" ng-show="showData">
+<h4>File Contents</h4>
+<pre ng-if="!isJson">{{singleFile}}</pre>
+<pretty-json ng-if="isJson" json="singleFile" />
 </div>

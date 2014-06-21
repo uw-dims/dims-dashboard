@@ -1,11 +1,16 @@
 angular.module('dimsDemo.controllers').
-  controller('DataFilesCtrl', function (fileSources, $scope, $http, $location, $routeParams) {
+  controller('DataFilesCtrl', function (fileSourceMap, Utils, $scope, $http, $location, $routeParams) {
 
     // Setup form data
     $scope.formData = {};
     $scope.showData = false;
-    $scope.sources = fileSources;
-    $scope.formData.source = $scope.sources[0];
+    $scope.showFiles = false;
+    $scope.sourceMap = fileSourceMap;
+    $scope.formData.source = $scope.sourceMap[0].value;
+
+    console.log('source is ' + $scope.formData.source);
+    console.log('map is');
+    console.log($scope.sourcesMap);
 
     // Set up ng-grid
     $scope.gridData = {};
@@ -27,7 +32,6 @@ angular.module('dimsDemo.controllers').
           // if ($scope.fileSelections[0] !== undefined)
           $scope.tableClicked(rowitem.entity.name);
         }};
-    $scope.files=[];
     $scope.singleFile="";
 
     $scope.getFiles = function() {
@@ -45,6 +49,7 @@ angular.module('dimsDemo.controllers').
           $scope.gridData = data.result;
           $scope.filePath = data.path;
           $scope.fileSource = config.params.source;
+          $scope.showFiles = true;
         }).
         error(function(data, status, headers, config) {
           console.log("Error getting file list");
@@ -68,6 +73,9 @@ angular.module('dimsDemo.controllers').
         success(function(data, status, headers, config){
           $scope.singleFile = data;
           $scope.showData = true;
+          $scope.isJson = (data instanceof Object);
+          console.log("is Json? " + $scope.isJson);
+
         }).
         error(function(data, status, headers, config) {
           console.log("Error getting file contents");

@@ -50,8 +50,13 @@ var dimsDemoConfig = function($routeProvider, $locationProvider, datepickerConfi
 }
 
 var constants = {
-  'fileSources': ['ip_lists', 'map_files', 'data_files', 'default_data'] 
-  
+  'fileSources': ['ip_lists', 'map_files', 'data_files', 'default_data'],
+  'fileSourceMap': [
+      { value: 'ip_lists', label: 'List of IPs, CIDR, or Domains' },
+      { value: 'map_file', label: 'Mapping Files' },
+      { value: 'data_files', label: 'Uploaded Data Files' },
+      { value: 'default_data', label: 'Default Sample Data' }
+    ] 
 }
 
 var dimsDemo = angular.module('dimsDemo', 

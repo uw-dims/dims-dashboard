@@ -42,9 +42,7 @@ angular.module('dimsDemo.services', [])
 })
 
   .factory('Utils', function() {
-
     var root = {};
-
     root.setConfig = function(config, data, property) {
       if (root.inputPresent(data)) {
         config[property] = data;
@@ -56,6 +54,15 @@ angular.module('dimsDemo.services', [])
       else return false;
     }
 
+    root.isJson = function(text) {
+      try {
+        JSON.parse(text);
+      } catch (e) {
+        console.log(e);
+        return false
+      }
+      return true;
+    }
     return root;
   })
 
@@ -88,8 +95,8 @@ angular.module('dimsDemo.services', [])
           var j = 0,
               names = [];
           for (var i=0; i < data.fileNames.length; i++){
-            if (data.fileNames[i].indexOf(type+'_') === 0) {
-                names[j] = data.fileNames[i];
+            if (data.fileNames[i].type == type) {
+                names[j] = data.fileNames[i].name;
                 j++;
             }
           }

@@ -9,8 +9,9 @@ angular.module('dimsDemo.directives', []).
     return function(scope, elm, attrs) {
       elm.text(version);
     };
-  })
-  .directive('integer', function() {
+  }).
+
+  directive('integer', function() {
     return {
       require: 'ngModel',
       link: function(scope, elm, attrs, ctrl) {

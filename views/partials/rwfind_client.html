@@ -57,7 +57,7 @@
     
     <label  class="col-sm-2 control-label">Or Choose File</label>
     <div class="col-sm-3" ng-show="showFiles">
-      <select class="form-control input-sm" ng-model="formData.fileName" ng-options="n for n in fileNames" >
+      <select class="form-control input-sm" ng-model="formData.fileName" ng-options="n.name for n in fileNames" >
         <option></option>
       </select>
     </div>
@@ -140,9 +140,6 @@
 </tr>
 </tbody></table>
 </div></div></div>
-
-
-
 
 <!-- <div class="row" ng-show="showJsonResults"><div class="col-sm-12 well well-sm"><strong>Stats - {{ result.flows_found }} flows found </strong>
 <div class="gridStyle statsGridStyle" ng-grid="flowStatsGridOptions" ng-show="showJsonResults"></div></div></div>
