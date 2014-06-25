@@ -53,14 +53,14 @@ var constants = {
   'fileSources': ['ip_lists', 'map_files', 'data_files', 'default_data'],
   'fileSourceMap': [
       { value: 'ip_lists', label: 'List of IPs, CIDR, or Domains' },
-      { value: 'map_file', label: 'Mapping Files' },
+      { value: 'map_files', label: 'Mapping Files' },
       { value: 'data_files', label: 'Uploaded Data Files' },
       { value: 'default_data', label: 'Default Sample Data' }
     ],
   'fileDestinations': ['ip_lists', 'map_files', 'data_files'],
   'fileDestinationMap': [
       { value: 'ip_lists', label: 'List of IPs, CIDR, or Domains' },
-      { value: 'map_file', label: 'Mapping Files' },
+      { value: 'map_files', label: 'Mapping Files' },
       { value: 'data_files', label: 'Any Data Files' }
     ]  
 }

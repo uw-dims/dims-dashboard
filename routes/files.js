@@ -45,10 +45,16 @@ exports.upload = function(req, res){
         
         console.log("file passed validation");
         fs.rename(tmp_path, target_path, function(err) {
-            if (err) throw err; 
+            if (err) {
+                console.log('fs.rename error: ' + err);
+                return res.send(400, 'Bad destination directory specified.'); 
+            }
             // delete the temporary file, so that the explicitly set temporary upload dir does not get filled with unwanted files 
             fs.unlink(tmp_path, function() {
-                if (err) throw err;
+                if (err) { 
+                console.log('fs.unlinke error: ' + err);
+                return res.send(500, err);
+                }
             });
         });
         data.msg = "File uploaded sucessfully";
@@ -59,7 +65,10 @@ exports.upload = function(req, res){
     }  else{
     // delete the temporary file, so that the explicitly set temporary upload dir does not get filled with unwanted files 
         fs.unlink(tmp_path, function(err) {
-            if (err) throw err;
+            if (err) { 
+                console.log('fs.unlinke error: ' + err);
+                return res.send(500, err);
+            }
         });
         data.msg = "File upload failed. File extension not allowed and size must be less than "+maxSizeOfFile;
         data.path = "";
