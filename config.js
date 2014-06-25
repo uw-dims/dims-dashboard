@@ -16,7 +16,7 @@ config.inputdir = '/opt/dims/srv/input';
 
 config.outputdir = '/opt/dims/srv/output';
 
-config.data = '../data/'
+config.data = '../../data/sample-data/'
 
 config.userDataDir = './mydata/'
 
