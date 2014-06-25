@@ -1,10 +1,10 @@
 angular.module('dimsDemo.controllers').
-  controller ('UploadCtrl', function($scope, $upload, Utils) {
+  controller ('UploadCtrl', function(fileDestinationMap, $scope, $upload, Utils) {
 console.log("In UploadController");
   // Setup form data
     $scope.formData = {};
-    $scope.destinations = ['ip_lists', 'map_files', 'data_files'];
-    $scope.formData.destination = $scope.destinations[0];
+    $scope.destinationMap = fileDestinationMap;
+    $scope.formData.destination = $scope.destinationMap[0].value;
     $scope.showFilesToUpload = false;
 
   $scope.hasUploader = function(index) {

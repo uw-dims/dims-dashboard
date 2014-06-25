@@ -56,7 +56,13 @@ var constants = {
       { value: 'map_file', label: 'Mapping Files' },
       { value: 'data_files', label: 'Uploaded Data Files' },
       { value: 'default_data', label: 'Default Sample Data' }
-    ] 
+    ],
+  'fileDestinations': ['ip_lists', 'map_files', 'data_files'],
+  'fileDestinationMap': [
+      { value: 'ip_lists', label: 'List of IPs, CIDR, or Domains' },
+      { value: 'map_file', label: 'Mapping Files' },
+      { value: 'data_files', label: 'Any Data Files' }
+    ]  
 }
 
 var dimsDemo = angular.module('dimsDemo', 

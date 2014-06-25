@@ -3,18 +3,9 @@
 <form role="form" class="form-horizontal" name="uploadForm">
 
   <div class="form-group">
-  <label class="col-sm-2 control-label">New File Name</label>
+  <label  class="col-sm-2 control-label">Target File Location</label>
     <div class="col-sm-5">
-      <input type="text" class="form-control" ng-model="formData.fileName" name="fileName"  />
-    </div>
-    <p class="help-block">Optional: Enter a new name for the file you are uploading.</p>
-  </div>
-
-  <div class="form-group">
-  <label  class="col-sm-2 control-label">Target File Locations</label>
-    <div class="col-sm-5">
-      <select class="form-control" ng-model="formData.destination" ng-options="f for f in destinations" >
-        <option></option>
+      <select class="form-control" ng-model="formData.destination" ng-options="f.value as f.label for f in destinationMap" >
       </select>
     </div>
   </div>
@@ -81,19 +72,6 @@
 </div>
 
 <div class="col-sm-6 sel-file" ng-show="uploadResult[$index]"> {{ uploadResult[$index].msg }}: {{ uploadResult[$index].path }}</div>
-</div></div>
-
-<div class="response" ng-show="uploadResult.length > 0">
-      Server Response:
-      <ul>
-        <li ng-repeat="result in uploadResult">
-          {{ result.msg }} - {{ result.path }}
-        </li>
-      </ul>
-    </div>
-
-<div class="row" ng-show="showFilesUploaded"><div class="col-sm-12 well  well-sm"><strong>Response</strong></div></div>
-<div class="row" ng-show="showFilesUploaded" ng-repeat="f in files"><div class="col-sm-12">{{ f.name }}
 </div></div>
 
 </form>
