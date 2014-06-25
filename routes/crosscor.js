@@ -28,7 +28,7 @@ exports.list = function(req,res) {
     }
 
     console.log(inputArray);
-    console.log('ready to spawn python process');
+    console.log('ready to spawn python process for crosscor');
           var python = spawn(
             'python',
             inputArray

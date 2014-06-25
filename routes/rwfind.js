@@ -36,12 +36,8 @@ exports.list = function(req,res) {
 
     async.waterfall([
         function(callback) {
-          console.log("in rwfind route first async");
           if (req.query.ips !== undefined) {
             tmp.file(function _tempFileCreated(err, path, fd) {
-             
-              console.log('Tmp File: ', path);
-              console.log('Tmp Filedescriptor: ', fd);
               callback(err,path,fd);
             });
           } else {
@@ -49,7 +45,6 @@ exports.list = function(req,res) {
           }
           
         },function(path, fd, callback) {
-           console.log("in rwfind route 2nd async");
             if (req.query.ips !== undefined) {
               fs.writeFile(path, req.query.ips, function(err) {
                   if (err == undefined) {
@@ -64,9 +59,8 @@ exports.list = function(req,res) {
 
        }, function(callback) {  
             
-          console.log('In last callback, inputArray is: ');
           console.log(inputArray);
-
+          console.log('ready to spawn python process for rwfind');
           var python = spawn(
             'python',
             inputArray
@@ -74,7 +68,6 @@ exports.list = function(req,res) {
           util.processPython(python, req, res);
           callback(null, 'done');
         }, function(err,result) {
-          console.log('In final callback, tasks are '+ result);
         }
       ])  
   };

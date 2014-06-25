@@ -2,6 +2,8 @@ var config = {};
 
 config.port = process.env.PORT || 3200;
 
+config.sslport = 3030;
+
 config.log_level = process.env.LOG_LEVEL || 'debug'
 
 config.bin = '/opt/dims/bin';

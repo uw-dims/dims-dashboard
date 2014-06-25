@@ -39,21 +39,61 @@
     </div>
    </div>
 
-   <div class="form-group">
+ <!--   <div class="form-group">
     <div class="col-sm-2 col-sm-offset-2">
         <button type="submit" class="btn btn-primary" ng-click="onFormSubmit()">Upload File</button>
     </div>
     <div class="col-sm-2 ">
         <button type="reset" class="btn btn-primary" ng-click="clearForm()">Reset</button>
-    </div></div>
-</form>
+    </div></div> -->
+
+
+<!-- <div ng-show="selectedFiles != null">
+  <div class="sel-file" ng-repeat="f in selectedFiles">
+    {{($index + 1) + '.'}}
+    <img ng-show="dataUrls[$index]" ng-src="{{dataUrls[$index]}}">
+    <button class="button" ng-click="start($index)" ng-show="progress[$index] < 0">Start</button>
+    <span class="progress" ng-show="progress[$index] >= 0">           
+      <div style="width:{{progress[$index]}}%">{{progress[$index]}}%</div>
+    </span>       
+    <button class="button" ng-click="abort($index)" ng-show="hasUploader($index) && progress[$index] < 100">Abort</button>
+    {{f.name}} - size: {{f.size}}B - type: {{f.type}}
+  </div>
+</div>
+
+
+ -->
 
 <div class="row" ng-show="showFilesToUpload" ><div class="col-sm-12 well  well-sm"><strong>Files to upload</strong></div></div>
-<div class="row" ng-show="showFilesToUpload" ng-repeat="f in files"><div class="col-sm-12">{{ f.name }}
+
+<div class="form-group" ng-show="showFilesToUpload" ng-repeat="f in files"><div class="col-sm-1" ng-show="progress[$index] < 0">
+<button class="btn btn-primary btn-sm" ng-click="start($index)" >Start</button></div>
+<div class="col-sm-2"  ng-show="progress[$index] >= 0">
+    <span class="progress" >           
+      <div style="width:{{progress[$index]}}%">{{progress[$index]}}%</div>
+    </span>     
+</div>
+<div class="col-sm-1"  ng-show="hasUploader($index) && progress[$index] < 100"> 
+    <button class="btn btn-sm" ng-click="abort($index)" >Abort</button></div>
+<div class="col-sm-4 sel-file">
+    {{ f.name }} - {{ f.size }} Bytes </div>
+<div class="col-sm-3" ng-show="progress[$index] < 0"><input type="text" class="form-control" ng-model="uploadData[$index].newName" name="fileName" placeholder="Optional: New file name" />
+</div>
+
+<div class="col-sm-6 sel-file" ng-show="uploadResult[$index]"> {{ uploadResult[$index].msg }}: {{ uploadResult[$index].path }}</div>
 </div></div>
 
-<div class="row" ng-show="showFilesUploaded"><div class="col-sm-12 well  well-sm"><strong>Files to upload</strong></div></div>
+<div class="response" ng-show="uploadResult.length > 0">
+      Server Response:
+      <ul>
+        <li ng-repeat="result in uploadResult">
+          {{ result.msg }} - {{ result.path }}
+        </li>
+      </ul>
+    </div>
+
+<div class="row" ng-show="showFilesUploaded"><div class="col-sm-12 well  well-sm"><strong>Response</strong></div></div>
 <div class="row" ng-show="showFilesUploaded" ng-repeat="f in files"><div class="col-sm-12">{{ f.name }}
 </div></div>
 
-
+</form>

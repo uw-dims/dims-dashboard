@@ -7,12 +7,83 @@ console.log("In UploadController");
     $scope.formData.destination = $scope.destinations[0];
     $scope.showFilesToUpload = false;
 
+  $scope.hasUploader = function(index) {
+    return $scope.upload[index] != null;
+  };
+  $scope.abort = function(index) {
+    $scope.upload[index].abort(); 
+    $scope.upload[index] = null;
+  };
+
   $scope.onFileSelect = function($files) {
     $scope.files =  $files;
     console.log("set files");
     console.log($scope.files);
+    $scope.progress = [];
+
     $scope.showFilesToUpload = true;
+
+    // Check for files that haven't finished uploading
+    if ($scope.upload && $scope.upload.length > 0) {
+      for (var i = 0; i < $scope.upload.length; i++) {
+        if ($scope.upload[i] != null) {
+          $scope.upload[i].abort();
+        }
+      }
+    }
+    $scope.upload = [];
+    $scope.uploadResult = [];
+    $scope.selectedFiles = $files;
+    $scope.uploadData = [];
+    for (var i = 0; i < $files.length; i++) {
+      $scope.progress[i] = -1;
+      // $scope.uploadData[i].newName = "";
+      // $scope.uploadData[i].fileType = "";
+      // $scope.uploadData[i].desc = "";
+      // $scope.uploadData[i].destination = $scope.formData.destination;
+      $scope.uploadData.push({
+        newName: "",
+        fileType: "",
+        desc: "",
+        destination: $scope.formData.destination
+      })
+    }
   };
+
+  $scope.start = function(index) {
+
+    $scope.progress[index] = 0;
+    $scope.errorMsg = null;
+
+    console.log($scope.uploadData[index]);
+    console.log($scope.selectedFiles[index]);
+
+    $scope.upload[index] = $upload.upload({
+      url: '/upload',
+      data: $scope.uploadData[index],
+      file: $scope.selectedFiles[index]
+    }).then(function(response) {
+      $scope.uploadResult.push(response.data);
+      console.log($scope.uploadResult);
+      console.log(response);
+    }, 
+      function(response) {
+        console.log(response.status);
+        if (response.status > 0) { 
+          $scope.errorMsg = response.status+ ': '+response.data;
+          $scope.uploadResult.push(response.data);
+        }
+    },
+      function(evt) {
+        // Math.min is to fix IE which reports 200% sometimes
+        $scope.progress[index] = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+    }).
+      xhr(function(xhr) {
+        xhr.upload.addEventListener('abort', function() {console.log('abort complete')}, false);
+    });
+
+  }
+
 
   $scope.onFormSubmit = function() {
     console.log("in onformsubmit");

@@ -83,13 +83,13 @@ angular.module('dimsDemo.controllers').
           params: clientConfig
         } ).
         success(function(data, status, headers, config) {
-          console.log("rwfind was called successfully");
-          console.log(data);
-          console.log(status);
-          console.log(config);
+          console.log("rwfind returned data");
+          // console.log(data);
+          // console.log(status);
+          // console.log(config);
           $scope.result = data;
           $scope.showResults = true;
-          console.log('showResults is '+$scope.showResults);
+          // console.log('showResults is '+$scope.showResults);
         }).
         error(function(data, status, headers, config) {
           console.log("rwfind Error");

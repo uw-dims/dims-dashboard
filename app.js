@@ -14,8 +14,18 @@ var express = require('express')
   // , ipgrep = require('./routes/ipgrep')
   , utils = require('./util')
   , http = require('http')
+  , https = require('https')
+  , fs = require('fs')
   , path = require('path')
   , config = require('./config');
+
+var sslOptions = {
+  key: fs.readFileSync('./cert/server.key'),
+  cert: fs.readFileSync('./cert/server.crt'),
+  ca: fs.readFileSync('./cert/ca.crt'),
+  requestCert: true,
+  rejectUnauthorized: false
+};
 
 var app = module.exports = express();
 
@@ -23,6 +33,7 @@ app.engine('html', require('ejs').renderFile);
 
 // all environments
 app.set('port', config.port);
+app.set('sslport', config.sslport);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'html');
 app.use(express.favicon());
@@ -65,7 +76,7 @@ app.get('*', routes.index);
 */
 
 
-http.createServer(app).listen(app.get('port'), function(){
-  console.log('Express server listening on port ' + app.get('port'));
+https.createServer(sslOptions,app).listen(app.get('sslport'), function(){
+  console.log('Express server listening on port ' + app.get('sslport'));
 });
 

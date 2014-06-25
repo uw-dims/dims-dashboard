@@ -19,7 +19,12 @@ exports.upload = function(req, res){
         },
         data = {};
 
-    filename = (req.body.fileName !== null && req.body.fileName !== undefined) ? req.body.fileName : req.files.file.name;
+    console.log(req.body.destination);
+    console.log(req.body.fileType);
+    console.log(req.body.newName);
+    console.log(req.body.desc);
+
+    filename = (req.body.newName !== "" && req.body.newName !== undefined) ? req.body.newName : req.files.file.name;
     i = filename.lastIndexOf('.');
     file_extension = (i < 0) ? '' : filename.substr(i);      
     tmp_path = req.files.file.path;
@@ -33,6 +38,9 @@ exports.upload = function(req, res){
         }
     }
 
+    console.log("target_path: " + target_path);
+    console.log("filename: " + filename);
+
     if((file_extension in oc(extensionAllowed)) && ((req.files.file.size /1024 ) < maxSizeOfFile)) { 
         
         console.log("file passed validation");
@@ -45,7 +53,6 @@ exports.upload = function(req, res){
         });
         data.msg = "File uploaded sucessfully";
         data.path = target_path;
-        data.success = false;
         console.log("data sent back is");
         console.log(data);
 
@@ -55,7 +62,6 @@ exports.upload = function(req, res){
             if (err) throw err;
         });
         data.msg = "File upload failed. File extension not allowed and size must be less than "+maxSizeOfFile;
-        data.success = false;
         data.path = "";
         console.log(data)
         res.send(400, data);

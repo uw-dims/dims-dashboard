@@ -116,6 +116,10 @@ body {
   overflow-x: visible;
 }
 
+/*
+ * Upload
+ */
+
 .uploadDropzone {
   background: #ddd;
     width: 150px;
@@ -127,3 +131,36 @@ body {
 .uploadDropzone-hover {
   background: #bbb;
 }
+
+.sel-file {
+  padding: 1px 5px;
+  font-size: smaller;
+  color: gray;
+}
+
+.response {
+  padding-top: 30px;
+}
+
+.response>ul {
+  list-style-type: decimal;
+}
+
+.response li, .response .reqh {
+  color: blue;
+  font-size: smaller;
+  padding-bottom: 5px; 
+}
+
+.progress {
+  display: inline-block;
+  width: 100px; 
+  border: 3px groove #CCC;
+}
+
+.progress div {
+  font-size: smaller;
+  background: orange;
+  width: 0;
+}
+

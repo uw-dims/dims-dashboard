@@ -99,9 +99,9 @@ angular.module('dimsDemo.controllers').
           params: clientConfig
         } ).
         success(function(data, status, headers, config) {
-          console.log("crosscor returned data");
-          console.log(status);
-          console.log(data);
+          // console.log("crosscor returned data");
+          // console.log(status);
+          // console.log(data);
           $scope.data = data;
          
           $scope.showResults = true;
