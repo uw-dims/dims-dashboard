@@ -49,7 +49,7 @@
     
     <label  class="col-sm-2 control-label">Or Choose File</label>
     <div class="col-sm-3" ng-show="showFiles">
-      <select class="form-control input-sm" ng-model="formData.fileName" ng-options="n for n in fileNames" >
+      <select class="form-control input-sm" ng-model="formData.fileName" ng-options="n.name for n in fileNames" >
         <option></option>
       </select>
     </div>

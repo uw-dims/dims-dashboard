@@ -6,7 +6,7 @@
     
     <label  class="col-sm-2 control-label">File to anonymize</label>
     <div class="col-sm-3" ng-show="showFiles">
-      <select class="form-control" ng-model="formData.fileName" ng-options="n for n in fileNames" >
+      <select class="form-control" ng-model="formData.fileName" ng-options="n.name for n in fileNames" >
         <option></option>
       </select>
     </div>
@@ -17,7 +17,7 @@
     
     <label  class="col-sm-2 control-label">Map File</label>
     <div class="col-sm-3" ng-show="showFiles">
-      <select class="form-control" ng-model="formData.mapName" ng-options="m for m in mapNames" >
+      <select class="form-control" ng-model="formData.mapName" ng-options="m.name for m in mapNames" >
         <option></option>
       </select>
     </div>
