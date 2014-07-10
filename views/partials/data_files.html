@@ -1,46 +1,23 @@
 <h2 class="sub-header">View Files</h2>
-
-<form role="form" class="form-horizontal">
-
-
-  <div class="form-group">
-  <label  class="col-sm-3 control-label">Choose a Directory</label>
-    <div class="col-sm-5">
-      <select class="form-control" ng-model="formData.source" ng-options="f.value as f.label for f in sourceMap" >
+<form role="form" class="form-inline">
+ <div class="form-group">
+  <label  class="control-label inline-group">Choose Data Directory</label>
+      <select class="form-control inline-group" ng-model="formData.source" ng-options="f.value as f.label for f in sourceMap" >
       </select>
-    </div>
   </div>
-
-   <div class="form-group">
-    <div class="col-sm-3 col-sm-offset-2">
-        <button type="button" class="btn btn-primary" ng-click="getFiles()">View Files</button>
-    </div></div>
-
+  <button type="button" class="btn btn-primary btn-sm inline-group" ng-click="getFiles()">View Data Files</button>
 </form>
-
-<!-- <div class="panel panel-default"><div class="panel-body" ng-show="showFiles"> -->
-<!-- <div class="row" ng-show="showFiles">
-<div class="col-sm-12"> -->
-<!-- <div ng-show="showFiles">
- --><div class="gridStyle gridStyle-short" ng-grid="gridOptions"></div><!-- </div> -->
-<!-- </div></div> -->
-  
-<!-- <div class="row">
-<div class="col-sm-4">
-<div class="table-responsive">
-  <table class="table table-striped" >
-    <thead><tr><th>File Name</th></tr></thead>
-    <tbody>
-    <tr ng-repeat="file in files" ng-click="tableClicked(file)"><td>{{file}}</td>
-    </tr>
-    </tbody>
-  </table>
-</div> 
-</div> -->
-<!-- <div class="row" ng-show="showData">
-<div class="col-sm-12" > -->
-<div class="dataPanel" ng-show="showData">
-<h4>File Contents</h4>
-<pre ng-if="!isJson">{{singleFile}}</pre>
-<pretty-json ng-if="isJson" json="singleFile" />
+<div class="gridStyle gridStyle-short" ng-grid="gridOptions"></div>
+<div class="heading-block"><p>Click on a file name to display contents. Files larger than 1 megabyte are truncated.</p></div>
+<div ng-show="showData">
+<div class="heading-block">
+<span class="inline-group"><strong>File Contents</strong></span>
+<button type="button" class="btn btn-primary btn-sm inline-group" ng-click="showPrettyResults()" ng-show="isRaw && isJson">Pretty Print</button>
+<button type="button" class="btn btn-primary btn-sm inline-group" ng-click="showRawData()" ng-hide="isRaw">Show Raw Data</button>
+<span class="inline-group">{{prettyMsg}}</span>
+<span class="inline-group" ng-show="loading">Loading data...</span>
+</div>
+<div class="dataPanel">
+<pre> {{singleFile}} </pre>
+</div>
 </div>

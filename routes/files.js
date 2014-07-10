@@ -1,5 +1,6 @@
 
 var fs = require('fs');
+var util = require('util');
 var config = require('../config');
 var yaml = require('js-yaml');
 
@@ -118,15 +119,49 @@ exports.files = function(req,res) {
     // Request: read a file
     if (req.query.action == 'read') {
         directory = directory + req.query.file;
-        fs.readFile(directory, 'utf8', function(err, data) {
-            if (err) {
-                console.log('fs.readFile error');
-                console.log(err);
-                return res.send(500, err);
+        fs.exists(directory, function(exists) {
+            if (exists) {
+                fs.stat(directory, function(err, stats) {
+                    if (err) {
+                        console.log('fs.stat error');
+                        console.log(err);
+                        return res.send(500, err);
+                    } 
+                    fs.open(directory, 'r', function(err, fd) {
+                        if (err) {
+                            console.log('fs.open error', err);
+                            return res.send(500, err);
+                        } 
+                        // Limit size since large files slow down page response and entire
+                        // content is not needed for this function
+                        var buf = new Buffer((stats.size > 1000000) ? 1000000 : stats.size);
+                        fs.read(fd, buf, 0, buf.length, null, function(err, bytesRead, buffer) {
+                            if (err) {
+                                console.log('fs.read error', err);
+                                fs.close(fd, function(err) {
+                                    if (err) {
+                                      console.log("Error closing file: " + err);
+                                    }
+                                });
+                                return res.send(500, err);
+                            }
+                            console.log('File read: ' + directory);
+                            fs.close(fd, function(err) {
+                                if (err) {
+                                  console.log("Error closing file: " + err);
+                                }
+                            });
+                            return res.send(200, buffer.toString('utf-8', 0, buf.length));
+                        });
+                    });
+                });
+
+            } else {
+                console.log(directory+' does not exist');
+                return res.send(400, 'File does not exist');
             }
-            console.log('File read: ' + directory);
-            return res.send(200, data);
-        })
+        });
+
 
     // Request: Get directory listing
     } else {

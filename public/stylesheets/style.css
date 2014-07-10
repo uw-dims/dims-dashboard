@@ -164,3 +164,12 @@ body {
   width: 0;
 }
 
+.inline-group {
+  margin-right: 10px;
+}
+
+.heading-block {
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
