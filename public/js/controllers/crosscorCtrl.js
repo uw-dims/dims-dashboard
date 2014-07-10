@@ -82,10 +82,10 @@ angular.module('dimsDemo.controllers').
       Utils.setConfig(clientConfig, $scope.formData.stats, 'stats');
       Utils.setConfig(clientConfig, $scope.formData.iff, 'iff');
       if (Utils.inputPresent($scope.formData.mapName)) {
-        Utils.setConfig(clientConfig, $scope.mapPath+$scope.formData.mapName, 'mapName');
+        Utils.setConfig(clientConfig, $scope.mapPath+$scope.formData.mapName.name, 'mapName');
       }
       if (Utils.inputPresent($scope.formData.fileName)) {
-        Utils.setConfig(clientConfig, $scope.filePath+$scope.formData.fileName, 'fileName');
+        Utils.setConfig(clientConfig, $scope.filePath+$scope.formData.fileName.name, 'fileName');
       }
 
       console.log(clientConfig);

@@ -53,7 +53,7 @@ angular.module('dimsDemo.controllers').
       $scope.formErrorMsg = "";
 
       // Catch some input errors
-      if (!Utils.inputPresent($scope.formData.fileName)) {
+      if (!Utils.inputPresent($scope.formData.fileName.name)) {
         $scope.showFormError = true;
         $scope.formErrorMsg = 'You have to choose a file to anonymize.';
         return;
@@ -65,10 +65,10 @@ angular.module('dimsDemo.controllers').
       Utils.setConfig(clientConfig, $scope.formData.stats, 'stats');
       Utils.setConfig(clientConfig, $scope.formData.outputType, 'outputType');
       if (Utils.inputPresent($scope.formData.mapName)) {
-        Utils.setConfig(clientConfig, $scope.mapPath+$scope.formData.mapName, 'mapName');
+        Utils.setConfig(clientConfig, $scope.mapPath+$scope.formData.mapName.name, 'mapName');
       }
       if (Utils.inputPresent($scope.formData.fileName)) {
-        Utils.setConfig(clientConfig, $scope.filePath+$scope.formData.fileName, 'fileName');
+        Utils.setConfig(clientConfig, $scope.filePath+$scope.formData.fileName.name, 'fileName');
       }
 
       console.log(clientConfig);

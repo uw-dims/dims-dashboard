@@ -121,9 +121,10 @@
 </tbody></table>
 </div>
 
-<div class="row"><div class="col-sm-12 well  well-sm" ng-show="showResults">
-<strong>Raw Results</strong>
-<pretty-json  ng-show="showResults" json="data" />
-</div></div>
+<div ng-show="showResults">
+<div class="heading-block">
+<strong>Raw Results</strong></div>
+<div class="dataPanel">
+<pre > {{rawData}} </pre></div></div>
 
 

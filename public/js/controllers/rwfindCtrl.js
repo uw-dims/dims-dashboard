@@ -47,6 +47,7 @@ angular.module('dimsDemo.controllers').
     $scope.showJsonResults = false;
     $scope.result = null;
     $scope.resultsMsg = 'Results';
+    $scope.rawData = "";
 
     // Setup grid
     $scope.flows = [];
@@ -69,6 +70,7 @@ angular.module('dimsDemo.controllers').
     var prepareData = function(data,status,headers,config) {
       console.log("rwfind returned data");
       console.log(status);
+       $scope.rawData = data;
       var flowsFound = -1;
        if ($scope.formData.outputType == 'json') {
           $scope.result = data;
@@ -187,7 +189,7 @@ angular.module('dimsDemo.controllers').
       Utils.setConfig(clientConfig, $scope.formData.ips, 'ips');
       Utils.setConfig(clientConfig, $scope.formData.header, 'header');
       if (Utils.inputPresent($scope.formData.fileName)) {
-        Utils.setConfig(clientConfig, $scope.filePath+$scope.formData.fileName, 'fileName');
+        Utils.setConfig(clientConfig, $scope.filePath+$scope.formData.fileName.name, 'fileName');
       }
 
       console.log(clientConfig);

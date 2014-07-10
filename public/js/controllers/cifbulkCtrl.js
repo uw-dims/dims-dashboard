@@ -38,6 +38,7 @@ angular.module('dimsDemo.controllers').
     $scope.showResults = false;
     $scope.result = null;
     $scope.resultsMsg = 'Results';
+    $scope.rawData = "";
 
     $scope.data = {};
     // Set up ng-grid - currently this has been superseded but may be used later
@@ -61,7 +62,7 @@ angular.module('dimsDemo.controllers').
     // Prepare incoming data
     var prepareData = function(data, status, headers, config) {
       console.log(data);
-      // $scope.data = data;
+      $scope.rawData = data;
       $scope.noResults = [];
       $scope.showResults = true;
       $scope.resultsMsg = 'Results';
@@ -155,7 +156,7 @@ angular.module('dimsDemo.controllers').
       Utils.setConfig(clientConfig, $scope.formData.stats, 'stats');
       Utils.setConfig(clientConfig, $scope.formData.header, 'header');
       if (Utils.inputPresent($scope.formData.fileName)) {
-        Utils.setConfig(clientConfig, $scope.filePath+$scope.formData.fileName, 'fileName');
+        Utils.setConfig(clientConfig, $scope.filePath+$scope.formData.fileName.name, 'fileName');
       }
     
       console.log(clientConfig);

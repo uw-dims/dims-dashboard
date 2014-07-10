@@ -55,6 +55,7 @@ angular.module('dimsDemo.controllers').
       $scope.rawFile = "";
       $scope.loading = true;
       $scope.prettyMsg = "";
+      $maxFileSize = 1000000;
 
       return $http({
         method: 'GET',
@@ -67,8 +68,10 @@ angular.module('dimsDemo.controllers').
         }],
         url: '/files',
         // headers: {Accept: "text/plain, */*"},
+        // Using truncate param to truncate file if too large
         params: {
           action: 'read',
+          truncate: maxFileSize,
           file: file,
           source: $scope.fileSource
         }
