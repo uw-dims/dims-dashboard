@@ -48,6 +48,10 @@ angular.module('dimsDemo.controllers').
     $scope.result = null;
     $scope.resultsMsg = 'Results';
     $scope.rawData = "";
+    $scope.prettyData = "";
+    $scope.dataSize=100;
+    $scope.totalDataSize=0;
+    $scope.query="";
 
     // Setup grid
     $scope.flows = [];
@@ -68,9 +72,10 @@ angular.module('dimsDemo.controllers').
     // $scope.flowStatsGridOptions = { data: 'flowStats' };
 
     var prepareData = function(data,status,headers,config) {
-      console.log("rwfind returned data");
+      console.log("rwfind returned data - in prepareData");
       console.log(status);
-       $scope.rawData = data;
+      $scope.rawData = data;
+      $scope.flowItems=[];
       var flowsFound = -1;
        if ($scope.formData.outputType == 'json') {
           $scope.result = data;
@@ -79,33 +84,48 @@ angular.module('dimsDemo.controllers').
             $scope.flows = $scope.result.flows;
             $scope.flowStats = $scope.result.flow_stats;
             // Massage flow_stats data so it can be displayed. TODO: Remove % returned by client
-            for (var i=0; i< $scope.flowStats.length; i++ ) {
-              for (key in $scope.flowStats[i]) {
-                if($scope.flowStats[i].hasOwnProperty(key)) {
-                var newKey = key;
-                  if (key == '%_of_total') {
-                     newKey = 'Percent_of_total';
-                  } else if (key == 'cumul_%') {
-                     newKey = 'Cumulative_Percent';
-                  }
-                  if (key !== newKey) {
-                     $scope.flowStats[i][newKey] = $scope.flowStats[i][key];
-                     delete($scope.flowStats[i][key]);
+            if($scope.flowStats) {
+              for (var i=0; i< $scope.flowStats.length; i++ ) {
+                for (key in $scope.flowStats[i]) {
+                  if($scope.flowStats[i].hasOwnProperty(key)) {
+                  var newKey = key;
+                    if (key == '%_of_total') {
+                       newKey = 'Percent_of_total';
+                    } else if (key == 'cumul_%') {
+                       newKey = 'Cumulative_Percent';
+                    }
+                    if (key !== newKey) {
+                       $scope.flowStats[i][newKey] = $scope.flowStats[i][key];
+                       delete($scope.flowStats[i][key]);
+                    }
                   }
                 }
-              }
-            }                 
+              } 
+            }                
             $scope.showJsonResults = true;
+            $scope.start = 0;
+            $scope.totalDataSize = $scope.flows.length;
+            $scope.pageResults();
           }          
          
       } else {
           $scope.result = data;
       }
-     
+      console.log("Done processing JSON");
       $scope.showResults = true;
       $scope.resultsMsg = (flowsFound >=0) ? 'Results - ' + flowsFound + ' flows found': 'Results';         
-
+      $scope.isRaw = true;
     };
+
+    $scope.pageResults = function() {
+      // console.log("calling pageResults: start is " + $scope.start);
+      var end = ($scope.start + $scope.dataSize) > $scope.totalDataSize ? $scope.totalDataSize : $scope.start + $scope.dataSize;
+      // var iterationSize = ($scope.start + $scope.dataSize) > size ? size - $scope.start : $scope.dataSize;
+      for (var i=$scope.start; i<end; i++ ){
+        $scope.flowItems.push($scope.flows[i]);
+      }
+      $scope.start = end;
+    }
 
     var getDemo = function(file) {
       console.log("in getDemo");
@@ -212,5 +232,24 @@ angular.module('dimsDemo.controllers').
           $scope.resultsMsg = 'Results';
           $scope.showResults = false;
         });
+      };
+
+  $scope.showPrettyResults= function() {
+    $scope.prettyMsg = "";
+    if ($scope.prettyData.length == 0) {
+      try {
+        $scope.prettyData = JSON.stringify($scope.rawData,null,2);
+        $scope.isRaw = false;
+      } catch(e) {
+        $scope.prettyMsg = "Pretty print does not work on this data."
       }
+    }
+    $scope.isRaw = false;
+    
+  };
+
+  $scope.showRawData = function() {
+        $scope.isRaw = true;
+    };
+
 });

@@ -111,9 +111,12 @@ body {
 }
 
 .dataPanel {
-  max-height: 300px;
-  overflow-y: scroll;
-  overflow-x: visible;
+  max-height: 400px;
+  /*overflow-y: scroll;
+  overflow-x: visible;*/
+  overflow:auto;
+  margin: 10px 0px;
+  border: 1px solid #eee;
 }
 
 /*
@@ -171,5 +174,35 @@ body {
 .heading-block {
   margin-bottom: 10px;
   margin-top: 10px;
+}
+
+div.tableContainer {
+  clear:both;
+  border: 1px solid #963;
+  height: 400px;
+  overflow: auto;
+}
+
+html>body thead.fixedHeader tr {
+  display:block;
+}
+
+.scrollTable {
+
+}
+
+.fixedHeader {
+
+}
+
+html>body tbody.scrollContent {
+  display:block;
+  height: 350px;
+  overflow: auto;
+}
+
+.scrollContent {
+
+
 }
 

@@ -66,7 +66,7 @@ var constants = {
 }
 
 var dimsDemo = angular.module('dimsDemo', 
-  ['ngRoute','angularFileUpload','ui.bootstrap','ui.bootstrap.showErrors','ngGrid','ngPrettyJson','truncate','dimsDemo.controllers', 'dimsDemo.directives', 'dimsDemo.services'])
+  ['ngRoute','angularFileUpload','ui.bootstrap','ui.bootstrap.showErrors','ngGrid', 'ngPrettyJson','truncate', 'dimsDemo.controllers', 'dimsDemo.directives', 'dimsDemo.services'])
   .config(dimsDemoConfig);
 
 dimsDemo.constant(constants);

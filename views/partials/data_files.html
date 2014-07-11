@@ -14,10 +14,13 @@
 <span class="inline-group"><strong>File Contents</strong></span>
 <button type="button" class="btn btn-primary btn-sm inline-group" ng-click="showPrettyResults()" ng-show="isRaw && isJson">Pretty Print</button>
 <button type="button" class="btn btn-primary btn-sm inline-group" ng-click="showRawData()" ng-hide="isRaw">Show Raw Data</button>
+
 <span class="inline-group">{{prettyMsg}}</span>
 <span class="inline-group" ng-show="loading">Loading data...</span>
 </div>
+
 <div class="dataPanel">
 <pre> {{singleFile}} </pre>
 </div>
+
 </div>

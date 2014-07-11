@@ -55,7 +55,7 @@ angular.module('dimsDemo.controllers').
       $scope.rawFile = "";
       $scope.loading = true;
       $scope.prettyMsg = "";
-      $maxFileSize = 1000000;
+      var maxFileSize = 1000000;
 
       return $http({
         method: 'GET',
