@@ -1,0 +1,28 @@
+<table class="table table-striped table-hover table-bordered table-condensed " ><thead>
+<tr><th>Index</th>
+<th>Source IP</th>
+<th>Destination IP</th>
+<th>Source Port</th>
+<th>Destination Port</th>
+<th>Protocol</th>
+<th>Packets</th>
+<th>Bytes</th>
+<th>Flags</th>
+<th>Start Time</th>
+<th>Duration</th>
+</tr></thead><tbody>
+<tr ng-repeat="f in flowItems track by $index" ng-init="rowindex = $index" >
+<td>{{rowindex}}</td>
+<td>{{ f.sIP }}</td>
+<td>{{ f.dIP }}</td>
+<td>{{ f.sPort }}</td>
+<td>{{ f.dPort }}</td>
+<td>{{ f.pro }}</td>
+<td>{{ f.packets }}</td>
+<td>{{ f.bytes }}</td>
+<td>{{ f.flags }}</td>
+<td>{{ f.sTime }}</td>
+<td>{{ f.dur }}</td>
+
+</tr>
+</tbody></table>

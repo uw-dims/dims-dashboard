@@ -11,6 +11,7 @@ var express = require('express')
   , cifbulk = require('./routes/cifbulk')
   , crosscor = require('./routes/crosscor')
   , anon = require('./routes/anon')
+  , data = require('./routes/data')
   // , ipgrep = require('./routes/ipgrep')
   , utils = require('./util')
   , http = require('http')
@@ -62,6 +63,7 @@ app.get('/cifbulk', cifbulk.list);
 app.get('/crosscor', crosscor.list);
 app.get('/anon', anon.list);
 app.get('/rwfind', rwfind.list);
+app.get('/data', data.list);
 app.get('*', routes.index);
 
 // Handle cross-domain requests

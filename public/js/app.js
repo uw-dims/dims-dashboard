@@ -39,6 +39,10 @@ var dimsDemoConfig = function($routeProvider, $locationProvider, datepickerConfi
     controller: 'RwfindCtrl',
     templateUrl: 'partials/rwfind_client.html'
   }).
+  when('/graph', {
+    controller: 'GraphCtrl',
+    templateUrl: 'partials/graph.html'
+  }).
   otherwise({
     redirectTo: '/'
   });

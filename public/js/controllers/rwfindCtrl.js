@@ -20,17 +20,23 @@ angular.module('dimsDemo.controllers').
     $scope.showDemoFiles = false;
 
     FileService.getFileList('ip_lists').then(function(result) {
+      console.log('result in rwfindCtrl getFileList');
       console.log(result);
         $scope.fileNames = result.fileNames;
         $scope.filePath = result.filePath;
         $scope.showFiles = true;
+      console.log('$scope.fileNames in rwfindCtrl getFileList');
+      console.log($scope.fileNames);
     });
 
     FileService.getDemoList('rwfind').then(function(result) {
+      console.log('result in rwfindCtrl getDemoList');
       console.log(result);
       $scope.demoPath = result.filePath;
       $scope.demoNames = result.fileNames;
       $scope.showDemoFiles = true;
+      console.log('$scope.demoNames in rwfindCtrl getDemoList');
+      console.log($scope.demoNames);
     });
 
     // Setup date

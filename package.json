@@ -16,6 +16,8 @@
     "tmp": "*",
     "ng-prettyjson": "*",
     "underscore": "1.6.0",
-    "js-yaml": "3.0.2"
+    "js-yaml": "3.0.2",
+    "lodash":"2.4.1",
+    "JSONStream": "0.8.4"
   }
 }

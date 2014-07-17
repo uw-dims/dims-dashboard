@@ -81,7 +81,9 @@ angular.module('dimsDemo.services', [])
               var result = {
                 fileNames: data.result,
                 filePath: data.path
-              } 
+              };
+              console.log('result in getFileList success method');
+              console.log(result);
               deferred.resolve(result);
         }).error(function(data,status,headers,config) {
               deferred.reject("No results. Status: "+ status);
@@ -90,8 +92,11 @@ angular.module('dimsDemo.services', [])
       };
 
       var getDemoList = function(type) {
+        console.log('In FileService:getDemoList');
         var deferred = $q.defer();
         getFileList('default_data').then(function(data) {
+          console.log('data in getDemoList then function');
+          console.log(data);
           var j = 0,
               names = [];
           for (var i=0; i < data.fileNames.length; i++){
@@ -102,8 +107,10 @@ angular.module('dimsDemo.services', [])
           }
           var result = {
             fileNames: names,
-            filePath: data.path
-          }
+            filePath: data.filePath
+          };
+          console.log('result in GetDemoList then after filter');
+          console.log(result);
           deferred.resolve(result);
         });
         return deferred.promise;
