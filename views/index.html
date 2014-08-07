@@ -5,10 +5,7 @@
     <% include navbar %>
 
     <div class="container-fluid">
-      <div class="row">
-        <% include sidebar %>
-        <% include center %>
-      </div>
+      <% include center %> 
     </div>
     
     <!-- Bootstrap core JavaScript
@@ -17,7 +14,7 @@
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="lib/jquery.js"></script>
     <!-- Latest compiled and minified JavaScript -->
-    <script  src="lib/bootstrap.js"></script>
+    <script  src="lib/bootstrap/bootstrap.js"></script>
     <script src="lib/angular-file-upload-bower-1.4.0/angular-file-upload-shim.js"></script> 
     <script src="lib/angular.js"></script>
     <script src="lib/angular-route.js"></script>
@@ -46,6 +43,12 @@
     <script src="js/filters/filters.js"></script>
     <script src="js/services/services.js"></script>
     <script src="js/services/dataService.js"></script>
+    <script>
+$('.dropdown-toggle').click(function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+});
+</script> 
 
 </body>
 </html>

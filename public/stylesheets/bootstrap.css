@@ -274,8 +274,8 @@ html {
 }
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 14px;
-  line-height: 1.42857143;
+  font-size: 12px;
+  line-height: 1.3;
   color: #333;
   background-color: #fff;
 }
@@ -401,7 +401,7 @@ h2,
 .h2,
 h3,
 .h3 {
-  margin-top: 20px;
+  margin-top: 15px;
   margin-bottom: 10px;
 }
 h1 small,
@@ -443,11 +443,13 @@ h6 .small,
 }
 h1,
 .h1 {
-  font-size: 36px;
+  /*font-size: 36px;*/
+  font-size: 24px;
 }
 h2,
 .h2 {
-  font-size: 30px;
+  /*font-size: 30px;*/
+  font-size: 20px;
 }
 h3,
 .h3 {
