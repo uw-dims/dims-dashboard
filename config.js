@@ -28,15 +28,10 @@ config.directoryMapping = {
 
 config.defaultMapping = {
 	'default_data': config.data
-}
-
-config.sslOptions = {
-  key: fs.readFileSync('./cert/server.key'),
-  cert: fs.readFileSync('./cert/server.crt'),
-  ca: fs.readFileSync('./cert/ca.crt'),
-  requestCert: true,
-  rejectUnauthorized: false
 };
 
+config.server.key = './cert/server.key';
+config.server.crt = './cert/server.crt';
+config.server.ca = './cert/ca.crt';
 
 module.exports = config;
