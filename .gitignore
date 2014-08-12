@@ -7,3 +7,4 @@ upload/*
 mydata/*
 bower_components/*
 *.log
+certs/*
