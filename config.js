@@ -30,8 +30,8 @@ config.defaultMapping = {
 	'default_data': config.data
 };
 
-config.server.key = './cert/server.key';
-config.server.crt = './cert/server.crt';
-config.server.ca = './cert/ca.crt';
+config.server_key = './cert/server.key';
+config.server_crt = './cert/server.crt';
+config.server_ca = './cert/ca.crt';
 
 module.exports = config;

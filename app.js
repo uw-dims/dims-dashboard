@@ -21,9 +21,9 @@ var express = require('express')
   , config = require('./config');
 
 var sslOptions = {
-  key: fs.readFileSync(config.server.key),
-  cert: fs.readFileSync(config.server.crt),
-  ca: fs.readFileSync(config.server.ca),
+  key: fs.readFileSync(config.server_key),
+  cert: fs.readFileSync(config.server_crt),
+  ca: fs.readFileSync(config.server_ca),
   requestCert: true,
   rejectUnauthorized: false
 };
