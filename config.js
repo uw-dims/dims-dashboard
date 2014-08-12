@@ -30,5 +30,13 @@ config.defaultMapping = {
 	'default_data': config.data
 }
 
+config.sslOptions = {
+  key: fs.readFileSync('./cert/server.key'),
+  cert: fs.readFileSync('./cert/server.crt'),
+  ca: fs.readFileSync('./cert/ca.crt'),
+  requestCert: true,
+  rejectUnauthorized: false
+};
+
 
 module.exports = config;

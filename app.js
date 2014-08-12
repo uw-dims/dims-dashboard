@@ -20,13 +20,7 @@ var express = require('express')
   , path = require('path')
   , config = require('./config');
 
-var sslOptions = {
-  key: fs.readFileSync('./cert/server.key'),
-  cert: fs.readFileSync('./cert/server.crt'),
-  ca: fs.readFileSync('./cert/ca.crt'),
-  requestCert: true,
-  rejectUnauthorized: false
-};
+var sslOptions = config.sslOptions;
 
 var app = module.exports = express();
 
