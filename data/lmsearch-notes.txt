@@ -1,7 +1,0 @@
-First record: Tue Feb  4 00:00:29 PST 2014
-Last record:  Mon Feb 10 12:46:42 PST 2014
-Num records:  35151
-Fields:
-	(Pdb) data[1].keys()
-	[u'dstip', u'description', u'event_name', u'timestamp', u'report_device', u'CUSTOM3', u'usr', u'srcip', u'device_vendor', u'dstport']
-
