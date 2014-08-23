@@ -17,7 +17,7 @@ module.exports = function (grunt) {
 
   // Configurable paths for the application
   var appConfig = {
-    app: require('./bower.json').appPath || 'app',
+    app: require('./bower.json').appPath || 'dimswebapp',
     dist: '../server/dist'
   };
 
@@ -164,15 +164,18 @@ module.exports = function (grunt) {
       },
       app: {
         src: ['<%= appConfig.app %>/index.html'],
-        ignorePath:  /\.\.\//
+        exclude: ['bower_components/bootstrap/dist/js/bootstrap.js']
+        //ignorePath:  /\.\.\//
       },
       less: {
-        src: ['<%= appConfig.app %>/styles/main.less']
+        src: ['<%= appConfig.app %>/styles/style.less'],
+        exclude: ['bower_components/bootstrap/dist/css/bootstrap.css']
+        //ignorePath:  /\.\.\//
         //ignorePath: /(\.\.\/){1,2}bower_components\//
       }
     },
 
-    // Compiles Sass to CSS and generates necessary files if requested
+    // Compiles LESS to CSS and generates necessary files if requested
     less: {
       development: {
         options: {
@@ -183,7 +186,7 @@ module.exports = function (grunt) {
 
         },
         files: {
-          '.tmp/styles/main.css':'<%= appConfig.app %>/styles/main.less'
+          '.tmp/styles/style.css':'<%= appConfig.app %>/styles/style.less'
         }
       },
 
@@ -192,7 +195,7 @@ module.exports = function (grunt) {
           paths: ['<%= appConfig.app %>/styles']
         },
         files: {
-          '<%= appConfig.app %>/styles/main.css': '<%= appConfig.app %>/styles/main.less'
+          '<%= appConfig.app %>/styles/style.css': '<%= appConfig.app %>/styles/style.less'
         }
       }
 
@@ -332,10 +335,10 @@ module.exports = function (grunt) {
       }
     },
 
-    // ngmin tries to make the code safe for minification automatically by
+    // ngAnnotate tries to make the code safe for minification automatically by
     // using the Angular long form for dependency injection. It doesn't work on
     // things like resolve or inject so those have to be done manually.
-    ngmin: {
+    ngAnnotate: {
       dist: {
         files: [{
           expand: true,
@@ -447,7 +450,7 @@ module.exports = function (grunt) {
     'useminPrepare',
     'autoprefixer',
     'concat',
-    'ngmin',
+    'ngAnnotate',
     'copy:dist',
     'cdnify',
     'cssmin',

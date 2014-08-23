@@ -2,7 +2,7 @@
 
 /* Services, factories */
 
-angular.module('dimsDemo.services', [])
+angular.module('dimsDashboard.services')
   
   .factory('DateService', function() {
 
@@ -20,16 +20,16 @@ angular.module('dimsDemo.services', [])
         startingDay: 0
       },
       tomorrow: tomorrow
-    }
+    };
 
     // Open calendar picker handler
     var open = function($event, datePicker) {
       $event.preventDefault();
       $event.stopPropagation();
       if (datePicker === 'startOpened') {
-        return [true, false]
+        return [true, false];
       } else {
-        return [false, true]
+        return [false, true];
       }
     }; 
 
@@ -37,7 +37,7 @@ angular.module('dimsDemo.services', [])
 
       dateConfig: dateConfig,
       open: open
-    }
+    };
 
 })
 
@@ -50,19 +50,22 @@ angular.module('dimsDemo.services', [])
     };
 
     root.inputPresent = function(data) {
-      if (data !== null && data !== undefined && data !== "") return true;
-      else return false;
-    }
+      if (data !== null && data !== undefined && data !== '') {
+        return true;
+      } else { 
+        return false;
+      }
+    };
 
     root.isJson = function(text) {
       try {
         JSON.parse(text);
       } catch (e) {
         console.log(e);
-        return false
+        return false;
       }
       return true;
-    }
+    };
     return root;
   })
 
@@ -86,7 +89,7 @@ angular.module('dimsDemo.services', [])
               console.log(result);
               deferred.resolve(result);
         }).error(function(data,status,headers,config) {
-              deferred.reject("No results. Status: "+ status);
+              deferred.reject('No results. Status: '+ status);
         });
         return deferred.promise;
       };
@@ -100,7 +103,7 @@ angular.module('dimsDemo.services', [])
           var j = 0,
               names = [];
           for (var i=0; i < data.fileNames.length; i++){
-            if (data.fileNames[i].type == type) {
+            if (data.fileNames[i].type === type) {
                 names[j] = data.fileNames[i].name;
                 j++;
             }

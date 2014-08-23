@@ -1,6 +1,8 @@
-angular.module('dimsDemo.controllers').
-  controller('CrosscorCtrl', function ($scope, Utils, FileService, $http, DateService, $location, $routeParams) {
-    console.log("In crosscor controller");
+'use strict';
+angular.module('dimsDashboard.controllers').
+  controller('CrosscorCtrl', ['$scope', 'Utils', 'FileService', '$http', 'DateService', '$location', '$routeParams', 
+    function ($scope, Utils, FileService, $http, DateService, $location, $routeParams) {
+    console.log('In crosscor controller');
 
     // Set up form data
     $scope.formData = {};
@@ -67,7 +69,7 @@ angular.module('dimsDemo.controllers').
       // Initialize/reset when calling a client
       $scope.showResults = false;
       $scope.showFormError = false;
-      $scope.formErrorMsg = "";
+      $scope.formErrorMsg = '';
 
       // Catch some input errors
       if (!Utils.inputPresent($scope.formData.fileName)) {
@@ -89,7 +91,7 @@ angular.module('dimsDemo.controllers').
       }
 
       console.log(clientConfig);
-      console.log("Now sending http get request");
+      console.log('Now sending http get request');
 
       $scope.resultsMsg = 'Results - Waiting...';
       
@@ -109,7 +111,7 @@ angular.module('dimsDemo.controllers').
           
         }).
         error(function(data, status, headers, config) {
-          console.log("rwfind Error");
+          console.log('rwfind Error');
           console.log(data);
           console.log(status);
           $scope.showFormError = true;
@@ -117,5 +119,5 @@ angular.module('dimsDemo.controllers').
           $scope.resultsMsg = 'Results';
           $scope.showResults = false;
         });
-      }
-});
+      };
+}]);

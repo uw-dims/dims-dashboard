@@ -1,6 +1,8 @@
-angular.module('dimsDemo.controllers').
-  controller('DataFilesCtrl', function (fileSourceMap, Utils, $scope, $http, $log, $location, $routeParams) {
-
+'use strict';
+angular.module('dimsDashboard.controllers').
+  controller('DataFilesCtrl', ['fileSourceMap', 'Utils', '$scope', '$http', '$log', '$location', '$routeParams', 
+      function (fileSourceMap, Utils, $scope, $http, $log, $location, $routeParams) {
+    console.log('In DataFiles controller');
     // Setup form data
     $scope.formData = {};
     $scope.showData = false;
@@ -24,7 +26,7 @@ angular.module('dimsDemo.controllers').
         enableCellEdit: true
       };
 
-    $scope.singleFile="";
+    $scope.singleFile='';
 
     $scope.getFiles = function() {
       return $http({
@@ -42,19 +44,19 @@ angular.module('dimsDemo.controllers').
           $scope.showFiles = true;
         }).
         error(function(data, status, headers, config) {
-          console.log("Error getting file list");
+          console.log('Error getting file list');
           console.log(data);
           console.log(status);
         });
-    }
+    };
 
     // Display file contents when clicked
     $scope.tableClicked = function(file) {
       $scope.showData = false;
-      $scope.singleFile = "";
-      $scope.rawFile = "";
+      $scope.singleFile = '';
+      $scope.rawFile = '';
       $scope.loading = true;
-      $scope.prettyMsg = "";
+      $scope.prettyMsg = '';
       var maxFileSize = 1000000;
 
       return $http({
@@ -85,29 +87,29 @@ angular.module('dimsDemo.controllers').
         }).
         error(function(data, status, headers, config) {
           $scope.loading = false;
-          console.log("Error getting file contents");
+          console.log('Error getting file contents');
           console.log(data);
           console.log(status);
         });
     };
 
-    isJson = function(data) {
-      $scope.jsonData = "";
+    var isJson = function(data) {
+      $scope.jsonData = '';
       try {
         $scope.jsonData = JSON.parse($scope.singleFile);
         return true;
       } catch(e) {
         return false;
       }
-    }
+    };
 
     $scope.showPrettyResults= function() {
-      $scope.prettyMsg = "";
+      $scope.prettyMsg = '';
       try {
         var jsonPretty = JSON.stringify($scope.jsonData,null,2);
         $scope.$evalAsync($scope.fileContentsLoaded(jsonPretty));
       } catch(e) {
-        $scope.prettyMsg = "Pretty print does not work on this data."
+        $scope.prettyMsg = 'Pretty print does not work on this data.';
       }
     };
 
@@ -119,7 +121,7 @@ angular.module('dimsDemo.controllers').
 
     $scope.showRawData = function() {
         $scope.singleFile = $scope.rawFile;
-        $scope.rawFile = "";
+        $scope.rawFile = '';
         $scope.isRaw = true;
     };
-  });
+  }]);

@@ -1,1 +1,1 @@
-angular.module('dimsDemo.controllers', []);
+angular.module('dimsDashboard.controllers', []);

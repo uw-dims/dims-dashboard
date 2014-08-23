@@ -4,7 +4,7 @@
 
 var INTEGER_REGEXP = /^\-?\d+$/;
 
-angular.module('dimsDemo.directives', []).
+angular.module('dimsDashboard.directives').
   directive('appVersion', function (version) {
     return function(scope, elm, attrs) {
       elm.text(version);
@@ -27,7 +27,7 @@ angular.module('dimsDemo.directives', []).
           }
         });
       }
-    }
+    };
   }).
 
   directive('infiniteScroll', [
@@ -40,14 +40,14 @@ angular.module('dimsDemo.directives', []).
         elem.css('overflow-x', 'hidden');
         elem.css('height', 'inherit');
         scrollDistance = 0;
-        if (attrs.infiniteScrollDistance != null) {
+        if (attrs.infiniteScrollDistance !== null) {
           scope.$watch(attrs.infiniteScrollDistance, function(value) {
             return scrollDistance = parseInt(value, 10);
           });
         }
         scrollEnabled = true;
         checkWhenEnabled = false;
-        if (attrs.infiniteScrollDisabled != null) {
+        if (attrs.infiniteScrollDisabled !== null) {
           scope.$watch(attrs.infiniteScrollDisabled, function(value) {
             scrollEnabled = !value;
             if (scrollEnabled && checkWhenEnabled) {
@@ -57,7 +57,7 @@ angular.module('dimsDemo.directives', []).
           });
         }
         $rootScope.$on('refreshStart', function(event, parameters){
-            elem.animate({ scrollTop: "0" });
+            elem.animate({ scrollTop: '0' });
         });
         handler = function() {
           var container, elementBottom, remaining, shouldScroll, containerBottom;
@@ -80,7 +80,7 @@ angular.module('dimsDemo.directives', []).
         scope.$on('$destroy', function() {
           return $window.off('scroll', handler);
         });
-        return $timeout((function() {
+        return $timeout(function() {
           if (attrs.infiniteScrollImmediateCheck) {
             if (scope.$eval(attrs.infiniteScrollImmediateCheck)) {
               return handler();
@@ -88,7 +88,7 @@ angular.module('dimsDemo.directives', []).
           } else {
             return handler();
           }
-        }), 0);
+        }, 0);
       }
     };
   }

@@ -1,21 +1,36 @@
 {
   "name": "dims-server",
+  "main": "app.js",
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node app.js"
+    "start": "NODE_ENV=production node app.js",
+    "test": "NODE_ENV=development nodemon app.js"
   },
   "dependencies": {
-    "express": "3.2.6",
-    "ejs": "*",
-    "python-shell": "0.0.2",
-    "fileupload": "*",
-    "carrier": "*",
-    "async": "*",
-    "xml2js": "*",
-    "tmp": "*",
-    "js-yaml": "3.0.2",
-    "lodash":"2.4.1",
+    "express": "~4.8.5",
+    "body-parser": "~1.6.5",
+    "compression": "*",
+    "cookie-session": "*",
+    "morgan": "*",
+    "cookie-parser": "*",
+    "express-session": "*",
+    "response-time": "*",
+    "errorhandler": "*",
+    "method-override": "*",
+    "connect-timeout": "*",
+    "vhost": "*",
+    "csurf": "*",
+    "serve-favicon": "*",
+    "ejs": "~1.0.0",
+    "python-shell": "~0.0.2",
+    "fileupload": "~0.3.0",
+    "carrier": "~0.1.14",
+    "async": "~0.9.0",
+    "xml2js": "~0.4.4",
+    "tmp": "~0.0.24",
+    "js-yaml": "~3.0.2",
+    "lodash": "~2.4.1",
     "JSONStream": "0.8.4"
   }
 }

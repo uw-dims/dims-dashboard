@@ -1,6 +1,8 @@
-angular.module('dimsDemo.controllers').
-  controller('RwfindCtrl', function ($scope, Utils, $http, FileService, DateService, $location, $routeParams) {
-    console.log("In rwfind controller");
+'use strict';
+angular.module('dimsDashboard.controllers').
+  controller('RwfindCtrl', ['$scope', 'Utils', '$http', 'FileService', 'DateService', '$location', '$routeParams',  
+      function ($scope, Utils, $http, FileService, DateService, $location, $routeParams) {
+    console.log('In rwfind controller');
 
     // Set up form data
     $scope.formData = {};
@@ -53,11 +55,11 @@ angular.module('dimsDemo.controllers').
     $scope.showJsonResults = false;
     $scope.result = null;
     $scope.resultsMsg = 'Results';
-    $scope.rawData = "";
-    $scope.prettyData = "";
+    $scope.rawData = '';
+    $scope.prettyData = '';
     $scope.dataSize=100;
     $scope.totalDataSize=0;
-    $scope.query="";
+    $scope.query='';
 
     // Setup grid
     $scope.flows = [];
@@ -78,12 +80,12 @@ angular.module('dimsDemo.controllers').
     // $scope.flowStatsGridOptions = { data: 'flowStats' };
 
     var prepareData = function(data,status,headers,config) {
-      console.log("rwfind returned data - in prepareData");
+      console.log('rwfind returned data - in prepareData');
       console.log(status);
       $scope.rawData = data;
       $scope.flowItems=[];
       var flowsFound = -1;
-       if ($scope.formData.outputType == 'json') {
+       if ($scope.formData.outputType === 'json') {
           $scope.result = data;
           flowsFound = $scope.result.flows_found;
           if (flowsFound > 0) {
@@ -92,12 +94,12 @@ angular.module('dimsDemo.controllers').
             // Massage flow_stats data so it can be displayed. TODO: Remove % returned by client
             if($scope.flowStats) {
               for (var i=0; i< $scope.flowStats.length; i++ ) {
-                for (key in $scope.flowStats[i]) {
+                for (var key in $scope.flowStats[i]) {
                   if($scope.flowStats[i].hasOwnProperty(key)) {
                   var newKey = key;
-                    if (key == '%_of_total') {
+                    if (key === '%_of_total') {
                        newKey = 'Percent_of_total';
-                    } else if (key == 'cumul_%') {
+                    } else if (key === 'cumul_%') {
                        newKey = 'Cumulative_Percent';
                     }
                     if (key !== newKey) {
@@ -117,7 +119,7 @@ angular.module('dimsDemo.controllers').
       } else {
           $scope.result = data;
       }
-      console.log("Done processing JSON");
+      console.log('Done processing JSON');
       $scope.showResults = true;
       $scope.resultsMsg = (flowsFound >=0) ? 'Results - ' + flowsFound + ' flows found': 'Results';         
       $scope.isRaw = true;
@@ -131,10 +133,10 @@ angular.module('dimsDemo.controllers').
         $scope.flowItems.push($scope.flows[i]);
       }
       $scope.start = end;
-    }
+    };
 
     var getDemo = function(file) {
-      console.log("in getDemo");
+      console.log('in getDemo');
       $scope.showResults = false;
       $scope.showJsonResults = false;
       $scope.data = {};
@@ -152,24 +154,24 @@ angular.module('dimsDemo.controllers').
           console.log(data);
           console.log(status);
         });
-    }
+    };
     
 
     /**
      *  callClient function
      */
     $scope.callClient = function() {
-      console.log("in callClient");
+      console.log('in callClient');
       console.log($scope.formData);
       // Initialize/reset when calling a client
       $scope.showResults = false;
       $scope.showFormError = false;
       $scope.showJsonResults = false;
-      $scope.formErrorMsg = "";
+      $scope.formErrorMsg = '';
 
       // User wants demo data - get data and return
       if ($scope.formData.demoName !== null && $scope.formData.demoName !== undefined) {
-        console.log("looking for demo data");
+        console.log('looking for demo data');
         console.log($scope.formData.demoName);
         $scope.resultsMsg = 'Results - Waiting...';
         getDemo($scope.formData.demoName);
@@ -194,8 +196,8 @@ angular.module('dimsDemo.controllers').
         $scope.formErrorMsg = 'Either enter number of days, or enter a start time and (optionally) end time.';
         return;
       }
-      if ((!Utils.inputPresent($scope.formData.startDate) && Utils.inputPresent($scope.formData.startHour))
-        ||(!Utils.inputPresent($scope.formData.endDate) && Utils.inputPresent($scope.formData.endHour))) {
+      if ((!Utils.inputPresent($scope.formData.startDate) && Utils.inputPresent($scope.formData.startHour)) || 
+        (!Utils.inputPresent($scope.formData.endDate) && Utils.inputPresent($scope.formData.endHour))) {
         $scope.showFormError = true;
         $scope.formErrorMsg = 'If you enter a value for the hour, also enter a value for the date.';
         return;
@@ -219,7 +221,7 @@ angular.module('dimsDemo.controllers').
       }
 
       console.log(clientConfig);
-      console.log("Now sending http get request");
+      console.log('Now sending http get request');
 
       $scope.resultsMsg = 'Results - Waiting...';
       
@@ -230,7 +232,7 @@ angular.module('dimsDemo.controllers').
         } ).
         success(prepareData).
         error(function(data, status, headers, config) {
-          console.log("rwfind Error");
+          console.log('rwfind Error');
           console.log(data);
           console.log(status);
           $scope.showFormError = true;
@@ -241,13 +243,13 @@ angular.module('dimsDemo.controllers').
       };
 
   $scope.showPrettyResults= function() {
-    $scope.prettyMsg = "";
-    if ($scope.prettyData.length == 0) {
+    $scope.prettyMsg = '';
+    if ($scope.prettyData.length === 0) {
       try {
         $scope.prettyData = JSON.stringify($scope.rawData,null,2);
         $scope.isRaw = false;
       } catch(e) {
-        $scope.prettyMsg = "Pretty print does not work on this data."
+        $scope.prettyMsg = 'Pretty print does not work on this data.';
       }
     }
     $scope.isRaw = false;
@@ -258,4 +260,4 @@ angular.module('dimsDemo.controllers').
         $scope.isRaw = true;
     };
 
-});
+}]);

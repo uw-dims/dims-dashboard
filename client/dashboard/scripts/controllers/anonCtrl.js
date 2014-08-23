@@ -1,5 +1,7 @@
-angular.module('dimsDemo.controllers').
-  controller('AnonCtrl', function ($scope, Utils, FileService, $http, DateService, $location, $routeParams) {
+'use strict';
+angular.module('dimsDashboard.controllers').
+  controller('AnonCtrl', ['$scope', 'Utils', 'FileService', '$http', 'DateService', '$location', '$routeParams', 
+    function ($scope, Utils, FileService, $http, DateService, $location, $routeParams) {
     console.log("In crosscor controller");
 
     // Set up form data
@@ -50,7 +52,7 @@ angular.module('dimsDemo.controllers').
       $scope.showResults = false;
       $scope.showJsonResults = false;
       $scope.showFormError = false;
-      $scope.formErrorMsg = "";
+      $scope.formErrorMsg = '';
 
       // Catch some input errors
       if (!Utils.inputPresent($scope.formData.fileName.name)) {
@@ -82,7 +84,7 @@ angular.module('dimsDemo.controllers').
           params: clientConfig
         } ).
         success(function(data, status, headers, config) {
-          console.log("anon returned data");
+          console.log('anon returned data');
           console.log(status);
           console.log(data);
           $scope.data = data;
@@ -90,13 +92,13 @@ angular.module('dimsDemo.controllers').
           $scope.showResults = true;
 
           $scope.resultsMsg = 'Results'; 
-          if ($scope.formData.outputType == 'json') {
+          if ($scope.formData.outputType === 'json') {
             $scope.showJsonResults = true;
           }        
           
         }).
         error(function(data, status, headers, config) {
-          console.log("rwfind Error");
+          console.log('rwfind Error');
           console.log(data);
           console.log(status);
           $scope.showFormError = true;
@@ -105,4 +107,4 @@ angular.module('dimsDemo.controllers').
           $scope.showResults = false;
         });
       }
-});
+}]);

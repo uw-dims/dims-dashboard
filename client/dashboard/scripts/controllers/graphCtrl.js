@@ -1,5 +1,7 @@
-angular.module('dimsDemo.controllers').
-  controller('GraphCtrl', function($scope, $http, FileService, DataService, $location, $routeParams) {
+'use strict';
+angular.module('dimsDashboard.controllers').
+  controller('GraphCtrl', ['$scope','$http','FileService', 'DataService', '$location', '$routeParams', 
+      function($scope, $http, FileService, DataService, $location, $routeParams) {
 
     console.log('In GraphCtrl');
     $scope.formData = {};
@@ -16,21 +18,21 @@ angular.module('dimsDemo.controllers').
 
     $scope.graphData = function() {
       $scope.showResults = true;
-      $scope.formErrorMsg = "";
+      $scope.formErrorMsg = '';
       $scope.resultsMsg = 'Results - Waiting...';
       // Empty any existing chart
-      $("#chart svg").empty();
+      $('#chart svg').empty();
 
       DataService.getData($scope.filePath+$scope.formData.fileName).
         then (function(result) {
           $scope.graphDataPoints = [
             {
-              "key": "MB",
-              "values": result
+              'key': 'MB',
+              'values': result
             }
           // Massage data
           ].map(function(series) {
-            series.values = series.values.map(function(d) { return {x: d[0], y: d[1] } });
+            series.values = series.values.map(function(d) { return {x: d[0], y: d[1] }; });
             return series;
           });
 
@@ -56,7 +58,7 @@ angular.module('dimsDemo.controllers').
             // chart sub-models (ie. xAxis, yAxis, etc) when accessed directly, return themselves, not the parent chart, so need to chain separately
             chart.xAxis
               .tickFormat($scope.xAxisTickFormatFunction())
-              .tickPadding("8")
+              .tickPadding('8')
               .axisLabel('Date');
 
             chart.x2Axis
@@ -72,7 +74,7 @@ angular.module('dimsDemo.controllers').
 
             chart.y2Axis
               .tickFormat($scope.yAxisTickFormatFunction())
-              .tickPadding("4");
+              .tickPadding('4');
 
             d3.select('#chart svg')
               .datum($scope.graphDataPoints)
@@ -93,17 +95,17 @@ angular.module('dimsDemo.controllers').
 
     $scope.xAxisTickFormatFunction = function() {
       return function(d) {
-        return d3.time.format("%x")(new Date(d));
-      }
+        return d3.time.format('%x')(new Date(d));
+      };
 
     };
 
     $scope.yAxisTickFormatFunction = function() {
       return function(d) {
-        return d3.format(",.3f")(d/1000000);
-      }
+        return d3.format(',.3f')(d/1000000);
+      };
       
     };
 
 
-  });
+  }]);

@@ -1,6 +1,8 @@
-angular.module('dimsDemo.controllers').
-  controller('CifbulkCtrl', function ($scope, Utils, FileService, $http, DateService, $location, $routeParams) {
-    console.log("In cifbulk controller");
+'use strict';
+angular.module('dimsDashboard.controllers').
+  controller('CifbulkCtrl', ['$scope', 'Utils', 'FileService', '$http', 'DateService', '$location', '$routeParams', 
+      function ($scope, Utils, FileService, $http, DateService, $location, $routeParams) {
+    console.log('In cifbulk controller');
 
     // Set up form data
     $scope.formData = {};
@@ -38,7 +40,7 @@ angular.module('dimsDemo.controllers').
     $scope.showResults = false;
     $scope.result = null;
     $scope.resultsMsg = 'Results';
-    $scope.rawData = "";
+    $scope.rawData = '';
 
     $scope.data = {};
     // Set up ng-grid - currently this has been superseded but may be used later
@@ -72,7 +74,7 @@ angular.module('dimsDemo.controllers').
       $scope.data.time = data.time;
       $scope.data.results=[];
       for (var i=0; i < data.results.length; i++) {
-        if (data.results[i].results.length == 0) {
+        if (data.results[i].results.length === 0) {
           $scope.noResults.push({searchitem: data.results[i].searchitem});
         } else {
           for (var j=0; j < data.results[i].results.length; j++) {
@@ -115,7 +117,7 @@ angular.module('dimsDemo.controllers').
       // Initialize/reset when calling a client
       $scope.showResults = false;
       $scope.showFormError = false;
-      $scope.formErrorMsg = "";
+      $scope.formErrorMsg = '';
 
       // User wants demo data - get data and return
       if ($scope.formData.demoName !== null && $scope.formData.demoName !== undefined) {
@@ -136,8 +138,8 @@ angular.module('dimsDemo.controllers').
         return;
       }
       
-      if ((!Utils.inputPresent($scope.formData.startDate) && Utils.inputPresent($scope.formData.startHour))
-        ||(!Utils.inputPresent($scope.formData.endDate) && Utils.inputPresent($scope.formData.endHour))) {
+      if ((!Utils.inputPresent($scope.formData.startDate) && Utils.inputPresent($scope.formData.startHour)) ||
+       (!Utils.inputPresent($scope.formData.endDate) && Utils.inputPresent($scope.formData.endHour))) {
         $scope.showFormError = true;
         $scope.formErrorMsg = 'If you enter a value for the hour, also enter a value for the date.';
         return;
@@ -160,7 +162,7 @@ angular.module('dimsDemo.controllers').
       }
     
       console.log(clientConfig);
-      console.log("Now sending http get request");
+      console.log('Now sending http get request');
 
       $scope.resultsMsg = 'Results - Waiting...';
       
@@ -173,7 +175,7 @@ angular.module('dimsDemo.controllers').
         .success(prepareData)
 
         .error(function(data, status, headers, config) {
-          console.log("cifbulk Error");
+          console.log('cifbulk Error');
           console.log(data);
           console.log(status);
           $scope.showFormError = true;
@@ -181,5 +183,5 @@ angular.module('dimsDemo.controllers').
           $scope.resultsMsg = 'Results';
           $scope.showResults = false;
         });
-      }
-});
+      };
+}]);

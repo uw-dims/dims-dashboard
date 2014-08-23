@@ -6,42 +6,42 @@
  * @name app
  * @type {angular.Module}
  */
-var dimsDemoConfig = function($routeProvider, $locationProvider, datepickerConfig, datepickerPopupConfig) {
+var dimsDashboardConfig = function($routeProvider, $locationProvider, datepickerConfig, datepickerPopupConfig) {
   $routeProvider.when('/', {
     controller: 'MainCtrl',
-    templateUrl: 'partials/main.html'
+    templateUrl: 'views/partials/main.html'
   }).
   when('/uploadfile', {
     controller: 'UploadCtrl',
-    templateUrl: 'partials/upload.html'
+    templateUrl: 'views/partials/upload.html'
   }).
   when('/datafiles', {
     controller: 'DataFilesCtrl',
-    templateUrl: 'partials/data_files.html'
+    templateUrl: 'views/partials/data_files.html'
   }).
   when('/ipgrep_client', {
     controller:'IpgrepCtrl',
-    templateUrl: 'partials/ipgrep.html'
+    templateUrl: '/views/partials/ipgrep.html'
   }).
   when('/anon_client', {
     controller: 'AnonCtrl',
-    templateUrl: 'partials/anon_client.html'
+    templateUrl: '/views/partials/anon_client.html'
   }).
   when('/crosscor_client', {
     controller: 'CrosscorCtrl',
-    templateUrl: 'partials/crosscor_client.html'
+    templateUrl: '/views/partials/crosscor_client.html'
   }).
   when('/cifbulk_client', {
     controller: 'CifbulkCtrl',
-    templateUrl: 'partials/cifbulk_client.html'
+    templateUrl: '/views/partials/cifbulk_client.html'
   }).
   when('/rwfind_client', {
     controller: 'RwfindCtrl',
-    templateUrl: 'partials/rwfind_client.html'
+    templateUrl: 'views/partials/rwfind_client.html'
   }).
   when('/graph', {
     controller: 'GraphCtrl',
-    templateUrl: 'partials/graph.html'
+    templateUrl: 'views/partials/graph.html'
   }).
   otherwise({
     redirectTo: '/'
@@ -51,7 +51,7 @@ var dimsDemoConfig = function($routeProvider, $locationProvider, datepickerConfi
   datepickerConfig.minDate = '1960-01-01';
   datepickerConfig.showWeeks = false;
   datepickerPopupConfig.datepickerPopup = 'MM-dd-yyyy';
-}
+};
 
 var constants = {
   'fileSources': ['ip_lists', 'map_files', 'data_files', 'default_data'],
@@ -67,11 +67,16 @@ var constants = {
       { value: 'map_files', label: 'Mapping Files' },
       { value: 'data_files', label: 'Any Data Files' }
     ]  
-}
+};
 
-var dimsDemo = angular.module('dimsDemo', 
-  ['ngRoute','angularFileUpload','ui.bootstrap','ui.bootstrap.showErrors','ngGrid', 'ngPrettyJson','truncate', 'dimsDemo.controllers', 'dimsDemo.directives', 'dimsDemo.services'])
-  .config(dimsDemoConfig);
+var dimsDashboard = angular.module('dimsDashboard', 
+  ['ngRoute','angularFileUpload','ui.bootstrap','ui.bootstrap.showErrors','ngGrid', 'truncate', 'dimsDashboard.controllers', 'dimsDashboard.directives', 'dimsDashboard.services'])
+  .config(dimsDashboardConfig);
 
-dimsDemo.constant(constants);
+dimsDashboard.constant(constants);
+
+angular.module('dimsDashboard.controllers', []);
+angular.module('dimsDashboard.services', []);
+angular.module('dimsDashboard.directives', []);
+angular.module('dimsDashboard.filters', []);
 

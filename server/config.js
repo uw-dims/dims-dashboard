@@ -1,10 +1,20 @@
 var config = {};
 
+config.sslOn = process.env.SSL_ON || true;
+
 config.port = process.env.PORT || 3200;
 
-config.sslport = 3030;
+config.sslport = process.env.SSL_PORT || 3030;
 
-config.log_level = process.env.LOG_LEVEL || 'debug'
+config.log_level = process.env.LOG_LEVEL || 'debug';
+
+config.cert_dir = process.env.CERT_DIRECTORY || 'certs/';
+
+config.ca_name = process.env.CA_NAME || 'dims-ca';
+
+config.cert_name = process.env.CERT_NAME || 'localhost';
+
+console.log ('cert directory is ' + config.cert_dir);
 
 config.bin = '/opt/dims/bin';
 
@@ -16,7 +26,7 @@ config.inputdir = '/opt/dims/srv/input';
 
 config.outputdir = '/opt/dims/srv/output';
 
-config.data = '../../data/sample-data/'
+config.data = '../../../data/sample-data/'
 
 config.userDataDir = './mydata/'
 
@@ -30,8 +40,8 @@ config.defaultMapping = {
 	'default_data': config.data
 };
 
-config.server_key = './cert/server.key';
-config.server_crt = './cert/server.crt';
-config.server_ca = './cert/ca.crt';
+config.server_key = config.cert_dir + config.cert_name + '.key';
+config.server_crt = config.cert_dir + config.cert_name + '.crt';
+config.server_ca = config.cert_dir + config.ca_name + '.crt';
 
 module.exports = config;

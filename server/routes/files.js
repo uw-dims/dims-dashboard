@@ -19,7 +19,7 @@ exports.upload = function(req, res){
             'data_files': 'dataFiles/'
         },
         data = {};
-
+    console.log(req);
     console.log(req.body.destination);
     console.log(req.body.fileType);
     console.log(req.body.newName);
@@ -48,13 +48,13 @@ exports.upload = function(req, res){
         fs.rename(tmp_path, target_path, function(err) {
             if (err) {
                 console.log('fs.rename error: ' + err);
-                return res.send(400, 'Bad destination directory specified.'); 
+                return res.status(400).send('Bad destination directory specified.'); 
             }
             // delete the temporary file, so that the explicitly set temporary upload dir does not get filled with unwanted files 
             fs.unlink(tmp_path, function() {
                 if (err) { 
                 console.log('fs.unlinke error: ' + err);
-                return res.send(500, err);
+                return res.status(500).send(err);
                 }
             });
         });
@@ -68,16 +68,16 @@ exports.upload = function(req, res){
         fs.unlink(tmp_path, function(err) {
             if (err) { 
                 console.log('fs.unlinke error: ' + err);
-                return res.send(500, err);
+                return res.status(500).send(err);
             }
         });
         data.msg = "File upload failed. File extension not allowed and size must be less than "+maxSizeOfFile;
         data.path = "";
         console.log(data)
-        res.send(400, data);
+        res.status(400).send(data);
         // return res.send(200, "File upload failed.File extension not allowed and size must be less than "+maxSizeOfFile);
     }
-    return res.send(200, data);
+    return res.status(200).send(data);
 };
 
 function oc(a){
@@ -113,7 +113,7 @@ exports.files = function(req,res) {
 
     if (directory == -1) {
         // bad input
-        return res.send(400, 'Bad source directory specified.');
+        return res.status(400).send('Bad source directory specified.');
     } 
 
     // Request: read a file
@@ -126,12 +126,12 @@ exports.files = function(req,res) {
                         if (err) {
                             console.log('fs.stat error');
                             console.log(err);
-                            return res.send(500, err);
+                            return res.status(500).send(err);
                         } 
                         fs.open(directory, 'r', function(err, fd) {
                             if (err) {
                                 console.log('fs.open error', err);
-                                return res.send(500, err);
+                                return res.status(500).send(err);
                             } 
                             // Limit size since large files slow down page response and entire
                             // content is not needed for this function
@@ -145,7 +145,7 @@ exports.files = function(req,res) {
                                           console.log("Error closing file: " + err);
                                         }
                                     });
-                                    return res.send(500, err);
+                                    return res.status(500).send(err);
                                 }
                                 console.log('File read: ' + directory);
                                 fs.close(fd, function(err) {
@@ -153,7 +153,7 @@ exports.files = function(req,res) {
                                       console.log("Error closing file: " + err);
                                     }
                                 });
-                                return res.send(200, buffer.toString());
+                                return res.status(200).send(buffer.toString());
                             });
                         });
                     });
@@ -162,16 +162,17 @@ exports.files = function(req,res) {
                     fs.readFile(directory, 'utf8', function(err, data) {
                         if (err) {
                             console.log('fs.readFile error', err);
-                            return res.send(500, err);
+                            return res.status(500).send(err);
                         } 
-                        return res.send(200, data);
+                        return res.status(200).send(data);
                     });
 
                 }
                 
             } else {
                 console.log(directory+' does not exist');
-                return res.send(400, 'File does not exist');
+                //return res.send(400, 'File does not exist');
+                return res.status(400).send('File does not exist');
             }
         });
 
@@ -189,7 +190,9 @@ exports.files = function(req,res) {
                     if (err) {
                         console.log('fs.readdir error');
                         console.log(err);
-                        return res.send(500, err);
+                       // return res.send(500, err);
+                       return res.status(500).send(err);
+
                     }
                     var len = files.length;
                     data.result = [];
@@ -200,17 +203,20 @@ exports.files = function(req,res) {
                             k++;
                         }
                     }    
-                    return res.send(200, data);
+                    //return res.send(200, data);
+                    return res.status(200).send(data);
                 });
 
             } else {
                 // Use yaml file for file contents
                 try {                
                     data.result = yaml.safeLoad(content);
-                    return res.send(200,data);
+                    //return res.send(200,data);
+                    return res.status(200).send(data);
                 } catch (e) {
                     console.log(e);
-                    return res.send(500,e);
+                    //return res.send(500,e);
+                    return res.status(500).send(e);
                 }              
             }
         })

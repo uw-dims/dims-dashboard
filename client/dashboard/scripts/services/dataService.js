@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('dimsDemo.services').factory('DataService', function($http, $q) {
+angular.module('dimsDashboard.services').factory('DataService', function($http, $q) {
 
   // var root={};
 
@@ -27,15 +27,15 @@ angular.module('dimsDemo.services').factory('DataService', function($http, $q) {
       console.log(result);
       deferred.resolve(result);
     }).error(function(data,status,headers,config) {
-      deferred.reject("No results. Status: " + status);
-    })
+      deferred.reject('No results. Status: ' + status);
+    });
 
     return deferred.promise;
 
-  }
+  };
 
   return {
     getData: getData
-  }
+  };
 
 });

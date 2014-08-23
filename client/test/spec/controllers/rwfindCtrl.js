@@ -1,17 +1,17 @@
 'use strict';
 
-describe('Controller: SignupCtrl', function () {
+describe('Controller: RwfindCtrl', function () {
 
   // load the controller's module
-  beforeEach(module('clientApp'));
+  beforeEach(module('dimsDashboard'));
 
-  var SignupCtrl,
+  var RwfindCtrl,
     scope;
 
   // Initialize the controller and a mock scope
   beforeEach(inject(function ($controller, $rootScope) {
     scope = $rootScope.$new();
-    SignupCtrl = $controller('SignupCtrl', {
+    RwfindCtrl = $controller('RwfindCtrl', {
       $scope: scope
     });
   }));
