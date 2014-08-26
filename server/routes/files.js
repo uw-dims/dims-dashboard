@@ -20,8 +20,6 @@ exports._deleteFiles = function(files) {
 exports.upload = function(req, res){
     var filename, 
         tmp_path,
-        i,
-        file_extension,
         data = {},
         extensionAllowed = [".txt", ".json"],
         maxSizeOfFile = 2000,
@@ -34,34 +32,61 @@ exports.upload = function(req, res){
         },
         form = new multiparty.Form();
 
+    var oc = function (a){
+        var o = {};
+        for(var i=0;i<a.length;i++) {
+            o[a[i]]='';
+        }
+        return o; 
+    };
+
+    var getFileExtension = function(name) {
+        var i = name.lastIndexOf('.');
+        return  (i < 0) ? '' : name.substr(i);  
+    }
+
     form.parse(req, function(err, fields, files) {
+       console.log(util.inspect(fields));
+       console.log(util.inspect(files));
         if (err) {
-            return res.status(400).send('Invalid request: '+ err.message); 
+            console.log('error on parse');
+            data.msg = 'Invalid request: '+ err.message;
+            return res.status(400).send(data); 
         }
         
         if ('file' in files) {
             var file = files['file'][0];
             filename = file.originalFilename;
+            if ('newName' in fields) {
+                targetFilename = fields['newName'][0];
+            } else {
+                targetFilename = filename;
+            }
             tmp_path = file.path;
+            target_path = target_path + targetFilename;
             console.log('DEBUG: Current temp path is ' + tmp_path);
-            i = filename.lastIndexOf('.');
-            file_extension = (i < 0) ? '' : filename.substr(i);  
+            console.log('filename is ' + filename);
+            console.log('targetFilename is ' + targetFilename);
+            console.log('target_path is ' + target_path);
 
-            if ('destination' in fields) {
-                for (key in directoryMapping) {
-                    if (key == fields['destination'][0]) {
-                        target_path = myDirectory + directoryMapping[key] + filename;
+            // Check for valid extension and size
+            if((getFileExtension(filename) in oc(extensionAllowed)) && (getFileExtension(targetFilename) in oc(extensionAllowed)) && ((file.size /1024 ) < maxSizeOfFile)) { 
+                console.log ('File passed validation');
+
+                if ('destination' in fields) {
+                    for (key in directoryMapping) {
+                        if (key == fields['destination'][0]) {
+                            target_path = myDirectory + directoryMapping[key] + targetFilename;
+                        }
                     }
                 }
-            }
-            // Check for valid extension and size
-            if((file_extension in oc(extensionAllowed)) && ((file.size /1024 ) < maxSizeOfFile)) { 
-                console.log ('File passed validation');
+                
                 fs.rename(tmp_path, target_path, function(err) {
                     if (err) {
                         exports._deleteFiles(files);
                         console.log('fs.rename error: ' + err);
-                        return res.status(400).send('Bad destination directory specified.'); 
+                        data.msg = 'Bad destination directory specified.';
+                        return res.status(400).send(data); 
                     }
                     data.msg = "File uploaded sucessfully";
                     data.path = target_path;
@@ -69,14 +94,16 @@ exports.upload = function(req, res){
                 });
 
             } else {
+                console.log('Wrong file extension');
                 exports._deleteFiles(files);
-                data.msg = "File upload failed. File extension not allowed and size must be less than "+maxSizeOfFile;
+                data.msg = "File upload failed. File extension not allowed and/or size is greater than "+maxSizeOfFile + ' kbytes';
                 data.path = "";
                 res.status(400).send(data);
             }
 
         } else {
-            res.status(400).send('No file found in upload');
+            data.msg = 'No file found in upload';
+            res.status(400).send(data);
         }
 
     });
@@ -168,13 +195,7 @@ exports.upload = function(req, res){
     // return res.status(200).send(data);
 };
 
-function oc(a){
-    var o = {};
-    for(var i=0;i<a.length;i++) {
-        o[a[i]]='';
-    }
-    return o; 
-}
+
 
 /**
  * 

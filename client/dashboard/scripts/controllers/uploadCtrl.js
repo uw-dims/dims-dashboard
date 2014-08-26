@@ -13,7 +13,7 @@ console.log('In UploadController');
     $scope.showFilesToUpload = false;
 
   $scope.hasUploader = function(index) {
-    return $scope.upload[index] !== null;
+    return $scope.upload[index] !== undefined;
   };
   $scope.abort = function(index) {
     $scope.upload[index].abort(); 
@@ -54,14 +54,7 @@ console.log('In UploadController');
         }(fileReader, j);
       }
       $scope.progress[j] = -1;
-      // $scope.uploadData[j].newName = "";
-      // $scope.uploadData[j].fileType = "";
-      // $scope.uploadData[j].desc = "";
-      // $scope.uploadData[j].destination = $scope.formData.destination;
       $scope.uploadData.push({
-        newName: '',
-        fileType: '',
-        desc: '',
         destination: $scope.formData.destination
       });
     }
@@ -69,7 +62,7 @@ console.log('In UploadController');
 
   $scope.start = function(index) {
 
-    $scope.progress[index] = 0;
+    $scope.progress[index] = 1;
     $scope.errorMsg = null;
 
     console.log($scope.uploadData[index]);
@@ -80,22 +73,24 @@ console.log('In UploadController');
       method: 'POST',
       data: $scope.uploadData[index],
       file: $scope.selectedFiles[index],
-      fileFormDataName: 'myFile'
+      fileFormDataName: 'file'
     });
 
     $scope.upload[index].then(function(response) {
       $timeout(function() {
-        $scope.uploadResult.push(response.data);
-        console.log($scope.uploadResult);
+        console.log('Successful upload. response is');
         console.log(response);
+        $scope.uploadResult.push(response.data.msg);
       });
       
     }, 
       function(response) {
-        console.log(response.status);
+        console.log('Unsuccessful upload. response is');
+        console.log(response);
         if (response.status > 0) { 
-          $scope.errorMsg = response.status+ ': '+response.data;
-          $scope.uploadResult.push(response.data);
+          $scope.progress[index] = 0;
+          //$scope.errorMsg = response.status+ ': '+response.data;
+          $scope.uploadResult.push('Error: ' +response.status+ ': '+response.data.msg);
         }
     },
       function(evt) {
@@ -107,17 +102,6 @@ console.log('In UploadController');
       console.log('in xhr');
       //xhr.upload.addEventListener('abort', function() {console.log('abort complete');}, false);
     });
-
-    $scope.upload[index].xhr(function(xhr){
-//        xhr.upload.addEventListener('abort', function() {console.log('abort complete')}, false);
-      });
-      
-    // .
-    //   xhr(function(xhr) {
-    //     //xhr.upload.addEventListener('abort', function() {console.log('abort complete');}, false);
-    //     $scope.abort = function() {
-    //       xhr.abort();
-    //     }
 
   };
 
@@ -134,6 +118,6 @@ console.log('In UploadController');
     } else {
       hasFile = true;
     }
-    return hasFile ? "dragover" : "dragover-err";
+    return hasFile ? "uploadDropzone-hover" : "uploadDropzone-hover-err";
   };
 }]);

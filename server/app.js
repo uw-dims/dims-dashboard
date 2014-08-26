@@ -4,7 +4,6 @@
  */
 
 var express = require('express')
-  , bodyParser = require('body-parser')
   , compress = require('compression')
   , cookieSession = require('cookie-session')
   , json = require('express-json')
@@ -128,7 +127,7 @@ if (config.sslOn) {
    console.log('Express server listening on port ' + app.get('sslport'));
   });
 } else {
-  https.createServer(app).listen(app.get('port'), function(){
+  http.createServer(app).listen(app.get('port'), function(){
     console.log('Express server listening on port ' + app.get('port'));
   });
 }
