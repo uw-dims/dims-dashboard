@@ -9,9 +9,10 @@
   },
   "dependencies": {
     "express": "~4.8.5",
-    "body-parser": "~1.6.5",
     "compression": "*",
     "cookie-session": "*",
+    "express-json": "~1.0.x",
+    "multiparty": "~3.3.x",
     "morgan": "*",
     "cookie-parser": "*",
     "express-session": "*",

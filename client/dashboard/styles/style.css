@@ -6280,6 +6280,10 @@ body {
 .uploadDropzone-hover {
   background: #bbb;
 }
+.uploadDropzone-hover-error {
+  background: #bbb;
+  border: 1px solid #f0ad4e;
+}
 .sel-file {
   padding: 1px 5px;
   font-size: smaller;

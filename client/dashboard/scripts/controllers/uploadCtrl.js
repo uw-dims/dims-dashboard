@@ -1,7 +1,11 @@
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller ('UploadCtrl', ['$scope', '$upload', 'Utils', function($scope, $upload, Utils) {
+  controller ('UploadCtrl', ['$scope', '$http', '$timeout', '$upload', 'Utils', function($scope, $http, $timeout, $upload, Utils) {
 console.log('In UploadController');
+
+  $scope.usingFlash = FileAPI && FileAPI.upload != null;
+  $scope.fileReaderSupported = window.FileReader != null && (window.FileAPI == null || FileAPI.html5 != false);
+
   // Setup form data
     $scope.formData = {};
     $scope.destinationMap = constants.fileDestinationMap;
@@ -17,12 +21,10 @@ console.log('In UploadController');
   };
 
   $scope.onFileSelect = function($files) {
-    $scope.files =  $files;
-    console.log('set files');
-    console.log($scope.files);
+    $scope.selectedFiles = [];
     $scope.progress = [];
 
-    $scope.showFilesToUpload = true;
+   // $scope.showFilesToUpload = true;
 
     // Check for files that haven't finished uploading
     if ($scope.upload && $scope.upload.length > 0) {
@@ -34,9 +36,23 @@ console.log('In UploadController');
     }
     $scope.upload = [];
     $scope.uploadResult = [];
-    $scope.selectedFiles = $files;
+    $scope.selectedFiles =  $files;
     $scope.uploadData = [];
+    $scope.dataUrls = [];
+
     for (var j = 0; j < $files.length; j++) {
+      var $file = $files[j];
+      if ($scope.fileReaderSupported && $file.type.indexOf('image') > -1) {
+        var fileReader = new FileReader();
+        fileReader.readAsDataURL($files[j]);
+        var loadFile = function(fileReader, index) {
+            fileReader.onload = function(e) {
+                $timeout(function() {
+                $scope.dataUrls[index] = e.target.result;
+              });
+            }
+        }(fileReader, j);
+      }
       $scope.progress[j] = -1;
       // $scope.uploadData[j].newName = "";
       // $scope.uploadData[j].fileType = "";
@@ -61,12 +77,19 @@ console.log('In UploadController');
 
     $scope.upload[index] = $upload.upload({
       url: '/upload',
+      method: 'POST',
       data: $scope.uploadData[index],
-      file: $scope.selectedFiles[index]
-    }).then(function(response) {
-      $scope.uploadResult.push(response.data);
-      console.log($scope.uploadResult);
-      console.log(response);
+      file: $scope.selectedFiles[index],
+      fileFormDataName: 'myFile'
+    });
+
+    $scope.upload[index].then(function(response) {
+      $timeout(function() {
+        $scope.uploadResult.push(response.data);
+        console.log($scope.uploadResult);
+        console.log(response);
+      });
+      
     }, 
       function(response) {
         console.log(response.status);
@@ -79,61 +102,38 @@ console.log('In UploadController');
         // Math.min is to fix IE which reports 200% sometimes
         $scope.progress[index] = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
     });
+
+    $scope.upload[index].xhr(function(xhr) {
+      console.log('in xhr');
+      //xhr.upload.addEventListener('abort', function() {console.log('abort complete');}, false);
+    });
+
+    $scope.upload[index].xhr(function(xhr){
+//        xhr.upload.addEventListener('abort', function() {console.log('abort complete')}, false);
+      });
+      
     // .
     //   xhr(function(xhr) {
-    //     xhr.upload.addEventListener('abort', function() {console.log('abort complete');}, false);
-    // });
+    //     //xhr.upload.addEventListener('abort', function() {console.log('abort complete');}, false);
+    //     $scope.abort = function() {
+    //       xhr.abort();
+    //     }
 
   };
 
-
-  $scope.onFormSubmit = function() {
-    console.log('in onformsubmit');
-    console.log($scope.files);
-    var uploadData = {};
-    if ($scope.files.length === 1) {
-      Utils.setConfig(uploadData, $scope.formData.fileName, 'fileName');
+ $scope.dragOverClass = function($event) {
+    var items = $event.dataTransfer.items;
+    var hasFile = false;
+    if (items != null) {
+      for (var i = 0 ; i < items.length; i++) {
+        if (items[i].kind == 'file') {
+          hasFile = true;
+          break;
+        }
+      }
+    } else {
+      hasFile = true;
     }
-    Utils.setConfig(uploadData, $scope.formData.destination, 'destination');
-
-    //$scope.files: an array of files selected, each file has name, size, and type.
-    for (var i = 0; i < $scope.files.length; i++) {
-      var file = $scope.files[i];
-      $scope.upload = $upload.upload({
-        url: '/upload', //upload.php script, node.js route, or servlet url
-        // method: 'POST' or 'PUT',
-        // headers: {'header-key': 'header-value'},
-        // withCredentials: true,
-        data: uploadData,
-        file: file, // or list of files: $files for html5 only
-        /* set the file formData name ('Content-Desposition'). Default is 'file' */
-        //fileFormDataName: myFile, //or a list of names for multiple files (html5).
-        /* customize how data is added to formData. See #40#issuecomment-28612000 for sample code */
-        //formDataAppender: function(formData, key, val){}
-      }).progress(function(evt) {
-        console.log('percent: ' + parseInt(100.0 * evt.loaded / evt.total));
-      }).success(function(data, status, headers, config) {
-        // file is uploaded successfully
-        console.log(data);
-        console.log(status);
-
-      }).error(function(data,status,headers,config) {
-        console.log('error');
-        console.log(data);
-        console.log(status);
-      });
-      //.error(...)
-      //.then(success, error, progress); 
-      //.xhr(function(xhr){xhr.upload.addEventListener(...)})// access and attach any event listener to XMLHttpRequest.
-    }
-    $scope.uploadForm.$setPristine();
-    $scope.formData = {};
-    $scope.formData.destination = $scope.destinations[0];
-    $scope.files = null;
-    // $files = null;
-    /* alternative way of uploading, send the file binary with the file's content-type.
-       Could be used to upload files to CouchDB, imgur, etc... html5 FileReader is needed. 
-       It could also be used to monitor the progress of a normal http post/put request with large data*/
-    // $scope.upload = $upload.http({...})  see 88#issuecomment-31366487 for sample code.
+    return hasFile ? "dragover" : "dragover-err";
   };
 }]);

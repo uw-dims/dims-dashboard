@@ -14,19 +14,18 @@
   <div class="form-group">
     <label class="col-sm-2 control-label" for="inputOneFile">Choose one file</label>
     <div class="col-sm-5">
-    <input type="file" ng-file-select="onFileSelect($files)" id="inputOneFile" class="form-control" />
+    <input type="file" ng-file-select="onFileSelect($files)" id="inputOneFile" class="form-control" onclick="this.value=null" />
     </div></div>
 
-  <div class="form-group">
+  <div class="form-group" >
 
     <label class="col-sm-2 control-label" for="dragDropFiles">Drag and drop</label>
     <div class="col-sm-5">
-      <div class="uploadDropzone" ng-file-drop="onFileSelect($files)" ng-file-drag-over-class="uploadDropzone-hover"
+      <div class="uploadDropzone" ng-file-drop="onFileSelect($files)" ng-file-drag-over-class="uploadDropzone-hover" ng-file-drop-available="dropSupported=true"
                       ng-show="dropSupported" id="dragDropFiles">Drop files here</div>
-      <div ng-file-drop-available="dropSupported=true" 
-                      ng-show="!dropSupported">HTML5 Drop File is not supported!</div>
-      <!-- <button ng-click="upload.abort()">Cancel Upload</button> -->
-    </div>
+      <div  ng-show="!dropSupported">HTML5 Drop File is not supported!</div>
+<!--       <button ng-click="upload.abort()">Cancel Upload</button>
+ -->    </div>
    </div>
 
 <div class="row" ng-show="showFilesToUpload" ><div class="col-sm-12 well  well-sm"><strong>Files to upload</strong></div></div>

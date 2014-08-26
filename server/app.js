@@ -7,6 +7,7 @@ var express = require('express')
   , bodyParser = require('body-parser')
   , compress = require('compression')
   , cookieSession = require('cookie-session')
+  , json = require('express-json')
   , logger = require('morgan')
   , cookieParser = require('cookie-parser')
   , session = require('express-session')
@@ -58,11 +59,11 @@ app.set('view engine', 'html');
 //app.use(favicon());
 app.use(logger('dev'));
 // For handling uploads
-app.use(bodyParser.urlencoded({
-  extended: true,
-  keepExtensions: true,
-  uploadDir: (path.join(__dirname,'/tmp'))
-}));
+// app.use(bodyParser.urlencoded({
+//   extended: true,
+//   keepExtensions: true)
+// }));
+app.use(json());
 app.use(methodOverride());
 // app.use(express.static(path.join(__dirname, 'public')));
 // app.use(app.router);
