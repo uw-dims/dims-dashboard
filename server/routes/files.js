@@ -4,6 +4,7 @@ var util = require('util');
 var config = require('../config');
 var yaml = require('js-yaml');
 var multiparty = require('multiparty');
+var logger = require('../utils/logger');
 
 exports._deleteFiles = function(files) {
     for (var f in files) {

@@ -1,13 +1,9 @@
 
-/**
- * Module dependencies.
- */
-
 var express = require('express')
   , compress = require('compression')
   , cookieSession = require('cookie-session')
   , json = require('express-json')
-  , logger = require('morgan')
+  , winston = require('winston')
   , cookieParser = require('cookie-parser')
   , session = require('express-session')
   , favicon = require('serve-favicon')
@@ -30,8 +26,9 @@ var express = require('express')
   , anon = require('./routes/anon')
   , data = require('./routes/data')
   // , ipgrep = require('./routes/ipgrep')
-  , utils = require('./util')
-  , config = require('./config');
+  , utils = require('./utils/util')
+  , config = require('./config')
+  , logger = require('./utils/logger');
 
 var sslOptions = {
   key: fs.readFileSync(config.server_key),
@@ -41,10 +38,6 @@ var sslOptions = {
   //rejectUnauthorized: false
 };
 
-console.log (sslOptions.key);
-console.log(sslOptions.cert);
-console.log(config.sslOn);
-
 var app = module.exports = express();
 var env = process.env.NODE_ENV || 'development';
 
@@ -53,22 +46,19 @@ app.engine('html', require('ejs').renderFile);
 // all environments
 app.set('port', config.port);
 app.set('sslport', config.sslport);
-app.set('views', __dirname + '/views');
+//app.set('views', __dirname + '/views');
 app.set('view engine', 'html');
 //app.use(favicon());
-app.use(logger('dev'));
-// For handling uploads
-// app.use(bodyParser.urlencoded({
-//   extended: true,
-//   keepExtensions: true)
-// }));
 app.use(json());
 app.use(methodOverride());
-// app.use(express.static(path.join(__dirname, 'public')));
-// app.use(app.router);
+
+app.use(require('morgan') ('common',{
+  'stream': logger.stream
+}));
 
 // development only
 if (env === 'development') {
+  logger.debug("Setting up development views and static path");
   app.set('views', path.join(__dirname, '../client/dashboard'));
   app.use(errorHandler());
   app.use(express.static(path.join(__dirname, '../client')));
@@ -84,6 +74,7 @@ if (env === 'development') {
 }
 
 if (env === 'production') {
+    logger.info("Setting view root and static path to dist directory");
     app.set('views', path.join(__dirname, '/dist'));
     app.use(express.static(path.join(__dirname, '/dist')));
     app.use(function(err, req, res, next) {
@@ -124,11 +115,11 @@ app.use('/', router);
 
 if (config.sslOn) {
   https.createServer(sslOptions,app).listen(app.get('sslport'), function(){
-   console.log('Express server listening on port ' + app.get('sslport'));
+   logger.info('Express server listening on port ' + app.get('sslport'));
   });
 } else {
   http.createServer(app).listen(app.get('port'), function(){
-    console.log('Express server listening on port ' + app.get('port'));
+    logger.info('Express server listening on port ' + app.get('port'));
   });
 }
 

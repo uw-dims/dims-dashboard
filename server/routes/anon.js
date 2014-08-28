@@ -1,16 +1,15 @@
 var spawn =  require('child_process').spawn;
-// var carrier = require('carrier');
 var tmp = require('tmp');
 var async = require('async');
 var fs = require('fs');
-var util = require('../util');
+var util = require('../utils/util');
+var logger = require('../utils/logger');
 
 exports.list = function(req,res) {
-    console.log('In anon server call');
     var inputArray = ['/opt/dims/bin/anon_client', '--server', 'rabbitmq.prisem.washington.edu',
           '--queue-base', 'anon'];
     
-    console.log(req.query);
+    logger.debug('ANON query - Request: ', req.query);
     req.query.stats == 'true' ? inputArray.push('-s') : "";
     if (req.query.outputType == 'json') inputArray.push('-J');
     
@@ -24,13 +23,13 @@ exports.list = function(req,res) {
       inputArray.push(req.query.mapName);
     }
 
-    console.log(inputArray);
+    logger.debug('ANON query - Input to python child process: ', inputArray);
 
-          var python = spawn(
-            'python',
-            inputArray
-            );
-          util.processPython(python, req, res);
+    var python = spawn(
+      'python',
+      inputArray
+      );
+    util.processPython(python, req, res);
           
   };
 

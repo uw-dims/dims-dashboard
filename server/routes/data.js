@@ -1,5 +1,5 @@
 var fs = require('fs');
-var util = require('../util');
+var util = require('../utils/util');
 var config = require('../config');
 var yaml = require('js-yaml');
 var JSONStream = require('JSONStream');

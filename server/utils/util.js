@@ -1,6 +1,7 @@
 var stream = require('stream');
 var async = require('async');
 var _ = require('lodash');
+var logger = require('./logger');
 
 var createParser = function() {
 
@@ -17,7 +18,6 @@ var createParser = function() {
   };
 
   parser._transform = function(chunk, encoding, done) {
-    console.log('in _transform');
     var data = chunk.toString();
     if (this._lastLineData) {
       data = this._lastLineData + data;
@@ -49,29 +49,30 @@ var createParser = function() {
   };
 
   return parser;
-}
-
-
+};
 
 exports.createParser = createParser;
 
 
 var processPython = function(python, req, res) {
   var output = '';
-  console.log('Spawned child pid: ' + python.pid);
+  logger.debug('processPython spawned child pid: %d', python.pid);
   python.stdout.on('data', function(data) {
+    logger.debug('processPython receiving data on pid: %d', python.pid);
     output += data;
   });
 
   python.stderr.on('data', function(data) {
-    console.log('stderr: '+ data);
+    var decoder = new (require('string_decoder').StringDecoder)('utf-8');
+    logger.error('processPython stderr %s', decoder.write(data));
   });
+
   python.on('close', function(code) {
-    console.log("python closed");
+    logger.debug('processPython closed. PID: %d', python.pid);
     if (code !== 0) {
-      return res.json(500, {code: code, pid: python.pid, data: output});
+      logger.error('processPython closed with error. ', {code: code, pid: python.pid});
+      return res.status(500).json({code: code, pid: python.pid, data: output});
     }
- 
     return res.send(200, output);
   })
 };

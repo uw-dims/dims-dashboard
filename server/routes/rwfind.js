@@ -1,16 +1,14 @@
 var spawn =  require('child_process').spawn;
-// var carrier = require('carrier');
 var tmp = require('tmp');
 var async = require('async');
 var fs = require('fs');
-var util = require('../util');
+var util = require('../utils/util');
+var logger = require('../utils/logger');
 
 exports.list = function(req,res) {
-    console.log('In rwfind server call');
     var inputArray = ['/opt/dims/bin/rwfind_client', '--server', 'rabbitmq.prisem.washington.edu',
           '--queue-base', 'rwfind'];
-    
-    console.log(req.query);
+    logger.debug('RWFIND query - Request: ', req.query);
     req.query.header == 'true' ? inputArray.push('-H') : "";
     if (req.query.hitLimit !== undefined) {
       inputArray.push('-T')
@@ -59,8 +57,7 @@ exports.list = function(req,res) {
 
        }, function(callback) {  
             
-          console.log(inputArray);
-          console.log('ready to spawn python process for rwfind');
+          logger.debug('RWFIND query - Input to python child process: ', inputArray);
           var python = spawn(
             'python',
             inputArray
@@ -68,6 +65,7 @@ exports.list = function(req,res) {
           util.processPython(python, req, res);
           callback(null, 'done');
         }, function(err,result) {
+          logger.debug('RWFIND final done callback. ')
         }
       ])  
   };

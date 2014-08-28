@@ -1,16 +1,16 @@
 var spawn =  require('child_process').spawn;
-// var carrier = require('carrier');
 var tmp = require('tmp');
 var async = require('async');
 var fs = require('fs');
-var util = require('../util');
+var util = require('../utils/util');
+var logger = require('../utils/logger');
 
 exports.list = function(req,res) {
-    console.log('In cifbulk server call');
     var inputArray = ['/opt/dims/bin/cifbulk_client', '--server', 'rabbitmq.prisem.washington.edu',
           '--queue-base', 'cifbulk'];
     
-    console.log(req.query);
+    logger.debug('CIFBULK query - Request: ', req.query);
+
     req.query.header == 'true' ? inputArray.push('-H') : "";
     req.query.stats == 'true' ? inputArray.push('-s') : "";
     if (req.query.numDays !== undefined) {
@@ -31,14 +31,10 @@ exports.list = function(req,res) {
       inputArray.push(req.query.fileName);
     }
     
-
     async.waterfall([
         function(callback) {
            if (req.query.ips !== undefined) {
             tmp.file(function _tempFileCreated(err, path, fd) {
-             
-              console.log('Tmp File: ', path);
-              console.log('Tmp Filedescriptor: ', fd);
               callback(err,path,fd);
             });
           } else {
@@ -59,8 +55,7 @@ exports.list = function(req,res) {
             }
        }, function(callback) {  
             
-          console.log('In last cifbulk callback, inputArray is: ');
-          console.log(inputArray);
+          logger.debug('CIFBULK query - Input to python child process: ', inputArray);
 
           var python = spawn(
             'python',

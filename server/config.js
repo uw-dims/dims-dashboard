@@ -8,13 +8,13 @@ config.sslport = process.env.SSL_PORT || 3030;
 
 config.log_level = process.env.LOG_LEVEL || 'debug';
 
+config.log_dir = process.env.LOG_PATH || 'logs/';
+
 config.cert_dir = process.env.CERT_DIRECTORY || 'certs/';
 
 config.ca_name = process.env.CA_NAME || 'dims-ca';
 
 config.cert_name = process.env.CERT_NAME || 'localhost';
-
-console.log ('cert directory is ' + config.cert_dir);
 
 config.bin = '/opt/dims/bin';
 

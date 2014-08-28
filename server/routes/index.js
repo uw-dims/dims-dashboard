@@ -3,8 +3,6 @@
  */
 
 exports.index = function(req, res){
-  console.log('DEBUG: In exports.index');
-  console.log(req.url);
   res.render('index', { title: 'DIMS Dashboard' });
 };
 

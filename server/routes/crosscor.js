@@ -2,7 +2,8 @@ var spawn =  require('child_process').spawn;
 var tmp = require('tmp');
 var async = require('async');
 var fs = require('fs');
-var util = require('../util');
+var util = require('../utils/util');
+var logger = require('../utils/logger');
 
 exports.list = function(req,res) {
     console.log('In crosscor server call');
