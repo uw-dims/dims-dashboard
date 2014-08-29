@@ -2,22 +2,29 @@ var spawn =  require('child_process').spawn;
 var tmp = require('tmp');
 var async = require('async');
 var fs = require('fs');
-var util = require('../utils/util');
+var dimsutil = require('../utils/util');
 var logger = require('../utils/logger');
+var config = require('../config');
 
 exports.list = function(req,res) {
-    var inputArray = ['/opt/dims/bin/cifbulk_client', '--server', 'rabbitmq.prisem.washington.edu',
-          '--queue-base', 'cifbulk'];
-    
-    logger.debug('CIFBULK query - Request: ', req.query);
 
-    req.query.header == 'true' ? inputArray.push('-H') : "";
-    req.query.stats == 'true' ? inputArray.push('-s') : "";
+    logger.debug('cifbulk:list - Request query is: ', req.query);
+
+    var rpcQueuebase = 'cifbulk',
+        rpcClientApp = 'cifbulk_client',
+        debug = process.env.NODE_ENV === 'development' ? '--debug' : (req.query.debug === 'true' ? '--debug' : ''),
+        verbose = process.env.NODE_ENV === 'development' ? '--verbose' : (req.query.verbose === 'true' ? '--verbose' : '');
+
+    var inputArray = [config.bin + rpcClientApp, debug, verbose, '--server', config.rpcServer,
+          '--queue-base', rpcQueuebase];
+
+    req.query.header === 'true' ? inputArray.push('-H') : "";
+    req.query.stats === 'true' ? inputArray.push('-s') : "";
+
     if (req.query.numDays !== undefined) {
       inputArray.push('-D')
       inputArray.push(req.query.numDays);
     } 
-    
     if (req.query.startTime !== undefined) {
       inputArray.push('--stime');
       inputArray.push(req.query.startTime);
@@ -44,7 +51,7 @@ exports.list = function(req,res) {
         },function(path, fd, callback) {
             if (req.query.ips !== undefined) {
               fs.writeFile(path, req.query.ips, function(err) {
-                  if (err == undefined) {
+                  if (err === undefined) {
                      inputArray.push('-r');
                      inputArray.push(path);
                   }
@@ -55,17 +62,17 @@ exports.list = function(req,res) {
             }
        }, function(callback) {  
             
-          logger.debug('CIFBULK query - Input to python child process: ', inputArray);
+          logger.debug('cifbulk:list - Input to python child process:', inputArray);
 
           var python = spawn(
             'python',
-            inputArray
-            );
-          util.processPython(python, req, res);
+            inputArray,
+            {cwd: '../logs/rpc'}
+          );
+          dimsutil.processPython(python, req, res);
           callback(null, 'done');
         }, function(err,result) {
-          console.log('In final cifbulk callback, result is '+ result);
         }
-      ])  
+      ]);  
   };
 

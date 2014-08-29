@@ -66,7 +66,8 @@ var constants = {
       { value: 'ip_lists', label: 'List of IPs, CIDR, or Domains' },
       { value: 'map_files', label: 'Mapping Files' },
       { value: 'data_files', label: 'Any Data Files' }
-    ]  
+    ] ,
+  'maxFileUpload': 10
 };
 
 var dimsDashboard = angular.module('dimsDashboard', 

@@ -16,9 +16,9 @@ config.ca_name = process.env.CA_NAME || 'dims-ca';
 
 config.cert_name = process.env.CERT_NAME || 'localhost';
 
-config.bin = '/opt/dims/bin';
+config.bin = '/opt/dims/bin/';
 
-config.server = 'rabbitmq.prisem.washington.edu';
+config.rpcServer = 'rabbitmq.prisem.washington.edu';
 
 config.mapfile = '/etc/ipgrep_networks.txt';
 
@@ -39,6 +39,9 @@ config.directoryMapping = {
 config.defaultMapping = {
 	'default_data': config.data
 };
+
+config.maxUploadFileNum = 10;
+config.maxUploadFileSize = 39273942;
 
 config.server_key = config.cert_dir + config.cert_name + '.key';
 config.server_crt = config.cert_dir + config.cert_name + '.crt';

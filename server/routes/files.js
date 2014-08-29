@@ -8,10 +8,10 @@ var logger = require('../utils/logger');
 
 exports._deleteFiles = function(files) {
     for (var f in files) {
-        console.log('DEBUG: In deleteFiles, path is ' + files[f][0].path);
+        logger.debug('files._deleteFiles: Path to delete: ' + files[f][0].path);
         fs.unlink(files[f][0].path, function(err) {
             if (err) { 
-                console.log('fs.unlink error: Path: '+ files[f][0].path +', error: ' + err);
+                logger.error('files._deleteFiles: fs.unlink error for path: '+ files[f][0].path +', error: ' + err);
             }
         });
     }
@@ -19,19 +19,27 @@ exports._deleteFiles = function(files) {
 
 
 exports.upload = function(req, res){
+
+    logger.debug('dirname is ' + __dirname);
+
     var filename, 
         tmp_path,
         data = {},
-        extensionAllowed = [".txt", ".json"],
-        maxSizeOfFile = 2000,
-        myDirectory = './mydata/',
-        target_path = './upload/',
+        extensionAllowed = [".txt", ".json", ".log"],
+        maxSizeOfFile = config.maxUploadFileSize,
+        // myDirectory = './mydata/',
+        // target_path = './upload/',
+        myDirectory = __dirname + '/../mydata/',
+        target_path = __dirname + '/../upload/',
         directoryMapping = {
             'ip_lists': 'ipFiles/',
             'map_files': 'mapFiles/',
             'data_files': 'dataFiles/'
         },
         form = new multiparty.Form();
+
+        logger.debug('Initial myDirectory: ' + myDirectory);
+        logger.debug('Initial target_path: ' + target_path);
 
     var oc = function (a){
         var o = {};
@@ -47,10 +55,11 @@ exports.upload = function(req, res){
     }
 
     form.parse(req, function(err, fields, files) {
-       console.log(util.inspect(fields));
-       console.log(util.inspect(files));
+        logger.debug('files.upload form.parse - input fields: ', util.inspect(fields));
+        logger.debug('files.upload form.parse - input files: ', util.inspect(files));
+
         if (err) {
-            console.log('error on parse');
+            logger.error('files.upload form.parse - Error parsing request: '+ err.message);
             data.msg = 'Invalid request: '+ err.message;
             return res.status(400).send(data); 
         }
@@ -65,37 +74,40 @@ exports.upload = function(req, res){
             }
             tmp_path = file.path;
             target_path = target_path + targetFilename;
-            console.log('DEBUG: Current temp path is ' + tmp_path);
-            console.log('filename is ' + filename);
-            console.log('targetFilename is ' + targetFilename);
-            console.log('target_path is ' + target_path);
+
+            logger.debug('files.upload form.parse - tmp_path: ' + tmp_path);
+            logger.debug('files.upload form.parse - filename: ' + filename);
+            logger.debug('files.upload form.parse - targetFilename: ' + targetFilename);
+            logger.debug('files.upload form.parse - target_path: ' + target_path);
 
             // Check for valid extension and size
-            if((getFileExtension(filename) in oc(extensionAllowed)) && (getFileExtension(targetFilename) in oc(extensionAllowed)) && ((file.size /1024 ) < maxSizeOfFile)) { 
-                console.log ('File passed validation');
+            if((getFileExtension(filename) in oc(extensionAllowed)) && (getFileExtension(targetFilename) in oc(extensionAllowed)) && (file.size  < maxSizeOfFile)) { 
+                logger.debug('files.upload form.parse - File passed validation');
 
                 if ('destination' in fields) {
                     for (key in directoryMapping) {
-                        if (key == fields['destination'][0]) {
+                        if (key === fields['destination'][0]) {
                             target_path = myDirectory + directoryMapping[key] + targetFilename;
                         }
                     }
                 }
                 
+                logger.debug('files.upload form.parse - now target_path: '+ target_path);
                 fs.rename(tmp_path, target_path, function(err) {
                     if (err) {
+                        logger.error('files.upload form.parse - Error renaming file: ', err);
                         exports._deleteFiles(files);
-                        console.log('fs.rename error: ' + err);
                         data.msg = 'Bad destination directory specified.';
                         return res.status(400).send(data); 
                     }
                     data.msg = "File uploaded sucessfully";
-                    data.path = target_path;
+                    data.path = fields['destination'][0];
+                    data.filename = targetFilename;
                     res.status(200).send(data);
                 });
 
             } else {
-                console.log('Wrong file extension');
+                logger.error('files.upload form.parse - File not validated. Size: '+ file.size + ', Extension: ' + getFileExtension(filename));
                 exports._deleteFiles(files);
                 data.msg = "File upload failed. File extension not allowed and/or size is greater than "+maxSizeOfFile + ' kbytes';
                 data.path = "";
@@ -103,6 +115,7 @@ exports.upload = function(req, res){
             }
 
         } else {
+            logger.error('files.upload form.parse - No file found in upload');
             data.msg = 'No file found in upload';
             res.status(400).send(data);
         }

@@ -33,7 +33,6 @@
     "tmp": "~0.0.24",
     "vhost": "*",
     "winston": "~0.7.3",
-    "winston-syslog": "^0.2.5",
     "xml2js": "~0.4.4"
   }
 }

@@ -6276,6 +6276,7 @@ body {
   line-height: 50px;
   text-align: center;
   font-weight: bold;
+  border-radius: 4px;
 }
 .uploadDropzone-hover {
   background: #bbb;
@@ -6288,6 +6289,12 @@ body {
   padding: 1px 5px;
   font-size: smaller;
   color: gray;
+}
+.file-response {
+  color: #5cb85c;
+}
+.file-response-fail {
+  color: #d9534f;
 }
 .response {
   padding-top: 30px;
@@ -6304,12 +6311,26 @@ body {
 .progress {
   display: inline-block;
   width: 100px;
-  border: 3px groove #CCC;
 }
 .progress div {
-  font-size: smaller;
-  background: orange;
+  margin-bottom: 0;
+  text-align: left;
+  vertical-align: middle;
+  cursor: default;
+  background-image: none;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  padding: 1px 5px;
+  font-size: 12px;
+  border-radius: 3px;
+  background: #5cb85c;
+  color: white;
   width: 0;
+}
+.progress-fail div {
+  padding: 0px;
+  color: #d9534f;
+  background: transparent;
 }
 .inline-group {
   margin-right: 10px;

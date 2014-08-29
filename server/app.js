@@ -3,7 +3,6 @@ var express = require('express')
   , compress = require('compression')
   , cookieSession = require('cookie-session')
   , json = require('express-json')
-  , winston = require('winston')
   , cookieParser = require('cookie-parser')
   , session = require('express-session')
   , favicon = require('serve-favicon')
@@ -58,7 +57,7 @@ app.use(require('morgan') ('common',{
 
 // development only
 if (env === 'development') {
-  logger.debug("Setting up development views and static path");
+  logger.debug('Setting up development views and static path');
   app.set('views', path.join(__dirname, '../client/dashboard'));
   app.use(errorHandler());
   app.use(express.static(path.join(__dirname, '../client')));
@@ -74,7 +73,7 @@ if (env === 'development') {
 }
 
 if (env === 'production') {
-    logger.info("Setting view root and static path to dist directory");
+    logger.debug("Startup: Setting view root and static path to dist directory");
     app.set('views', path.join(__dirname, '/dist'));
     app.use(express.static(path.join(__dirname, '/dist')));
     app.use(function(err, req, res, next) {
@@ -85,9 +84,7 @@ if (env === 'production') {
         });
     });
 }
-// app.get('/', routes.index);
-// app.get('/partials/:name', routes.partials);
-// app.get('/users', user.list);
+
 var router = express.Router();
 router.post('/upload', files.upload);
 router.get('/files', files.files);
@@ -100,7 +97,6 @@ router.get('/data', data.list);
 router.get('*', routes.index);
 
 app.use('/', router);
-// app.get('*', routes.index);
 
 // Handle cross-domain requests
 // NOTE: Uncomment this funciton to enable cross-domain request.
@@ -115,11 +111,11 @@ app.use('/', router);
 
 if (config.sslOn) {
   https.createServer(sslOptions,app).listen(app.get('sslport'), function(){
-   logger.info('Express server listening on port ' + app.get('sslport'));
+   logger.info('Startup: Express server listening on port ' + app.get('sslport'));
   });
 } else {
   http.createServer(app).listen(app.get('port'), function(){
-    logger.info('Express server listening on port ' + app.get('port'));
+    logger.info('Startup: Express server listening on port ' + app.get('port'));
   });
 }
 

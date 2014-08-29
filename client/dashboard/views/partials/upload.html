@@ -33,7 +33,7 @@
   <div class="col-sm-1" ng-show="progress[$index] < 0">
     <button class="btn btn-primary btn-sm" ng-click="start($index)"  >Start</button></div>
   <div class="col-sm-2"  ng-show="progress[$index] >= 0 ">
-    <span class="progress" >           
+    <span class="progress {{progressClass[$index]}}" >           
       <div style="width:{{progress[$index]}}%">{{progress[$index]}}%</div>
     </span>     
   </div>
@@ -41,10 +41,10 @@
     <button class="btn btn-sm" ng-click="abort($index)" >Abort</button></div>
   <div class="col-sm-3 sel-file">
     {{ f.name }} - {{ f.size }} Bytes </div>
-  <div class="col-sm-3" ng-show="progress[$index] < 0"><input type="text" class="form-control" ng-model="uploadData[$index].newName" name="fileName" placeholder="Optional: New file name" />
+  <div class="col-sm-3" ng-show="progress[$index] < 0"><input type="text" class="form-control" ng-model="newName[$index]" name="fileName" placeholder="Optional: New file name" />
   </div>
 
-  <div class="col-sm-3 sel-file" ng-show="uploadResult[$index]"> {{ uploadResult[$index]}}</div>
+  <div class="col-sm-6 sel-file {{fileResponseClass[$index]}} " ng-show="uploadResult[$index]"> {{ uploadResult[$index]}}</div>
 </div>
 
 </form>

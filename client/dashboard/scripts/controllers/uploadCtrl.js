@@ -23,6 +23,8 @@ console.log('In UploadController');
   $scope.onFileSelect = function($files) {
     $scope.selectedFiles = [];
     $scope.progress = [];
+    $scope.progressClass = [];
+    $scope.fileResponseClass = [];
 
    // $scope.showFilesToUpload = true;
 
@@ -37,10 +39,12 @@ console.log('In UploadController');
     $scope.upload = [];
     $scope.uploadResult = [];
     $scope.selectedFiles =  $files;
-    $scope.uploadData = [];
+    $scope.newName = [];
     $scope.dataUrls = [];
 
-    for (var j = 0; j < $files.length; j++) {
+    var numFiles = $files.length > constants.maxFileUpload ? constants.maxFileUpload : $files.length;
+
+    for (var j = 0; j < numFiles; j++) {
       var $file = $files[j];
       if ($scope.fileReaderSupported && $file.type.indexOf('image') > -1) {
         var fileReader = new FileReader();
@@ -54,9 +58,9 @@ console.log('In UploadController');
         }(fileReader, j);
       }
       $scope.progress[j] = -1;
-      $scope.uploadData.push({
-        destination: $scope.formData.destination
-      });
+      $scope.progressClass[j] = '';
+      $scope.fileResponseClass[j] = 'file-response';
+      $scope.uploadResult[j] = '';
     }
   };
 
@@ -65,32 +69,32 @@ console.log('In UploadController');
     $scope.progress[index] = 1;
     $scope.errorMsg = null;
 
-    console.log($scope.uploadData[index]);
-    console.log($scope.selectedFiles[index]);
+    var data = {};
+    data.destination = $scope.formData.destination;
+    if ($scope.newName[index] !== undefined) {
+      data.newName = $scope.newName[index];
+    }
 
     $scope.upload[index] = $upload.upload({
       url: '/upload',
       method: 'POST',
-      data: $scope.uploadData[index],
+      data: data,
       file: $scope.selectedFiles[index],
       fileFormDataName: 'file'
     });
 
     $scope.upload[index].then(function(response) {
       $timeout(function() {
-        console.log('Successful upload. response is');
-        console.log(response);
-        $scope.uploadResult.push(response.data.msg);
+        $scope.uploadResult[index] = response.data.msg + '. Filename: ' + response.data.filename + '. Location: ' + response.data.path;
       });
       
     }, 
       function(response) {
-        console.log('Unsuccessful upload. response is');
-        console.log(response);
         if (response.status > 0) { 
           $scope.progress[index] = 0;
-          //$scope.errorMsg = response.status+ ': '+response.data;
-          $scope.uploadResult.push('Error: ' +response.status+ ': '+response.data.msg);
+          $scope.uploadResult[index] = 'Error: ' +response.status+ ': '+response.data.msg;
+          $scope.progressClass[index] = 'progress-fail';
+          $scope.fileResponseClass[index] = 'file-response-fail';
         }
     },
       function(evt) {
@@ -99,8 +103,7 @@ console.log('In UploadController');
     });
 
     $scope.upload[index].xhr(function(xhr) {
-      console.log('in xhr');
-      //xhr.upload.addEventListener('abort', function() {console.log('abort complete');}, false);
+      xhr.upload.addEventListener('abort', function() {console.log('abort complete');}, false);
     });
 
   };

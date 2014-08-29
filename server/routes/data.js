@@ -1,5 +1,5 @@
 var fs = require('fs');
-var util = require('../utils/util');
+var dimsutil = require('../utils/util');
 var config = require('../config');
 var yaml = require('js-yaml');
 var JSONStream = require('JSONStream');
@@ -8,7 +8,7 @@ exports.list = function(req, res){
   console.log ('in data.list');
   path = req.query.source;
   var source = fs.createReadStream(path);
-  source.pipe(util.createParser())
+  source.pipe(dimsutil.createParser())
     .pipe(JSONStream.stringify())
     .pipe(res);
 

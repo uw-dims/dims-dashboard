@@ -56,21 +56,21 @@ exports.createParser = createParser;
 
 var processPython = function(python, req, res) {
   var output = '';
-  logger.debug('processPython spawned child pid: %d', python.pid);
+  logger.debug('util:processPython spawned child PID: %d', python.pid);
   python.stdout.on('data', function(data) {
-    logger.debug('processPython receiving data on pid: %d', python.pid);
+    logger.debug('processPython receiving data on PID: %d', python.pid);
     output += data;
   });
 
   python.stderr.on('data', function(data) {
     var decoder = new (require('string_decoder').StringDecoder)('utf-8');
-    logger.error('processPython stderr %s', decoder.write(data));
+    logger.info('util:processPython stderr %s', decoder.write(data));
   });
 
   python.on('close', function(code) {
-    logger.debug('processPython closed. PID: %d', python.pid);
+    logger.debug('processPython closed. PID: '+ python.pid + ', code: ' + code);
     if (code !== 0) {
-      logger.error('processPython closed with error. ', {code: code, pid: python.pid});
+      logger.error('processPython closed with error. PID: %d, code: %s', python.pid, code);
       return res.status(500).json({code: code, pid: python.pid, data: output});
     }
     return res.send(200, output);

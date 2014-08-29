@@ -1,11 +1,20 @@
 var winston = require('winston');
 var config = require('../config');
+var os = require('os');
 
-require('winston-syslog').Syslog;
+//require('./winston-syslog/lib/winston-syslog').Syslog;
 
 var logger = new (winston.Logger);
+// logger.setLevels(winston.config.syslog.levels);
 
-logger.add(winston.transports.Syslog);
+// logger.add(winston.transports.Syslog, {
+//   level: config.log_level,
+//   handleExceptions: true,
+//   json: false,
+//   colorize: false,
+//   localhost: os.hostname(),
+//   app_name: 'dimswebapp'
+// });
 
 if (process.env.NODE_ENV === 'development') {
   logger.add(winston.transports.Console, {
@@ -18,7 +27,6 @@ if (process.env.NODE_ENV === 'development') {
 
 logger.exitOnError = false;
 logger.emitErrs = false;
-//logger.setLevels(winston.config.syslog.levels);
 
 module.exports = logger;
 module.exports.stream = {
