@@ -1,4 +1,4 @@
-<h2 class="subheader">anon</h2>
+<h1 class="sub-header">Anonymize</h1>
 
 <form class="form-horizontal" role="form" name="anonForm">
 <div class="alert alert-danger form-group" ng-show="showFormError">{{formErrorMsg}}</div>
@@ -42,11 +42,9 @@
   </div></div>
 </form>
 
-<div class="row"><div class="col-sm-12 well  well-sm"><strong>{{ resultsMsg }}</strong></div></div>
+<h2 class="sub-header">{{ resultsMsg }}</h2>
+
 <div class="row" ng-show="showJsonResults"><div class="col-sm-12">
 </div></div>
 
-<div class="row"><div class="col-sm-12 well  well-sm" ng-show="showResults">
-<strong>Raw Results</strong>
-<pretty-json  ng-show="showResults" json="data" />
-</div></div>
+<dims-raw-results></dims-raw-results>

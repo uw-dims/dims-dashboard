@@ -10,7 +10,7 @@ exports.list = function(req,res) {
 
   logger.debug('crosscor:list - Request: ', req.query);
 
-  var rpcQueuebase = 'crosscor',
+  var rpcQueuebase = config.rpcQueueNames['crosscor'],
       rpcClientApp = 'crosscor_client',
       debug = process.env.NODE_ENV === 'development' ? '--debug' : (req.query.debug === 'true' ? '--debug' : ''),
       verbose = process.env.NODE_ENV === 'development' ? '--verbose' : (req.query.verbose === 'true' ? '--verbose' : '');

@@ -64,26 +64,26 @@ angular.module('dimsDashboard.controllers').
     // Prepare incoming data
     var prepareData = function(data, status, headers, config) {
       console.log(data);
-      $scope.rawData = data;
+      $scope.rawData = data.data;
       $scope.noResults = [];
       $scope.showResults = true;
       $scope.resultsMsg = 'Results';
       $scope.data = {};
-      $scope.data.iff = data.iff;
-      $scope.data.program = data.program;
-      $scope.data.time = data.time;
+      $scope.data.iff = $scope.rawData.iff;
+      $scope.data.program = $scope.rawData.program;
+      $scope.data.time = $scope.rawData.time;
       $scope.data.results=[];
-      for (var i=0; i < data.results.length; i++) {
-        if (data.results[i].results.length === 0) {
-          $scope.noResults.push({searchitem: data.results[i].searchitem});
+      for (var i=0; i < $scope.rawData.results.length; i++) {
+        if ($scope.rawData.results[i].results.length === 0) {
+          $scope.noResults.push({searchitem: $scope.rawData.results[i].searchitem});
         } else {
-          for (var j=0; j < data.results[i].results.length; j++) {
-            var detectDate = new Date(data.results[i].results[j].detecttime*1000);
-            var createdDate = new Date(data.results[i].results[j].created*1000);
-            data.results[i].results[j].detecttime = detectDate;
-            data.results[i].results[j].created = createdDate;
+          for (var j=0; j < $scope.rawData.results[i].results.length; j++) {
+            var detectDate = new Date($scope.rawData.results[i].results[j].detecttime*1000);
+            var createdDate = new Date($scope.rawData.results[i].results[j].created*1000);
+            $scope.rawData.results[i].results[j].detecttime = detectDate;
+            $scope.rawData.results[i].results[j].created = createdDate;
           }
-          $scope.data.results.push(data.results[i]);
+          $scope.data.results.push($scope.rawData.results[i]);
         }
       }
     };

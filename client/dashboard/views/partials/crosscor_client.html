@@ -43,7 +43,7 @@
   </div></div>
 </form>
 
-<div class="row"><div class="col-sm-12 well  well-sm"><strong>{{ resultsMsg }}</strong></div></div>
+<h2 class="sub-header">{{ resultsMsg }}</h2>
 
 <div class="row" ng-show="showResults"><div class="col-sm-12">
 <strong>Matching</strong>
@@ -52,7 +52,7 @@
 <tr><th>IP</th>
 <th>Site</th>
 </tr>
-<tr ng-repeat="m in data.matching">
+<tr ng-repeat="m in rawData.matching">
 <td>{{ m.ip4 }}</td>
 <td>{{ m.site }}</td>
 </tr></tbody></table>
@@ -65,7 +65,7 @@
 <tr><th>IP</th>
 <th>Site</th>
 </tr>
-<tr ng-repeat="n in data.nonmatching">
+<tr ng-repeat="n in rawData.nonmatching">
 <td>{{ n.ip4 }}</td>
 <td>{{ n.site }}</td>
 </tr></tbody></table>
@@ -79,14 +79,11 @@
 <th>Percent</th>
 <th>Site</th>
 </tr>
-<tr ng-repeat="s in data.matching_stats">
+<tr ng-repeat="s in rawData.matching_stats">
 <td>{{ s.count }}</td>
 <td>{{ s.percent }}</td>
 <td>{{ s.site }}</td>
 </tr></tbody></table>
 </div></div></div>
 
-<div class="row"><div class="col-sm-12 well  well-sm" ng-show="showResults">
-<strong>Raw Results</strong>
-<pretty-json  ng-show="showResults" json="data" />
-</div></div>
+<dims-raw-results></dims-raw-results>

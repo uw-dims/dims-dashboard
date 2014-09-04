@@ -1,8 +1,8 @@
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller('RwfindCtrl', ['$scope', 'Utils', '$http', 'FileService', 'DateService', '$location', '$routeParams',  
-      function ($scope, Utils, $http, FileService, DateService, $location, $routeParams) {
-    console.log('In rwfind controller');
+  controller('RwfindCtrl', ['$scope', 'Utils', '$http', '$log', 'FileService', 'DateService', '$location', '$routeParams',  
+      function ($scope, Utils, $http, $log, FileService, DateService, $location, $routeParams) {
+    $log.debug('In rwfind controller');
 
     // Set up form data
     $scope.formData = {};
@@ -22,23 +22,15 @@ angular.module('dimsDashboard.controllers').
     $scope.showDemoFiles = false;
 
     FileService.getFileList('ip_lists').then(function(result) {
-      console.log('result in rwfindCtrl getFileList');
-      console.log(result);
         $scope.fileNames = result.fileNames;
         $scope.filePath = result.filePath;
         $scope.showFiles = true;
-      console.log('$scope.fileNames in rwfindCtrl getFileList');
-      console.log($scope.fileNames);
     });
 
     FileService.getDemoList('rwfind').then(function(result) {
-      console.log('result in rwfindCtrl getDemoList');
-      console.log(result);
       $scope.demoPath = result.filePath;
       $scope.demoNames = result.fileNames;
       $scope.showDemoFiles = true;
-      console.log('$scope.demoNames in rwfindCtrl getDemoList');
-      console.log($scope.demoNames);
     });
 
     // Setup date
@@ -56,7 +48,6 @@ angular.module('dimsDashboard.controllers').
     $scope.result = null;
     $scope.resultsMsg = 'Results';
     $scope.rawData = '';
-    $scope.prettyData = '';
     $scope.dataSize=100;
     $scope.totalDataSize=0;
     $scope.query='';
@@ -80,13 +71,16 @@ angular.module('dimsDashboard.controllers').
     // $scope.flowStatsGridOptions = { data: 'flowStats' };
 
     var prepareData = function(data,status,headers,config) {
-      console.log('rwfind returned data - in prepareData');
-      console.log(status);
-      $scope.rawData = data;
+      $log.debug('rwfind returned data - in prepareData');
+      $log.debug('status: '+status);
+      $log.debug('data: ');
+      $log.debug(data);
+      $scope.rawData = data.data;
+      $scope.pid = data.pid;
       $scope.flowItems=[];
       var flowsFound = -1;
        if ($scope.formData.outputType === 'json') {
-          $scope.result = data;
+          $scope.result = $scope.rawData;
           flowsFound = $scope.result.flows_found;
           if (flowsFound > 0) {
             $scope.flows = $scope.result.flows;
@@ -117,12 +111,12 @@ angular.module('dimsDashboard.controllers').
           }          
          
       } else {
-          $scope.result = data;
+          $scope.result = data.data;
+          $scope.pid = data.pid
       }
-      console.log('Done processing JSON');
+      $log.debug('Done processing JSON for pid: ' + $scope.pid);
       $scope.showResults = true;
       $scope.resultsMsg = (flowsFound >=0) ? 'Results - ' + flowsFound + ' flows found': 'Results';         
-      $scope.isRaw = true;
     };
 
     $scope.pageResults = function() {
@@ -161,8 +155,8 @@ angular.module('dimsDashboard.controllers').
      *  callClient function
      */
     $scope.callClient = function() {
-      console.log('in callClient');
-      console.log($scope.formData);
+      $log.debug('rwfind CallClient: User clicked button to process request. Formdata: ');
+      $log.debug($scope.formData);
       // Initialize/reset when calling a client
       $scope.showResults = false;
       $scope.showFormError = false;
@@ -171,8 +165,6 @@ angular.module('dimsDashboard.controllers').
 
       // User wants demo data - get data and return
       if ($scope.formData.demoName !== null && $scope.formData.demoName !== undefined) {
-        console.log('looking for demo data');
-        console.log($scope.formData.demoName);
         $scope.resultsMsg = 'Results - Waiting...';
         getDemo($scope.formData.demoName);
         return;
@@ -219,9 +211,9 @@ angular.module('dimsDashboard.controllers').
       if (Utils.inputPresent($scope.formData.fileName)) {
         Utils.setConfig(clientConfig, $scope.filePath+$scope.formData.fileName.name, 'fileName');
       }
-
-      console.log(clientConfig);
-      console.log('Now sending http get request');
+      $log.debug('rwfind CallClient. Finished processing config. clientConfig: ');
+      $log.debug(clientConfig);
+      $log.debug('rwfind CallClient: Now sending http get request');
 
       $scope.resultsMsg = 'Results - Waiting...';
       
@@ -232,32 +224,11 @@ angular.module('dimsDashboard.controllers').
         } ).
         success(prepareData).
         error(function(data, status, headers, config) {
-          console.log('rwfind Error');
-          console.log(data);
-          console.log(status);
           $scope.showFormError = true;
           $scope.formErrorMsg = 'Your request did not get a result. Status: '+status;
           $scope.resultsMsg = 'Results';
           $scope.showResults = false;
         });
       };
-
-  $scope.showPrettyResults= function() {
-    $scope.prettyMsg = '';
-    if ($scope.prettyData.length === 0) {
-      try {
-        $scope.prettyData = JSON.stringify($scope.rawData,null,2);
-        $scope.isRaw = false;
-      } catch(e) {
-        $scope.prettyMsg = 'Pretty print does not work on this data.';
-      }
-    }
-    $scope.isRaw = false;
-    
-  };
-
-  $scope.showRawData = function() {
-        $scope.isRaw = true;
-    };
 
 }]);

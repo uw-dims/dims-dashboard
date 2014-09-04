@@ -18,6 +18,8 @@ config.cert_name = process.env.CERT_NAME || 'localhost';
 
 config.bin = '/opt/dims/bin/';
 
+config.rpcPath = '/opt/dims/src/prisem/rpc'
+
 config.rpcServer = 'rabbitmq.prisem.washington.edu';
 
 config.mapfile = '/etc/ipgrep_networks.txt';
@@ -26,19 +28,28 @@ config.inputdir = '/opt/dims/srv/input';
 
 config.outputdir = '/opt/dims/srv/output';
 
-config.data = '../../../data/sample-data/'
+config.data = '/opt/dims/data/sample-data'
 
-config.userDataDir = './mydata/'
+config.serverPath = __dirname;
+
+config.userDataPath =  config.serverPath + '/mydata/'
 
 config.directoryMapping = {
-  'ip_lists': config.userDataDir+'ipFiles/',
-  'map_files': config.userDataDir+'mapFiles/',
-  'data_files': config.userDataDir+'dataFiles/'
+  'ip_lists': config.userDataPath+'ipFiles/',
+  'map_files': config.userDataPath+'mapFiles/',
+  'data_files': config.userDataPath+'dataFiles/'
 };
 
 config.defaultMapping = {
 	'default_data': config.data
 };
+
+config.rpcQueueNames = {
+  'cifbulk': 'cifbulk_v1',
+  'anon': 'anon',
+  'rwfind': 'rwfind',
+  'crosscor': 'crosscor'
+}
 
 config.maxUploadFileNum = 10;
 config.maxUploadFileSize = 39273942;

@@ -10,7 +10,7 @@ exports.list = function(req,res) {
 
   logger.debug('rwfind:list - Request query is: ', req.query);
 
-  var rpcQueuebase = 'rwfind',
+  var rpcQueuebase = config.rpcQueueNames['rwfind'],
       rpcClientApp = 'rwfind_client',
       debug = process.env.NODE_ENV === 'development' ? '--debug' : (req.query.debug === 'true' ? '--debug' : ''),
       verbose = process.env.NODE_ENV === 'development' ? '--verbose' : (req.query.verbose === 'true' ? '--verbose' : '');
@@ -46,6 +46,9 @@ exports.list = function(req,res) {
         function(callback) {
           if (req.query.ips !== undefined) {
             tmp.file(function _tempFileCreated(err, path, fd) {
+              logger.debug('rwfind temp file created error: ', err);
+              logger.debug('rwfind temp file created path: ' + path);
+              logger.debug('rwfind temp file created fd: ' + fd);
               callback(err,path,fd);
             });
           } else {
@@ -53,9 +56,13 @@ exports.list = function(req,res) {
           }
           
         },function(path, fd, callback) {
-            if (req.query.ips !== undefined) {
+            logger.debug('rwfind writefile path: ' + path);
+            logger.debug('rwfind req.query.ips: ', req.query.ips);
+            if (req.query.ips !== undefined ) {
               fs.writeFile(path, req.query.ips, function(err) {
-                  if (err === undefined) {
+                  logger.debug('rwfind writefile error: ' + err);
+                  if (err === undefined || err === null) {
+                     logger.debug('rwfind writefile error is null or undefined');
                      inputArray.push('-r');
                      inputArray.push(path);
                   }

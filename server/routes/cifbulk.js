@@ -10,7 +10,7 @@ exports.list = function(req,res) {
 
     logger.debug('cifbulk:list - Request query is: ', req.query);
 
-    var rpcQueuebase = 'cifbulk',
+    var rpcQueuebase = config.rpcQueueNames['cifbulk'],
         rpcClientApp = 'cifbulk_client',
         debug = process.env.NODE_ENV === 'development' ? '--debug' : (req.query.debug === 'true' ? '--debug' : ''),
         verbose = process.env.NODE_ENV === 'development' ? '--verbose' : (req.query.verbose === 'true' ? '--verbose' : '');
@@ -51,7 +51,7 @@ exports.list = function(req,res) {
         },function(path, fd, callback) {
             if (req.query.ips !== undefined) {
               fs.writeFile(path, req.query.ips, function(err) {
-                  if (err === undefined) {
+                  if (err === undefined || err === null) {
                      inputArray.push('-r');
                      inputArray.push(path);
                   }
@@ -67,7 +67,7 @@ exports.list = function(req,res) {
           var python = spawn(
             'python',
             inputArray,
-            {cwd: '../logs/rpc'}
+            {cwd: 'logs/rpc'}
           );
           dimsutil.processPython(python, req, res);
           callback(null, 'done');

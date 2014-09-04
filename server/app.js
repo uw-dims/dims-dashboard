@@ -51,13 +51,13 @@ app.set('view engine', 'html');
 app.use(json());
 app.use(methodOverride());
 
+// Override Express logging - stream logs to logger
 app.use(require('morgan') ('common',{
   'stream': logger.stream
 }));
 
 // development only
 if (env === 'development') {
-  logger.debug('Setting up development views and static path');
   app.set('views', path.join(__dirname, '../client/dashboard'));
   app.use(errorHandler());
   app.use(express.static(path.join(__dirname, '../client')));
@@ -73,7 +73,6 @@ if (env === 'development') {
 }
 
 if (env === 'production') {
-    logger.debug("Startup: Setting view root and static path to dist directory");
     app.set('views', path.join(__dirname, '/dist'));
     app.use(express.static(path.join(__dirname, '/dist')));
     app.use(function(err, req, res, next) {
@@ -84,6 +83,9 @@ if (env === 'production') {
         });
     });
 }
+
+logger.debug('current directory: ' + __dirname);
+logger.debug('server directory config: ' + config.serverPath);
 
 var router = express.Router();
 router.post('/upload', files.upload);

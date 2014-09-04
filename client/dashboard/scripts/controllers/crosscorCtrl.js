@@ -1,7 +1,7 @@
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller('CrosscorCtrl', ['$scope', 'Utils', 'FileService', '$http', 'DateService', '$location', '$routeParams', 
-    function ($scope, Utils, FileService, $http, DateService, $location, $routeParams) {
+  controller('CrosscorCtrl', ['$scope', 'Utils', 'FileService', '$http', '$log', 'DateService', '$location', '$routeParams', 
+    function ($scope, Utils, FileService, $http, $log, DateService, $location, $routeParams) {
     console.log('In crosscor controller');
 
     // Set up form data
@@ -22,14 +22,12 @@ angular.module('dimsDashboard.controllers').
     $scope.showMaps = false;
 
     FileService.getFileList('data_files').then(function(result) {
-      console.log(result);
         $scope.fileNames = result.fileNames;
         $scope.filePath = result.filePath;
         $scope.showFiles = true;
     });
 
     FileService.getFileList('map_files').then(function(result) {
-      console.log(result);
         $scope.mapNames = result.fileNames;
         $scope.mapPath = result.filePath;
         $scope.showMaps = true;
@@ -39,6 +37,7 @@ angular.module('dimsDashboard.controllers').
     // Other setup
     $scope.showResults = false;
     $scope.data = null;
+    $scope.rawData = null;
     $scope.resultsMsg = 'Results';
 
     // Setup grid
@@ -65,7 +64,8 @@ angular.module('dimsDashboard.controllers').
      */
     $scope.callClient = function() {
 
-      console.log($scope.formData);
+      $log.debug('crosscor CallClient: User clicked button to process request. Formdata: ');
+      $log.debug($scope.formData);
       // Initialize/reset when calling a client
       $scope.showResults = false;
       $scope.showFormError = false;
@@ -90,8 +90,9 @@ angular.module('dimsDashboard.controllers').
         Utils.setConfig(clientConfig, $scope.filePath+$scope.formData.fileName.name, 'fileName');
       }
 
-      console.log(clientConfig);
-      console.log('Now sending http get request');
+      $log.debug('crosscor CallClient. Finished processing config. clientConfig: ');
+      $log.debug(clientConfig);
+      $log.debug('crosscor CallClient: Now sending http get request');
 
       $scope.resultsMsg = 'Results - Waiting...';
       
@@ -101,10 +102,13 @@ angular.module('dimsDashboard.controllers').
           params: clientConfig
         } ).
         success(function(data, status, headers, config) {
-          // console.log("crosscor returned data");
-          // console.log(status);
-          // console.log(data);
-          $scope.data = data;
+          $log.debug('crosscor returned data');
+          $scope.rawData = data.data;
+          $scope.pid = data.pid;
+
+          $log.debug('crosscor pid: ' + $scope.pid);
+          $log.debug('crosscor data:  ');
+          $log.debug(data);
          
           $scope.showResults = true;
           $scope.resultsMsg = 'Results';         

@@ -58,7 +58,6 @@ var processPython = function(python, req, res) {
   var output = '';
   logger.debug('util:processPython spawned child PID: %d', python.pid);
   python.stdout.on('data', function(data) {
-    logger.debug('processPython receiving data on PID: %d', python.pid);
     output += data;
   });
 
@@ -73,7 +72,12 @@ var processPython = function(python, req, res) {
       logger.error('processPython closed with error. PID: %d, code: %s', python.pid, code);
       return res.status(500).json({code: code, pid: python.pid, data: output});
     }
-    return res.send(200, output);
+    try {
+      var jsonOutput = JSON.parse(output);
+      return res.status(200).json({pid: python.pid, data: jsonOutput});
+    } catch (e) {
+      return res.status(200).json({pid: python.pid, data: output});
+    } 
   })
 };
 

@@ -86,8 +86,10 @@ angular.module('dimsDashboard.controllers').
         success(function(data, status, headers, config) {
           console.log('anon returned data');
           console.log(status);
-          console.log(data);
-          $scope.data = data;
+          $scope.rawData = data.data;
+          $scope.pid = data.pid;
+          console.log($scope.rawData);
+          console.log($scope.pid);
          
           $scope.showResults = true;
 
