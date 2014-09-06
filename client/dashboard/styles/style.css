@@ -6168,6 +6168,23 @@ button.close {
 body {
   padding-top: 50px;
 }
+/* override bootstrap container margin */
+.container {
+  margin-left: 35px;
+  width: 93%;
+}
+/* Added as per ui.bootstrap instructiona */
+.nav,
+.pagination,
+.carousel,
+.panel-title a {
+  cursor: pointer;
+}
+/* We don't want underlines in panel title links */
+.panel-title a:hover,
+.panel-title a:focus {
+  text-decoration: none;
+}
 /*
  * Global add-ons
  */
@@ -6218,6 +6235,7 @@ body {
  */
 .main {
   padding-top: 20px;
+  position: relative;
 }
 /*
  * Placeholder dashboard ideas
@@ -6362,4 +6380,12 @@ html > body tbody.scrollContent {
 .fadeout.ng-hide-add,
 .fadein.ng-hide-remove.ng-hide-remove-active {
   opacity: 1;
+}
+.query-tray-btn {
+  cursor: pointer;
+}
+.query-tray-icon {
+  position: fixed;
+  left: 12px;
+  top: 70px;
 }

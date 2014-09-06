@@ -1,6 +1,5 @@
 *.sublime-*
 .bowerrc
-.jshintrc
 node_modules/
 tmp/*
 upload/*
