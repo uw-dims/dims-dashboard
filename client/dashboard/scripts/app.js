@@ -67,14 +67,75 @@ var constants = {
       { value: 'map_files', label: 'Mapping Files' },
       { value: 'data_files', label: 'Any Data Files' }
     ] ,
-  'maxFileUpload': 10
+  'maxFileUpload': 10,
+  'SILK' : 'rwfind',
+  'CIF' : 'cifbulk',
+  'CORRELATE' : 'crosscor',
+  'ANONYMIZE' : 'anon'
 };
 
+var rpcClientOptions = {
+  'searchFile' : {
+    'flag': '-r',
+    'short': true,
+    'clients': [constants.ANON, constants.SILK, constants.CIF, constants.CORRELATE]
+  },
+  'mapFile': {
+    'flag': '-m',
+    'short': true,
+    'clients': [constants.ANON, constants.CORRELATE]
+  },
+  'showJson': {
+    'flag': '-J',
+    'short': true,
+    'clients': [constants.ANON, constants.SILK]
+  },
+  'showStats': {
+    'flag': '-s',
+    'short': true,
+    'clients': [constants.ANON, constants.CIF, constants.CORRELATE]
+  },
+  'noHeader': {
+    'flag': '-H',
+    'short': true,
+    'clients': [constants.SILK, constants.CIF]
+  },
+  'startTime': {
+    'flag': '--stime=',
+    'short': false,
+    'clients': [constants.SILK, constants.CIF]
+  },
+  'endTime': {
+    'flag': '--etime=',
+    'short': false,
+    'clients': [constants.SILK, constants.CIF]
+  },
+  'numDays': {
+    'flag': '-D',
+    'short': true,
+    'clients': [constants.SILK, constants.CIF]
+  },
+  'hitLimit': {
+    'flag': '-T',
+    'short': true,
+    'clients': [constants.SILK]
+  },
+  'friendFoe': {
+    'flag': '-I',
+    'short': true,
+    'clients': [constants.CORRELATE]
+  }
+};
+
+
+
 var dimsDashboard = angular.module('dimsDashboard', 
-  ['ngRoute','angularFileUpload','ui.bootstrap','ui.bootstrap.showErrors','ngGrid', 'truncate', 'dimsDashboard.controllers', 'dimsDashboard.directives', 'dimsDashboard.services'])
+  ['ngRoute','angularFileUpload','ui.bootstrap','ui.bootstrap.showErrors','ngGrid', 'ngAnimate',
+    'truncate', 'dimsDashboard.controllers', 'dimsDashboard.directives', 'dimsDashboard.services'])
   .config(dimsDashboardConfig);
 
 dimsDashboard.constant(constants);
+dimsDashboard.constant(rpcClientOptions);
 
 angular.module('dimsDashboard.controllers', []);
 angular.module('dimsDashboard.services', []);

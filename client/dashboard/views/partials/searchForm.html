@@ -1,0 +1,93 @@
+<form class="form-horizontal" role="form" name="{{program}}Form">
+  <div class="alert alert-danger form-group" ng-show="showFormError">{{formErrorMsg}}</div>
+  
+  <div class="form-group" show-errors>
+    <label for="startDate" class="col-sm-2 control-label">Start Date/Hour</label>
+    <div class="col-sm-3"><div class="input-group input-group-sm">
+      <input type="text" class="form-control"  datepicker-popup={{dateFormat}} ng-model="formData.startDate" is-open="dateConfig.startOpened" 
+          datepicker-options="dateConfig.dateOptions" max-date="dateConfig.tomorrow" ng-required="true" close-text="Close" type="date"/>
+      <span class="input-group-btn">
+          <button type="button" class="btn btn-default" ng-click="open($event, 'startOpened')"><i class="glyphicon glyphicon-calendar"></i></button>
+      </span>
+    </div></div>
+    <div class="col-sm-2"><input type="number" class="form-control input-sm" ng-model="formData.startHour" name="startHour" min="00" max="24" integer /></div>
+  </div>
+  
+  <div class="form-group"><div class="col-sm-10 col-sm-offset-1 help-block">
+    Optional if number of days is entered below. Hours are from 0 to 24. Default is 0 (midnight). 
+  </div></div>
+
+  <div class="form-group" show-errors>
+    <label for="endDate" class="col-sm-2 control-label">End Date/Hour</label>
+    <div class="col-sm-3"><div class="input-group input-group-sm">
+      <input type="text" class="form-control"  datepicker-popup={{dateFormat}} ng-model="formData.endDate" is-open="dateConfig.endOpened" 
+          datepicker-options="dateConfig.dateOptions" max-date="dateConfig.tomorrow" ng-required="true" close-text="Close" />
+      <span class="input-group-btn">
+          <button type="button" class="btn btn-default" ng-click="open($event,'endOpened')"><i class="glyphicon glyphicon-calendar"></i></button>
+      </span>
+    </div></div>
+    <div class="col-sm-2"><input type="number" class="form-control input-sm" ng-model="formData.endHour" name="endHour" min="00" max="24" integer /></div>
+  </div>
+  
+  <div class="form-group"><div class="col-sm-10 col-sm-offset-1 help-block">
+    Optional if number of days is entered below or if a start date is specified. Default end date is today. Hours are from 0 to 24. Default is 0 (midnight). 
+  </div></div>
+
+  <div class="form-group" show-errors>
+    <label class="col-sm-2 control-label">Number of Days</label>
+    <div class="col-sm-2">
+      <input type="number" class="form-control input-sm" ng-model="formData.numDays" name="numDays" min="1" integer/>
+    </div>
+    <p class="help-block">Optional: Use to specify date range as a certain number of days up to now. 
+    <span ng-if="rwfindForm.numDays.$error.integer">Must be an integer.</span></p>
+  </div>
+
+  <div class="form-group" show-errors>
+     <label class="col-sm-2 control-label">Hit Limit</label>
+    <div class="col-sm-2">
+      <input type="number" class="form-control input-sm" ng-model="formData.hitLimit" name="hitLimit" min="1" integer />
+    </div>
+    <p class="help-block">Optional: Limit number of hits returned, greater than 0 (default is 100). <span ng-if="rwfindForm.numDays.$error.integer">Must be an integer.</span></p>
+  </div>
+
+  <div class="form-group">
+    <label  class="col-sm-2 control-label">IP/CIDR/Domains</label>
+    <div class="col-sm-3">
+      <textarea class="form-control input-sm" rows="3" ng-model="formData.ips" id="ipsId"></textarea>
+    </div>
+    
+    <label  class="col-sm-2 control-label">Or Choose File</label>
+    <div class="col-sm-3" ng-show="showFiles">
+      <select class="form-control input-sm" ng-model="formData.fileName" ng-options="n.name for n in fileNames" >
+        <option></option>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-group">
+  <label  class="col-sm-2 control-label">Output Type</label>
+    <div class="col-sm-3">
+      <select class="form-control input-sm" ng-model="formData.outputType" ng-options="o.value as o.label for o in outputTypes"> 
+      </select>
+    </div>
+    <label  class="col-sm-2 control-label">Show Header?</label>
+    <div class="col-sm-1">
+      <input type="checkbox" ng-model="formData.header" name="header" class="form-control input-sm"  />
+    </div>
+  </div>
+
+  <div class="form-group">
+  <label  class="col-sm-2 control-label">Use Demo Data?</label>
+  <div class="col-sm-3" ng-show="showDemoFiles">
+      <select class="form-control input-sm" ng-model="formData.demoName" ng-options="n for n in demoNames" >
+      <option></option>
+    </select>
+  </div>
+  </div>
+
+  
+  <div class="form-group">
+  <div class="col-sm-3 col-sm-offset-2">
+  <button type="button" class="btn btn-primary btn-sm" ng-click="callClient()"><span class="glyphicon glyphicon-flash"></span>Call rwfind</button>
+  </div></div>
+</form>

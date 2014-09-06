@@ -9,6 +9,19 @@ body {
   padding-top: 50px;
 }
 
+/* override bootstrap container margin */
+.container {
+  margin-left: 35px; 
+  width: 93%;
+}
+
+/* Added as per ui.bootstrap instructiona */
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+
+/* We don't want underlines in panel title links */
+.panel-title a:hover, .panel-title a:focus {
+  text-decoration: none;
+}
 
 /*
  * Global add-ons
@@ -64,19 +77,23 @@ body {
  * Main content
  */
 
-.main {
-  padding: 20px;
-}
-@media (min-width: 768px) {
-  .main {
-    padding-right: 40px;
-    padding-left: 40px;
-  }
-}
-.main .page-header {
-  margin-top: 0;
-}
+// .main {
+//   padding: 20px;
+// }
+// @media (min-width: 768px) {
+//   .main {
+//     padding-right: 30px;
+//     padding-left: 30px;
+//   }
+// }
+// .main .page-header {
+//   margin-top: 0;
+// }
 
+.main {
+  padding-top: 20px;
+  position: relative;
+}
 
 /*
  * Placeholder dashboard ideas
@@ -239,6 +256,36 @@ html>body tbody.scrollContent {
 
 .scrollContent {
 
+}
 
+
+.fadein,
+.fadeout {
+  -webkit-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+  -moz-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+  -o-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+  transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+}
+
+.fadein.ng-hide-remove,
+.fadeout.ng-hide-add.ng-hide-add-active {
+  opacity: 0;
+  //display: block !important;
+}
+
+.fadeout.ng-hide-add,
+.fadein.ng-hide-remove.ng-hide-remove-active {
+  opacity: 1;
+  //display: block !important;
+}
+
+.query-tray-btn {
+  cursor: pointer;
+}
+
+.query-tray-icon {
+  position: fixed;
+  left: 12px;
+  top: 70px;
 }
 

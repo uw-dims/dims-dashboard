@@ -1,1 +1,51 @@
-<h2>Main</h2>
+
+<div class="query-tray-icon"><div style="width: 10px;"> <span class="glyphicon glyphicon-folder-close query-tray-btn"  ng-click="queryToggle()" ng-show="isCollapsed"></span>
+<span class="glyphicon glyphicon-folder-open query-tray-btn" ng-click="queryToggle()" ng-show="!isCollapsed"></span>
+<span class="glyphicon glyphicon-search query-tray-btn" ng-click="getTools()" ng-show="!isCollapsed"></span>
+<span class="glyphicon glyphicon-tasks query-tray-btn" ng-click="getSavedQueries()" ng-show="!isCollapsed"></span>
+</div>
+</div>
+
+<div class="container main">
+
+<div class="row" collapse="isCollapsed">
+
+<div class="col-xs-2">
+<div ng-show="showTools">
+<!-- <button class="btn btn-primary btn-small" ng-click="setTool('rwfind')">Search SiLK</button>
+<button class="btn btn-primary btn-small" ng-click="setTool('cifbulk')">Search CIF</button>
+<button class="btn btn-primary btn-small" ng-click="setTool('crosscor')">Cross-correlate</button>
+<button class="btn btn-primary btn-small" ng-click="setTool('anon')">Anonymize</button> -->
+</div>
+<div ng-show="showSavedQueries">Queries go here
+</div>
+<!-- <accordion close-others="false">
+ -->
+<!-- <accordion-group is-open="status.open">
+<accordion-heading>Query Tools <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+</accordion-heading> -->
+<!-- <ul class="list-group">
+<li class="list-group-item" ng-click="setTool('rwfind')">Search SiLK flows</li>
+<li class="list-group-item" ng-click="setTool('cifbulk')">Search CIF</li>
+<li class="list-group-item" ng-click="setTool('crosscor')">Cross-correlate data</li>
+<li class="list-group-item" ng-click="setTool('anon')">Anonymize</li>
+</ul> -->
+<!-- <button class="btn btn-primary btn-small" ng-click="setTool('rwfind')">Search SiLK</button>
+<button class="btn btn-primary btn-small" ng-click="setTool('cifbulk')">Search CIF</button>
+<button class="btn btn-primary btn-small" ng-click="setTool('crosscor')">Cross-correlate</button>
+<button class="btn btn-primary btn-small" ng-click="setTool('anon')">Anonymize</button>
+</accordion-group>
+
+<accordion-group heading="Saved Queries">Queries content</accordion-group>
+</accordion> -->
+
+</div>
+<div class="col-xs-10">
+<div class="panel panel-default">
+  <div class="panel-body">Panel 1</div>
+</div></div>
+</div>
+
+<div class="row"><div class="col-xs-12">Next Row</div></div>  
+
+</div>
