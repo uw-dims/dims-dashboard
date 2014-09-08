@@ -4,6 +4,12 @@
 
 @import "variables.less";
 
+/* Application variables */
+@list-group-item-top-padding: 5px;
+@list-group-item-side-padding: 10px;
+//** Text color of disabled list items
+@list-group-disabled-color:      @gray;
+
 /* Move down content because we have a fixed navbar that is 50px tall */
 body {
   padding-top: 50px;
@@ -23,15 +29,57 @@ body {
   text-decoration: none;
 }
 
+/* override list groups for dims */
+.list-group-item {
+  padding: @list-group-item-top-padding @list-group-item-side-padding;
+  border: none;
+  border-top: 1px solid @list-group-border;
+
+  // Do not Round the first and last items. Add border to bottom
+  &:first-child {
+    .border-top-radius(0px);
+  }
+  &:last-child {
+    margin-bottom: 0;
+    .border-bottom-radius(0px);
+  }
+}
+
+.list-group-item {
+  // Disabled state
+  &.disabled,
+  &.disabled:hover,
+  &.disabled:focus {
+    cursor: default !important;
+  }
+}
+
+/* override base panel class */
+.panel {
+  border: none;
+  .box-shadow( 0 0 0 rgba(0,0,0,0));
+}
+
+
 /*
  * Global add-ons
  */
+
+.main h1 {
+  margin-top: 0px;
+  padding-bottom: 5px;
+}
 
 .sub-header {
   padding-bottom: 10px;
   border-bottom: 1px solid #eee;
 }
 
+.saved-query-group {
+  height: 200px;
+  max-height: 200px;
+  overflow-y: scroll;
+}
 
 /*
  * Sidebar
@@ -286,6 +334,6 @@ html>body tbody.scrollContent {
 .query-tray-icon {
   position: fixed;
   left: 12px;
-  top: 70px;
+  top: 73px;
 }
 

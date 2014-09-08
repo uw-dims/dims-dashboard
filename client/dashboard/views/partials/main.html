@@ -7,17 +7,35 @@
 </div>
 
 <div class="container main">
+<h1>Current Activity</h1>
 
 <div class="row" collapse="isCollapsed">
 
-<div class="col-xs-2">
-<div ng-show="showTools">
-<!-- <button class="btn btn-primary btn-small" ng-click="setTool('rwfind')">Search SiLK</button>
-<button class="btn btn-primary btn-small" ng-click="setTool('cifbulk')">Search CIF</button>
-<button class="btn btn-primary btn-small" ng-click="setTool('crosscor')">Cross-correlate</button>
-<button class="btn btn-primary btn-small" ng-click="setTool('anon')">Anonymize</button> -->
+<div class="col-xs-2" >
+<div class="list-group" ng-show="showTools">
+<a href="#" class="list-group-item disabled">
+<h4 class="list-group-item-heading">Choose a Tool</h4>
+</a>
+<a href="#" class="list-group-item {{groupActive.rwfind}}" ng-click="setTool('rwfind')">Search SiLK flows</a>
+<a href="#" class="list-group-item {{groupActive.cifbulk}}" ng-click="setTool('cifbulk')">Search CIF</a>
+<a href="#" class="list-group-item {{groupActive.crosscor}}" ng-click="setTool('crosscor')">Cross-correlate data</a>
+<a href="#" class="list-group-item {{groupActive.anon}}" ng-click="setTool('anon')">Anonymize</a>
 </div>
-<div ng-show="showSavedQueries">Queries go here
+</div>
+<div class="col-xs-10" >
+<div class="panel panel-default" ng-show="showTools">
+  <div class="panel-body">Showtools panel</div>
+</div></div>
+
+<div class="col-xs-2" >
+<div style="border: 1px solid #eee;" ng-show="showSavedQueries">
+<div class="list-group" style="margin-bottom: 0px;"><a href="#" class="list-group-item disabled">
+<h4 class="list-group-item-heading">Saved Queries</h4>
+</a></div>
+<div class="list-group saved-query-group" >
+
+<a href="#" class="list-group-item" ng-repeat="q in savedDemoQueries" ng-click="setQuery(q)" >{{q.name}}</a>
+
 </div>
 <!-- <accordion close-others="false">
  -->
@@ -30,6 +48,7 @@
 <li class="list-group-item" ng-click="setTool('crosscor')">Cross-correlate data</li>
 <li class="list-group-item" ng-click="setTool('anon')">Anonymize</li>
 </ul> -->
+
 <!-- <button class="btn btn-primary btn-small" ng-click="setTool('rwfind')">Search SiLK</button>
 <button class="btn btn-primary btn-small" ng-click="setTool('cifbulk')">Search CIF</button>
 <button class="btn btn-primary btn-small" ng-click="setTool('crosscor')">Cross-correlate</button>
@@ -38,14 +57,23 @@
 
 <accordion-group heading="Saved Queries">Queries content</accordion-group>
 </accordion> -->
-
-</div>
-<div class="col-xs-10">
-<div class="panel panel-default">
-  <div class="panel-body">Panel 1</div>
 </div></div>
-</div>
+<div class="col-xs-10" >
+<div class="panel panel-default" ng-show="showSavedQueries">
+  <div class="panel-body">{{currentSelectedQuery | json}}</div>
+</div></div>
 
-<div class="row"><div class="col-xs-12">Next Row</div></div>  
+</div> <!-- end of row -->
+
+<div class="row"><div class="col-xs-12" >
+<div class="panel panel-default">
+  <div class="panel-body">Graph Panel</div>
+</div>  
+</div></div>  
+<div class="row"><div class="col-xs-12">
+<div class="panel panel-default">
+  <div class="panel-body">Data Panel</div>
+</div>  
+</div></div>  
 
 </div>
