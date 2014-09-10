@@ -14,7 +14,7 @@ config.cert_dir = process.env.CERT_DIRECTORY || 'certs/';
 
 config.ca_name = process.env.CA_NAME || 'dims-ca';
 
-config.cert_name = process.env.HOSTNAME || 'localhost';
+config.cert_name = process.env.CERT_NAME || 'localhost';
 
 config.bin = '/opt/dims/bin/';
 
