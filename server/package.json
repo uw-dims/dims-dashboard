@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "start": "NODE_ENV=production LOG_LEVEL=info node app.js",
-    "test": "NODE_ENV=development LOG_LEVEL=debug CERT_DIRECTORY=/home/lparsons/ CERT_NAME=process.env.HOSTNAME nodemon app.js"
+    "test": "NODE_ENV=development LOG_LEVEL=debug nodemon app.js"
   },
   "dependencies": {
     "JSONStream": "0.8.4",
@@ -36,5 +36,19 @@
     "xml2js": "~0.4.4",
     "glossy": "0.x.x",
     "unix-dgram": ">= 0.0.1"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.5",
+    "grunt-concurrent": "^0.5.0",
+    "grunt-contrib-clean": "^0.5.0",
+    "grunt-contrib-copy": "^0.5.0",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-mocha-test": "~0.11.0",
+    "jshint-stylish": "^0.2.0",
+    "load-grunt-tasks": "^0.4.0",
+    "time-grunt": "^0.3.1",
+    "chai": "~1.9.1",
+    "sinon-chai":"~2.5.0"
   }
 }

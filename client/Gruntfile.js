@@ -1,4 +1,3 @@
-// Generated on 2014-08-18 using generator-angular 0.9.5
 'use strict';
 
 // # Globbing
@@ -130,6 +129,9 @@ module.exports = function (grunt) {
 
     // Empties folders to start fresh
     clean: {
+      options:{
+        force: true
+      },
       dist: {
         files: [{
           dot: true,

@@ -74,7 +74,7 @@ angular.module('dimsDashboard.controllers').
       }
 
       console.log(clientConfig);
-      console.log("Now sending http get request");
+      console.log('Now sending http get request');
 
       $scope.resultsMsg = 'Results - Waiting...';
       
