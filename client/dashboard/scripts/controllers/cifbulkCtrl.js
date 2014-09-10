@@ -105,7 +105,7 @@ angular.module('dimsDashboard.controllers').
           console.log(data);
           console.log(status);
         });
-    }
+    };
 
     /**
      *  callClient function

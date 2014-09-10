@@ -2,7 +2,7 @@
 angular.module('dimsDashboard.controllers').
   controller('AnonCtrl', ['$scope', 'Utils', 'FileService', '$http', 'DateService', '$location', '$routeParams', 
     function ($scope, Utils, FileService, $http, DateService, $location, $routeParams) {
-    console.log("In crosscor controller");
+    console.log('In crosscor controller');
 
     // Set up form data
     $scope.formData = {};
@@ -108,5 +108,5 @@ angular.module('dimsDashboard.controllers').
           $scope.resultsMsg = 'Results';
           $scope.showResults = false;
         });
-      }
+      };
 }]);

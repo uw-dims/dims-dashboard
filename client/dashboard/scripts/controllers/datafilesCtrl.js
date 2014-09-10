@@ -17,7 +17,7 @@ angular.module('dimsDashboard.controllers').
           cellTemplate: '<div class="ngCellText" ng-click="tableClicked(row.getProperty(col.field))">{{row.getProperty(col.field)}}</div>'},
       {field: 'type', displayName: 'Type', enableCellEdit: true},
       {field: 'desc', displayName: 'Description', enableCellEdit: true}
-    ]
+    ];
     $scope.fileSelections = [];
     $scope.gridOptions = {data: 'gridData', 
         columnDefs: columnDefs,

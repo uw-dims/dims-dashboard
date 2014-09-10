@@ -91,6 +91,7 @@
     <script src="scripts/filters/filters.js"></script>
     <script src="scripts/services/services.js"></script>
     <script src="scripts/services/dataService.js"></script>
+    <script src="scripts/lib/owf/owf-widget-debug.js"></script>
     <!-- endbuild -->
     
     <script>
@@ -99,6 +100,37 @@ $('.dropdown-toggle').click(function(e) {
   e.stopPropagation();
 });
 </script> 
+
+<script>
+// Source: Neon widgets
+OWF.ready(function () { 
+
+    var widgetState = Ozone.state.WidgetState.getInstance({
+        onStateEventReceived: function(sender, msg) {
+            var event = msg.eventName;
+
+            if(event === 'activate' || event === 'show') {
+                $(document.body).show();
+            }
+            else if(event === 'hide') {
+                $(document.body).hide();
+            }
+        }
+    });
+
+    // listen for  activate and hide events so that we can
+    // hide our body.  Some browsers, specifically Chrome, continues
+    // to render iframes with elments that use specific webkit transforms
+    // even when they are hidden.  This impact many Map packages and some
+    // SVG packages.  The work around for this is to hide our widget body
+    // on hide events.
+    widgetState.addStateEventListeners({
+        events: ['activate', 'hide', 'show']
+    });
+    
+    OWF.notifyWidgetReady();
+});
+</script>
 
 </body>
 </html>

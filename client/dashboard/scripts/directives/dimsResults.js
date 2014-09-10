@@ -17,7 +17,7 @@ angular.module('dimsDashboard.directives').
 
         // Data passed back from http request will be converted into object
         // automatically if possible. If not, it will be a string
-        if (typeof($scope.rawData) === 'string') {
+        if (typeof(scope.rawData) === 'string') {
           scope.isJson = false;
         } else {
           scope.isJson = true;

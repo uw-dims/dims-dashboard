@@ -28,7 +28,7 @@ config.inputdir = '/opt/dims/srv/input';
 
 config.outputdir = '/opt/dims/srv/output';
 
-config.data = '/opt/dims/data/sample-data'
+config.data = '/opt/dims/data/sample-data/'
 
 config.serverPath = __dirname;
 

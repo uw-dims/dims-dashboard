@@ -3,8 +3,8 @@ angular.module('dimsDashboard.controllers').
   controller ('UploadCtrl', ['$scope', '$http', '$timeout', '$upload', 'Utils', function($scope, $http, $timeout, $upload, Utils) {
 console.log('In UploadController');
 
-  $scope.usingFlash = FileAPI && FileAPI.upload != null;
-  $scope.fileReaderSupported = window.FileReader != null && (window.FileAPI == null || FileAPI.html5 != false);
+  $scope.usingFlash = FileAPI && FileAPI.upload !== null;
+  $scope.fileReaderSupported = window.FileReader !== null && (window.FileAPI === null || FileAPI.html5 !== false);
 
   // Setup form data
     $scope.formData = {};
@@ -54,7 +54,7 @@ console.log('In UploadController');
                 $timeout(function() {
                 $scope.dataUrls[index] = e.target.result;
               });
-            }
+            };
         }(fileReader, j);
       }
       $scope.progress[j] = -1;
@@ -111,9 +111,9 @@ console.log('In UploadController');
  $scope.dragOverClass = function($event) {
     var items = $event.dataTransfer.items;
     var hasFile = false;
-    if (items != null) {
+    if (items !== null) {
       for (var i = 0 ; i < items.length; i++) {
-        if (items[i].kind == 'file') {
+        if (items[i].kind === 'file') {
           hasFile = true;
           break;
         }
@@ -121,6 +121,6 @@ console.log('In UploadController');
     } else {
       hasFile = true;
     }
-    return hasFile ? "uploadDropzone-hover" : "uploadDropzone-hover-err";
+    return hasFile ? 'uploadDropzone-hover' : 'uploadDropzone-hover-err';
   };
 }]);

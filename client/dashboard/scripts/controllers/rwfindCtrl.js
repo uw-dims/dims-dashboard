@@ -112,7 +112,7 @@ angular.module('dimsDashboard.controllers').
          
       } else {
           $scope.result = data.data;
-          $scope.pid = data.pid
+          $scope.pid = data.pid;
       }
       $log.debug('Done processing JSON for pid: ' + $scope.pid);
       $scope.showResults = true;

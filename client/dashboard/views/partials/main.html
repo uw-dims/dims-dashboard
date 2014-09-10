@@ -12,19 +12,20 @@
 <div class="row" collapse="isCollapsed">
 
 <div class="col-xs-2" >
-<div class="list-group" ng-show="showTools">
-<a href="#" class="list-group-item disabled">
+<div style="border: 1px solid #eee;" ng-show="showTools">
+<div class="list-group" style="margin-bottom: 0px;"><a href="#" class="list-group-item disabled">
 <h4 class="list-group-item-heading">Choose a Tool</h4>
-</a>
-<a href="#" class="list-group-item {{groupActive.rwfind}}" ng-click="setTool('rwfind')">Search SiLK flows</a>
-<a href="#" class="list-group-item {{groupActive.cifbulk}}" ng-click="setTool('cifbulk')">Search CIF</a>
-<a href="#" class="list-group-item {{groupActive.crosscor}}" ng-click="setTool('crosscor')">Cross-correlate data</a>
-<a href="#" class="list-group-item {{groupActive.anon}}" ng-click="setTool('anon')">Anonymize</a>
-</div>
-</div>
+</a></div>
+<div class="list-group" style="margin-bottom: 0px;">
+<a href="#" class="list-group-item {{t.selected}}" ng-repeat="t in availableTools" ng-click="setTool(t, $index)">{{t.desc}}</a>
+
+</div> <!-- End main list-group div -->
+</div> <!-- End enclosing div -->
+</div> <!-- End first col div -->
+
 <div class="col-xs-10" >
 <div class="panel panel-default" ng-show="showTools">
-  <div class="panel-body">Showtools panel</div>
+  <div class="panel-body">Showtools panel. Selected Tool: {{currentSelectedTool | json}}</div>
 </div></div>
 
 <div class="col-xs-2" >
@@ -32,35 +33,15 @@
 <div class="list-group" style="margin-bottom: 0px;"><a href="#" class="list-group-item disabled">
 <h4 class="list-group-item-heading">Saved Queries</h4>
 </a></div>
-<div class="list-group saved-query-group" >
+<div class="list-group saved-query-group" style="margin-bottom: 0px;" >
+<a href="#" class="list-group-item {{q.selected}}" ng-repeat="q in savedQueries" ng-click="setQuery(q, $index)" >{{q.name}}</a>
+</div> <!-- End main list-group div -->
+</div> <!-- End enclosing div -->
+</div> <!-- End first col div -->
 
-<a href="#" class="list-group-item" ng-repeat="q in savedDemoQueries" ng-click="setQuery(q)" >{{q.name}}</a>
-
-</div>
-<!-- <accordion close-others="false">
- -->
-<!-- <accordion-group is-open="status.open">
-<accordion-heading>Query Tools <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
-</accordion-heading> -->
-<!-- <ul class="list-group">
-<li class="list-group-item" ng-click="setTool('rwfind')">Search SiLK flows</li>
-<li class="list-group-item" ng-click="setTool('cifbulk')">Search CIF</li>
-<li class="list-group-item" ng-click="setTool('crosscor')">Cross-correlate data</li>
-<li class="list-group-item" ng-click="setTool('anon')">Anonymize</li>
-</ul> -->
-
-<!-- <button class="btn btn-primary btn-small" ng-click="setTool('rwfind')">Search SiLK</button>
-<button class="btn btn-primary btn-small" ng-click="setTool('cifbulk')">Search CIF</button>
-<button class="btn btn-primary btn-small" ng-click="setTool('crosscor')">Cross-correlate</button>
-<button class="btn btn-primary btn-small" ng-click="setTool('anon')">Anonymize</button>
-</accordion-group>
-
-<accordion-group heading="Saved Queries">Queries content</accordion-group>
-</accordion> -->
-</div></div>
 <div class="col-xs-10" >
 <div class="panel panel-default" ng-show="showSavedQueries">
-  <div class="panel-body">{{currentSelectedQuery | json}}</div>
+  <div class="panel-body">Saved Queries Panel. Selected query: {{currentSelectedQuery | json}}</div>
 </div></div>
 
 </div> <!-- end of row -->

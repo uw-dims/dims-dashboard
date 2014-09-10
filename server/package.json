@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "start": "NODE_ENV=production LOG_LEVEL=info node app.js",
-    "test": "NODE_ENV=development LOG_LEVEL=debug CERT_DIRECTORY=/home/lparsons/ CERT_NAME=parsonstest4-server nodemon app.js"
+    "test": "NODE_ENV=development LOG_LEVEL=debug CERT_DIRECTORY=/home/lparsons/ CERT_NAME=process.env.HOSTNAME nodemon app.js"
   },
   "dependencies": {
     "JSONStream": "0.8.4",
