@@ -41,7 +41,17 @@ angular.module('dimsDashboard.controllers').
 
     var initializeDemoQueries = function() {
       // Demo data
-      for (var i=0; i<$scope.demoActivitiesNum; i++) {
+      $scope.savedDemoQueries.push({
+        'name': 'Logcenter data usage',
+        'key': 'demo:logcenter',
+        'selected': ''
+      });
+      $scope.savedDemoQueries.push({
+        'name': 'SiLK data usage',
+        'key': 'demo:silk',
+        'selected': ''
+      });
+      for (var i=2; i<$scope.demoActivitiesNum; i++) {
         $scope.savedDemoQueries.push({
           'name' : 'Demo Query '+ i,
           'key' : 'key'+i,
@@ -92,12 +102,18 @@ angular.module('dimsDashboard.controllers').
 
 
     $scope.getTools = function() {
+      if ($scope.isCollapsed) {
+        $scope.queryToggle();
+      }
       $scope.showTools = true;
       $scope.showSavedQueries = false;
       $log.debug('getTools called');
     };
 
     $scope.getSavedQueries = function() {
+      if ($scope.isCollapsed) {
+        $scope.queryToggle();
+      }
       $scope.showTools = false;
       $scope.showSavedQueries = true;
       $log.debug('getSavedQueries called');

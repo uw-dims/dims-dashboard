@@ -1,8 +1,8 @@
 
 <div class="query-tray-icon"><div style="width: 10px;"> <span class="glyphicon glyphicon-folder-close query-tray-btn"  ng-click="queryToggle()" ng-show="isCollapsed"></span>
 <span class="glyphicon glyphicon-folder-open query-tray-btn" ng-click="queryToggle()" ng-show="!isCollapsed"></span>
-<span class="glyphicon glyphicon-search query-tray-btn" ng-click="getTools()" ng-show="!isCollapsed"></span>
-<span class="glyphicon glyphicon-tasks query-tray-btn" ng-click="getSavedQueries()" ng-show="!isCollapsed"></span>
+<span class="glyphicon glyphicon-search query-tray-btn" ng-click="getTools()" ></span>
+<span class="glyphicon glyphicon-tasks query-tray-btn" ng-click="getSavedQueries()" ></span>
 </div>
 </div>
 
@@ -12,7 +12,7 @@
 <div class="row" collapse="isCollapsed">
 
 <div class="col-xs-2" >
-<div style="border: 1px solid #eee;" ng-show="showTools">
+<div style="border: 1px solid #ddd;" ng-show="showTools">
 <div class="list-group" style="margin-bottom: 0px;"><a href="#" class="list-group-item disabled">
 <h4 class="list-group-item-heading">Choose a Tool</h4>
 </a></div>
@@ -24,12 +24,11 @@
 </div> <!-- End first col div -->
 
 <div class="col-xs-10" >
-<div class="panel panel-default" ng-show="showTools">
-  <div class="panel-body">Showtools panel. Selected Tool: {{currentSelectedTool | json}}</div>
-</div></div>
+<dims-search-form ng-show="currentSelectedTool.name !== undefined && showTools" tool="currentSelectedTool"></dims-search-form>
+</div>
 
 <div class="col-xs-2" >
-<div style="border: 1px solid #eee;" ng-show="showSavedQueries">
+<div style="border: 1px solid #ddd;" ng-show="showSavedQueries">
 <div class="list-group" style="margin-bottom: 0px;"><a href="#" class="list-group-item disabled">
 <h4 class="list-group-item-heading">Saved Queries</h4>
 </a></div>
@@ -40,20 +39,24 @@
 </div> <!-- End first col div -->
 
 <div class="col-xs-10" >
-<div class="panel panel-default" ng-show="showSavedQueries">
-  <div class="panel-body">Saved Queries Panel. Selected query: {{currentSelectedQuery | json}}</div>
+<div class="panel panel-default" ng-show="currentSelectedQuery.name !== undefined && showSavedQueries">
+  <div class="panel-body" >
+  <h4>{{currentSelectedQuery.name}}</h4>
+  <p>{{currentSelectedQuery.key}}</p>
+  <button type="button" class="btn btn-primary btn-sm" ng-click="callClient()">Show Data</button>
+  </div>
 </div></div>
 
 </div> <!-- end of row -->
 
-<div class="row"><div class="col-xs-12" >
+<div class="row" style="margin-top: 15px;"><div class="col-xs-12" >
 <div class="panel panel-default">
-  <div class="panel-body">Graph Panel</div>
+  <div class="panel-body">Current Main Graph</div>
 </div>  
 </div></div>  
 <div class="row"><div class="col-xs-12">
 <div class="panel panel-default">
-  <div class="panel-body">Data Panel</div>
+  <div class="panel-body">Current Data</div>
 </div>  
 </div></div>  
 
