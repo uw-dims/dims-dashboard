@@ -1,0 +1,16 @@
+{
+ "program": "rwfind",
+ "date": "Fri, 12 Sep 2014 01:11:58 +0000",
+ "sdate": "2013/10/15:00",
+ "edate": "2013/11/15:00",
+ "stime": 1381795200,
+ "etime": 1384473600,
+ "flows_found": 0,
+ "flows": [
+
+  ],
+ "topn": 100,
+ "flow_stats": [
+
+  ]
+}
