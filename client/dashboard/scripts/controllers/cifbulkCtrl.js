@@ -1,7 +1,7 @@
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller('CifbulkCtrl', ['$scope', 'Utils', 'FileService', '$http', 'DateService', '$location', '$routeParams', 
-      function ($scope, Utils, FileService, $http, DateService, $location, $routeParams) {
+  controller('CifbulkCtrl', ['$scope', 'Utils', 'FileService', '$http', '$log', 'DateService', '$location', '$routeParams', 
+      function ($scope, Utils, FileService, $http, $log, DateService, $location, $routeParams) {
     console.log('In cifbulk controller');
 
     // Set up form data
@@ -63,7 +63,7 @@ angular.module('dimsDashboard.controllers').
 
     // Prepare incoming data
     var prepareData = function(data, status, headers, config) {
-      console.log(data);
+      $log.debug('Data in prepareData is ', data);
       $scope.rawData = data.data;
       $scope.noResults = [];
       $scope.showResults = true;
@@ -100,7 +100,11 @@ angular.module('dimsDashboard.controllers').
           source: 'default_data'
         }
 
-      }).success(prepareData)
+      }).success(function(data, status, headers, config) {
+        var serverData = {};
+        serverData.data = data;
+        prepareData(serverData, status, headers, config);
+        } )
         .error(function(data, status, headers, config) {
           console.log(data);
           console.log(status);

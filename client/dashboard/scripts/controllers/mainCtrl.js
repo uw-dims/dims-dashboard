@@ -43,14 +43,41 @@ angular.module('dimsDashboard.controllers').
       // Demo data
       $scope.savedDemoQueries.push({
         'name': 'Logcenter data usage',
-        'key': 'demo:logcenter',
+        'desc': 'Time-series logcenter data usage',
+        'key': 'logcenter-sizes-2.txt',
         'selected': ''
       });
       $scope.savedDemoQueries.push({
         'name': 'SiLK data usage',
-        'key': 'demo:silk',
+        'key': 'silk-sizes-2.txt',
+        'desc': 'Time-series SiLK data usage',
         'selected': ''
       });
+      $scope.savedDemoQueries.push({
+        'name': 'RWFIND Demo 1',
+        'key': 'testrw1.txt',
+        'desc': 'Search Seattle netflow data past 3 days for CIF 65% confidence indicators',
+        'selected': ''
+      });
+      $scope.savedDemoQueries.push({
+        'name': 'RWFIND Demo 3',
+        'key': 'testrw3.txt',
+        'desc': 'Search Seattle netflow data past 3 days for CIF 95% confidence indicators',
+        'selected': ''
+      });
+      $scope.savedDemoQueries.push({
+        'name': 'RWFIND Demo 5',
+        'key': 'testrw5.txt',
+        'desc': 'Search Seattle netflow data past 7 days for suspect CIDR block',
+        'selected': ''
+      });
+      $scope.savedDemoQueries.push({
+        'name': 'CIFBULK Demo 1',
+        'key': 'testcif1.txt',
+        'desc': 'Search for CIF 65% confidence IPs',
+        'selected': ''
+      });
+     
       for (var i=2; i<$scope.demoActivitiesNum; i++) {
         $scope.savedDemoQueries.push({
           'name' : 'Demo Query '+ i,

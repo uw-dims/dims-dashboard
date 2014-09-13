@@ -63,13 +63,16 @@ exports.list = function(req,res) {
        }, function(callback) {  
             
           logger.debug('cifbulk:list - Input to python child process:', inputArray);
-
-          var python = spawn(
-            'python',
-            inputArray,
-            {cwd: 'logs/rpc'}
-          );
-          dimsutil.processPython(python, req, res);
+          try {
+            var python = spawn(
+              'python',
+              inputArray
+            );
+            dimsutil.processPython(python, req, res);
+          } catch (e) {
+            log.error(e);
+          }   
+          
           callback(null, 'done');
         }, function(err,result) {
         }
