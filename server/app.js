@@ -24,6 +24,7 @@ var express = require('express')
   , crosscor = require('./routes/crosscor')
   , anon = require('./routes/anon')
   , data = require('./routes/data')
+  , settings = require('./routes/settings')
   // , ipgrep = require('./routes/ipgrep')
   , utils = require('./utils/util')
   , config = require('./config')
@@ -96,6 +97,9 @@ router.get('/crosscor', crosscor.list);
 router.get('/anon', anon.list);
 router.get('/rwfind', rwfind.list);
 router.get('/data', data.list);
+// Settings api - now just doing GET one setting, PUT
+router.get('/settings/:id', settings.get);
+router.put('/settings/:id', settings.update);
 router.get('*', routes.index);
 
 app.use('/', router);

@@ -1,6 +1,6 @@
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller('MainCtrl', ['$scope', '$location', '$routeParams', '$log', '$filter', function ($scope, $location, $routeParams, $log, $filter) {
+  controller('MainCtrl', ['$scope', '$location', '$routeParams', '$log', '$filter', '$http', function ($scope, $location, $routeParams, $log, $filter, $http) {
     // write Ctrl here
     $log.debug('In MainCtrl');
 
@@ -10,6 +10,8 @@ angular.module('dimsDashboard.controllers').
     $scope.showActivities = false;
     $scope.currentSelectedQuery = {};
     $scope.currentSelectedTool = {};
+    $scope.settings = {};
+    $scope.settingsUrl = '/settings/0';
     $scope.demoActivitiesNum = 10;
     $scope.savedDemoQueries = [];
     $scope.savedQueries = [] || $scope.savedQueries;
@@ -93,10 +95,12 @@ angular.module('dimsDashboard.controllers').
       });
     };
 
+    
+
     initializeTools();
     initializeDemoQueries();
     initializeQueryList();
-
+    
     $log.debug('Saved queries: ', $scope.savedQueries);
 
     $scope.queryToggle = function() {
@@ -134,7 +138,7 @@ angular.module('dimsDashboard.controllers').
       }
       $scope.showTools = true;
       $scope.showSavedQueries = false;
-      $log.debug('getTools called');
+      $scope.showSettings = false;
     };
 
     $scope.getSavedQueries = function() {
@@ -143,6 +147,60 @@ angular.module('dimsDashboard.controllers').
       }
       $scope.showTools = false;
       $scope.showSavedQueries = true;
-      $log.debug('getSavedQueries called');
+      $scope.showSettings = false;
     };
+
+    $scope.getSettings = function() {
+      if ($scope.isCollapsed) {
+        $scope.queryToggle();
+      }
+      $scope.showTools = false;
+      $scope.showSavedQueries = false;
+      $scope.showSettings = true;
+    };
+
+    $scope.getUserSettings = function() {
+      $log.debug('in getUserSettings');
+      return $http({
+        method: 'GET',
+        url: $scope.settingsUrl
+      }).
+        success(function(data, status, headers, config) {
+          $log.debug('data is ', data);
+          $scope.settings = data;
+          $log.debug('scope settings now', $scope.settings);
+
+        }).
+        error(function(data, status, headers, config) {
+          console.log('Error getting settings');
+          console.log(data);
+          console.log(status);
+        });
+    };
+
+    $scope.setUserSettings = function() {
+      var settings = $scope.settings;
+      settings.anonymize = 'true';
+      console.log('in setUserSettings');
+      console.log(settings);
+      return $http({
+        method: 'PUT',
+        url: $scope.settingsUrl,
+        params: settings
+      }).
+        success(function(data, status, headers, config) {
+          $log.debug('success setting, data is ', data);
+          $log.debug('status is ', status);
+        }).
+        error(function(data, status, headers, config) {
+          console.log('Error setting settings');
+          console.log(data);
+          console.log(status);
+        });
+      };
+
+      // Initialize settings
+      $scope.getUserSettings();
+
+
   }]);

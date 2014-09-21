@@ -32,7 +32,9 @@ config.data = '/opt/dims/data/sample-data/'
 
 config.serverPath = __dirname;
 
-config.userDataPath =  config.serverPath + '/mydata/'
+config.userDataPath =  config.serverPath + '/mydata/';
+
+config.demoDatastorePath = config.serverPath + '/data/';
 
 config.directoryMapping = {
   'ip_lists': config.userDataPath+'ipFiles/',

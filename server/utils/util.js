@@ -2,6 +2,8 @@ var stream = require('stream');
 var async = require('async');
 var _ = require('lodash');
 var logger = require('./logger');
+var fs = require('fs');
+var config = require('../config');
 
 var createParser = function() {
 
@@ -82,4 +84,33 @@ var processPython = function(python, req, res) {
 };
 
 exports.processPython = processPython;
+
+var getSettings = function() {
+  var path = config.demoDatastorePath + 'settings.json';
+  console.log('in getSettings');
+  fs.exists(path, function(exists) {
+    if (exists) {
+      fs.readFile(path, 'utf8', function(err, data) {
+          if (err) {
+              console.log('fs.readFile error', err);
+              return err;
+          } 
+          return data;
+      });
+    } else {
+        console.log(path+' does not exist');
+        //return res.send(400, 'File does not exist');
+        return  err;
+    }
+  });
+};
+
+exports.getSettings = getSettings;
+
+var writeSettings = function(json) {
+
+};
+
+exports.writeSettings = writeSettings;
+
 

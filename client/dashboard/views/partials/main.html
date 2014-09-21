@@ -12,7 +12,7 @@
 <h1>Current Activity</h1>
 
 <div class="row" collapse="isCollapsed">
-
+<!-- Tools -->
 <div class="col-xs-2" >
 <div style="border: 1px solid #ddd;" ng-show="showTools">
 <div class="list-group" style="margin-bottom: 0px;"><a href="#" class="list-group-item disabled">
@@ -29,6 +29,7 @@
 <dims-search-form ng-show="currentSelectedTool.name !== undefined && showTools" tool="currentSelectedTool"></dims-search-form>
 </div>
 
+<!-- Saved Queries -->
 <div class="col-xs-2" >
 <div style="border: 1px solid #ddd;" ng-show="showSavedQueries">
 <div class="list-group" style="margin-bottom: 0px;"><a href="#" class="list-group-item disabled">
@@ -46,6 +47,17 @@
   <h4>{{currentSelectedQuery.name}}</h4>
   <p>{{currentSelectedQuery.desc}}</p>
   <button type="button" class="btn btn-primary btn-sm" ng-click="callClient()">Show Data</button>
+  </div>
+</div></div>
+
+<!-- Settings -->
+<div class="col-xs-12">
+<div class="panel panel-default" ng-show="showSettings" >
+  <div class="panel-body" >
+  <h4>Settings</h4>
+  <button type="button" class="btn btn-primary btn-sm" ng-click="getUserSettings()">Call GET</button>
+  <button type="button" class="btn btn-primary btn-sm" ng-click="setUserSettings()">Call PUT</button>
+  {{ settings }}
   </div>
 </div></div>
 
