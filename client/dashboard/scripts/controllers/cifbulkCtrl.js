@@ -117,8 +117,12 @@ angular.module('dimsDashboard.controllers').
       //   serverData.data = data;
       //   prepareData(serverData, status, headers, config);
       //   } )
-        }).success(anonymizeData)
-
+        }).success(function(data, status, headers, config) {
+            var fileData = {};
+            fileData.data = data;
+            fileData.status = status;
+            anonymizeData(fileData,status,headers,config)
+          })
         .error(function(data, status, headers, config) {
           console.log(data);
           console.log(status);
