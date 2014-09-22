@@ -22,23 +22,57 @@ exports.list = function(req,res) {
 
   if (req.query.outputType == 'json') inputArray.push('-J');
   
-  if (req.query.fileName !== undefined) {
-    inputArray.push('-r');
-    inputArray.push(req.query.fileName);
-  }
-
   if (req.query.mapName !== undefined) {
     inputArray.push('-m');
     inputArray.push(req.query.mapName);
   }
 
-  logger.debug('anon:list - Input to python child process: ', inputArray);
+  
 
-  var python = spawn(
-    'python',
-    inputArray
-    );
+  if (req.query.fileName !== undefined) {
+    inputArray.push('-r');
+    inputArray.push(req.query.fileName);
+  }
 
-  dimsutil.processPython(python, req, res);
+  async.waterfall([
+    function(callback) {
+       if (req.query.inputData !== undefined) {
+        tmp.file(function _tempFileCreated(err, path, fd) {
+          callback(err,path,fd);
+        });
+      } else {
+        callback(null, null, null);
+      }
+ 
+    },function(path, fd, callback) {
+        if (req.query.inputData !== undefined) {
+          fs.writeFile(path, req.query.inputData, function(err) {
+              if (err === undefined || err === null) {
+                 inputArray.push('-r');
+                 inputArray.push(path);
+              }
+           callback(err);
+          });
+        } else {
+          callback(null);
+        }
+   }, function(callback) {  
+        
+      logger.debug('anon:list - Input to python child process:', inputArray);
+      try {
+        var python = spawn(
+          'python',
+          inputArray
+        );
+        dimsutil.processPython(python, req, res);
+      } catch (e) {
+        log.error(e);
+      }   
+      
+      callback(null, 'done');
+    }, function(err,result) {
+    }
+  ]);  
+
 };
 

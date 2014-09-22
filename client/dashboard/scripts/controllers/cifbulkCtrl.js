@@ -27,6 +27,12 @@ angular.module('dimsDashboard.controllers').
       $scope.showDemoFiles = true;
     });
 
+    SettingsService.getSettings().then(function(result){
+      console.log('getSettings result');
+      console.log(result);
+      $scope.anonymize = result.anonymize;
+    });
+
     // Setup date
     $scope.dateConfig = DateService.dateConfig;
 

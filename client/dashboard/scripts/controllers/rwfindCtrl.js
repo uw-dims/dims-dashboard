@@ -1,7 +1,8 @@
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller('RwfindCtrl', ['$scope', 'Utils', '$http', '$log', 'FileService', 'DateService', '$location', '$routeParams',  
-      function ($scope, Utils, $http, $log, FileService, DateService, $location, $routeParams) {
+  controller('RwfindCtrl', ['$scope', 'Utils', '$http', '$log', 'FileService', 'DateService', 
+    'AnonService', 'SettingsService', '$location', '$routeParams',  
+      function ($scope, Utils, $http, $log, FileService, DateService, AnonService, SettingsService, $location, $routeParams) {
     $log.debug('In rwfind controller');
 
     // Set up form data
@@ -31,6 +32,12 @@ angular.module('dimsDashboard.controllers').
       $scope.demoPath = result.filePath;
       $scope.demoNames = result.fileNames;
       $scope.showDemoFiles = true;
+    });
+
+    SettingsService.getSettings('0').then(function(result){
+      console.log('getSettings result');
+      console.log(result);
+      $scope.anonymize = result.anonymize;
     });
 
     // Setup date
@@ -70,7 +77,12 @@ angular.module('dimsDashboard.controllers').
     $scope.flowStats = [];
     // $scope.flowStatsGridOptions = { data: 'flowStats' };
 
-    var prepareData = function(data,status,headers,config) {
+    var anonymizeData = function(data,status,headers,config) {
+       AnonService.anonymize($scope.anonymize, data, $scope.formData.outputType)
+              .then(prepareData);
+            };
+
+    var prepareData = function(data) {
       $log.debug('rwfind returned data - in prepareData');
       $log.debug('status: '+status);
       $log.debug('data: ');
@@ -222,7 +234,7 @@ angular.module('dimsDashboard.controllers').
           url: '/rwfind', 
           params: clientConfig
         } ).
-        success(prepareData).
+        success(anonymizeData).
         error(function(data, status, headers, config) {
           $scope.showFormError = true;
           $scope.formErrorMsg = 'Your request did not get a result. Status: '+status;
