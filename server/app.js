@@ -94,7 +94,7 @@ router.get('/files', files.files);
 // app.get('/ipgrep', ipgrep.call);
 router.get('/cifbulk', cifbulk.list);
 router.get('/crosscor', crosscor.list);
-router.get('/anon', anon.list);
+router.post('/anon', anon.list);
 router.get('/rwfind', rwfind.list);
 router.get('/data', data.list);
 // Settings api - now just doing GET one setting, PUT

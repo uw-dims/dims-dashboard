@@ -1,7 +1,7 @@
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller('AnonCtrl', ['$scope', 'Utils', 'FileService', '$http', 'DateService', '$location', '$routeParams', 
-    function ($scope, Utils, FileService, $http, DateService, $location, $routeParams) {
+  controller('AnonCtrl', ['$scope', 'Utils', 'FileService', '$http', 'DateService', 'SettingsService', 'AnonService', '$location', '$routeParams', 
+    function ($scope, Utils, FileService, $http, DateService, SettingsService, AnonService, $location, $routeParams) {
     console.log('In crosscor controller');
 
     // Set up form data
@@ -33,6 +33,12 @@ angular.module('dimsDashboard.controllers').
         $scope.mapNames = result.fileNames;
         $scope.mapPath = result.filePath;
         $scope.showMaps = true;
+    });
+
+    SettingsService.getSettings('0').then(function(result){
+      console.log('getSettings result');
+      console.log(result);
+      $scope.anonymize = result.anonymize;
     });
     
 
@@ -79,7 +85,7 @@ angular.module('dimsDashboard.controllers').
       $scope.resultsMsg = 'Results - Waiting...';
       
       $http(
-        { method: 'GET',
+        { method: 'POST',
           url: '/anon', 
           params: clientConfig
         } ).

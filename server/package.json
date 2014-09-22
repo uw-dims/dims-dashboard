@@ -35,7 +35,8 @@
     "winston": "~0.7.3",
     "xml2js": "~0.4.4",
     "glossy": "0.x.x",
-    "unix-dgram": ">= 0.0.1"
+    "unix-dgram": ">= 0.0.1",
+    "node-promise": "~0.5.10"
   },
   "devDependencies": {
     "grunt": "~0.4.5",

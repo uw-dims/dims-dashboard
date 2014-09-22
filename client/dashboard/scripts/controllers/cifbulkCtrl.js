@@ -1,7 +1,7 @@
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller('CifbulkCtrl', ['$scope', 'Utils', 'FileService', '$http', '$log', 'DateService', '$location', '$routeParams', 
-      function ($scope, Utils, FileService, $http, $log, DateService, $location, $routeParams) {
+  controller('CifbulkCtrl', ['$scope', 'Utils', 'FileService', '$http', '$log', 'DateService', 'SettingsService', 'AnonService', '$location', '$routeParams', 
+      function ($scope, Utils, FileService, $http, $log, DateService, SettingsService, AnonService, $location, $routeParams) {
     console.log('In cifbulk controller');
 
     // Set up form data
@@ -27,7 +27,7 @@ angular.module('dimsDashboard.controllers').
       $scope.showDemoFiles = true;
     });
 
-    SettingsService.getSettings().then(function(result){
+    SettingsService.getSettings('0').then(function(result){
       console.log('getSettings result');
       console.log(result);
       $scope.anonymize = result.anonymize;
@@ -66,6 +66,12 @@ angular.module('dimsDashboard.controllers').
     //       {field: 'subnet_end', displayName: 'Subnet End'},
     //       {field: 'weight', displayName: 'Weight'}
     //     ];
+
+    var anonymizeData = function(data,status,headers,config) {
+       $log.debug('Call anonymize service');
+       AnonService.anonymize($scope.anonymize, data.data, data.pid)
+              .then(prepareData);
+            };
 
     // Prepare incoming data
     var prepareData = function(data, status, headers, config) {
@@ -106,11 +112,13 @@ angular.module('dimsDashboard.controllers').
           source: 'default_data'
         }
 
-      }).success(function(data, status, headers, config) {
-        var serverData = {};
-        serverData.data = data;
-        prepareData(serverData, status, headers, config);
-        } )
+      // }).success(function(data, status, headers, config) {
+      //   var serverData = {};
+      //   serverData.data = data;
+      //   prepareData(serverData, status, headers, config);
+      //   } )
+        }).success(anonymizeData)
+
         .error(function(data, status, headers, config) {
           console.log(data);
           console.log(status);
@@ -182,7 +190,7 @@ angular.module('dimsDashboard.controllers').
           params: clientConfig
         } )
 
-        .success(prepareData)
+        .success(anonymizeData)
 
         .error(function(data, status, headers, config) {
           console.log('cifbulk Error');

@@ -55,9 +55,9 @@
 <div class="panel panel-default" ng-show="showSettings" >
   <div class="panel-body" >
   <h4>Settings</h4>
-  <button type="button" class="btn btn-primary btn-sm" ng-click="getUserSettings()">Call GET</button>
-  <button type="button" class="btn btn-primary btn-sm" ng-click="setUserSettings()">Call PUT</button>
-  {{ settings }}
+  <button type="button" class="btn btn-primary btn-sm" ng-click="setUserSettings()" ng-show="settings.anonymize === 'true'">Turn Anonymization Off</button>
+  <button type="button" class="btn btn-primary btn-sm" ng-click="setUserSettings()" ng-show="settings.anonymize === 'false'">Turn Anonymization On</button>
+  &nbsp; &nbsp; Anonymization is {{ settings.anonymize === 'true' ? 'On' : 'Off' }}.
   </div>
 </div></div>
 

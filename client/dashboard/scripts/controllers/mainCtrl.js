@@ -180,9 +180,8 @@ angular.module('dimsDashboard.controllers').
 
     $scope.setUserSettings = function() {
       var settings = $scope.settings;
-      settings.anonymize = 'true';
-      console.log('in setUserSettings');
-      console.log(settings);
+      settings.anonymize = $scope.settings.anonymize === 'false' ? 'true' : 'false';
+
       return $http({
         method: 'PUT',
         url: $scope.settingsUrl,

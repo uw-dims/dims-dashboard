@@ -78,11 +78,12 @@ angular.module('dimsDashboard.controllers').
     // $scope.flowStatsGridOptions = { data: 'flowStats' };
 
     var anonymizeData = function(data,status,headers,config) {
-       AnonService.anonymize($scope.anonymize, data, $scope.formData.outputType)
+       $log.debug('Call anonymize service');
+       AnonService.anonymize($scope.anonymize, data.data, data.pid)
               .then(prepareData);
             };
 
-    var prepareData = function(data) {
+    var prepareData = function(data, status, headers, config) {
       $log.debug('rwfind returned data - in prepareData');
       $log.debug('status: '+status);
       $log.debug('data: ');
@@ -155,7 +156,7 @@ angular.module('dimsDashboard.controllers').
           source: 'default_data'
         }
 
-      }).success(prepareData)
+      }).success(anonymizeData)
         .error(function(data, status, headers, config) {
           console.log(data);
           console.log(status);

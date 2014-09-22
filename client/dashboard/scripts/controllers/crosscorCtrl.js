@@ -1,7 +1,7 @@
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller('CrosscorCtrl', ['$scope', 'Utils', 'FileService', '$http', '$log', 'DateService', '$location', '$routeParams', 
-    function ($scope, Utils, FileService, $http, $log, DateService, $location, $routeParams) {
+  controller('CrosscorCtrl', ['$scope', 'Utils', 'FileService', '$http', '$log', 'DateService', 'SettingsService', 'AnonService', '$location', '$routeParams', 
+    function ($scope, Utils, FileService, $http, $log, DateService, SettingsService, AnonService, $location, $routeParams) {
     console.log('In crosscor controller');
 
     // Set up form data
@@ -32,6 +32,12 @@ angular.module('dimsDashboard.controllers').
         $scope.mapPath = result.filePath;
         $scope.showMaps = true;
     });
+
+    SettingsService.getSettings('0').then(function(result){
+      console.log('getSettings result');
+      console.log(result);
+      $scope.anonymize = result.anonymize;
+    });
     
 
     // Other setup
@@ -58,6 +64,24 @@ angular.module('dimsDashboard.controllers').
     //       {field: 'percent', displayName:'Percent'}
     //     ]};
     
+    var anonymizeData = function(data,status,headers,config) {
+       $log.debug('Call anonymize service');
+       AnonService.anonymize($scope.anonymize, data.data, data.pid)
+              .then(prepareData);
+            };
+
+    var prepareData = function(data, status, headers, config) {
+      $log.debug('crosscor returned data');
+      $scope.rawData = data.data;
+      $scope.pid = data.pid;
+
+      $log.debug('crosscor pid: ' + $scope.pid);
+      $log.debug('crosscor data:  ');
+      $log.debug(data);
+     
+      $scope.showResults = true;
+      $scope.resultsMsg = 'Results';   
+    };
 
     /**
      *  callClient function
@@ -101,19 +125,7 @@ angular.module('dimsDashboard.controllers').
           url: '/crosscor', 
           params: clientConfig
         } ).
-        success(function(data, status, headers, config) {
-          $log.debug('crosscor returned data');
-          $scope.rawData = data.data;
-          $scope.pid = data.pid;
-
-          $log.debug('crosscor pid: ' + $scope.pid);
-          $log.debug('crosscor data:  ');
-          $log.debug(data);
-         
-          $scope.showResults = true;
-          $scope.resultsMsg = 'Results';         
-          
-        }).
+        success(anonymizeData).
         error(function(data, status, headers, config) {
           console.log('rwfind Error');
           console.log(data);
