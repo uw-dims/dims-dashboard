@@ -24,6 +24,8 @@ var express = require('express')
   , crosscor = require('./routes/crosscor')
   , anon = require('./routes/anon')
   , data = require('./routes/data')
+  , logmon = require('./routes/logmon')
+  , chat = require('./routes/chat')
   , settings = require('./routes/settings')
   // , ipgrep = require('./routes/ipgrep')
   , utils = require('./utils/util')
@@ -97,6 +99,13 @@ router.get('/crosscor', crosscor.list);
 router.post('/anon', anon.list);
 router.get('/rwfind', rwfind.list);
 router.get('/data', data.list);
+// Set up routes for rabbitmq connection for logging and chat
+router.get('/start-logmonitor', logmon.start);
+router.get('/stop-logmonitor', logmon.stop);
+router.get('/status-logmonitor', logmon.status);
+router.get('/start-chat', chat.start);
+router.get('/stop-chat', chat.stop);
+router.get('/status-chat', chat.status);
 // Settings api - now just doing GET one setting, PUT
 router.get('/settings/:id', settings.get);
 router.put('/settings/:id', settings.update);
@@ -114,6 +123,7 @@ app.use('/', router);
   }, 200);
   });
 */
+
 
 if (config.sslOn) {
   https.createServer(sslOptions,app).listen(app.get('sslport'), function(){

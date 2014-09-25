@@ -5,7 +5,6 @@ var fs = require('fs');
 var dimsutil = require('../utils/util');
 var logger = require('../utils/logger');
 var config = require('../config');
-var when = require('node-promise/promise').when;
 
 exports.list = function(req,res) {
 

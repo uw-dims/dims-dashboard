@@ -10,7 +10,7 @@ config.log_level = process.env.LOG_LEVEL || 'debug';
 
 config.log_dir = process.env.LOG_PATH || 'logs/';
 
-config.cert_dir = process.env.CERT_DIRECTORY || 'certs/';
+config.cert_dir = process.env.CERT_DIRECTORY || '/opt/dims/certs/';
 
 config.ca_name = process.env.CA_NAME || 'dims-ca';
 
@@ -47,7 +47,7 @@ config.defaultMapping = {
 };
 
 config.rpcQueueNames = {
-  'cifbulk': 'cifbulk_v1_test',
+  'cifbulk': 'cifbulk_v1_demo_test',
   'anon': 'anon',
   'rwfind': 'rwfind',
   'crosscor': 'crosscor'

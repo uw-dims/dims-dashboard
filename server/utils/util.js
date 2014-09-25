@@ -4,7 +4,6 @@ var _ = require('lodash');
 var logger = require('./logger');
 var fs = require('fs');
 var config = require('../config');
-var when = require('node-promise/promise').when;
 
 var createParser = function() {
 
@@ -86,39 +85,39 @@ var processPython = function(python, req, res) {
 
 exports.processPython = processPython;
 
-var getPythonResults = function(python, req, res) {
-  var output = '';
-  logger.debug('util:processPython spawned child PID: %d', python.pid);
-  python.stdout.on('data', function(data) {
-    output += data;
-  });
+// var getPythonResults = function(python, req, res) {
+//   var output = '';
+//   logger.debug('util:processPython spawned child PID: %d', python.pid);
+//   python.stdout.on('data', function(data) {
+//     output += data;
+//   });
 
-  python.stderr.on('data', function(data) {
-    var decoder = new (require('string_decoder').StringDecoder)('utf-8');
-    logger.info('util:processPython stderr %s', decoder.write(data));
-  });
+//   python.stderr.on('data', function(data) {
+//     var decoder = new (require('string_decoder').StringDecoder)('utf-8');
+//     logger.info('util:processPython stderr %s', decoder.write(data));
+//   });
 
-  python.on('close', function(code) {
-    return when(code, function(code) {
-      logger.debug('processPython closed. PID: '+ python.pid + ', code: ' + code);
-      if (code !== 0) {
-        logger.error('processPython closed with error. PID: %d, code: %s', python.pid, code);
-        var result = {status: '500', code: code, pid: python.pid, data: output};
-        return {res: res, result: result};
-      }
-      try {
-        var jsonOutput = JSON.parse(output);
-        var result = {status: '200',pid: python.pid, data: jsonOutput};
-        return {res: res, result: result};
-      } catch (e) {
-        var result = {status: '200',pid: python.pid, data: output};
-        return {res: res, result: result};
-      } 
-    });
-  });
-};
+//   python.on('close', function(code) {
+//     return when(code, function(code) {
+//       logger.debug('processPython closed. PID: '+ python.pid + ', code: ' + code);
+//       if (code !== 0) {
+//         logger.error('processPython closed with error. PID: %d, code: %s', python.pid, code);
+//         var result = {status: '500', code: code, pid: python.pid, data: output};
+//         return {res: res, result: result};
+//       }
+//       try {
+//         var jsonOutput = JSON.parse(output);
+//         var result = {status: '200',pid: python.pid, data: jsonOutput};
+//         return {res: res, result: result};
+//       } catch (e) {
+//         var result = {status: '200',pid: python.pid, data: output};
+//         return {res: res, result: result};
+//       } 
+//     });
+//   });
+// };
 
-exports.getPythonResults = getPythonResults;
+// exports.getPythonResults = getPythonResults;
 
 var getSettings = function() {
   var path = config.demoDatastorePath + 'settings.json';
