@@ -126,14 +126,16 @@ app.use('/', router);
 
 
 if (config.sslOn) {
-  https.createServer(sslOptions,app).listen(app.get('sslport'), function(){
+  var server = https.createServer(sslOptions,app).listen(app.get('sslport'), function(){
    logger.info('Startup: Express server listening on port ' + app.get('sslport'));
   });
 } else {
-  http.createServer(app).listen(app.get('port'), function(){
+  var server = http.createServer(app).listen(app.get('port'), function(){
     logger.info('Startup: Express server listening on port ' + app.get('port'));
   });
 }
+
+var io = require('socket.io').listen(server);
 
 
 
