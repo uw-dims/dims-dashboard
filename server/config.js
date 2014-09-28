@@ -16,6 +16,8 @@ config.ca_name = process.env.CA_NAME || 'dims-ca';
 
 config.cert_name = process.env.CERT_NAME || process.env.HOSTNAME || 'localhost';
 
+config.cookieSecret = '3xueis763$%STID47373deC!!QUsT8J4$';
+
 config.bin = '/opt/dims/bin/';
 
 config.rpcPath = '/opt/dims/src/prisem/rpc'

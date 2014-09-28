@@ -1,4 +1,4 @@
-var rpcConnection = require('../services/rpcConnection');
+var rpcConnection = require('../services/rabbitConnection');
 var config = require('../config');
 
 exports.start = function(req, res) {
