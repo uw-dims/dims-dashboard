@@ -37,7 +37,9 @@
     "glossy": "0.x.x",
     "unix-dgram": ">= 0.0.1",
     "amqplib": "0.2.1",
-    "socket.io": "~1.1.0"
+    "socket.io": "~1.1.0",
+    "redis": "*",
+    "connect-redis": "*"
   },
   "devDependencies": {
     "grunt": "~0.4.5",

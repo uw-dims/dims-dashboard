@@ -13,7 +13,6 @@
 <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
 <!-- build:css(.) styles/vendor.css -->
 <!-- bower:css -->
-<link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.css" />
 <link rel="stylesheet" href="../bower_components/angular-motion/dist/angular-motion.min.css" />
 <link rel="stylesheet" href="../bower_components/ng-grid/ng-grid.css" />
 <link rel="stylesheet" href="../bower_components/nvd3/src/nv.d3.css" />
@@ -105,9 +104,21 @@ $('.dropdown-toggle').click(function(e) {
 </script> 
 
 <script>
-// Source: Neon widgets
+
 OWF.ready(function () { 
 
+    // console.log('in OWF.ready');
+    // OWF.Preferences.getCurrentUser({
+    //     onSuccess: function(result) {
+    //         // Get the session
+    //         console.log(result);
+
+    //     },
+    //     onFailure: function(error) {
+    //         console.log('Cannot retrieve OWF user ' + error);
+    //     }
+    // });
+    // Source: Neon widgets
     var widgetState = Ozone.state.WidgetState.getInstance({
         onStateEventReceived: function(sender, msg) {
             var event = msg.eventName;

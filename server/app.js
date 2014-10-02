@@ -4,7 +4,6 @@ var express = require('express')
   , cookieSession = require('cookie-session')
   , json = require('express-json')
   , cookieParser = require('cookie-parser')
-  , session = require('express-session')
   , favicon = require('serve-favicon')
   , responseTime = require('response-time')
   , errorHandler = require('errorhandler')
@@ -30,6 +29,9 @@ var express = require('express')
   // , ipgrep = require('./routes/ipgrep')
   , utils = require('./utils/util')
   , config = require('./config')
+  , session = require('express-session')
+  , redis = require('redis')
+  , redisStore = require('connect-redis')(session)
   , logger = require('./utils/logger');
 
 var sslOptions = {
@@ -40,6 +42,7 @@ var sslOptions = {
   //rejectUnauthorized: false
 };
 
+var redisClient = redis.createClient();
 var app = module.exports = express();
 var env = process.env.NODE_ENV || 'development';
 
@@ -53,8 +56,19 @@ app.set('view engine', 'html');
 //app.use(favicon());
 app.use(json());
 app.use(methodOverride());
-app.use(cookieParser());
-app.use(session({secret: config.cookieSecret}));
+
+// Cookies and session
+app.use(cookieParser(config.cookieSecret));
+app.use(session({
+  secret: config.sessionSecret,
+  store: new redisStore({
+    host: 'localhost',
+    port: 6379,
+    client: redisClient
+  }),
+  saveUninitialized: false, // don't create session until something stored
+  resave: false // don't save session if unmodified
+}));
 
 // Override Express logging - stream logs to logger
 app.use(require('morgan') ('common',{
@@ -111,6 +125,11 @@ router.get('/status-chat', chat.status);
 // Settings api - now just doing GET one setting, PUT
 router.get('/settings/:id', settings.get);
 router.put('/settings/:id', settings.update);
+
+// router.get('/session/set/:value', function(req,res) {
+//   req.session.
+// });
+
 router.get('*', routes.index);
 
 app.use('/', router);
@@ -138,6 +157,8 @@ if (config.sslOn) {
 }
 
 var io = require('socket.io').listen(server);
+// export io so it can be used
+exports.io = io;
 
 
 
