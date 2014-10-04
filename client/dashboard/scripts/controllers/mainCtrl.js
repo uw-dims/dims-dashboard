@@ -1,6 +1,6 @@
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller('MainCtrl', ['$scope', '$location', '$routeParams', '$log', '$filter', '$http', function ($scope, $location, $routeParams, $log, $filter, $http) {
+  controller('MainCtrl', ['$scope', 'Socket', '$location', '$routeParams', '$log', '$filter', '$http', function ($scope, Socket, $location, $routeParams, $log, $filter, $http) {
     // write Ctrl here
     $log.debug('In MainCtrl');
 
@@ -8,6 +8,8 @@ angular.module('dimsDashboard.controllers').
     $scope.showTools = false;
     $scope.showSavedQueries = false;
     $scope.showActivities = false;
+    $scope.logmonOn = false;
+    $scope.logs = [];
     $scope.currentSelectedQuery = {};
     $scope.currentSelectedTool = {};
     $scope.settings = {};
@@ -34,6 +36,13 @@ angular.module('dimsDashboard.controllers').
         'type': 'rpc',
         'selected': '' }
     ];
+
+    $scope.Socket = Socket;
+
+    // SocketService.on('logmon:data', function(data) {
+    //       $scope.logs = $scope.logs.concat(data);
+    //       // $log.debug(data);
+    //     });
 
     var initializeTools = function() {
       angular.forEach($scope.initialTools, function(value, index) {
@@ -95,8 +104,6 @@ angular.module('dimsDashboard.controllers').
       });
     };
 
-    
-
     initializeTools();
     initializeDemoQueries();
     initializeQueryList();
@@ -157,6 +164,25 @@ angular.module('dimsDashboard.controllers').
       $scope.showTools = false;
       $scope.showSavedQueries = false;
       $scope.showSettings = true;
+    };
+
+    $scope.toggleLogMonitor = function() {
+
+      if ($scope.logmonOn) {
+        // Turn it off
+        $scope.logmonOn = false;
+        $log.debug('Turning log monitor off');
+        // SocketService.emit('logmon:stop');
+        // SocketService.remove('logomon:data');
+        $scope.Socket.socket.emit('logmon:stop');
+      } else {
+        // Turn it on
+        $scope.logmonOn = true;
+        $log.debug('Turning log monitor on');
+        // SocketService.emit('logmon:start', true);
+        $scope.Socket.socket.emit('logmon:start', true);
+      }
+
     };
 
     $scope.getUserSettings = function() {

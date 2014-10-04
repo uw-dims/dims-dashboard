@@ -55,9 +55,17 @@
 <div class="panel panel-default" ng-show="showSettings" >
   <div class="panel-body" >
   <h4>Settings</h4>
+
   <button type="button" class="btn btn-primary btn-sm" ng-click="setUserSettings()" ng-show="settings.anonymize === 'true'">Turn Anonymization Off</button>
   <button type="button" class="btn btn-primary btn-sm" ng-click="setUserSettings()" ng-show="settings.anonymize === 'false'">Turn Anonymization On</button>
   &nbsp; &nbsp; Anonymization is {{ settings.anonymize === 'true' ? 'On' : 'Off' }}.
+
+  <button type="button" class="btn btn-primary btn-sm" ng-click="toggleLogMonitor()" ng-show="!logmonOn">Turn Log Monitor On</button>
+  <button type="button" class="btn btn-primary btn-sm" ng-click="toggleLogMonitor()" ng-show="logmonOn">Turn Log Monitor Off</button>
+  &nbsp; &nbsp; Log Monitor is {{ logmonOn ? 'On' : 'Off' }}.
+  <div style="overflow-y: scroll;">
+   {{Socket.messages}} 
+  </div>
   </div>
 </div></div>
 

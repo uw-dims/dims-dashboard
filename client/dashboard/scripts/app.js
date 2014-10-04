@@ -71,7 +71,8 @@ var constants = {
   'SILK' : 'rwfind',
   'CIF' : 'cifbulk',
   'CORRELATE' : 'crosscor',
-  'ANONYMIZE' : 'anon'
+  'ANONYMIZE' : 'anon',
+  'SOCKETIO_URL' : 'https://lpsrv1:3030'
 };
 
 var rpcClientOptions = {

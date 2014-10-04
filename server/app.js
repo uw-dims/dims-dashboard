@@ -32,6 +32,10 @@ var express = require('express')
   , session = require('express-session')
   , redis = require('redis')
   , redisStore = require('connect-redis')(session)
+  , socket = require('socket.io')
+  , flash = require('flash');
+  , passport = require('passport')
+  , LocalStrategy = require('passport-local').Strategy
   , logger = require('./utils/logger');
 
 var sslOptions = {
@@ -56,6 +60,7 @@ app.set('view engine', 'html');
 //app.use(favicon());
 app.use(json());
 app.use(methodOverride());
+app.use(flash());
 
 // Cookies and session
 app.use(cookieParser(config.cookieSecret));
@@ -70,10 +75,13 @@ app.use(session({
   resave: false // don't save session if unmodified
 }));
 
+app.use(passport.initialize());
+app.use(passport.session());
+
 // Override Express logging - stream logs to logger
-app.use(require('morgan') ('common',{
-  'stream': logger.stream
-}));
+// app.use(require('morgan') ('common',{
+//   'stream': logger.stream
+// }));
 
 // development only
 if (env === 'development') {
@@ -144,21 +152,36 @@ app.use('/', router);
   }, 200);
   });
 */
-
-
 if (config.sslOn) {
-  var server = https.createServer(sslOptions,app).listen(app.get('sslport'), function(){
-   logger.info('Startup: Express server listening on port ' + app.get('sslport'));
-  });
+  var server = https.createServer(sslOptions, app);
+  var port = app.get('sslport');
 } else {
-  var server = http.createServer(app).listen(app.get('port'), function(){
-    logger.info('Startup: Express server listening on port ' + app.get('port'));
-  });
+  var server = http.createServer(app);
+  var port = app.get('port');
 }
 
-var io = require('socket.io').listen(server);
-// export io so it can be used
-exports.io = io;
+var io = socket.listen(server);
+
+server.listen(port);
+
+// exports.server = server;
+
+
+// var io = socket.listen(server);
+
+// io.sockets.on('connection', function(socket) {
+//   console.log('socket io connection');
+//   socket.emit('logmon:data', {hello: 'world'});
+//   socket.on('logmon:start', function(data) {
+//     console.log(data);
+//   });
+//   socket.on('logmon:stop', function(data) {
+//     console.log(data);
+//   })
+// });
+
+
+require('./services/socketConnection.js')(io);
 
 
 
