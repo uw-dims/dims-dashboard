@@ -47,7 +47,7 @@ config.defaultMapping = {
 };
 
 config.rpcQueueNames = {
-  'cifbulk': 'cifbulk_v1_test',
+  'cifbulk': 'cifbulk_v1_demo_test',
   'anon': 'anon',
   'rwfind': 'rwfind',
   'crosscor': 'crosscor'
