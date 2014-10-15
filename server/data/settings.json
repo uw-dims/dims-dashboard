@@ -2,7 +2,7 @@
 "rpcDebug": "true",
 "rpcVerbose": "true",
 "demoMode": "false",
-"cifbulkQueue": "cibulk_v1",
+"cifbulkQueue": "cifbulk_v1",
 "user": "dittrich",
 "id": "0"
 }
