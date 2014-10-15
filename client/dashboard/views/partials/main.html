@@ -54,25 +54,26 @@
 <div class="col-xs-12">
 <div class="panel panel-default" ng-show="showSettings" >
   <div class="panel-body" >
-  <h4>Settings</h4>
+  <h3>Settings</h3>
   <div>
   <form class="form-inline" role="form">
     <div class="form-group">
-      <label>Toggle Anonymization</label>
+      <label class="col-sm-3">Toggle Anonymization</label>
+      <div class="col-sm-5">Anonymization is {{ settings.anonymize === 'true' ? 'On' : 'Off' }}.
+      </div>
+      <button type="button" class="btn btn-primary btn-sm col-sm-2" ng-click="setUserSettings()" ng-show="settings.anonymize === 'true'">Turn Anonymization Off</button>
+    <button type="button" class="btn btn-primary btn-sm col-sm-2" ng-click="setUserSettings()" ng-show="settings.anonymize === 'false'">Turn Anonymization On</button>
     </div>
-    <button type="button" class="btn btn-primary btn-sm" ng-click="setUserSettings()" ng-show="settings.anonymize === 'true'">Turn Anonymization Off</button>
-    <button type="button" class="btn btn-primary btn-sm" ng-click="setUserSettings()" ng-show="settings.anonymize === 'false'">Turn Anonymization On</button>
-    &nbsp; &nbsp; Anonymization is {{ settings.anonymize === 'true' ? 'On' : 'Off' }}.
   </form>
   </div>
   <div>
     <form class="form-inline" role="form">
       <div class="form-group">
-        <label >Choose cifbulk queue</label>
-        <select class="form-control" ng-model="settingsFormData.cifbulkQueue" ng-options="f.value as f.label for f in cifbulkQueueValues" >
+        <label class="col-sm-3">Choose cifbulk queue</label>
+        <select class="form-control col-sm-5" ng-model="settingsFormData.cifbulkQueue" ng-options="f.value as f.label for f in cifbulkQueueValues" >
       </select>
       </div>
-      <button type="submit" class="btn btn-default" ng-click="setUserSettings()">Save</button>
+      <button type="submit" class="btn btn-primary btn-sm col-sm-2" ng-click="setUserSettings()">Save</button>
     </form>
   </div>
   </div>
