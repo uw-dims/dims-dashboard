@@ -31,6 +31,9 @@ angular.module('dimsDashboard.controllers').
       console.log('getSettings result');
       console.log(result);
       $scope.anonymize = result.anonymize;
+      $scope.rpcDebug = result.rpcDebug;
+      $scope.rpcVerbose = result.rpcVerbose;
+      $scope.cifbulkQueue = result.cifbulkQueue;
     });
 
     // Setup date
@@ -179,6 +182,9 @@ angular.module('dimsDashboard.controllers').
       Utils.setConfig(clientConfig, $scope.formData.ips, 'ips');
       Utils.setConfig(clientConfig, $scope.formData.stats, 'stats');
       Utils.setConfig(clientConfig, $scope.formData.header, 'header');
+      Utils.setConfig(clientConfig, $scope.rpcVerbose, 'verbose');
+      Utils.setConfig(clientConfig, $scope.rpcDebug, 'debug');
+      Utils.setConfig(clientConfig, $scope.cifbulkQueue, 'queue');
       if (Utils.inputPresent($scope.formData.fileName)) {
         Utils.setConfig(clientConfig, $scope.filePath+$scope.formData.fileName.name, 'fileName');
       }

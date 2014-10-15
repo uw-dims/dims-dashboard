@@ -12,12 +12,13 @@ exports.list = function(req,res) {
 
   var rpcQueuebase = config.rpcQueueNames['crosscor'],
       rpcClientApp = 'crosscor_client',
-      debug = process.env.NODE_ENV === 'development' ? '--debug' : (req.query.debug === 'true' ? '--debug' : ''),
-      verbose = process.env.NODE_ENV === 'development' ? '--verbose' : (req.query.verbose === 'true' ? '--verbose' : '');
+      // debug = process.env.NODE_ENV === 'development' ? '--debug' : (req.query.debug === 'true' ? '--debug' : ''),
+      // verbose = process.env.NODE_ENV === 'development' ? '--verbose' : (req.query.verbose === 'true' ? '--verbose' : '');
 
-  var inputArray = [config.bin + rpcClientApp, debug, verbose, '--server', config.rpcServer,
+      inputArray = [config.bin + rpcClientApp, '--server', config.rpcServer,
           '--queue-base', rpcQueuebase];
-  
+  req.query.debug === 'true' ? inputArray.push ('--debug') : '';
+  req.query.verbose === 'true' ? inputArray.push ('--verbose') : '';
   req.query.stats === 'true' ? inputArray.push('-s') : "";
   
   if (req.query.fileName !== undefined) {
