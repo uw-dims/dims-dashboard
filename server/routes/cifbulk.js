@@ -11,16 +11,23 @@ exports.list = function(req,res) {
 
     logger.debug('cifbulk:list - Request query is: ', req.query);
 
-    var rpcQueuebase = config.rpcQueueNames['cifbulk'],
+    var rpcQueuebase = req.query.queue !== undefined ? req.query.queue : config.rpcQueueNames['cifbulk'],
         rpcClientApp = 'cifbulk_client',
-        debug = process.env.NODE_ENV === 'development' ? '--debug' : (req.query.debug === 'true' ? '--debug' : ''),
-        verbose = process.env.NODE_ENV === 'development' ? '--verbose' : (req.query.verbose === 'true' ? '--verbose' : '');
+        // debug = process.env.NODE_ENV === 'development' ? '--debug' : (req.query.debug === 'true' ? '--debug' : ''),
+        // verbose = process.env.NODE_ENV === 'development' ? '--verbose' : (req.query.verbose === 'true' ? '--verbose' : '');
+        // debug = req.query.debug !== undefined ? (req.query.debug === 'true' ? '--debug' : '') : '';
+        // verbose = req.query.verbose !== undefined ? (req.query.verbose === 'true' ? '--verbose' : '') : '';
 
-    var inputArray = [config.bin + rpcClientApp, debug, verbose, '--server', config.rpcServer,
+        inputArray = [config.bin + rpcClientApp, '--server', config.rpcServer,
           '--queue-base', rpcQueuebase];
+ 
+    req.query.debug === 'true' ? inputArray.push ('--debug') : '';
+    req.query.verbose === 'true' ? inputArray.push ('--verbose') : '';
 
-    req.query.header === 'true' ? inputArray.push('-H') : "";
-    req.query.stats === 'true' ? inputArray.push('-s') : "";
+    req.query.header === 'true' ? inputArray.push('-H') : '';
+    req.query.stats === 'true' ? inputArray.push('-s') : '';
+
+    console.log(inputArray);
 
     if (req.query.numDays !== undefined) {
       inputArray.push('-D')

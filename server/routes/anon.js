@@ -25,17 +25,22 @@ exports.list = function(req,res) {
 
     var rpcQueuebase = config.rpcQueueNames['anon'],
       rpcClientApp = 'anon_client',
-      ipgrepApp = 'ipgrep',
-      debug = process.env.NODE_ENV === 'development' ? '--debug' : (req.query.debug === 'true' ? '--debug' : ''),
-      verbose = process.env.NODE_ENV === 'development' ? '--verbose' : (req.query.verbose === 'true' ? '--verbose' : '');
+      ipgrepApp = 'ipgrep';
+      // debug = process.env.NODE_ENV === 'development' ? '--debug' : (req.query.debug === 'true' ? '--debug' : ''),
+      // verbose = process.env.NODE_ENV === 'development' ? '--verbose' : (req.query.verbose === 'true' ? '--verbose' : '');
+
+
 
     if (req.query.type === 'ipgrep') {
       var inputArray = [config.bin + ipgrepApp, '-a', '--context', '-v', '-n', '/opt/dims/src/prisem/rpc/ipgrep_networks_prisem.txt'];
       var commandProgram = 'perl';
     } else {
       var commandProgram = 'python';
-      var inputArray = [config.bin + rpcClientApp, debug, verbose, '--server', config.rpcServer,
+      var inputArray = [config.bin + rpcClientApp, '--server', config.rpcServer,
             '--queue-base', rpcQueuebase]; 
+      req.query.debug === 'true' ? inputArray.push ('--debug') : '';
+      req.query.verbose === 'true' ? inputArray.push ('--verbose') : '';
+
       req.query.stats === 'true' ? inputArray.push('-s') : '';
       if (req.query.outputType == 'json') inputArray.push('-J');   
       if (req.query.mapName !== undefined) {

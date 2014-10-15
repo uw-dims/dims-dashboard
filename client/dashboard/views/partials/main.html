@@ -55,27 +55,60 @@
 <div class="panel panel-default" ng-show="showSettings" >
   <div class="panel-body" >
   <h3>Settings</h3>
-  <div>
-  <form class="form-inline" role="form">
+  <form role="form" class="form-horizontal">
     <div class="form-group">
-      <label class="col-sm-3">Toggle Anonymization</label>
-      <div class="col-sm-5">Anonymization is {{ settings.anonymize === 'true' ? 'On' : 'Off' }}.
+      <label class="col-sm-2">Toggle Anonymization</label>
+      <div class="col-sm-4">
+        <!-- <button type="button" class="btn btn-primary btn-sm" ng-click="setUserSettings()" ng-show="settings.anonymize === 'true'">Turn Anonymization Off</button>
+        <button type="button" class="btn btn-primary btn-sm" ng-click="setUserSettings()" ng-show="settings.anonymize === 'false'">Turn Anonymization On</button> -->
+        <select class="form-control" ng-model="settingsFormData.anonymize" ng-options="f.value as f.label for f in anonymizeValues" ng-change="setUserSettings()">
+        </select>
       </div>
-      <button type="button" class="btn btn-primary btn-sm col-sm-2" ng-click="setUserSettings()" ng-show="settings.anonymize === 'true'">Turn Anonymization Off</button>
-    <button type="button" class="btn btn-primary btn-sm col-sm-2" ng-click="setUserSettings()" ng-show="settings.anonymize === 'false'">Turn Anonymization On</button>
+      <div class="col-sm-4 form-control-static">
+        Current setting: Anonymization is <span ng-show="settings.anonymize">on</span><span ng-hide="settings.anonymize">off</span>
+      </div>
     </div>
   </form>
-  </div>
-  <div>
-    <form class="form-inline" role="form">
+
+    <form role="form" class="form-horizontal">
       <div class="form-group">
-        <label class="col-sm-3">Choose cifbulk queue</label>
-        <select class="form-control col-sm-5" ng-model="settingsFormData.cifbulkQueue" ng-options="f.value as f.label for f in cifbulkQueueValues" >
-      </select>
+        <label class="col-sm-2">Choose cifbulk queue</label>
+        <div class="col-sm-4">
+          <select class="form-control" ng-model="settingsFormData.cifbulkQueue" ng-options="f.value as f.label for f in cifbulkQueueValues" ng-change="setUserSettings()">
+          </select>
+        </div>
+        <div class="col-sm-4 form-control-static">
+          Current setting: Queue is {{ settings.cifbulkQueue }}
+        </div>
       </div>
-      <button type="submit" class="btn btn-primary btn-sm col-sm-2" ng-click="setUserSettings()">Save</button>
     </form>
-  </div>
+
+    <form role="form" class="form-horizontal">
+      <div class="form-group">
+        <label class="col-sm-2">Toggle RPC client debug flag</label>
+        <div class="col-sm-4">
+          <select class="form-control" ng-model="settingsFormData.rpcDebug" ng-options="f.value as f.label for f in rpcDebugValues" ng-change="setUserSettings()">
+          </select>
+        </div>
+        <div class="col-sm-4 form-control-static">
+          Current setting: RPC debug flag is <span ng-show="settings.rpcDebug">on</span><span ng-hide="settings.rpcDebug">off</span>
+        </div>
+      </div>
+    </form>
+
+    <form role="form" class="form-horizontal">
+      <div class="form-group">
+        <label class="col-sm-2">Toggle RPC client verbose flag</label>
+        <div class="col-sm-4">
+          <select class="form-control" ng-model="settingsFormData.rpcVerbose" ng-options="f.value as f.label for f in rpcVerboseValues" ng-change="setUserSettings()">
+          </select>
+        </div>
+        <div class="col-sm-4 form-control-static">
+          Current setting: RPC verbose flag is <span ng-show="settings.rpcVerbose">on</span><span ng-hide="settings.rpcVerbose">off</span>
+        </div>
+      </div>
+    </form>
+
   </div>
 </div></div>
 

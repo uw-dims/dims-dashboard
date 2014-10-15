@@ -39,6 +39,8 @@ angular.module('dimsDashboard.controllers').
       console.log('getSettings result');
       console.log(result);
       $scope.anonymize = result.anonymize;
+      $scope.rpcDebug = result.rpcDebug;
+      $scope.rpcVerbose = result.rpcVerbose;
     });
     
 
@@ -78,6 +80,8 @@ angular.module('dimsDashboard.controllers').
       if (Utils.inputPresent($scope.formData.fileName)) {
         Utils.setConfig(clientConfig, $scope.filePath+$scope.formData.fileName.name, 'fileName');
       }
+      Utils.setConfig(clientConfig, $scope.rpcVerbose, 'verbose');
+      Utils.setConfig(clientConfig, $scope.rpcDebug, 'debug');
 
       console.log(clientConfig);
       console.log('Now sending http get request');
