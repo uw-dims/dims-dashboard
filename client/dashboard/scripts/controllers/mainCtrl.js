@@ -46,7 +46,7 @@ angular.module('dimsDashboard.controllers').
       label: 'cifbulk_v1_demo_test - alternate queue with debug and verbose on'
     }];
 
-    $scope.settingsFormdata = {};
+    $scope.settingsFormData = {};
 
 
     var initializeTools = function() {
