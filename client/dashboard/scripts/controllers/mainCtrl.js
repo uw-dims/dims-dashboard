@@ -197,7 +197,7 @@ angular.module('dimsDashboard.controllers').
     $scope.setUserSettings = function() {
       var settings = $scope.settings;
       settings.anonymize = $scope.settings.anonymize === 'false' ? 'true' : 'false';
-      settings.cifbulkQueue = $scope.settingsFormdata.cifbulkQueue;
+      settings.cifbulkQueue = $scope.settingsFormData.cifbulkQueue;
 
       return $http({
         method: 'PUT',
