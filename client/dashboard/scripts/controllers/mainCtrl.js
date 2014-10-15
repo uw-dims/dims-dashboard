@@ -37,12 +37,55 @@ angular.module('dimsDashboard.controllers').
         'selected': '' }
     ];
 
+
     $scope.Socket = Socket;
 
     // SocketService.on('logmon:data', function(data) {
     //       $scope.logs = $scope.logs.concat(data);
     //       // $log.debug(data);
     //     });
+
+    $scope.cifbulkQueueValues = [{
+      value: 'cifbulk_v1',
+      label: 'cifbulk_v1 - default'
+    },{
+      value: 'cifbulk_v1_test',
+      label: 'cifbulk_v1 - default with debug and verbose'
+    },{
+      value: 'cifbulk_v1_demo',
+      label: 'cifbulk_v1_demo - alternate queue'
+    },{
+      value: 'cifbulk_v1_demo_test',
+      label: 'cifbulk_v1_demo_test - alternate queue with debug and verbose'
+    }];
+
+    $scope.anonymizeValues =[{
+      value: 'true',
+      label: 'Anonymization On'
+    },{
+      value: 'false',
+      label: 'Anonymization Off'
+    }];
+
+    $scope.rpcDebugValues = [{
+      value: 'true',
+      label: 'RPC Client Debug On'
+    },{
+      value: 'false',
+      label: 'RPC Client Debug Off'
+    }];
+
+    $scope.rpcVerboseValues = [{
+      value: 'true',
+      label: 'RPC Client Verbose On'
+    },{
+      value: 'false',
+      label: 'RPC Client Verbose Off'
+    }];
+
+    $scope.settingsFormData = {};
+
+
 
     var initializeTools = function() {
       angular.forEach($scope.initialTools, function(value, index) {
@@ -195,6 +238,11 @@ angular.module('dimsDashboard.controllers').
           $log.debug('data is ', data);
           $scope.settings = data;
           $log.debug('scope settings now', $scope.settings);
+          // need to move this later
+          $scope.settingsFormData.cifbulkQueue = $scope.settings.cifbulkQueue;
+          $scope.settingsFormData.anonymize = $scope.settings.anonymize;
+          $scope.settingsFormData.rpcDebug = $scope.settings.rpcDebug;
+          $scope.settingsFormData.rpcVerbose = $scope.settings.rpcVerbose;
 
         }).
         error(function(data, status, headers, config) {
@@ -206,7 +254,11 @@ angular.module('dimsDashboard.controllers').
 
     $scope.setUserSettings = function() {
       var settings = $scope.settings;
-      settings.anonymize = $scope.settings.anonymize === 'false' ? 'true' : 'false';
+      // settings.anonymize = $scope.settings.anonymize === 'false' ? 'true' : 'false';
+      settings.anonymize = $scope.settingsFormData.anonymize;
+      settings.cifbulkQueue = $scope.settingsFormData.cifbulkQueue;
+      settings.rpcDebug = $scope.settingsFormData.rpcDebug;
+      settings.rpcVerbose = $scope.settingsFormData.rpcVerbose;
 
       return $http({
         method: 'PUT',
@@ -225,7 +277,8 @@ angular.module('dimsDashboard.controllers').
       };
 
       // Initialize settings
-      $scope.getUserSettings();
-
+     $scope.getUserSettings();
+     // Need to put getUserSettings in a service with a promise so can do 
+     // other things upon a success
 
   }]);
