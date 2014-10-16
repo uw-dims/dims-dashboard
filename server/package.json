@@ -42,7 +42,9 @@
     "connect-redis": "~2.1.0",
     "passport": "*",
     "passport-local": "*",
-    "connect-flash": "*"
+    "connect-flash": "*",
+    "pg": "*",
+    "sql": "*"
   },
   "devDependencies": {
     "grunt": "~0.4.5",
