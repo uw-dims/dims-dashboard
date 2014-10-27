@@ -163,8 +163,6 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// require('./utils/passport')(passport, Bookshelf);
-
 // Override Express logging - stream logs to logger
 // app.use(require('morgan') ('common',{
 //   'stream': logger.stream
@@ -234,7 +232,7 @@ router.put('/settings/:id', ensureAuthenticated, settings.update);
 // router.post('/settings', ensureAuthenticated, settings.create);
 // router.delete('/settings/:id', ensureAuthenticated, settings.delete);
 
-router.get('/users:ident', ensureAuthenticated, users.show);
+// router.get('/users:ident', ensureAuthenticated, users.show);
 
 router.get('/auth/session', ensureAuthenticated, require('./routes/session').session);
 router.post('/auth/session', require('./routes/session').login);

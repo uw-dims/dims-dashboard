@@ -16,7 +16,6 @@ var userSchema = {
     uuid: {nullable: false, unique: true}
   }
 
-
 };
 
 module.exports = userSchema;
