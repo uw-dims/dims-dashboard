@@ -6,7 +6,7 @@
  * @name app
  * @type {angular.Module}
  */
-var dimsDashboardConfig = function($routeProvider, $locationProvider, datepickerConfig, datepickerPopupConfig) {
+var dimsDashboardConfig = function($provide, $routeProvider, $locationProvider, datepickerConfig, datepickerPopupConfig) {
   $routeProvider.when('/', {
     controller: 'MainCtrl',
     templateUrl: 'views/partials/main.html'
@@ -43,6 +43,10 @@ var dimsDashboardConfig = function($routeProvider, $locationProvider, datepicker
     controller: 'GraphCtrl',
     templateUrl: 'views/partials/graph.html'
   }).
+  when('/login', {
+    controller: 'LoginCtrl',
+    templateUrl: 'views/partials/login.html'
+  }).
   otherwise({
     redirectTo: '/'
   });
@@ -51,6 +55,21 @@ var dimsDashboardConfig = function($routeProvider, $locationProvider, datepicker
   datepickerConfig.minDate = '1960-01-01';
   datepickerConfig.showWeeks = false;
   datepickerPopupConfig.datepickerPopup = 'MM-dd-yyyy';
+  // Decorate $log function
+  // $provide.decorator( '$log', ['$delegate', function($delegate) {
+  //   // Save original $log.debug()
+  //   var debugFn = $delegate.debug;
+  //   $delegate.debug = function() {
+  //     var args = [].slice.call(arguments),
+  //         now = DateTime.formattedNow();
+  //     // Prepend timestamp
+  //     args[0] = supplant("{0} - {1}", [ now, args[0] ]);
+
+  //     // Call the orginal with the output prepended
+  //     debugFn.apply(null, args);
+  //   };
+  //   return $delegate;
+  // }]);
 };
 
 var constants = {
@@ -131,8 +150,8 @@ var rpcClientOptions = {
 
 
 var dimsDashboard = angular.module('dimsDashboard', 
-  ['ngRoute','angularFileUpload','ui.bootstrap','ui.bootstrap.showErrors','ngGrid', 'ngAnimate',
-    'truncate', 'dimsDashboard.controllers', 'dimsDashboard.directives', 'dimsDashboard.services'])
+  ['ngRoute','angularFileUpload','ui.bootstrap','ui.bootstrap.showErrors','ngGrid', 'ngAnimate', 'ngResource', 'http-auth-interceptor',
+    'ngCookies','truncate', 'dimsDashboard.controllers', 'dimsDashboard.directives', 'dimsDashboard.services'])
   .config(dimsDashboardConfig);
 
 dimsDashboard.constant(constants);
@@ -142,4 +161,25 @@ angular.module('dimsDashboard.controllers', []);
 angular.module('dimsDashboard.services', []);
 angular.module('dimsDashboard.directives', []);
 angular.module('dimsDashboard.filters', []);
+
+dimsDashboard.run(function($rootScope, $location, $log, AuthService) {
+  //watching the value of the currentUser variable.
+  $rootScope.$watch('currentUser', function(currentUser) {
+    // if no currentUser and on a page that requires authorization then try to update it
+    // will trigger 401s if user does not have a valid session
+    $log.debug('Run: watch currentUser handler. currentUser is ',currentUser);
+    if (!currentUser && (['/login'].indexOf($location.path()) == -1 )) {
+      $log.debug('Run: watch currentUser handler. No currentUser and not on login page. Call AuthService.currentUser()');
+      AuthService.currentUser();
+    }
+  });
+
+  // On catching 401 errors, redirect to the login page.
+  $rootScope.$on('event:auth-loginRequired', function() {
+    $log.debug('Run: auth-loginRequired event handler. Caught 401, redirect to login page');
+    $location.path('/login');
+    return false;
+  });
+});
+
 

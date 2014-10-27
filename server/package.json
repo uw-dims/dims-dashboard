@@ -10,6 +10,7 @@
   "dependencies": {
     "JSONStream": "0.8.4",
     "async": "~0.9.0",
+    "body-parser": "~1.9.1",
     "carrier": "~0.1.14",
     "compression": "~1.0.11",
     "connect-timeout": "~1.2.2",
@@ -36,7 +37,7 @@
     "xml2js": "~0.4.4",
     "glossy": "0.x.x",
     "unix-dgram": ">= 0.0.1",
-    "amqplib": "~0.2.1",
+    "amqplib": "~0.3.0",
     "socket.io": "~1.1.0",
     "redis": "~0.12.1",
     "connect-redis": "~2.1.0",
@@ -44,7 +45,9 @@
     "passport-local": "*",
     "connect-flash": "*",
     "pg": "*",
-    "sql": "*"
+    "sql": "*",
+    "knex": "*",
+    "bookshelf":"~0.7.7"
   },
   "devDependencies": {
     "grunt": "~0.4.5",

@@ -4,6 +4,8 @@
 
 exports.index = function(req, res){
 	// console.log(req.session);
+  var session = req.session;
+
   res.render('index', { title: 'DIMS Dashboard' });
 };
 

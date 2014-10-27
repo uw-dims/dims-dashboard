@@ -13,7 +13,7 @@ function RabbitConnection(name, type) {
   self.user = 'rpc_user';
   self.pwd = 'rpcm3pwd';
   self.port = '5672';
-  self.server = 'localhost';
+  self.server = 'rabbitmq.prisem.washington.edu';
   
   // name: exchange
   self.name = name || 'logs';
@@ -27,14 +27,18 @@ function RabbitConnection(name, type) {
 
   EventEmitter.call(self);
 
-  self.open = amqp.connect('amqp://'+ self.server);
+  self.open = amqp.connect('amqp://'+ self.user+':'+self.pwd+'@'+self.server);
+
+  logger.debug('New RabbitConnection called');
 };
 
 RabbitConnection.prototype.subscribe = function() {
 
     var self = this;
+    logger.debug('RabbitConnection.subscribe started');
     self.open.then(function(conn) {
       // Save the connection so it can be closed later
+      logger.debug('RabbitConnect.subscribe: open promise');
       self.conn = conn;
       self.conn.on('close', function() {
         logger.debug('RabbitConnection received connection close event');
