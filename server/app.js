@@ -33,7 +33,7 @@ var express = require('express')
 
 // routes
 var routes = require('./routes')
-  , users = require('./routes/users')
+  // , users = require('./routes/users')
   , files = require('./routes/files')
   , rwfind = require('./routes/rwfind')
   , cifbulk = require('./routes/cifbulk')
@@ -82,9 +82,8 @@ var userdata = require('./models/user')(Bookshelf);
 // Passport functions - will put in separate file later
 // Serialize the user info
 passport.serializeUser(function(user, done) {
-  logger.debug('passport serializeUser. user is ');
-  console.log(user);
-    done(null, user.get('ident'));
+  logger.debug('10 passport serializeUser. user ident is ', user.get('ident'));
+  done(null, user.get('ident'));
 });
 // Deserialize the user info
 passport.deserializeUser(function(ident, done) {
@@ -92,7 +91,7 @@ passport.deserializeUser(function(ident, done) {
     new userdata.User({ident: ident}).fetch().then(function(user) {
         // user here is retrieved from database so can use .get functions
         // returning user - should it be user.get('ident')?
-        logger.debug('passport deserializeUser - retrieved user', user.get('ident'), user.get('affiliation'));
+        logger.debug('14 passport deserializeUser - retrieved user', user.get('ident'));
         return done(null, user);
     }, function(error) {
         return done(error);
@@ -103,23 +102,20 @@ passport.use(new LocalStrategy({
     usernameField: 'username',
     passwordField: 'password'
 },function(username, password, done) {
-    logger.debug('passport.use');
+    // Look up the user corresponding to the supplied username
     new userdata.User({ident: username}).fetch({require: true}).then(function(user) {
-      // user here is user obtained from User model
-        var pw = user.get('password');
-        // var program = 'perl -e "print crypt(\'' + password + '\',\'' + pw + '\');"';
-        
+      // Call perl crypt to check password since we are using passwords generated using crypt
+        var pw = user.get('password');        
         var program = 'perl ./utils/getPass.pl ' + password + ' ' + '\''+pw+'\'';
-        logger.debug('passport.use', program);
         exec(program, function(error, stdout, stderr) {
-            logger.debug('passport.use: perl stdout ' , stdout);
-            logger.debug('passport.use: perl stderr ' , stderr);
+            logger.debug('5 passport.use: perl stderr ' , stderr);
             if (error !== null) {
                 logger.error('passport.use: exec error: ' , error);
-                return done(null, false, {'message': 'Error'});
+                return done(null, false, {'message': 'Perl Error'});
             } 
             if (pw === stdout) {
-              logger.debug('passport.use: Passwords match. Return user');
+              logger.debug('6 passport.use: Passwords match. Return user');
+              // We are passing back user record
                 return done(null, user);
             }
             return done(null, false, { 'message': 'Invalid password'});
@@ -163,6 +159,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Disabled for now - socket.io inundates the logs
 // Override Express logging - stream logs to logger
 // app.use(require('morgan') ('common',{
 //   'stream': logger.stream
@@ -238,14 +235,6 @@ router.get('/auth/session', ensureAuthenticated, require('./routes/session').ses
 router.post('/auth/session', require('./routes/session').login);
 router.delete('/auth/session', require('./routes/session').logout);
 
-// Route to test if user is logged in
-// router.get('/loggedin', function(req, res) {
-  // User this later
-  // res.send(req.isAuthenticated() ? req.user : '0');
-  // res.send(req.user);
-// })
-
-
 // router.get('/session/set/:value', function(req,res) {
 //   req.session.
 // });
@@ -255,7 +244,7 @@ router.get('*', ensureAuthenticated, routes.index);
 app.use('/', router);
 
 // Handle cross-domain requests
-// NOTE: Uncomment this funciton to enable cross-domain request.
+// NOTE: Uncomment this function to enable cross-domain request.
 /*
   app.options('/upload', function(req, res){
   console.log('OPTIONS');
@@ -272,26 +261,10 @@ if (config.sslOn) {
   var port = app.get('port');
 }
 
+// Set up socket.io to listen on same port as https
 var io = socket.listen(server);
 
 server.listen(port);
-
-// exports.server = server;
-
-
-// var io = socket.listen(server);
-
-// io.sockets.on('connection', function(socket) {
-//   console.log('socket io connection');
-//   socket.emit('logmon:data', {hello: 'world'});
-//   socket.on('logmon:start', function(data) {
-//     console.log(data);
-//   });
-//   socket.on('logmon:stop', function(data) {
-//     console.log(data);
-//   })
-// });
-
 
 require('./services/socketConnection.js')(io);
 

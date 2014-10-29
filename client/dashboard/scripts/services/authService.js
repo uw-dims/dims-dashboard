@@ -14,6 +14,7 @@ angular.module('dimsDashboard.services')
       return {
 
         login: function(provider, user, callback) {
+          $log.debug('AuthService:login');
           var cb = callback || angular.noop;
           SessionService.save({
             provider: provider,
@@ -21,7 +22,8 @@ angular.module('dimsDashboard.services')
             password: user.password,
             rememberMe: user.rememberMe
           }, function(user) {
-            $rootScope.currentUser = user;
+            $log.debug('AuthService:login callback user is ', user);
+            $rootScope.currentUser = user.user;
             return cb();
           }, function(err) {
             return cb(err.data);
@@ -29,6 +31,7 @@ angular.module('dimsDashboard.services')
         },
 
         logout: function(callback) {
+          $log.debug('AuthService:logout');
           var cb = callback || angular.noop;
           SessionService.delete(function(res) {
               $rootScope.currentUser = null;

@@ -22,26 +22,33 @@ exports.logout = function(req,res) {
 };
 
 exports.login = function(req,res,next) {
-  logger.debug('auth/session.login');
+  logger.debug('1 auth/session.login');
   passport.authenticate('local', function(err, user, info) {
-    logger.debug('auth/session.login authenticate callback');
-    logger.debug('auth/session.login authenticate callback. info: ', info);
-    logger.debug('auth/session.login authenticate callback. err: ', err);
+    // At this point user is Bookshelf object
+    // err, user, and info are passed back from passport.use 
+    // Info contains messages regarding why login was unsuccessful
+    
     if (err || !user) {
+      var message = (info !== null && info !== undefined) ? info : '';
+      message = message + (err !== null && err !== undefined) ? err : '';
+      logger.debug('auth/session.login authenticate callback error. Message: ', message);
       req.flash('username', req.body.username);
       req.flash('error', err);
-      return res.status(400).send(err);
+      req.flash('info', info);
+      return res.status(400).send(message);
     }
+    // Puts the logged in user in the session
     req.logIn(user, function(err) {
-      logger.debug('auth/session.login authenticate req.logIn. err ', err);
-      logger.debug('auth/session.login authenticate req.logIn. user ', user);
-      if (err) {
+
+      if (err !== null && err !== undefined) {
+        logger.debug('auth/session.login authenticate req.logIn err ', err);
         req.flash('error', err);
         return res.send(err);
       }
-      // Send back req.user.ident
-      logger.debug('auth/session.login authenticate req.logIn. req.user.ident ', req.user.ident);
-      res.json(req.user.ident)
+      // Send back req.user.ident. User is bookshelf object
+      logger.debug('13 auth/session.login authenticate req.logIn success. req.user ident is ', req.user.get('ident'));
+      // res.json(req.user)
+      res.send({user: req.user.get('ident')});
     });
   })(req, res, next);
 };

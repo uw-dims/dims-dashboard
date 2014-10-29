@@ -1,11 +1,6 @@
 /*global angular */
 'use strict';
 
-/**
- * The main app module
- * @name app
- * @type {angular.Module}
- */
 var dimsDashboardConfig = function($provide, $routeProvider, $locationProvider, datepickerConfig, datepickerPopupConfig) {
   $routeProvider.when('/', {
     controller: 'MainCtrl',
@@ -55,21 +50,6 @@ var dimsDashboardConfig = function($provide, $routeProvider, $locationProvider, 
   datepickerConfig.minDate = '1960-01-01';
   datepickerConfig.showWeeks = false;
   datepickerPopupConfig.datepickerPopup = 'MM-dd-yyyy';
-  // Decorate $log function
-  // $provide.decorator( '$log', ['$delegate', function($delegate) {
-  //   // Save original $log.debug()
-  //   var debugFn = $delegate.debug;
-  //   $delegate.debug = function() {
-  //     var args = [].slice.call(arguments),
-  //         now = DateTime.formattedNow();
-  //     // Prepend timestamp
-  //     args[0] = supplant("{0} - {1}", [ now, args[0] ]);
-
-  //     // Call the orginal with the output prepended
-  //     debugFn.apply(null, args);
-  //   };
-  //   return $delegate;
-  // }]);
 };
 
 var constants = {
