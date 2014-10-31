@@ -75,6 +75,8 @@ var Bookshelf = require('bookshelf')(knex, {debug:true});
 Bookshelf.plugin('virtuals');
 // Make express setting so can be used elsewhere
 app.set('Bookshelf', Bookshelf);
+// Make redisClient available to routes:
+app.set('client', redisClient);
 
 // Get the user model so Passport can use it
 var userdata = require('./models/user')(Bookshelf);
@@ -91,7 +93,6 @@ passport.deserializeUser(function(ident, done) {
     new userdata.User({ident: ident}).fetch().then(function(user) {
         // user here is retrieved from database so can use .get functions
         // returning user - should it be user.get('ident')?
-        logger.debug('14 passport deserializeUser - retrieved user', user.get('ident'));
         return done(null, user);
     }, function(error) {
         return done(error);
@@ -111,18 +112,18 @@ passport.use(new LocalStrategy({
             logger.debug('5 passport.use: perl stderr ' , stderr);
             if (error !== null) {
                 logger.error('passport.use: exec error: ' , error);
-                return done(null, false, {'message': 'Perl Error'});
+                return done(null, false, 'Perl error');
             } 
             if (pw === stdout) {
               logger.debug('6 passport.use: Passwords match. Return user');
               // We are passing back user record
                 return done(null, user);
             }
-            return done(null, false, { 'message': 'Invalid password'});
+            return done(null, false, 'Invalid password');
         });
         
     }, function(error) {
-        return done(null, false, { 'message': 'Unknown user'});
+        return done(null, false, 'Unknown user');
     });
 }));
 
@@ -226,18 +227,18 @@ router.get('/status-chat', ensureAuthenticated, chat.status);
 // Settings api - now just doing GET one setting, PUT
 router.get('/settings/:id', ensureAuthenticated, settings.get);
 router.put('/settings/:id', ensureAuthenticated, settings.update);
-// router.post('/settings', ensureAuthenticated, settings.create);
+router.post('/settings', ensureAuthenticated, settings.create);
 // router.delete('/settings/:id', ensureAuthenticated, settings.delete);
 
 // router.get('/users:ident', ensureAuthenticated, users.show);
 
+// authorization
 router.get('/auth/session', ensureAuthenticated, require('./routes/session').session);
 router.post('/auth/session', require('./routes/session').login);
 router.delete('/auth/session', require('./routes/session').logout);
 
-// router.get('/session/set/:value', function(req,res) {
-//   req.session.
-// });
+// user session
+router.get('/session', ensureAuthenticated, require('./routes/usersession').session);
 
 router.get('*', ensureAuthenticated, routes.index);
 

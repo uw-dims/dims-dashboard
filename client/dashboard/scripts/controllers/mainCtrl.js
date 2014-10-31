@@ -13,7 +13,7 @@ angular.module('dimsDashboard.controllers').
     $scope.currentSelectedQuery = {};
     $scope.currentSelectedTool = {};
     $scope.settings = {};
-    $scope.settingsUrl = '/settings/0';
+    $scope.settingsUrl = '/settings/' 
     $scope.demoActivitiesNum = 10;
     $scope.savedDemoQueries = [];
     $scope.savedQueries = [] || $scope.savedQueries;
@@ -229,21 +229,44 @@ angular.module('dimsDashboard.controllers').
     };
 
     $scope.getUserSettings = function() {
-      $log.debug('in getUserSettings');
+      $log.debug('in getUserSettings. id is ', $scope.currentUser.username);
       return $http({
         method: 'GET',
-        url: $scope.settingsUrl
+        url: $scope.settingsUrl+$scope.currentUser.username
       }).
         success(function(data, status, headers, config) {
           $log.debug('data is ', data);
-          $scope.settings = data;
-          $log.debug('scope settings now', $scope.settings);
-          // need to move this later
-          $scope.settingsFormData.cifbulkQueue = $scope.settings.cifbulkQueue;
-          $scope.settingsFormData.anonymize = $scope.settings.anonymize;
-          $scope.settingsFormData.rpcDebug = $scope.settings.rpcDebug;
-          $scope.settingsFormData.rpcVerbose = $scope.settings.rpcVerbose;
+          $log.debug('status is ', status);
+           if (status === 204) {
+            // No data found - create the record
+            var settings = {
+              'user': $scope.currentUser.username,
+              'settings' : JSON.stringify(defaultUserSettings)
+            };
+            return $http({
+              method: 'POST',
+              url: $scope.settingsUrl,
+              params: settings
+            }).
+            success(function(data, status, headers, config) {
+              $log.debug('success creating, data is ', data);
+              $log.debug('status is ', status);
+            }).
+            error(function(data, status, headers, config) {
+              console.log('Error creatimg settings');
+              console.log(data);
+              console.log(status);
+            });
+          } else {
 
+            $scope.settings = data;
+            $log.debug('scope settings now', $scope.settings);
+            // need to move this later
+            $scope.settingsFormData.cifbulkQueue = $scope.settings.cifbulkQueue;
+            $scope.settingsFormData.anonymize = $scope.settings.anonymize;
+            $scope.settingsFormData.rpcDebug = $scope.settings.rpcDebug;
+            $scope.settingsFormData.rpcVerbose = $scope.settings.rpcVerbose;
+          }
         }).
         error(function(data, status, headers, config) {
           console.log('Error getting settings');

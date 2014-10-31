@@ -127,7 +127,12 @@ var rpcClientOptions = {
   }
 };
 
-
+var defaultUserSettings = {
+    "anonymize": "false",
+    "rpcDebug": "true",
+    "rpcVerbose": "true",
+    "cifbulkQueue": "cifbulk_v1"
+};
 
 var dimsDashboard = angular.module('dimsDashboard', 
   ['ngRoute','angularFileUpload','ui.bootstrap','ui.bootstrap.showErrors','ngGrid', 'ngAnimate', 'ngResource', 'http-auth-interceptor',
@@ -136,6 +141,7 @@ var dimsDashboard = angular.module('dimsDashboard',
 
 dimsDashboard.constant(constants);
 dimsDashboard.constant(rpcClientOptions);
+dimsDashboard.constant(defaultUserSettings);
 
 angular.module('dimsDashboard.controllers', []);
 angular.module('dimsDashboard.services', []);

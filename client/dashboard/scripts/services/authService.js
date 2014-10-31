@@ -19,13 +19,17 @@ angular.module('dimsDashboard.services')
           SessionService.save({
             provider: provider,
             username: user.username,
-            password: user.password,
-            rememberMe: user.rememberMe
-          }, function(user) {
-            $log.debug('AuthService:login callback user is ', user);
+            password: user.password
+          }, 
+          // If successful, user (username) is returned
+          function(user) {
+            $log.debug('AuthService:login success callback. user is ', user);
             $rootScope.currentUser = user.user;
             return cb();
-          }, function(err) {
+          }, 
+          // Failure, send error to callback
+          function(err) {
+            $log.debug('AuthService:login failure callback. err is ', err);
             return cb(err.data);
           });
         },
@@ -42,9 +46,12 @@ angular.module('dimsDashboard.services')
             });
         },
 
-        currentUser: function() {
+        currentUser: function(callback) {
+          $log.debug('AuthService:currentUser');
+          var cb = callback || angular.noop;
           SessionService.get(function(user) {
-            $rootScope.currentUser = user;
+            $log.debug('AuthService:currentUser. user returned from session is ', user);
+            $rootScope.currentUser = user.user;
             $log.debug('AuthService:currentUser. user is ', $rootScope.currentUser);
           });
         }

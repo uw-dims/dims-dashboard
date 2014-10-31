@@ -1,6 +1,7 @@
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller('LoginCtrl', ['$scope', 'AuthService', '$location', '$log', function($scope, AuthService, $location, $log) {
+  controller('LoginCtrl', ['$scope', 'AuthService', '$location', '$log', 'UsersessionService', 
+      function($scope, AuthService, $location, $log, UsersessionService) {
     $scope.error = {};
     $scope.user = {};
 
@@ -15,15 +16,15 @@ angular.module('dimsDashboard.controllers').
         $scope.errors = {};
 
         if (!err) {
-          $location.path('/');
-        } else {
-          angular.forEach(err.errors, function(error, field) {
-            // form[field].$setValidity('mongoose', false);
-            $scope.errors[field] = error.type;
-            $log.debug('LoginCtrl login error', error.type);
+          // Get the session data
+          UsersessionService.get(function(session) {
+            $log.debug('UsersessionService get, session is ', session);
+            $location.path('/');
           });
-          $scope.error.other = err.message;
-          $log.debug('LoginCtrl login error', err.message);
+          
+        } else {
+          $scope.errors.other = err;
+          $log.debug('LoginCtrl login error', err);
         }
       });
     };
