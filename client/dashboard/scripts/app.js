@@ -127,13 +127,6 @@ var rpcClientOptions = {
   }
 };
 
-var defaultUserSettings = {
-    "anonymize": "false",
-    "rpcDebug": "true",
-    "rpcVerbose": "true",
-    "cifbulkQueue": "cifbulk_v1"
-};
-
 var dimsDashboard = angular.module('dimsDashboard', 
   ['ngRoute','angularFileUpload','ui.bootstrap','ui.bootstrap.showErrors','ngGrid', 'ngAnimate', 'ngResource', 'http-auth-interceptor',
     'ngCookies','truncate', 'dimsDashboard.controllers', 'dimsDashboard.directives', 'dimsDashboard.services'])
@@ -141,19 +134,19 @@ var dimsDashboard = angular.module('dimsDashboard',
 
 dimsDashboard.constant(constants);
 dimsDashboard.constant(rpcClientOptions);
-dimsDashboard.constant(defaultUserSettings);
 
 angular.module('dimsDashboard.controllers', []);
 angular.module('dimsDashboard.services', []);
 angular.module('dimsDashboard.directives', []);
 angular.module('dimsDashboard.filters', []);
 
-dimsDashboard.run(function($rootScope, $location, $log, AuthService) {
+dimsDashboard.run(function($rootScope, $location, $log, AuthService, SettingsService) {
   //watching the value of the currentUser variable.
   $rootScope.$watch('currentUser', function(currentUser) {
     // if no currentUser and on a page that requires authorization then try to update it
     // will trigger 401s if user does not have a valid session
     $log.debug('Run: watch currentUser handler. currentUser is ',currentUser);
+    $log.debug('Run: watch currentUser handler. path is ', $location.path());
     if (!currentUser && (['/login'].indexOf($location.path()) == -1 )) {
       $log.debug('Run: watch currentUser handler. No currentUser and not on login page. Call AuthService.currentUser()');
       AuthService.currentUser();

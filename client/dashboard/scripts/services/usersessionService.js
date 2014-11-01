@@ -3,5 +3,5 @@
 angular.module('dimsDashboard.services')
   
   .factory('UsersessionService', function($resource) {
-    return $resource('/session');
+    return $resource('/settings');
   });

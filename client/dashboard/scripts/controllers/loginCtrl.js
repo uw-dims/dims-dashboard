@@ -1,7 +1,7 @@
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller('LoginCtrl', ['$scope', 'AuthService', '$location', '$log', 'UsersessionService', 
-      function($scope, AuthService, $location, $log, UsersessionService) {
+  controller('LoginCtrl', ['$scope', 'AuthService', '$location', '$log', 'SettingsService', 
+      function($scope, AuthService, $location, $log, SettingsService) {
     $scope.error = {};
     $scope.user = {};
 
@@ -16,11 +16,11 @@ angular.module('dimsDashboard.controllers').
         $scope.errors = {};
 
         if (!err) {
-          // Get the session data
-          UsersessionService.get(function(session) {
-            $log.debug('UsersessionService get, session is ', session);
-            $location.path('/');
-          });
+          // Get the settings data
+            // SettingsService.updateSettings().then(function(data) {
+            //   $log.debug('logn updateSettings promise. data is ', data);
+                $location.path('/');
+              // });
           
         } else {
           $scope.errors.other = err;

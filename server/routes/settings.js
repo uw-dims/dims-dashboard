@@ -4,48 +4,49 @@ var logger = require('../utils/logger');
 var fs = require('fs');
 var dimsutil = require('../utils/util');
 var async = require('async');
+var settings = require('../models/userSettings')
+// var settings = require('../models/userSettings')(req.app.get('client'), req.params.id, req.query.settings);
 
 exports.get = function(req, res) {
-	logger.debug('user settings get request, id is ', req.params.id);
+	// logger.debug('user settings get request, id is ', req.params.id);
+	logger.debug('user settings get request, id is ', req.user.get('ident'));
 	logger.debug('user settings get request. session is ', req.session);
-	console.log(req.params.id);
-	// Get the redis client
-	var client = req.app.get('client');
-	var key = 'userSetting:'+req.params.id;
-	client.hgetall(key, function(err, data) {
-			if (err) {
-				return res.status(400).send('Error retrieving from database');
-			} else if (data !== null) {
-				logger.debug('get result is ', data);
-				return res.status(200).send(data);
-			} else {
-				return res.status(204).send('No settings exist for this user');
-			}
-	} );
+
+	settings(req.app.get('client'),req.user.get('ident')).getSettings(function(result) {
+		if (result.status === 'error') {
+			return res.status(400).send(result.message);
+		} else if (result.data) {
+			return res.status(200).send({settings: result.data});
+		} else {
+			return res.status(204).send(result.message);
+		}
+	});
 
 };
 
 exports.create = function(req, res) {
-	logger.debug('user settings create request, id {0}, query {1}', req.params.id, req.query);
-	console.log(req.query);
-	var key = 'userSetting:'+req.query.user;
-	var settings = JSON.parse(req.query.settings);
-  var client = req.app.get('client');
-  client.hmset(key, settings, function(err, data) {
-  	if (err) {
-				return res.status(400).send('Error setting data in database');
+	logger.debug('user settings create request, id {0}, query {1}', req.params.id);
+
+  settings(req.app.get('client'), req.params.id).createSettings(function(result) {
+		if (result.status === 'error') {
+			return res.status(400).send(result.message);
 		} else {
-			return res.status(200).send(data);;
+			return res.status(200).send(result.data);;
 		}
-  });
-	
+	});
 };
 
 exports.update = function(req, res) {
 	logger.debug('user settings update request, id {0}, query {1}', req.params.id, req.query);
 	console.log(req, query);
 
-	return res.status(200).send(query);
+	settings(req.app.get('client'), req.params.id, req.query.settings).updateSettings(function(result) {
+		if (result.status === 'error') {
+			return res.status(400).send(result.message);
+		} else {
+			return res.status(200).send(result.data);;
+		}
+	});
 };
 
 

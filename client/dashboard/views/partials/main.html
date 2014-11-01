@@ -75,7 +75,7 @@
       <div class="form-group">
         <label class="col-sm-2">Choose cifbulk queue</label>
         <div class="col-sm-4">
-          <select class="form-control" ng-model="settingsFormData.cifbulkQueue" ng-options="f.value as f.label for f in cifbulkQueueValues" ng-change="setUserSettings()">
+          <select class="form-control" ng-model="settingsFormData.cifbulkQueue" ng-options="f.value as f.label for f in cifbulkQueueValues" ng-change="setUserSettings()" ng-selected="settings.cifbulkQueue">
           </select>
         </div>
         <div class="col-sm-4 form-control-static">

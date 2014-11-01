@@ -2,6 +2,7 @@
 
 var passport = require('passport');
 var logger = require('../utils/logger');
+var settings = require('../models/userSettings')
 
 exports.session = function(req,res) {
   logger.debug('auth/session.session (get) user: ', req.user.get('ident'), req.user.get('desc'));
@@ -11,8 +12,25 @@ exports.session = function(req,res) {
     username: req.user.get('ident'),
     name: req.user.get('descr')
   }
-  logger.debug('auth/session.session (get) user_info is ', user_info);
-  res.status(200).send({user: user_info});
+
+  settings(req.app.get('client'),req.user.get('ident')).getSettings(function(result) {
+        if (result.status === 'error') {
+          return res.status(400).send(result.message);
+        } else if (result.data) {
+          console.log(result.data);
+          user_info.settings = result.data;
+          res.status(200).send({user: user_info});
+        } else {
+          // No settings yet. Create them
+          settings(req.app.get('client'),req.user.get('ident')).createSettings (function(result) {
+            if (result.data) {
+              user_info.settings = result.data;
+            }
+            res.status(200).send({user: user_info});
+          });
+        }
+      });
+  
 };
 
 exports.logout = function(req,res) {
@@ -55,15 +73,36 @@ exports.login = function(req,res,next) {
       // Send back req.user.ident. User is bookshelf object
       logger.debug('13 auth/session.login authenticate req.logIn success. req.user ident is ', req.user.get('ident'));
       // res.json(req.user)
+
       var user_info = {
         username: req.user.get('ident'),
         name: req.user.get('descr')
-      }
-      logger.debug('auth/session.login authenticate req.logIn success user_info is ', user_info);
+      };
+
+      // Get user settings and put in user_info object
+
+      settings(req.app.get('client'),req.user.get('ident')).getSettings(function(result) {
+        if (result.status === 'error') {
+          return res.status(400).send(result.message);
+        } else if (result.data) {
+          console.log(result.data);
+          user_info.settings = result.data;
+          res.send({user: user_info});
+        } else {
+          // No settings yet. Create them
+          settings(req.app.get('client'),req.user.get('ident')).createSettings (function(result) {
+            if (result.data) {
+              user_info.settings = result.data;
+            }
+            res.send({user: user_info});
+          });
+        }
+      });
 
       // Check for user prefs in session
 
-      res.send({user: user_info});
+      
     });
   })(req, res, next);
 };
+

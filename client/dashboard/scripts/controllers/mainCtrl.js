@@ -1,8 +1,13 @@
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller('MainCtrl', ['$scope', 'Socket', '$location', '$routeParams', '$log', '$filter', '$http', function ($scope, Socket, $location, $routeParams, $log, $filter, $http) {
+  controller('MainCtrl', ['$scope', 'Socket', '$location', '$routeParams', '$log', '$filter', '$http', 'SettingsService',
+      function ($scope, Socket, $location, $routeParams, $log, $filter, $http, SettingsService) {
     // write Ctrl here
     $log.debug('In MainCtrl');
+
+    $scope.settings = SettingsService;
+
+    $log.debug('In MainCtrl. Scope.settings.data is ', $scope.settings.data);
 
     $scope.isCollapsed = true;
     $scope.showTools = false;
@@ -12,7 +17,7 @@ angular.module('dimsDashboard.controllers').
     $scope.logs = [];
     $scope.currentSelectedQuery = {};
     $scope.currentSelectedTool = {};
-    $scope.settings = {};
+    // $scope.settings = {};
     $scope.settingsUrl = '/settings/' 
     $scope.demoActivitiesNum = 10;
     $scope.savedDemoQueries = [];
@@ -229,50 +234,42 @@ angular.module('dimsDashboard.controllers').
     };
 
     $scope.getUserSettings = function() {
+      // SettingsService.updateSettings();
       $log.debug('in getUserSettings. id is ', $scope.currentUser.username);
-      return $http({
-        method: 'GET',
-        url: $scope.settingsUrl+$scope.currentUser.username
-      }).
-        success(function(data, status, headers, config) {
-          $log.debug('data is ', data);
-          $log.debug('status is ', status);
-           if (status === 204) {
-            // No data found - create the record
-            var settings = {
-              'user': $scope.currentUser.username,
-              'settings' : JSON.stringify(defaultUserSettings)
-            };
-            return $http({
-              method: 'POST',
-              url: $scope.settingsUrl,
-              params: settings
-            }).
-            success(function(data, status, headers, config) {
-              $log.debug('success creating, data is ', data);
-              $log.debug('status is ', status);
-            }).
-            error(function(data, status, headers, config) {
-              console.log('Error creatimg settings');
-              console.log(data);
-              console.log(status);
-            });
-          } else {
 
-            $scope.settings = data;
-            $log.debug('scope settings now', $scope.settings);
-            // need to move this later
-            $scope.settingsFormData.cifbulkQueue = $scope.settings.cifbulkQueue;
-            $scope.settingsFormData.anonymize = $scope.settings.anonymize;
-            $scope.settingsFormData.rpcDebug = $scope.settings.rpcDebug;
-            $scope.settingsFormData.rpcVerbose = $scope.settings.rpcVerbose;
-          }
-        }).
-        error(function(data, status, headers, config) {
-          console.log('Error getting settings');
-          console.log(data);
-          console.log(status);
-        });
+      $scope.settingsFormData.cifbulkQueue = $scope.settings.data.cifbulkQueue;
+            $scope.settingsFormData.anonymize = $scope.settings.data.anonymize;
+            $scope.settingsFormData.rpcDebug = $scope.settings.data.rpcDebug;
+            $scope.settingsFormData.rpcVerbose = $scope.settings.data.rpcVerbose;
+
+      $log.debug('getUserSettings. cifbulkQueue is ', $scope.settingsFormData.cifbulkQueue );
+
+      // return $http({
+      //   method: 'GET',
+      //   url: $scope.settingsUrl+$scope.currentUser.username
+      // }).
+      //   success(function(data, status, headers, config) {
+      //     $log.debug('data is ', data);
+      //     $log.debug('status is ', status);
+      //      if (status === 204) {
+      //       // No data found - create the record
+      //       console.log('no settings found');
+      //     } else {
+
+      //       $scope.settings = data;
+      //       $log.debug('scope settings now', $scope.settings);
+      //       // need to move this later
+      //       $scope.settingsFormData.cifbulkQueue = $scope.settings.cifbulkQueue;
+      //       $scope.settingsFormData.anonymize = $scope.settings.anonymize;
+      //       $scope.settingsFormData.rpcDebug = $scope.settings.rpcDebug;
+      //       $scope.settingsFormData.rpcVerbose = $scope.settings.rpcVerbose;
+      //     }
+      //   }).
+      //   error(function(data, status, headers, config) {
+      //     console.log('Error getting settings');
+      //     console.log(data);
+      //     console.log(status);
+      //   });
     };
 
     $scope.setUserSettings = function() {
@@ -282,6 +279,7 @@ angular.module('dimsDashboard.controllers').
       settings.cifbulkQueue = $scope.settingsFormData.cifbulkQueue;
       settings.rpcDebug = $scope.settingsFormData.rpcDebug;
       settings.rpcVerbose = $scope.settingsFormData.rpcVerbose;
+
 
       return $http({
         method: 'PUT',

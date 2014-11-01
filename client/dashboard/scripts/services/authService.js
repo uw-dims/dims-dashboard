@@ -5,7 +5,7 @@
 angular.module('dimsDashboard.services')
   
   // .factory('AuthService', function($location, $rootScope, SessionService, User, $cookieStore) {
-    .factory('AuthService', function($location, $rootScope, SessionService, $cookieStore, $log) {
+    .factory('AuthService', function($location, $rootScope, SessionService, $cookieStore, $log, SettingsService, UsersessionService) {
 
       $rootScope.currentUser = $cookieStore.get('user') || null;
       $log.debug('AuthService: rootScope.currentUser from cookieStore is ', $rootScope.currentUser);
@@ -25,7 +25,14 @@ angular.module('dimsDashboard.services')
           function(user) {
             $log.debug('AuthService:login success callback. user is ', user);
             $rootScope.currentUser = user.user;
-            return cb();
+            // $rootScope.userSettings = user.settings;
+            // SettingsService.updateSettings(user.user.username);
+            UsersessionService.get(function(settings) {
+              $log.debug('UsersessionService.get settings are ', settings.settings);
+              SettingsService.data = settings.settings;
+              return cb();
+            });
+            // return cb();
           }, 
           // Failure, send error to callback
           function(err) {
@@ -52,7 +59,12 @@ angular.module('dimsDashboard.services')
           SessionService.get(function(user) {
             $log.debug('AuthService:currentUser. user returned from session is ', user);
             $rootScope.currentUser = user.user;
-            $log.debug('AuthService:currentUser. user is ', $rootScope.currentUser);
+            SettingsService.data = user.user.settings;
+            UsersessionService.get(function(settings) {
+              $log.debug('UsersessionService.get settings are ', settings.settings);
+              SettingsService.data = settings.settings;
+              return cb();
+            });
           });
         }
       }

@@ -55,7 +55,14 @@ config.rpcQueueNames = {
   'anon': 'anon',
   'rwfind': 'rwfind',
   'crosscor': 'crosscor'
-}
+};
+
+config.defaultUserSettings = {
+    "anonymize": "false",
+    "rpcDebug": "true",
+    "rpcVerbose": "true",
+    "cifbulkQueue": "cifbulk_v1"
+};
 
 config.maxUploadFileNum = 10;
 config.maxUploadFileSize = 39273942;

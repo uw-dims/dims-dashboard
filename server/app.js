@@ -225,8 +225,10 @@ router.get('/stop-chat', ensureAuthenticated, chat.stop);
 router.get('/status-chat', ensureAuthenticated, chat.status);
 
 // Settings api - now just doing GET one setting, PUT
-router.get('/settings/:id', ensureAuthenticated, settings.get);
-router.put('/settings/:id', ensureAuthenticated, settings.update);
+// router.get('/settings/:id', ensureAuthenticated, settings.get);
+// router.put('/settings/:id', ensureAuthenticated, settings.update);
+router.get('/settings', ensureAuthenticated, settings.get);
+router.get('/settings', ensureAuthenticated, settings.update);
 router.post('/settings', ensureAuthenticated, settings.create);
 // router.delete('/settings/:id', ensureAuthenticated, settings.delete);
 
