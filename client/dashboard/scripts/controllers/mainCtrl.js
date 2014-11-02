@@ -1,11 +1,11 @@
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller('MainCtrl', ['$scope', 'Socket', '$location', '$routeParams', '$log', '$filter', '$http', 'SettingsService',
-      function ($scope, Socket, $location, $routeParams, $log, $filter, $http, SettingsService) {
+  controller('MainCtrl', ['$scope', 'Socket', '$location', '$routeParams', '$log', '$filter', '$http', 'SettingsService','UsersessionService',
+      function ($scope, Socket, $location, $routeParams, $log, $filter, $http, SettingsService, UsersessionService) {
     // write Ctrl here
     $log.debug('In MainCtrl');
 
-    $scope.settings = SettingsService;
+    $scope.settings = SettingsService.data;
 
     $log.debug('In MainCtrl. Scope.settings.data is ', $scope.settings.data);
 
@@ -237,10 +237,10 @@ angular.module('dimsDashboard.controllers').
       // SettingsService.updateSettings();
       $log.debug('in getUserSettings. id is ', $scope.currentUser.username);
 
-      $scope.settingsFormData.cifbulkQueue = $scope.settings.data.cifbulkQueue;
-            $scope.settingsFormData.anonymize = $scope.settings.data.anonymize;
-            $scope.settingsFormData.rpcDebug = $scope.settings.data.rpcDebug;
-            $scope.settingsFormData.rpcVerbose = $scope.settings.data.rpcVerbose;
+      $scope.settingsFormData.cifbulkQueue = SettingsService.data.cifbulkQueue;
+            $scope.settingsFormData.anonymize = SettingsService.data.anonymize;
+            $scope.settingsFormData.rpcDebug = SettingsService.data.rpcDebug;
+            $scope.settingsFormData.rpcVerbose = SettingsService.data.rpcVerbose;
 
       $log.debug('getUserSettings. cifbulkQueue is ', $scope.settingsFormData.cifbulkQueue );
 
@@ -273,29 +273,39 @@ angular.module('dimsDashboard.controllers').
     };
 
     $scope.setUserSettings = function() {
-      var settings = $scope.settings;
+      var settings = {};
       // settings.anonymize = $scope.settings.anonymize === 'false' ? 'true' : 'false';
       settings.anonymize = $scope.settingsFormData.anonymize;
       settings.cifbulkQueue = $scope.settingsFormData.cifbulkQueue;
       settings.rpcDebug = $scope.settingsFormData.rpcDebug;
       settings.rpcVerbose = $scope.settingsFormData.rpcVerbose;
 
+      UsersessionService.save({
+        settings: settings
+      },
+      function(resource) {
+        $log.debug('success setting, data is ', resource.data);
+      },
+      function(err) {
+        $log.debug('setUserSettings error', err);
+      });
+    };
 
-      return $http({
-        method: 'PUT',
-        url: $scope.settingsUrl,
-        params: settings
-      }).
-        success(function(data, status, headers, config) {
-          $log.debug('success setting, data is ', data);
-          $log.debug('status is ', status);
-        }).
-        error(function(data, status, headers, config) {
-          console.log('Error setting settings');
-          console.log(data);
-          console.log(status);
-        });
-      };
+      // return $http({
+      //   method: 'PUT',
+      //   url: $scope.settingsUrl,
+      //   params: settings
+      // }).
+      //   success(function(data, status, headers, config) {
+      //     $log.debug('success setting, data is ', data);
+      //     $log.debug('status is ', status);
+      //   }).
+      //   error(function(data, status, headers, config) {
+      //     console.log('Error setting settings');
+      //     console.log(data);
+      //     console.log(status);
+      //   });
+      // };
 
       // Initialize settings
      $scope.getUserSettings();

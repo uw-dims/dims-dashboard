@@ -47,7 +47,8 @@
     "pg": "*",
     "sql": "*",
     "knex": "*",
-    "bookshelf":"~0.7.7"
+    "bookshelf":"~0.7.7",
+    "q":"*"
   },
   "devDependencies": {
     "grunt": "~0.4.5",

@@ -84,7 +84,7 @@ var userdata = require('./models/user')(Bookshelf);
 // Passport functions - will put in separate file later
 // Serialize the user info
 passport.serializeUser(function(user, done) {
-  logger.debug('10 passport serializeUser. user ident is ', user.get('ident'));
+  logger.debug('10 passport.serializeUser. user ident is ', user.get('ident'));
   done(null, user.get('ident'));
 });
 // Deserialize the user info
@@ -197,10 +197,8 @@ if (env === 'production') {
 // Middleware to be used for every secured route
 var ensureAuthenticated = function(req, res, next) {
   if (!req.isAuthenticated()) {
-    logger.debug('ensureAuthenticated: Request is not authenticated. Return 401');
     res.status(401).send();
   } else {
-    logger.debug('ensureAuthenticated: Request is authenticated.');
     return next();
   }
 };
@@ -228,8 +226,8 @@ router.get('/status-chat', ensureAuthenticated, chat.status);
 // router.get('/settings/:id', ensureAuthenticated, settings.get);
 // router.put('/settings/:id', ensureAuthenticated, settings.update);
 router.get('/settings', ensureAuthenticated, settings.get);
-router.get('/settings', ensureAuthenticated, settings.update);
-router.post('/settings', ensureAuthenticated, settings.create);
+router.post('/settings', ensureAuthenticated, settings.update);
+// router.post('/settings', ensureAuthenticated, settings.create);
 // router.delete('/settings/:id', ensureAuthenticated, settings.delete);
 
 // router.get('/users:ident', ensureAuthenticated, users.show);

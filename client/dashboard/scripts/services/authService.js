@@ -21,18 +21,18 @@ angular.module('dimsDashboard.services')
             username: user.username,
             password: user.password
           }, 
-          // If successful, user (username) is returned
-          function(user) {
-            $log.debug('AuthService:login success callback. user is ', user);
-            $rootScope.currentUser = user.user;
+          function(resource) {
+            $log.debug('AuthService:login success callback. data is ', resource.data);
+            $rootScope.currentUser = resource.data.user;
+            SettingsService.data= resource.data.settings;
             // $rootScope.userSettings = user.settings;
             // SettingsService.updateSettings(user.user.username);
-            UsersessionService.get(function(settings) {
-              $log.debug('UsersessionService.get settings are ', settings.settings);
-              SettingsService.data = settings.settings;
-              return cb();
-            });
-            // return cb();
+            // UsersessionService.get(function(resource) {
+            //   $log.debug('UsersessionService.get settings are ', resource.data);
+            //   SettingsService.data = resource.data.settings;
+            //   return cb();
+            // });
+            return cb();
           }, 
           // Failure, send error to callback
           function(err) {
@@ -56,15 +56,15 @@ angular.module('dimsDashboard.services')
         currentUser: function(callback) {
           $log.debug('AuthService:currentUser');
           var cb = callback || angular.noop;
-          SessionService.get(function(user) {
-            $log.debug('AuthService:currentUser. user returned from session is ', user);
-            $rootScope.currentUser = user.user;
-            SettingsService.data = user.user.settings;
-            UsersessionService.get(function(settings) {
-              $log.debug('UsersessionService.get settings are ', settings.settings);
-              SettingsService.data = settings.settings;
-              return cb();
-            });
+          SessionService.get(function(resource) {
+            $log.debug('AuthService:currentUser. data returned from session is ', resource.data);
+            $rootScope.currentUser = resource.data.user;
+            SettingsService.data = resource.data.settings;
+            // UsersessionService.get(function(settings) {
+            //   $log.debug('UsersessionService.get settings are ', settings.settings);
+            //   SettingsService.data = settings.settings;
+            //   return cb();
+            // });
           });
         }
       }

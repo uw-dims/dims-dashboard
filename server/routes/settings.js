@@ -1,50 +1,52 @@
+'use strict';
+
+// Settings routes - retrieve settings via REST api
 
 var config = require('../config');
 var logger = require('../utils/logger');
-var fs = require('fs');
-var dimsutil = require('../utils/util');
-var async = require('async');
-var settings = require('../models/userSettings')
+// var fs = require('fs');
+// var dimsutil = require('../utils/util');
+// var async = require('async');
+var userSettings = require('../models/userSettings')
 // var settings = require('../models/userSettings')(req.app.get('client'), req.params.id, req.query.settings);
 
 exports.get = function(req, res) {
 	// logger.debug('user settings get request, id is ', req.params.id);
-	logger.debug('user settings get request, id is ', req.user.get('ident'));
-	logger.debug('user settings get request. session is ', req.session);
+	logger.debug('settings.get request, id is ', req.user.get('ident'));
+	logger.debug('settings.get request. session is ', req.session);
+	// id is from logged in user
+	var id = req.user.get('ident');
+	var client = req.app.get('client');
 
-	settings(req.app.get('client'),req.user.get('ident')).getSettings(function(result) {
-		if (result.status === 'error') {
-			return res.status(400).send(result.message);
-		} else if (result.data) {
-			return res.status(200).send({settings: result.data});
+	userSettings(client,id).getSettings(function(err, data) {
+		if (err) {
+			return res.status(400).send(err);
+		} else if (data) {
+			return res.status(200).send({data: data});
 		} else {
-			return res.status(204).send(result.message);
-		}
-	});
-
-};
-
-exports.create = function(req, res) {
-	logger.debug('user settings create request, id {0}, query {1}', req.params.id);
-
-  settings(req.app.get('client'), req.params.id).createSettings(function(result) {
-		if (result.status === 'error') {
-			return res.status(400).send(result.message);
-		} else {
-			return res.status(200).send(result.data);;
+			userSettings(client, username).createSettings(function(err, data) {
+        if (err) {
+          return res.status(400).send(err);
+        } else {
+          return res.status(200).send({data: data});
+        }
+      });
 		}
 	});
 };
 
 exports.update = function(req, res) {
-	logger.debug('user settings update request, id {0}, query {1}', req.params.id, req.query);
-	console.log(req, query);
+	logger.debug('settings.update request, id {0}, query {1}', req.params.id, req.body.settings);
+	console.log(req);
+	var id = req.user.get('ident');
+	var client = req.app.get('client');
+	var newSettings = req.body.settings;
 
-	settings(req.app.get('client'), req.params.id, req.query.settings).updateSettings(function(result) {
-		if (result.status === 'error') {
-			return res.status(400).send(result.message);
+	userSettings(client, id, newSettings).updateSettings(function(err, data) {
+		if (err) {
+			return res.status(400).send(err);
 		} else {
-			return res.status(200).send(result.data);;
+			return res.status(200).send({data: data});;
 		}
 	});
 };

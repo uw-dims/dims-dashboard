@@ -1,60 +1,99 @@
 'use strict';
 
+// userSettings model
+// Queries redis to read/update/create user settings
+
 var config = require('../config');
 var logger = require('../utils/logger');
 
-module.exports = function(client, user, userSettings) {
+exports = module.exports = UserSettings;
 
-	var settings = {};
-	var key = 'userSetting:' + user;
+function UserSettings(client, user, userSettings) {
+	var self = this;
+	self.client = client;
+	self.user = user;
+	self.userSettings = userSettings || {};
+	self.key = 'userSetting:' + user;
+};
 
-	settings.getSettings = function(callback) {
-		var result;
-		client.hgetall(key, function(err, data) {
-			if (err) {
-				result = { status: 'error', data:null, message: 'Error retrieving from database:' + err };
-			} else if (data !== null) {
-				result = { status: 'success', data: data, message:'' };
-			} else {
-				result = { status: 'success', message: 'No settings exist for this user' };
-			}
-			return callback(result);
-		});
-	};
+// Will retrieve settings for logged in user. If settings do not
+// exist, will return null data.
+UserSettings.prototype.getSettings = function(callback) {
+	var self = this;
+	self.client.hgetall(this.key, function(err, data) {
+			return callback(err, data);
+	});
+};
 
-	settings.updateSettings = function(callback) {
-		var result;
-		var settingsObject = JSON.parse(userSettings);
-	  client.hmset(key, settingsObject, function(err, data) {
-	  	if (err) {
-				result = 'Error setting data in database';
-			} else {
-				result = data;
-			}
-			return callback(result);
+// Updates settings for current logged in user
+UserSettings.prototype.updateSettings = function(callback) {
+	var self = this;
+	logger.debug('updateSettings, userSettings ', self.userSettings);
+	  self.client.hmset(self.key, self.userSettings, function(err, data) {
+			return callback(err, data);
 	  });
-	};
+};
 
-	settings.createSettings = function(callback) {
-		var result;
-		var settingsObject = config.defaultUserSettings;
-	  client.hmset(key, settingsObject, function(err, data) {
+UserSettings.prototype.get
+
+// Create settings for current logged in user
+UserSettings.prototype.createSettings = function(callback) {
+	var settingsObject = config.defaultUserSettings,
+			self = this;
+
+		// First put the key in the set of keys
+
+	  self.client.hmset(self.key, self.settingsObject, function(err, data) {
 	  	if (err) {
-				result = 'Error setting data in database';
-				return callback(result);
+				return callback(err, null);
 			} else {
-				client.hgetall(key, function(err, data) {
-					if (err) {
-						return callback('Error retrieving created data in database');
-					} else {
-						return callback({data: data});
-					}
+				self.client.hgetall(self.key, function(err, data) {
+					return callback(err, data);
 				});
 			}
-			
 	  });
-	};
-
-	return settings;
 };
+
+UserSettings.prototype.getAllKeys = function(callback) {
+
+};
+
+UserSettings.prototype.updateKey = function(callback) {
+
+};
+
+// module.exports = function(client, user, userSettings) {
+
+// 	var settings = {};
+// 	var key = 'userSetting:' + user;
+
+// 	settings.getSettings = function(callback) {
+// 		client.hgetall(key, function(err, data) {
+// 			return callback(err, data);
+// 		});
+// 	};
+
+// 	settings.updateSettings = function(callback) {
+// 		logger.debug('updateSettings, userSettings ', userSettings);
+// 	  client.hmset(key, userSettings, function(err, data) {
+// 			return callback(err, data);
+// 	  });
+// 	};
+
+// 	settings.createSettings = function(callback) {
+// 		var settingsObject = config.defaultUserSettings;
+
+// 	  client.hmset(key, settingsObject, function(err, data) {
+// 	  	if (err) {
+// 				return callback(err, null);
+// 			} else {
+// 				client.hgetall(key, function(err, data) {
+// 					return callback(err, data);
+// 				});
+// 			}
+// 	  });
+// 	};
+
+// 	return settings;
+// };
 

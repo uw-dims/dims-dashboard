@@ -64,6 +64,10 @@ config.defaultUserSettings = {
     "cifbulkQueue": "cifbulk_v1"
 };
 
+config.keyPrefixes = {
+  'userSettings': 'userSetting'
+};
+
 config.maxUploadFileNum = 10;
 config.maxUploadFileSize = 39273942;
 
