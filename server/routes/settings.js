@@ -7,7 +7,7 @@ var logger = require('../utils/logger');
 var UserSettings = require('../models/userSettings')
 
 exports.get = function(req, res) {
-
+	logger.debug('Route settings: get');
 	// id is from logged in user
 	var id = req.user.get('ident');
 	var client = req.app.get('client');
@@ -21,12 +21,13 @@ exports.get = function(req, res) {
 };
 
 exports.update = function(req, res) {
-
+	logger.debug('Route settings: post');
 	var id = req.user.get('ident');
 	var client = req.app.get('client');
 	var newSettings = req.body.settings;
 	
-	UserSettings.getSettings().then(function(data) {
+	var userSettings = new UserSettings(client, id, req.body.settings);
+	userSettings.updateSettings().then(function(data) {
       res.status(200).send({data: data});
     }).then(function(err) {
       return res.status(400).send(err);

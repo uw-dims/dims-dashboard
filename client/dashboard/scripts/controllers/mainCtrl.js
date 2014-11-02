@@ -5,9 +5,8 @@ angular.module('dimsDashboard.controllers').
     // write Ctrl here
     $log.debug('In MainCtrl');
 
-    $scope.settings = SettingsService.data;
-
-    $log.debug('In MainCtrl. Scope.settings.data is ', $scope.settings.data);
+    $scope.settings = SettingsService.get();
+    $scope.settingsFormData = SettingsService.get();
 
     $scope.isCollapsed = true;
     $scope.showTools = false;
@@ -87,10 +86,6 @@ angular.module('dimsDashboard.controllers').
       value: 'false',
       label: 'RPC Client Verbose Off'
     }];
-
-    $scope.settingsFormData = {};
-
-
 
     var initializeTools = function() {
       angular.forEach($scope.initialTools, function(value, index) {
@@ -233,44 +228,18 @@ angular.module('dimsDashboard.controllers').
 
     };
 
-    $scope.getUserSettings = function() {
-      // SettingsService.updateSettings();
-      $log.debug('in getUserSettings. id is ', $scope.currentUser.username);
+    // Populate form values for settings
+    // $scope.getFormUserSettings = function() {
+    //   $scope.settingsFormData = SettingsService.get();
 
-      $scope.settingsFormData.cifbulkQueue = SettingsService.data.cifbulkQueue;
-            $scope.settingsFormData.anonymize = SettingsService.data.anonymize;
-            $scope.settingsFormData.rpcDebug = SettingsService.data.rpcDebug;
-            $scope.settingsFormData.rpcVerbose = SettingsService.data.rpcVerbose;
+      // $scope.settingsFormData.cifbulkQueue = SettingsService.data.cifbulkQueue;
+      //       $scope.settingsFormData.anonymize = SettingsService.data.anonymize;
+      //       $scope.settingsFormData.rpcDebug = SettingsService.data.rpcDebug;
+      //       $scope.settingsFormData.rpcVerbose = SettingsService.data.rpcVerbose;
 
-      $log.debug('getUserSettings. cifbulkQueue is ', $scope.settingsFormData.cifbulkQueue );
-
-      // return $http({
-      //   method: 'GET',
-      //   url: $scope.settingsUrl+$scope.currentUser.username
-      // }).
-      //   success(function(data, status, headers, config) {
-      //     $log.debug('data is ', data);
-      //     $log.debug('status is ', status);
-      //      if (status === 204) {
-      //       // No data found - create the record
-      //       console.log('no settings found');
-      //     } else {
-
-      //       $scope.settings = data;
-      //       $log.debug('scope settings now', $scope.settings);
-      //       // need to move this later
-      //       $scope.settingsFormData.cifbulkQueue = $scope.settings.cifbulkQueue;
-      //       $scope.settingsFormData.anonymize = $scope.settings.anonymize;
-      //       $scope.settingsFormData.rpcDebug = $scope.settings.rpcDebug;
-      //       $scope.settingsFormData.rpcVerbose = $scope.settings.rpcVerbose;
-      //     }
-      //   }).
-      //   error(function(data, status, headers, config) {
-      //     console.log('Error getting settings');
-      //     console.log(data);
-      //     console.log(status);
-      //   });
-    };
+    //   $log.debug('getUserSettings. cifbulkQueue is ', $scope.settingsFormData.cifbulkQueue );
+    //   $log.debug('In getUserSettings. Scope.settings, scope.settingsFormData', $scope.settings, $scope.settingsFormData);
+    // };
 
     $scope.setUserSettings = function() {
       var settings = {};
@@ -280,36 +249,24 @@ angular.module('dimsDashboard.controllers').
       settings.rpcDebug = $scope.settingsFormData.rpcDebug;
       settings.rpcVerbose = $scope.settingsFormData.rpcVerbose;
 
-      UsersessionService.save({
-        settings: settings
-      },
-      function(resource) {
+      SettingsService.update(settings).then(function(resource) {
         $log.debug('success setting, data is ', resource.data);
-      },
-      function(err) {
+      }), (function(err) {
         $log.debug('setUserSettings error', err);
       });
+
+      // UsersessionService.save({
+      //   settings: settings
+      // },
+      // function(resource) {
+      //   $log.debug('success setting, data is ', resource.data);
+      // },
+      // function(err) {
+      //   $log.debug('setUserSettings error', err);
+      // });
     };
 
-      // return $http({
-      //   method: 'PUT',
-      //   url: $scope.settingsUrl,
-      //   params: settings
-      // }).
-      //   success(function(data, status, headers, config) {
-      //     $log.debug('success setting, data is ', data);
-      //     $log.debug('status is ', status);
-      //   }).
-      //   error(function(data, status, headers, config) {
-      //     console.log('Error setting settings');
-      //     console.log(data);
-      //     console.log(status);
-      //   });
-      // };
-
-      // Initialize settings
-     $scope.getUserSettings();
-     // Need to put getUserSettings in a service with a promise so can do 
-     // other things upon a success
-
+    // Initialize settings
+    // $scope.getFormUserSettings();
+    
   }]);

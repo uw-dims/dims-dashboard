@@ -61,7 +61,7 @@ UserSettings.prototype.getSettings = function() {
 };
 
 // Updates settings for current logged in user
-UserSettings.prototype.updateSettings = function(callback) {
+UserSettings.prototype.updateSettings = function() {
 	logger.debug('prototype.updateSettings');
 	var self = this;
 	var deferred = q.defer();
@@ -70,9 +70,10 @@ UserSettings.prototype.updateSettings = function(callback) {
 	}).then(function(err) {
 		return deferred.reject(err);
 	});
+	return deferred.promise;
 };
 
-UserSettings.prototype.getAllKeys = function(callback) {
+UserSettings.prototype.getAllKeys = function() {
 
 };
 

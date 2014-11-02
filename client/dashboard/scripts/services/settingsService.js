@@ -4,63 +4,35 @@
 
 angular.module('dimsDashboard.services')
   
-  .factory('SettingsService', function($http, $q, $log, $rootScope) {
-
-    // var getSettings = function(id) {
-    //   var deferred = $q.defer();     
-    //   $http ({
-    //     method: 'GET',
-    //     url: '/settings/'+id
-
-    //   }).success(function(data,status,headers,config){
-    //         deferred.resolve(data);
-    //   }).error(function(data,status,headers,config) {
-    //         deferred.reject('No results. Status: '+ status);
-    //   });
-    //   return deferred.promise;
-    // };
-
-    // var data = {};
-
-
-
-    // return {
-    //   getSettings: getSettings,
-    //   data: data
-    // };
+  .factory('SettingsService', function($http, $q, $log, $rootScope, $resource) {
 
     var SettingsService = {
 
       data: {},
 
-      // updateSettings: function() {
-      //   var id = ($rootScope.currentUser) ? $rootScope.currentUser.username : null;
-      //   $log.debug('In SettingsService.updateSettings. Id is ', id);  
+      set: function(settings) {
+        SettingsService.data = settings;
+      },
 
-      //   var deferred = $q.defer();
-      //   $http ({
-      //     method: 'GET',
-      //     url: '/settings/'+id
+      get: function() {
+        return SettingsService.data;
+      },
 
-      //   }).success(function(data,status,headers,config){
-      //     $log.debug('SettingsService.updateSettings callback. Data is ', data);
-      //         SettingsService.data = data;
-              
-      //         deferred.resolve(data);
-      //   }).error(function(data,status,headers,config) {
-      //         deferred.reject('No results. Status: '+ status);
-      //   });
-      //   return deferred.promise;
-
-        // SettingsService.data =  $http({
-        //     method: 'GET',
-        //     url: '/settings/'+id
-          
-        //   }).then(function(data) {
-        //     $log.debug('SettingsService.updateSettings callback. Data is ', data.data);
-        //     return data.data;
-        //   });
-      // }
+      update: function(settings) {
+        $log.debug('SettingService.update');
+        var deferred = $q.defer();
+        $resource('/settings/').save({settings: settings},
+          function(resource) {
+          $log.debug('resource is ', resource);
+          SettingsService.set(settings);
+          $log.debug('settings now', SettingsService.get());
+          deferred.resolve(resource);
+        }, function(err) {
+          $log.debug('error is ', err);
+          deferred.reject(err);
+        });
+        return deferred.promise;
+      }
 
     };
 
