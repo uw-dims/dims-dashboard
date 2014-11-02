@@ -1,54 +1,36 @@
 'use strict';
 
-// Settings routes - retrieve settings via REST api
+// Settings routes - retrieve and update settings via REST api for the logged in user
 
 var config = require('../config');
 var logger = require('../utils/logger');
-// var fs = require('fs');
-// var dimsutil = require('../utils/util');
-// var async = require('async');
-var userSettings = require('../models/userSettings')
-// var settings = require('../models/userSettings')(req.app.get('client'), req.params.id, req.query.settings);
+var UserSettings = require('../models/userSettings')
 
 exports.get = function(req, res) {
-	// logger.debug('user settings get request, id is ', req.params.id);
-	logger.debug('settings.get request, id is ', req.user.get('ident'));
-	logger.debug('settings.get request. session is ', req.session);
+
 	// id is from logged in user
 	var id = req.user.get('ident');
 	var client = req.app.get('client');
 
-	userSettings(client,id).getSettings(function(err, data) {
-		if (err) {
-			return res.status(400).send(err);
-		} else if (data) {
-			return res.status(200).send({data: data});
-		} else {
-			userSettings(client, username).createSettings(function(err, data) {
-        if (err) {
-          return res.status(400).send(err);
-        } else {
-          return res.status(200).send({data: data});
-        }
-      });
-		}
-	});
+	var userSettings = new UserSettings(client, id);
+	userSettings.getSettings().then(function(data) {
+      res.status(200).send({data: data});
+    }).then(function(err) {
+      return res.status(400).send(err);
+    });
 };
 
 exports.update = function(req, res) {
-	logger.debug('settings.update request, id {0}, query {1}', req.params.id, req.body.settings);
-	console.log(req);
+
 	var id = req.user.get('ident');
 	var client = req.app.get('client');
 	var newSettings = req.body.settings;
-
-	userSettings(client, id, newSettings).updateSettings(function(err, data) {
-		if (err) {
-			return res.status(400).send(err);
-		} else {
-			return res.status(200).send({data: data});;
-		}
-	});
+	
+	UserSettings.getSettings().then(function(data) {
+      res.status(200).send({data: data});
+    }).then(function(err) {
+      return res.status(400).send(err);
+    });
 };
 
 

@@ -5,6 +5,7 @@
 
 var config = require('../config');
 var logger = require('../utils/logger');
+var q = require('q');
 
 exports = module.exports = UserSettings;
 
@@ -14,86 +15,70 @@ function UserSettings(client, user, userSettings) {
 	self.user = user;
 	self.userSettings = userSettings || {};
 	self.key = 'userSetting:' + user;
+	self.keySet = 'userSettings';
+
+	self.update = function(settings) {
+		logger.debug('self.update');
+		var deferred = q.defer();
+		self.client.hmset(self.key, settings, function(err, data) {
+			if (err) deferred.reject(err);
+			else deferred.resolve(data);
+		});
+		return deferred.promise;
+	};
+
+	self.get = function() {
+		logger.debug('self.get');
+		var deferred = q.defer();
+		self.client.hgetall(self.key, function(err,data) {
+			if (err) deferred.reject(err);
+			else deferred.resolve(data);
+		});
+		return deferred.promise;
+	};
+
 };
 
 // Will retrieve settings for logged in user. If settings do not
-// exist, will return null data.
-UserSettings.prototype.getSettings = function(callback) {
+// exist, create settings using default.
+UserSettings.prototype.getSettings = function() {
+	logger.debug('prototype.getSettings');
 	var self = this;
-	self.client.hgetall(this.key, function(err, data) {
-			return callback(err, data);
+	var deferred = q.defer();
+	self.get().then(function(data) {
+		logger.debug('prototype.getSettings. data is ', data);
+		if (data) deferred.resolve(data);
+		else {
+			var settingsObject = config.defaultUserSettings;
+			self.update(settingsObject);
+			self.updateKey();
+			deferred.resolve(settingsObject);
+		}
+	}).then(function(err) {
+		deferred.reject(err);
 	});
+	return deferred.promise;
 };
 
 // Updates settings for current logged in user
 UserSettings.prototype.updateSettings = function(callback) {
+	logger.debug('prototype.updateSettings');
 	var self = this;
-	logger.debug('updateSettings, userSettings ', self.userSettings);
-	  self.client.hmset(self.key, self.userSettings, function(err, data) {
-			return callback(err, data);
-	  });
-};
-
-UserSettings.prototype.get
-
-// Create settings for current logged in user
-UserSettings.prototype.createSettings = function(callback) {
-	var settingsObject = config.defaultUserSettings,
-			self = this;
-
-		// First put the key in the set of keys
-
-	  self.client.hmset(self.key, self.settingsObject, function(err, data) {
-	  	if (err) {
-				return callback(err, null);
-			} else {
-				self.client.hgetall(self.key, function(err, data) {
-					return callback(err, data);
-				});
-			}
-	  });
+	var deferred = q.defer();
+	self.update(self.userSettings).then(function(data){
+		return deferred.resolve(data);
+	}).then(function(err) {
+		return deferred.reject(err);
+	});
 };
 
 UserSettings.prototype.getAllKeys = function(callback) {
 
 };
 
-UserSettings.prototype.updateKey = function(callback) {
-
+UserSettings.prototype.updateKey = function() {
+	logger.debug('prototype.updateKey');
+	var self = this;
+	self.client.sadd(self.keySet, self.key);
 };
-
-// module.exports = function(client, user, userSettings) {
-
-// 	var settings = {};
-// 	var key = 'userSetting:' + user;
-
-// 	settings.getSettings = function(callback) {
-// 		client.hgetall(key, function(err, data) {
-// 			return callback(err, data);
-// 		});
-// 	};
-
-// 	settings.updateSettings = function(callback) {
-// 		logger.debug('updateSettings, userSettings ', userSettings);
-// 	  client.hmset(key, userSettings, function(err, data) {
-// 			return callback(err, data);
-// 	  });
-// 	};
-
-// 	settings.createSettings = function(callback) {
-// 		var settingsObject = config.defaultUserSettings;
-
-// 	  client.hmset(key, settingsObject, function(err, data) {
-// 	  	if (err) {
-// 				return callback(err, null);
-// 			} else {
-// 				client.hgetall(key, function(err, data) {
-// 					return callback(err, data);
-// 				});
-// 			}
-// 	  });
-// 	};
-
-// 	return settings;
-// };
 
