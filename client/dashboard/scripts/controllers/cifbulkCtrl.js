@@ -27,14 +27,16 @@ angular.module('dimsDashboard.controllers').
       $scope.showDemoFiles = true;
     });
 
-    SettingsService.getSettings('0').then(function(result){
-      console.log('getSettings result');
-      console.log(result);
-      $scope.anonymize = result.anonymize;
-      $scope.rpcDebug = result.rpcDebug;
-      $scope.rpcVerbose = result.rpcVerbose;
-      $scope.cifbulkQueue = result.cifbulkQueue;
-    });
+    $scope.settings = SettingsService.get();
+
+    // SettingsService.getSettings('0').then(function(result){
+    //   console.log('getSettings result');
+    //   console.log(result);
+    //   $scope.anonymize = result.anonymize;
+    //   $scope.rpcDebug = result.rpcDebug;
+    //   $scope.rpcVerbose = result.rpcVerbose;
+    //   $scope.cifbulkQueue = result.cifbulkQueue;
+    // });
 
     // Setup date
     $scope.dateConfig = DateService.dateConfig;
@@ -72,7 +74,7 @@ angular.module('dimsDashboard.controllers').
 
     var anonymizeData = function(data,status,headers,config) {
        $log.debug('Call anonymize service');
-       AnonService.anonymize($scope.anonymize, data.data, data.pid)
+       AnonService.anonymize($scope.settings.anonymize, data.data, data.pid)
               .then(prepareData);
             };
 
@@ -182,9 +184,9 @@ angular.module('dimsDashboard.controllers').
       Utils.setConfig(clientConfig, $scope.formData.ips, 'ips');
       Utils.setConfig(clientConfig, $scope.formData.stats, 'stats');
       Utils.setConfig(clientConfig, $scope.formData.header, 'header');
-      Utils.setConfig(clientConfig, $scope.rpcVerbose, 'verbose');
-      Utils.setConfig(clientConfig, $scope.rpcDebug, 'debug');
-      Utils.setConfig(clientConfig, $scope.cifbulkQueue, 'queue');
+      Utils.setConfig(clientConfig, $scope.settings.rpcVerbose, 'verbose');
+      Utils.setConfig(clientConfig, $scope.settings.rpcDebug, 'debug');
+      Utils.setConfig(clientConfig, $scope.settings.cifbulkQueue, 'queue');
       if (Utils.inputPresent($scope.formData.fileName)) {
         Utils.setConfig(clientConfig, $scope.filePath+$scope.formData.fileName.name, 'fileName');
       }

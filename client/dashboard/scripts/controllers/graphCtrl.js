@@ -4,6 +4,7 @@ angular.module('dimsDashboard.controllers').
       function($scope, $http, FileService, DataService, $location, $routeParams) {
 
     console.log('In GraphCtrl');
+    $scope.settings = SettingsService.get();
     $scope.formData = {};
     $scope.fileNames = [];
     $scope.showFiles = false;

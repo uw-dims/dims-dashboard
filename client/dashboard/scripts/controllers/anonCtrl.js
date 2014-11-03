@@ -35,13 +35,15 @@ angular.module('dimsDashboard.controllers').
         $scope.showMaps = true;
     });
 
-    SettingsService.getSettings('0').then(function(result){
-      console.log('getSettings result');
-      console.log(result);
-      $scope.anonymize = result.anonymize;
-      $scope.rpcDebug = result.rpcDebug;
-      $scope.rpcVerbose = result.rpcVerbose;
-    });
+    $scope.settings = SettingsService.get();
+
+    // SettingsService.getSettings('0').then(function(result){
+    //   console.log('getSettings result');
+    //   console.log(result);
+    //   $scope.anonymize = result.anonymize;
+    //   $scope.rpcDebug = result.rpcDebug;
+    //   $scope.rpcVerbose = result.rpcVerbose;
+    // });
     
 
     // Other setup
@@ -80,8 +82,8 @@ angular.module('dimsDashboard.controllers').
       if (Utils.inputPresent($scope.formData.fileName)) {
         Utils.setConfig(clientConfig, $scope.filePath+$scope.formData.fileName.name, 'fileName');
       }
-      Utils.setConfig(clientConfig, $scope.rpcVerbose, 'verbose');
-      Utils.setConfig(clientConfig, $scope.rpcDebug, 'debug');
+      Utils.setConfig(clientConfig, $scope.settings.rpcVerbose, 'verbose');
+      Utils.setConfig(clientConfig, $scope.settings.rpcDebug, 'debug');
 
       console.log(clientConfig);
       console.log('Now sending http get request');

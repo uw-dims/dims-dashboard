@@ -10,6 +10,8 @@ angular.module('dimsDashboard.controllers').
     $scope.sourceMap = fileSourceMap;
     $scope.formData.source = $scope.sourceMap[0].value;
 
+    $scope.settings = SettingsService.get();
+
     // Set up ng-grid
     $scope.gridData = {};
     var columnDefs = [
