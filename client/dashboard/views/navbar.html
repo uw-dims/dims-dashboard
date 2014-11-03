@@ -33,7 +33,8 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="/">DIMS</a>
+      <a class="navbar-brand" href="/" ng-if="currentUser">DIMS</a>
+      <p class="navbar-text" ng-hide="currentUser">DIMS</p>
     </div>
     <div class="navbar-collapse collapse">
       <ul class="nav navbar-nav" ng-show="currentUser">

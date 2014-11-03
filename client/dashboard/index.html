@@ -24,13 +24,15 @@
 <link rel="stylesheet" href="styles/style.css" />
 <!-- endbuild -->
 </head>
-<body ng-app="dimsDashboard">
+<body ng-app="dimsDashboard" style="height: 100%;">
 
+<div style="min-height: 100%;">
     <div ng-include src="'views/navbar.html'"></div>
 
     <div ng-view >
       
     </div>
+</div>
     
     <!-- build:js(.) scripts/oldieshim.js -->
     <!--[if lt IE 9]>
