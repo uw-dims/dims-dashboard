@@ -1,16 +1,26 @@
 'use strict';
 
 angular.module('dimsDashboard.controllers').
-  controller('ChatCtrl', function($scope, $location, $log, ChatService) {
+  controller('ChatCtrl', function($scope, $location, $log, ChatService, $rootScope) {
 
     $log.debug('chatCtrl. scope.currentUser is ', $scope.currentUser);
 
+    $scope.chatMaximized = true;
+    $scope.chatClass = 'chatMax';
+
     $scope.close = function() {
-      
+      $rootScope.chatOn = false;
+      ChatService.stop();
     };
 
     $scope.hide = function() {
+      $rootScope.chatMaximized = false;
+      $scope.chatClass = 'chatMin'
+    };
 
+    $scope.show = function() {
+      $rootScope.chatMaximized = true;
+      $scope.chatClass = 'chatMax'
     };
 
     $scope.messages = '';
@@ -27,7 +37,7 @@ angular.module('dimsDashboard.controllers').
       }
       $scope.$apply(function() {
         $scope.messages = formatter(new Date(), data.payload) + $scope.messages;
-      })
-    })
+      });
+    });
 
   });

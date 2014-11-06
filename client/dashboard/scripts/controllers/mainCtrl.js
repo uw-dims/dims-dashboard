@@ -1,7 +1,7 @@
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller('MainCtrl', ['$scope', 'LogService','ChatService','$cookies','$location', '$routeParams', '$log', '$filter', '$http', 'SettingsService',
-      function ($scope, LogService, ChatService, $cookies, $location, $routeParams, $log, $filter, $http, SettingsService) {
+  controller('MainCtrl', ['$scope', 'LogService','ChatService','$cookies','$location', '$routeParams', '$log', '$filter', '$http', 'SettingsService','$rootScope',
+      function ($scope, LogService, ChatService, $cookies, $location, $routeParams, $log, $filter, $http, SettingsService, $rootScope) {
     // write Ctrl here
     $log.debug('In MainCtrl');
 
@@ -210,45 +210,39 @@ angular.module('dimsDashboard.controllers').
     };
 
     // Set current value of socket states
-    $scope.logmonOn = LogService.isRunning();
-    $scope.chatOn = ChatService.isRunning();
+    $rootScope.logmonOn = LogService.isRunning();
+    $rootScope.chatOn = ChatService.isRunning();
 
     $log.debug('Log and Chat are ', $scope.logmonOn, $scope.chatOn);
 
     $scope.toggleLogMonitor = function() {
       if ($scope.logmonOn) {
         // Turn it off
-        $scope.logmonOn = false;
-
+        $rootScope.logmonOn = false;
+        $
         $log.debug('Turning log monitor off');
-        // SocketService.emit('logmon:stop');
-        // SocketService.remove('logomon:data');
-        // $scope.Socket.socket.emit('logmon:stop');
         LogService.stop();
-        ChatService.stop();
       } else {
         // Turn it on
-        $scope.logmonOn = true;
+        $rootScope.logmonOn = true;
         $log.debug('Turning log monitor on');
-        // SocketService.emit('logmon:start', true);
-        // $scope.Socket.socket.emit('logmon:start', true);
         LogService.start();
-        ChatService.start();
       }
     };
 
-    // Populate form values for settings
-    // $scope.getFormUserSettings = function() {
-    //   $scope.settingsFormData = SettingsService.get();
-
-      // $scope.settingsFormData.cifbulkQueue = SettingsService.data.cifbulkQueue;
-      //       $scope.settingsFormData.anonymize = SettingsService.data.anonymize;
-      //       $scope.settingsFormData.rpcDebug = SettingsService.data.rpcDebug;
-      //       $scope.settingsFormData.rpcVerbose = SettingsService.data.rpcVerbose;
-
-    //   $log.debug('getUserSettings. cifbulkQueue is ', $scope.settingsFormData.cifbulkQueue );
-    //   $log.debug('In getUserSettings. Scope.settings, scope.settingsFormData', $scope.settings, $scope.settingsFormData);
-    // };
+    $scope.toggleChat = function() {
+      if ($scope.chatOn) {
+        // Turn it off
+        $rootScope.chatOn = false;
+        $log.debug('Turning chat off');
+        ChatService.stop();
+      } else {
+        // Turn it on
+        $rootScope.chatOn = true;
+        $log.debug('Turning chat on');
+        ChatService.start();
+      }
+    };
 
     $scope.setUserSettings = function() {
       var settings = {};
@@ -263,19 +257,6 @@ angular.module('dimsDashboard.controllers').
       }), (function(err) {
         $log.debug('setUserSettings error', err);
       });
-
-      // UsersessionService.save({
-      //   settings: settings
-      // },
-      // function(resource) {
-      //   $log.debug('success setting, data is ', resource.data);
-      // },
-      // function(err) {
-      //   $log.debug('setUserSettings error', err);
-      // });
     };
-
-    // Initialize settings
-    // $scope.getFormUserSettings();
     
   }]);

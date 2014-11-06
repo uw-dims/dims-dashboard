@@ -8,6 +8,8 @@ angular.module('dimsDashboard.services')
 
     $rootScope.$on('authenticated', function() {
 
+      $log.debug('Socket rootScope received authenticated event');
+
       $timeout(function() {
         var newSocket = (function() {
           return socketFactory({
@@ -35,22 +37,23 @@ angular.module('dimsDashboard.services')
 
         start: function() {
           chatService.running = true;
-          $log.debug('ChatService is Running');
+          $log.debug('ChatService start. ChatService running - ', chatService.running);
           Socket.then(function(socket) { 
               // socket.on('chat:data', function(data) {
               //   $log.debug('chat:data - ', data);
               //   chatService.chatMessages.push(data);
               // });
+              $log.debug('ChatService start. Now set forward listener');
               socket.forward('chat:data');
           });
         }, 
 
         stop: function() {
           chatService.running = false;
-          $log.debug('ChatService is not Running');
+          $log.debug('ChatService stop. ChatService running - ', chatService.running);
           Socket.then(function(socket) {
             socket.removeListener('chat:data', function() {
-              $log.debug('ChatService: removed listener');
+              $log.debug('ChatService stop: removed listener');
             });
           });
         },
@@ -74,21 +77,22 @@ angular.module('dimsDashboard.services')
         },
         start: function() {
           logService.running = true;
-          $log.debug('LogService is Running');
+          $log.debug('LogService start. LogService running - ', logService.running);
           Socket.then(function(socket) { 
               // socket.on('log:data', function(data) {
               //   $log.debug('log:data - ', data);
               //   logService.logMessages.push(data);
               // });
+            $log.debug('LogService start. Now set forward listener');
             socket.forward('log:data');
           });
         },
         stop: function() {
           logService.running = false;
-          $log.debug('LogService is not Running');
+          $log.debug('LogService stop. LogService running - ', logService.running);
           Socket.then(function(socket) {
             socket.removeListener('log:data', function() {
-              $log.debug('ChatService: removed listener');
+              $log.debug('LogService: removed listener');
             });
           });
         }

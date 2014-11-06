@@ -60,13 +60,8 @@
     <div class="form-group">
       <label class="col-sm-2">Toggle Anonymization</label>
       <div class="col-sm-4">
-        <!-- <button type="button" class="btn btn-primary btn-sm" ng-click="setUserSettings()" ng-show="settings.anonymize === 'true'">Turn Anonymization Off</button>
-        <button type="button" class="btn btn-primary btn-sm" ng-click="setUserSettings()" ng-show="settings.anonymize === 'false'">Turn Anonymization On</button> -->
         <select class="form-control" ng-model="settingsFormData.anonymize" ng-options="f.value as f.label for f in anonymizeValues" ng-change="setUserSettings()" >
         </select>
-      </div>
-      <div class="col-sm-4 form-control-static">
-        Current setting: Anonymization is <span ng-show="settings.anonymize">on</span><span ng-hide="settings.anonymize">off</span>
       </div>
     </div>
   </form>
@@ -78,9 +73,6 @@
           <select class="form-control" ng-model="settingsFormData.cifbulkQueue" ng-options="f.value as f.label for f in cifbulkQueueValues" ng-change="setUserSettings()" >
           </select>
         </div>
-        <div class="col-sm-4 form-control-static">
-          Current setting: Queue is {{ settings.cifbulkQueue }}
-        </div>
       </div>
     </form>
 
@@ -90,9 +82,6 @@
         <div class="col-sm-4">
           <select class="form-control" ng-model="settingsFormData.rpcDebug" ng-options="f.value as f.label for f in rpcDebugValues" ng-change="setUserSettings()" >
           </select>
-        </div>
-        <div class="col-sm-4 form-control-static">
-          Current setting: RPC debug flag is <span ng-show="settings.rpcDebug">on</span><span ng-hide="settings.rpcDebug">off</span>
         </div>
       </div>
     </form>
@@ -104,17 +93,14 @@
           <select class="form-control" ng-model="settingsFormData.rpcVerbose" ng-options="f.value as f.label for f in rpcVerboseValues" ng-change="setUserSettings()" >
           </select>
         </div>
-        <div class="col-sm-4 form-control-static">
-          Current setting: RPC verbose flag is <span ng-show="settings.rpcVerbose">on</span><span ng-hide="settings.rpcVerbose">off</span>
-        </div>
       </div>
     </form>
-     <button type="button" class="btn btn-primary btn-sm" ng-click="toggleLogMonitor()" ng-show="!logmonOn">Turn Log Monitor On</button>
+     <button type="button" class="btn btn-primary btn-sm" ng-click="toggleLogMonitor()" ng-hide="logmonOn">Turn Log Monitor On</button>
   <button type="button" class="btn btn-primary btn-sm" ng-click="toggleLogMonitor()" ng-show="logmonOn">Turn Log Monitor Off</button>
   &nbsp; &nbsp; Log Monitor is {{ logmonOn ? 'On' : 'Off' }}.
-  <div style="overflow-y: scroll;">
-   {{Socket.messages}} 
-  </div>
+   <button type="button" class="btn btn-primary btn-sm" ng-click="toggleChat()" ng-hide="chatOn">Turn Chat On</button>
+  <button type="button" class="btn btn-primary btn-sm" ng-click="toggleChat()" ng-show="chatOn">Turn Chat Off</button>
+  &nbsp; &nbsp; Chat is {{ chatOn ? 'On' : 'Off' }}.
   </div>
 </div></div>
 
