@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('dimsDashboard.services')
+// angular.module('dimsDashboard.services')
 
   // .factory('SocketService', function($rootScope) {
   //   var socket = io.connect(constants.SOCKETIO_URL);
@@ -30,26 +30,26 @@ angular.module('dimsDashboard.services')
   //   };
   // })
 
-  .factory('Socket', ['$rootScope', function($rootScope) {
+  // .factory('Socket', ['$rootScope', function($rootScope) {
 
-    var Socket = {
-      messages: [],
-      url: constants.SOCKETIO_URL,
-      socket: io.connect(this.url),
-      testMsg: function(msg) {
-        console.log(msg);
-      }
-    };
-    console.log('Created socket');
-    // Set up listener
-    (function() {
-      Socket.socket.on('logmon:data', function(data) {
-        if (data) {
-          Socket.messages.push(data);
-          $rootScope.$digest();
-        }
-      });
-    }());
-    return Socket;
+  //   var Socket = {
+  //     messages: [],
+  //     url: constants.SOCKETIO_URL,
+  //     socket: io.connect(this.url),
+  //     testMsg: function(msg) {
+  //       console.log(msg);
+  //     }
+  //   };
+  //   console.log('Created socket');
+  //   // Set up listener
+  //   (function() {
+  //     Socket.socket.on('logmon:data', function(data) {
+  //       if (data) {
+  //         Socket.messages.push(data);
+  //         $rootScope.$digest();
+  //       }
+  //     });
+  //   }());
+  //   return Socket;
 
-  }]);
+  // }]);

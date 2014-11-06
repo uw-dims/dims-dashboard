@@ -25,67 +25,67 @@ var buffer = [];
 module.exports = function(io) {
 
   var discardClient = function() {
-  logger.debug('socketConnection:discardClient: Client disconnected. Open sockets now: ', numOpenSockets-1);
-  numOpenSockets--;
+    logger.debug('socketConnection:discardClient: Client disconnected. Open sockets now: ', numOpenSockets-1);
+    numOpenSockets--;
 
-  if (numOpenSockets <= 0) {
-    numOpenSockets = 0;
-    logger.debug('socketConnection:discardClient. No active clients. Stop subscribing to fanout');
-    logFanout.stop();
-  }
-};
-
-var handleClient = function(data, socket) {
-  if (data == true) {
-    logger.debug('socketConnection:handleClient: Client connected');
-    if (numOpenSockets <=0 ) {
+    if (numOpenSockets <= 0) {
       numOpenSockets = 0;
-      logger.debug('socketConnection:handleClient: First active client. Start log fanout');
-      logFanout.start();
-    } else {
-      logger.debug('socketConnection:handleClient: New active client: ', numOpenSockets+1,'. Fanout already running.')
+      logger.debug('socketConnection:discardClient. No active clients. Stop subscribing to fanout');
+      logFanout.stop();
     }
-    numOpenSockets++;
-  }
-};
+  };
 
-// Add listeners to socket
-io.sockets.on('connection', function(socket) {
-  logger.debug('socketConnection: Received connection event. Total sockets: ', io.sockets.sockets.length);
-  // console.log(this);
-  // console.log(this.server.eio.clients);
+  var handleClient = function(data, socket) {
+    if (data == true) {
+      logger.debug('socketConnection:handleClient: Client connected');
+      if (numOpenSockets <=0 ) {
+        numOpenSockets = 0;
+        logger.debug('socketConnection:handleClient: First active client. Start log fanout');
+        logFanout.start();
+      } else {
+        logger.debug('socketConnection:handleClient: New active client: ', numOpenSockets+1,'. Fanout already running.')
+      }
+      numOpenSockets++;
+    }
+  };
 
-  socket.on(IO_START, function(data) {
-    logger.debug('socketConnection: Received logmon:start event');
-    handleClient(data, socket);
+  // Add listeners to socket
+  io.sockets.on('connection', function(socket) {
+    logger.debug('socketConnection: Received connection event. Total sockets: ', io.sockets.sockets.length);
+    // console.log(this);
+    // console.log(this.server.eio.clients);
+
+    socket.on(IO_START, function(data) {
+      logger.debug('socketConnection: Received logmon:start event');
+      handleClient(data, socket);
+    });
+
+    socket.on(IO_STOP, function() {
+      logger.debug('socketConnection: Received logmon:stop event');
+      discardClient();
+    });
+
+    socket.on('disconnect', function() {
+      logger.debug('socketConnection: Received disconnect event');
+      discardClient();
+    });
+
   });
 
-  socket.on(IO_STOP, function() {
-    logger.debug('socketConnection: Received logmon:stop event');
-    discardClient();
+  logFanout.on('msg', function(msg) {
+    // buffer.push(msg);
+    logger.debug('socketConnection:logFanout received msg event. push packet ', msg);
+    // broadcastLog();
+    io.sockets.emit(IO_LOG, msg);
   });
 
-  socket.on('disconnect', function() {
-    logger.debug('socketConnection: Received disconnect event');
-    discardClient();
-  });
-
-});
-
-logFanout.on('msg', function(msg) {
-  // buffer.push(msg);
-  logger.debug('socketConnection:logFanout received msg event. push packet ', msg);
-  // broadcastLog();
-  io.sockets.emit(IO_LOG, msg);
-});
-
-var broadcastLog = function() {
-  if (buffer.length >= BUFFER_SIZE) {
-    logger.debug('socketConnection:broadcastLog Send packet', buffer);
-    io.sockets.emit(IO_LOG, buffer);
-    buffer = [];
-  }
-};
+  var broadcastLog = function() {
+    if (buffer.length >= BUFFER_SIZE) {
+      logger.debug('socketConnection:broadcastLog Send packet', buffer);
+      io.sockets.emit(IO_LOG, buffer);
+      buffer = [];
+    }
+  };
 
 };
 

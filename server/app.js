@@ -40,8 +40,8 @@ var routes = require('./routes')
   , crosscor = require('./routes/crosscor')
   , anon = require('./routes/anon')
   , data = require('./routes/data')
-  , logmon = require('./routes/logmon')
-  , chat = require('./routes/chat')
+  // , logmon = require('./routes/logmon')
+  // , chat = require('./routes/chat')
   , settings = require('./routes/settings');
 
 var sslOptions = {
@@ -203,6 +203,14 @@ var ensureAuthenticated = function(req, res, next) {
   }
 };
 
+// logger.debug('app.js. Start pubsub');
+// var Publisher = require('./services/publisher.js');
+// var Subscriber = require('./services/subscriber.js');
+// var chatReceiver = new Subscriber('chat');
+// var chatPublisher = new Publisher('chat');
+// chatReceiver.start();
+// chatPublisher.start();
+
 var router = express.Router();
 router.post('/upload', ensureAuthenticated, files.upload);
 router.get('/files', ensureAuthenticated, files.files);
@@ -214,13 +222,13 @@ router.get('/rwfind', ensureAuthenticated, rwfind.list);
 router.get('/data', ensureAuthenticated, data.list);
 
 // Set up routes for rabbitmq connection for logging and chat
-router.get('/start-logmonitor', ensureAuthenticated, logmon.start);
-router.get('/stop-logmonitor', ensureAuthenticated, logmon.stop);
-router.get('/status-logmonitor', ensureAuthenticated, logmon.status);
+// router.get('/start-logmonitor', ensureAuthenticated, logmon.start);
+// router.get('/stop-logmonitor', ensureAuthenticated, logmon.stop);
+// router.get('/status-logmonitor', ensureAuthenticated, logmon.status);
 
-router.get('/start-chat', ensureAuthenticated, chat.start);
-router.get('/stop-chat', ensureAuthenticated, chat.stop);
-router.get('/status-chat', ensureAuthenticated, chat.status);
+// router.get('/start-chat', ensureAuthenticated, chat.start);
+// router.get('/stop-chat', ensureAuthenticated, chat.stop);
+// router.get('/status-chat', ensureAuthenticated, chat.status);
 
 // User Settings api 
 router.get('/settings', ensureAuthenticated, settings.get);
@@ -261,7 +269,11 @@ var io = socket.listen(server);
 
 server.listen(port);
 
-require('./services/socketConnection.js')(io);
+RabbitSocket = require('./services/rabbitSocket');
+
+var chatPublisher = new RabbitSocket('chat', 'publisher', io);
+var chatSubscriber = new RabbitSocket('chat', 'subscriber', io);
+var logSubscriber = new RabbitSocket('logs', 'subscriber', io);
 
 
 

@@ -24,15 +24,34 @@
 <link rel="stylesheet" href="styles/style.css" />
 <!-- endbuild -->
 </head>
-<body ng-app="dimsDashboard" style="height: 100%;">
+<body ng-app="dimsDashboard" >
 
-<div style="min-height: 100%;">
     <div ng-include src="'views/navbar.html'"></div>
 
     <div ng-view >
       
     </div>
+
+    <div ng-include src="'views/partials/logmonitor.html'"></div>
+    <div ng-include src="'views/partials/chat.html'"></div>
+
+<!-- <div class="popup-log chat-popup">
+    <div class="popup-head">
+        <div class="popup-head-left">Log Monitor</div>
+        <div class="popup-head-right"><span class="glyphicon glyphicon-chevron-down popup-btn" ></span><span class="glyphicon glyphicon-remove popup-btn" ></span></div>
+        <div style="clear: both"></div>
+    </div>
+    <div class="popup-messages"></div>
 </div>
+<div class="popup-box chat-popup">
+    <div class="popup-head">
+        <div class="popup-head-left">Chat</div>
+        <div class="popup-head-right"><span class="glyphicon glyphicon-chevron-down popup-btn" ></span><span class="glyphicon glyphicon-remove popup-btn" ></span>
+</div>
+        <div style="clear: both"></div>
+    </div>
+    <div class="popup-messages"></div>
+</div> -->
     
     <!-- build:js(.) scripts/oldieshim.js -->
     <!--[if lt IE 9]>
@@ -76,6 +95,7 @@
     <script src="../bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
     <script src="../bower_components/angular-bootstrap-show-errors/src/showErrors.js"></script>
     <script src="../bower_components/angular-http-auth/src/http-auth-interceptor.js"></script>
+    <script src="../bower_components/angular-socket-io/socket.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -92,6 +112,8 @@
     <script src="scripts/controllers/graphCtrl.js"></script>
     <script src="scripts/controllers/loginCtrl.js"></script>
     <script src="scripts/controllers/navbarCtrl.js"></script>
+    <script src="scripts/controllers/logCtrl.js"></script>
+    <script src="scripts/controllers/chatCtrl.js"></script>
     <script src="scripts/directives/directives.js"></script>
     <script src="scripts/directives/dimsResults.js"></script>
     <script src="scripts/directives/dimsForms.js"></script>
@@ -100,7 +122,7 @@
     <script src="scripts/services/dataService.js"></script>
     <script src="scripts/services/anonService.js"></script>
     <script src="scripts/services/settingsService.js"></script>
-    <script src="scripts/services/socketService.js"></script>
+    <script src="scripts/services/socket.js"></script>
     <script src="scripts/services/authService.js"></script>
     <script src="scripts/services/sessionService.js"></script>
     <script src="scripts/services/usersessionService.js"></script>

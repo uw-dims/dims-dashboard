@@ -21,6 +21,11 @@ body {
   width: 93%;
 }
 
+/* override bootstrap label color */
+label {
+  color: lighten(@dims-dark, 10%);
+}
+
 /* Added as per ui.bootstrap instructiona */
 .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
 
@@ -362,3 +367,100 @@ html>body tbody.scrollContent {
   display: block;
 }
 
+// Chat popup styles
+.popup-box
+{
+    display: block;
+    position: fixed;
+    bottom: 0px;
+    right: 0px;
+    height: 200px;
+    background-color: @well-bg;
+    width: 200px;
+    border: 1px solid @well-border;
+}
+
+.popup-box .popup-head
+{
+    background-color: lighten(@navbar-inverse-bg, 20%);//#51524c; //#474843;
+    padding: 4px 4px 4px 10px;
+    color: white;
+    font-weight: normal;
+    font-size: 12px;
+    clear: both;
+}
+
+.popup-box .popup-head .popup-head-left
+{
+    float: left;
+}
+
+.popup-box .popup-head .popup-head-right
+{
+    float: right;
+    opacity: 0.5;
+}
+
+.popup-box .popup-head .popup-head-right a
+{
+    text-decoration: none;
+    color: inherit;
+}
+
+.popup-box .popup-messages
+{
+    height: 100%;
+    padding: 4px 4px 4px 10px;
+    overflow-y: scroll;
+}
+
+// log monitor styles
+.popup-log
+{
+    display: block;
+    position: fixed;
+    bottom: 0px;
+    right: 210px;
+    height: 200px;
+    background-color: @well-bg;
+    width: 700px;
+    border: 1px solid @well-border;
+}
+
+.popup-log .popup-head
+{
+    background-color: lighten(@navbar-inverse-bg, 20%); //#51524c; //#474843;
+    padding: 4px 10px;
+    color: white;
+    font-weight: normal;
+    font-size: 12px;
+    clear: both;
+}
+
+.popup-log .popup-head .popup-head-left
+{
+    float: left;
+}
+
+.popup-log .popup-head .popup-head-right
+{
+    float: right;
+    opacity: 0.5;
+}
+
+.popup-log .popup-head .popup-head-right a
+{
+    text-decoration: none;
+    color: inherit;
+}
+
+.popup-log .popup-messages
+{
+    height: 100%;
+    padding: 4px 10px;
+    overflow-y: scroll;
+}
+
+.popup-btn {
+    padding: 0px 4px 0px 6px;
+}

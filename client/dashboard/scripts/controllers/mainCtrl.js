@@ -1,7 +1,7 @@
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller('MainCtrl', ['$scope', 'Socket', '$location', '$routeParams', '$log', '$filter', '$http', 'SettingsService','UsersessionService',
-      function ($scope, Socket, $location, $routeParams, $log, $filter, $http, SettingsService, UsersessionService) {
+  controller('MainCtrl', ['$scope', 'LogService','ChatService','$cookies','$location', '$routeParams', '$log', '$filter', '$http', 'SettingsService',
+      function ($scope, LogService, ChatService, $cookies, $location, $routeParams, $log, $filter, $http, SettingsService) {
     // write Ctrl here
     $log.debug('In MainCtrl');
 
@@ -12,7 +12,7 @@ angular.module('dimsDashboard.controllers').
     $scope.showTools = false;
     $scope.showSavedQueries = false;
     $scope.showActivities = false;
-    $scope.logmonOn = false;
+    // $scope.logmonOn = false;
     $scope.logs = [];
     $scope.currentSelectedQuery = {};
     $scope.currentSelectedTool = {};
@@ -42,7 +42,7 @@ angular.module('dimsDashboard.controllers').
     ];
 
 
-    $scope.Socket = Socket;
+    // $scope.Socket = Socket;
 
     // SocketService.on('logmon:data', function(data) {
     //       $scope.logs = $scope.logs.concat(data);
@@ -209,23 +209,32 @@ angular.module('dimsDashboard.controllers').
       $scope.showSettings = true;
     };
 
-    $scope.toggleLogMonitor = function() {
+    // Set current value of socket states
+    $scope.logmonOn = LogService.isRunning();
+    $scope.chatOn = ChatService.isRunning();
 
+    $log.debug('Log and Chat are ', $scope.logmonOn, $scope.chatOn);
+
+    $scope.toggleLogMonitor = function() {
       if ($scope.logmonOn) {
         // Turn it off
         $scope.logmonOn = false;
+
         $log.debug('Turning log monitor off');
         // SocketService.emit('logmon:stop');
         // SocketService.remove('logomon:data');
-        $scope.Socket.socket.emit('logmon:stop');
+        // $scope.Socket.socket.emit('logmon:stop');
+        LogService.stop();
+        ChatService.stop();
       } else {
         // Turn it on
         $scope.logmonOn = true;
         $log.debug('Turning log monitor on');
         // SocketService.emit('logmon:start', true);
-        $scope.Socket.socket.emit('logmon:start', true);
+        // $scope.Socket.socket.emit('logmon:start', true);
+        LogService.start();
+        ChatService.start();
       }
-
     };
 
     // Populate form values for settings

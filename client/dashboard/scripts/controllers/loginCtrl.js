@@ -1,7 +1,7 @@
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller('LoginCtrl', ['$scope', 'AuthService', '$location', '$log', 'SettingsService', 
-      function($scope, AuthService, $location, $log, SettingsService) {
+  controller('LoginCtrl', ['$scope', 'AuthService', '$location', '$log','$rootScope', 'SettingsService', 
+      function($scope, AuthService, $location, $log, $rootScope, SettingsService) {
     $scope.error = {};
     $scope.user = {};
 
@@ -16,11 +16,9 @@ angular.module('dimsDashboard.controllers').
         $scope.errors = {};
 
         if (!err) {
-          // Get the settings data
-            // SettingsService.updateSettings().then(function(data) {
-            //   $log.debug('logn updateSettings promise. data is ', data);
-                $location.path('/');
-              // });
+          $location.path('/');
+          // Emit event so socket can resolve
+          $rootScope.$broadcast('authenticated');
           
         } else {
           $scope.errors.other = err;
