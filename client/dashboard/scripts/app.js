@@ -147,9 +147,16 @@ dimsDashboard.run(function($rootScope, $location, $log, AuthService, SettingsSer
     // will trigger 401s if user does not have a valid session
     $log.debug('Run: watch currentUser handler. currentUser is ',currentUser);
     $log.debug('Run: watch currentUser handler. path is ', $location.path());
-    if (!currentUser && (['/login'].indexOf($location.path()) == -1 )) {
-      $log.debug('Run: watch currentUser handler. No currentUser and not on login page. Call AuthService.currentUser()');
+    if (!currentUser && (['/','/login'].indexOf($location.path()) == -1 )) {
+      $log.debug('Run: watch currentUser handler. First if. No currentUser and not on login page. Call AuthService.currentUser()');
       AuthService.currentUser();
+    } else if (['/login'].indexOf($location.path()) == 0 ) {
+      $log.debug('Run: watch currentUser handler. 2nd if. currentUser is ', currentUser);
+      $log.debug('Run: watch currentUser handler. 2nd if. location ', $location.path());
+      $location.path('/login');
+    } else {
+      $log.debug('Run: watch currentUser handler. else. currentUser is ', currentUser);
+      $log.debug('Run: watch currentUser handler. else. location ', $location.path());
     }
   });
 

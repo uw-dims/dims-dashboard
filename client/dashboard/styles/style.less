@@ -376,7 +376,7 @@ html>body tbody.scrollContent {
     right: 0px;
     height: 25px;
     background-color: @well-bg;
-    width: 200px;
+    width: 350px;
     border: 1px solid @well-border;
 }
 
@@ -388,7 +388,7 @@ html>body tbody.scrollContent {
     right: 0px;
     height: 200px;
     background-color: @well-bg;
-    width: 200px;
+    width: 350px;
     border: 1px solid @well-border;
 }
 
@@ -397,10 +397,10 @@ html>body tbody.scrollContent {
     display: block;
     position: fixed;
     bottom: 0px;
-    right: 210px;
+    right: 355px;
     height: 25px;
     background-color: @well-bg;
-    width: 700px;
+    width: 750px;
     border: 1px solid @well-border;
 }
 
@@ -409,10 +409,10 @@ html>body tbody.scrollContent {
     display: block;
     position: fixed;
     bottom: 0px;
-    right: 210px;
+    right: 355px;
     height: 200px;
     background-color: @well-bg;
-    width: 700px;
+    width: 750px;
     border: 1px solid @well-border;
 }
 
@@ -443,11 +443,30 @@ html>body tbody.scrollContent {
     color: inherit;
 }
 
+.popup-box .message-container {
+    height: 100%;
+    padding: 0px;
+}
+
+.popup-box .popup-messages-chat {
+   height: 70%;
+   padding: 4px 4px 4px 10px;
+  overflow-y: scroll;
+  word-wrap: break-word;
+}
+
 .popup-box .popup-messages
 {
     height: 100%;
     padding: 4px 4px 4px 10px;
     overflow-y: scroll;
+}
+
+.popup-box .chat-send {
+  height: 25px;
+  position: fixed;
+  bottom: 0px;
+  width: 100%;
 }
 
 .popup-btn {

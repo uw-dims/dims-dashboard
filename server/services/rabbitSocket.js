@@ -29,10 +29,10 @@ function RabbitSocket(name, type, io) {
 
   if (type === 'publisher') {
     self.connection = new Publisher(name);
-    self.connection.on(self.clientEvent, function(msg) {
-      logger.debug('Socket: received event from client. msg is ', msg )
-      self.connection.publish(msg);
-    });
+    // self.connection.on(self.clientEvent, function(msg) {
+    //   logger.debug('Socket: Publisher received event from client. msg is ', msg )
+    //   self.connection.publish(msg);
+    // });
 
   } else {
     self.connection = new Subscriber(name);
@@ -43,7 +43,17 @@ function RabbitSocket(name, type, io) {
   }
 
   io.sockets.on('connection', function(socket) {
-    logger.debug('Received connection event. Total sockets: ', io.sockets.sockets.length);
+    logger.debug('socket.io: Received connection event from client '+name+'. Total sockets: ', io.sockets.sockets.length);
+    // Add a listener for events from the client so it can publish them
+    if (type === 'publisher') {
+      socket.on(self.clientEvent, function(msg) {
+        logger.debug('socket.io: Received client event from client '+name+', msg is ', msg.message);
+        self.connection.publish(msg.message);
+      });
+    }
+    socket.on('disconnect', function() {
+      logger.debug('socket.io: Received disconnect event from client');
+    });
   });
 
   self.connection.start();

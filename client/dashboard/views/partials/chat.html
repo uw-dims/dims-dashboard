@@ -10,7 +10,15 @@
 				</div>
         <div style="clear: both"></div>
     </div>
-    <div class="popup-messages" ng-show="chatMaximized">{{ messages }}</div>
+    <div class="message-container" ng-show="chatMaximized">
+    <div class="popup-messages-chat" style="white-space: pre;">{{ messages }}</div>
+    	<div class="chat-send" ng-show="chatMaximized">
+    	<form class="form-inline" role="form">
+    		<input type="text" class="form-control" placeholder="Enter message" ng-model="text"><button type="submit" class="btn btn-primary btn-sm" ng-click="send()">Send</button>
+    	</form>
+    	</div>
+   
+    </div>
 </div>
 </div>
 </div>

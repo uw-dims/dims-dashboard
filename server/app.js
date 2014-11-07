@@ -162,9 +162,9 @@ app.use(passport.session());
 
 // Disabled for now - socket.io inundates the logs
 // Override Express logging - stream logs to logger
-// app.use(require('morgan') ('common',{
-//   'stream': logger.stream
-// }));
+app.use(require('morgan') ('common',{
+  'stream': logger.stream
+}));
 
 // development only
 if (env === 'development') {
@@ -241,8 +241,7 @@ router.delete('/auth/session', require('./routes/session').logout);
 
 // user session - will delete
 router.get('/session', ensureAuthenticated, require('./routes/usersession').session);
-
-router.get('*', ensureAuthenticated, routes.index);
+router.get('/*', ensureAuthenticated, routes.index);
 
 app.use('/', router);
 
@@ -266,6 +265,22 @@ if (config.sslOn) {
 
 // Set up socket.io to listen on same port as https
 var io = socket.listen(server);
+
+// io.sockets.on('connection', function(socket) {
+//     logger.debug('socket.io: Received connection event from client. Total sockets: ', io.sockets.sockets.length);
+//     socket.on('chat:receive', function(from, msg) {
+//       logger.debug('socket.io: Received message event from client', from, msg);
+
+//     });
+//   });
+
+//   io.sockets.on('disconnect', function() {
+//     logger.debug('socket.io: Received disconnect event from client');
+//   })
+
+//   io.sockets.on('chat:receive', function() {
+//     logger.debug('socket.io: Received message event from client');
+//   });
 
 server.listen(port);
 

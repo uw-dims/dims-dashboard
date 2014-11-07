@@ -7,11 +7,24 @@ angular.module('dimsDashboard.controllers').
     
     $scope.logMaximized = true;
     $scope.logClass = 'logMax';
+    $scope.messages = '';
+    $scope.offListen = function() {};
+
+    $scope.listener = function(event) {
+    	if (event === 'start') {
+    		$scope.start();
+    	} else if (event === 'stop') {
+    		$scope.stop();
+    	}
+    };
+    // Register as a listener for LogService
+    LogService.registerObserverCallback($scope.listener);
 
     $scope.close = function() {
     	$log.debug('logCtrl.close');
     	$rootScope.logmonOn = false;
-    	LogService.stop();
+    	LogService.setRunning(false);
+    	$scope.offListen();
     };
 
     $scope.hide = function() {
@@ -26,15 +39,31 @@ angular.module('dimsDashboard.controllers').
     	$scope.logClass = 'logMax';
     };
 
-    $scope.$on('socket:log:data', function(event, data) {
-      $log.debug('LogCtrl: got a message ', event.name, data);
-      if (!data.payload) {
-        $log.error('LogCtrl: Invalid message', 'event', event, 'data', JSON.stringify(data));
-        return;
-      }
-      $scope.$apply(function() {
-        $scope.messages = formatter(new Date(), data.payload) + $scope.messages;
-      });
-    });
+    $scope.start = function(){
+    	LogService.setRunning(true);
+    	$scope.messages = ''; // Re-initialize messages
+    	// Add listener for socket:logs:data broadcast
+    	$scope.offListen = $scope.$on('socket:logs:data', function(event, data) {
+	      $log.debug('LogCtrl: got a message ', event.name, data);
+	      if (!data) {
+	        $log.error('LogCtrl: Invalid message. ', 'event: ', event, 'data: ', JSON.stringify(data));
+	        return;
+	      }
+	      $scope.$apply(function() {
+	        $scope.messages = $scope.messages + formatter(new Date(), data);
+	      });
+	    });
+	   };
+
+	   $scope.stop = function() {
+	   	// Remove listener for socket:logs:data broadcast
+	   	$scope.offListen();
+	   	$rootScope.logmonOn = false;
+	   	LogService.setRunning(false);
+	   };
+
+    var formatter = function(date, message) {
+      return message + '\n';
+    };
 
   });

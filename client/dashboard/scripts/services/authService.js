@@ -5,7 +5,7 @@
 angular.module('dimsDashboard.services')
   
   // .factory('AuthService', function($location, $rootScope, SessionService, User, $cookieStore) {
-    .factory('AuthService', function($location, $rootScope, SessionService, $cookieStore, $log, SettingsService, UsersessionService) {
+    .factory('AuthService', function($location, $rootScope, SessionService, $cookieStore, $log, SettingsService, ChatService, LogService, Socket) {
 
       $rootScope.currentUser = $cookieStore.get('user') || null;
       $log.debug('AuthService: rootScope.currentUser from cookieStore is ', $rootScope.currentUser);
@@ -25,13 +25,6 @@ angular.module('dimsDashboard.services')
             $log.debug('AuthService:login success callback. data is ', resource.data);
             $rootScope.currentUser = resource.data.user;
             SettingsService.data= resource.data.settings;
-            // $rootScope.userSettings = user.settings;
-            // SettingsService.updateSettings(user.user.username);
-            // UsersessionService.get(function(resource) {
-            //   $log.debug('UsersessionService.get settings are ', resource.data);
-            //   SettingsService.data = resource.data.settings;
-            //   return cb();
-            // });
             return cb();
           }, 
           // Failure, send error to callback
@@ -44,6 +37,13 @@ angular.module('dimsDashboard.services')
         logout: function(callback) {
           $log.debug('AuthService:logout');
           var cb = callback || angular.noop;
+          ChatService.stop();
+          LogService.stop();
+          Socket.then(function(socket) {
+            socket.removeAllListeners('chat:data');
+            socket.removeAllListeners('logs:data');
+            socket.disconnect();
+          });
           SessionService.delete(function(res) {
               $rootScope.currentUser = null;
               return cb();
@@ -60,6 +60,8 @@ angular.module('dimsDashboard.services')
             $log.debug('AuthService:currentUser. data returned from session is ', resource.data);
             $rootScope.currentUser = resource.data.user;
             SettingsService.data = resource.data.settings;
+            $rootScope.$emit('authenticated');
+
             // UsersessionService.get(function(settings) {
             //   $log.debug('UsersessionService.get settings are ', settings.settings);
             //   SettingsService.data = settings.settings;

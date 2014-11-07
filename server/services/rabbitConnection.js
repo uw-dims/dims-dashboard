@@ -197,6 +197,7 @@ RabbitConnection.prototype.subscribe = function() {
       };
 
 RabbitConnection.prototype.publish = function(message) {
+  var self = this;
   return self.pubExchange.then(function() {
           self.ch.publish(self.name, '', new Buffer(message));
           // Waiting for logs
