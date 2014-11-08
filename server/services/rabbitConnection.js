@@ -14,7 +14,7 @@ function RabbitConnection(name, type) {
   self.pwd = 'rpcm3pwd';
   self.port = '5672';
   // self.server = 'rabbitmq.prisem.washington.edu';
-  self.server = 'localhost';
+  self.server = config.rpcServer;
   
   // name: exchange
   self.name = name || 'logs';
