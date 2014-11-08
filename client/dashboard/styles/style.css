@@ -6447,14 +6447,44 @@ html > body tbody.scrollContent {
   font-weight: 400;
   display: block;
 }
-.popup-box {
+.chatMin > .popup-box {
+  display: block;
+  position: fixed;
+  bottom: 0px;
+  right: 0px;
+  height: 25px;
+  background-color: #f8f5f0;
+  width: 350px;
+  border: 1px solid #ede5d8;
+}
+.chatMax > .popup-box {
   display: block;
   position: fixed;
   bottom: 0px;
   right: 0px;
   height: 200px;
   background-color: #f8f5f0;
-  width: 200px;
+  width: 350px;
+  border: 1px solid #ede5d8;
+}
+.logMin > .popup-box {
+  display: block;
+  position: fixed;
+  bottom: 0px;
+  right: 355px;
+  height: 25px;
+  background-color: #f8f5f0;
+  width: 750px;
+  border: 1px solid #ede5d8;
+}
+.logMax > .popup-box {
+  display: block;
+  position: fixed;
+  bottom: 0px;
+  right: 355px;
+  height: 200px;
+  background-color: #f8f5f0;
+  width: 750px;
   border: 1px solid #ede5d8;
 }
 .popup-box .popup-head {
@@ -6476,45 +6506,28 @@ html > body tbody.scrollContent {
   text-decoration: none;
   color: inherit;
 }
+.popup-box .message-container {
+  height: 100%;
+  padding: 0px;
+}
+.popup-box .popup-messages-chat {
+  height: 70%;
+  padding: 4px 4px 4px 10px;
+  overflow-y: scroll;
+  word-wrap: break-word;
+}
 .popup-box .popup-messages {
   height: 100%;
   padding: 4px 4px 4px 10px;
   overflow-y: scroll;
 }
-.popup-log {
-  display: block;
+.popup-box .chat-send {
+  height: 25px;
   position: fixed;
   bottom: 0px;
-  right: 210px;
-  height: 200px;
-  background-color: #f8f5f0;
-  width: 700px;
-  border: 1px solid #ede5d8;
-}
-.popup-log .popup-head {
-  background-color: #6c6e66;
-  padding: 4px 10px;
-  color: white;
-  font-weight: normal;
-  font-size: 12px;
-  clear: both;
-}
-.popup-log .popup-head .popup-head-left {
-  float: left;
-}
-.popup-log .popup-head .popup-head-right {
-  float: right;
-  opacity: 0.5;
-}
-.popup-log .popup-head .popup-head-right a {
-  text-decoration: none;
-  color: inherit;
-}
-.popup-log .popup-messages {
-  height: 100%;
-  padding: 4px 10px;
-  overflow-y: scroll;
+  width: 100%;
 }
 .popup-btn {
   padding: 0px 4px 0px 6px;
+  cursor: pointer;
 }

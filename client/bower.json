@@ -31,7 +31,8 @@
     "socket.io-client": "*", 
     "angular-http-auth": "~1.2.1",
     "angular-socket-io": "~0.6.0",
-    "cryptojslib": "~3.1.2"
+    "cryptojslib": "~3.1.2",
+    "angular-cryptography": "*"
   },
   "devDependencies": {
     "angular-mocks": "~1.2.22",

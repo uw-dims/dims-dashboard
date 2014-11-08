@@ -167,7 +167,7 @@ module.exports = function (grunt) {
       },
       app: {
         src: ['<%= appConfig.app %>/index.html'],
-        exclude: ['bower_components/bootstrap/dist/js/bootstrap.js']
+        exclude: ['bower_components/bootstrap/dist/js/bootstrap.js', 'bower_components/cryptojslib']
         //ignorePath:  /\.\.\//
       },
       less: {

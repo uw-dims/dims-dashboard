@@ -1,7 +1,7 @@
 /*global angular */
 'use strict';
 
-var dimsDashboardConfig = function($provide, $routeProvider, $locationProvider, datepickerConfig, datepickerPopupConfig) {
+var dimsDashboardConfig = function($provide, $routeProvider, $locationProvider, $cryptoProvider, datepickerConfig, datepickerPopupConfig) {
   $routeProvider.when('/', {
     controller: 'MainCtrl',
     templateUrl: 'views/partials/main.html'
@@ -46,10 +46,12 @@ var dimsDashboardConfig = function($provide, $routeProvider, $locationProvider, 
     redirectTo: '/'
   });
   $locationProvider.html5Mode(true);
+  $cryptoProvider.setCryptographyKey('84jd$#lk903jcy2AUEI2j4nsKLJ!lIY'.toString());
   // Datepicker configurations
   datepickerConfig.minDate = '1960-01-01';
   datepickerConfig.showWeeks = false;
   datepickerPopupConfig.datepickerPopup = 'MM-dd-yyyy';
+
 };
 
 var constants = {
@@ -71,7 +73,8 @@ var constants = {
   'CIF' : 'cifbulk',
   'CORRELATE' : 'crosscor',
   'ANONYMIZE' : 'anon',
-  'SOCKETIO_URL' : 'https://lpsrv1:3030'
+  'SOCKETIO_URL' : 'https://lpsrv1:3030',
+  'PASS_SECRET' : '84jd$#lk903jcy2AUEI2j4nsKLJ!lIY'
 };
 
 var rpcClientOptions = {
@@ -128,7 +131,7 @@ var rpcClientOptions = {
 };
 
 var dimsDashboard = angular.module('dimsDashboard', 
-  ['ngRoute','angularFileUpload','ui.bootstrap','ui.bootstrap.showErrors','ngGrid', 'ngAnimate', 'ngResource', 'http-auth-interceptor',
+  ['ngRoute','angularFileUpload','ui.bootstrap','ui.bootstrap.showErrors','ngGrid', 'ngAnimate', 'ngResource','mdo-angular-cryptography','http-auth-interceptor',
     'ngCookies','btford.socket-io','truncate', 'dimsDashboard.controllers', 'dimsDashboard.directives', 'dimsDashboard.services'])
   .config(dimsDashboardConfig);
 
