@@ -1,7 +1,7 @@
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller('LoginCtrl', ['$scope', 'AuthService', '$location', '$log','$rootScope', '$crypto','SettingsService', 
-      function($scope, AuthService, $location, $log, $rootScope, $crypto, SettingsService) {
+  controller('LoginCtrl', ['$scope', 'AuthService', '$location', '$log','$rootScope', 'CryptoService','SettingsService', 
+      function($scope, AuthService, $location, $log, $rootScope, CryptoService, SettingsService) {
     $scope.error = {};
     $scope.user = {};
 
@@ -9,7 +9,10 @@ angular.module('dimsDashboard.controllers').
 
     $scope.login = function(form) {
       var userPass = $scope.user.password.toString();
-      var encPass = $crypto.encrypt($scope.user.password);
+      $log.debug('userPass is ', userPass);
+      var encPass = CryptoService.encryptAES(userPass, constants.PASS_SECRET);
+      $log.debug('encrypted password is: ', encPass);
+      
       AuthService.login('password', {
         'username': $scope.user.username,
         'password': encPass

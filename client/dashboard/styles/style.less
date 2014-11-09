@@ -23,7 +23,7 @@ body {
 
 /* override bootstrap label color */
 label {
-  color: lighten(@dims-dark, 10%);
+  color: lighten(@dims-dark, 15%);
 }
 
 /* Added as per ui.bootstrap instructiona */
@@ -73,6 +73,11 @@ label {
 /* override form-group class */
 .form-group {
   margin-bottom: 5px;
+}
+
+/* Alter panel color for settings */
+.settings .panel {
+  background-color: @panel-alternate;
 }
 
 
@@ -465,8 +470,13 @@ html>body tbody.scrollContent {
 .popup-box .chat-send {
   height: 25px;
   position: fixed;
-  bottom: 0px;
+  bottom: 4px;
   width: 100%;
+}
+
+.popup-box .chat-input {
+  width: 342px;
+  margin: 2px;
 }
 
 .popup-btn {

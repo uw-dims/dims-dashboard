@@ -20,7 +20,6 @@ angular.module('dimsDashboard.services')
       socket.resolve(mySocket);
     });
     return socket.promise;
-    // return socket;
   })
 
   .factory('ChatService', function($log, Socket) {

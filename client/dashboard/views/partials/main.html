@@ -51,56 +51,65 @@
 </div></div>
 
 <!-- Settings -->
-<div class="col-xs-12">
+<div class="col-xs-12 settings">
 <div class="panel panel-default" ng-show="showSettings" >
   <div class="panel-body" >
 
   <h3>Settings</h3>
+  <div class="row"><div class="col-sm-6">
   <form role="form" class="form-horizontal">
     <div class="form-group">
-      <label class="col-sm-2">Toggle Anonymization</label>
-      <div class="col-sm-4">
+      <label class="col-sm-4">Toggle Anonymization</label>
+      <div class="col-sm-7">
         <select class="form-control" ng-model="settingsFormData.anonymize" ng-options="f.value as f.label for f in anonymizeValues" ng-change="setUserSettings()" >
         </select>
       </div>
     </div>
   </form>
+  </div>
 
+  <div class="col-sm-6">
     <form role="form" class="form-horizontal">
       <div class="form-group">
-        <label class="col-sm-2">Choose cifbulk queue</label>
-        <div class="col-sm-4">
+        <label class="col-sm-4">Toggle RPC client debug flag</label>
+        <div class="col-sm-7">
+          <select class="form-control" ng-model="settingsFormData.rpcDebug" ng-options="f.value as f.label for f in rpcDebugValues" ng-change="setUserSettings()" >
+          </select>
+        </div>
+      </div>
+    </form>   
+  </div></div>
+
+  <div class="row"><div class="col-sm-6">
+    <form role="form" class="form-horizontal">
+      <div class="form-group">
+        <label class="col-sm-4">Choose cifbulk queue</label>
+        <div class="col-sm-7">
           <select class="form-control" ng-model="settingsFormData.cifbulkQueue" ng-options="f.value as f.label for f in cifbulkQueueValues" ng-change="setUserSettings()" >
           </select>
         </div>
       </div>
     </form>
-
+    </div>
+   
+    <div class="col-sm-6">
     <form role="form" class="form-horizontal">
       <div class="form-group">
-        <label class="col-sm-2">Toggle RPC client debug flag</label>
-        <div class="col-sm-4">
-          <select class="form-control" ng-model="settingsFormData.rpcDebug" ng-options="f.value as f.label for f in rpcDebugValues" ng-change="setUserSettings()" >
-          </select>
-        </div>
-      </div>
-    </form>
-
-    <form role="form" class="form-horizontal">
-      <div class="form-group">
-        <label class="col-sm-2">Toggle RPC client verbose flag</label>
-        <div class="col-sm-4">
+        <label class="col-sm-4">Toggle RPC client verbose flag</label>
+        <div class="col-sm-7">
           <select class="form-control" ng-model="settingsFormData.rpcVerbose" ng-options="f.value as f.label for f in rpcVerboseValues" ng-change="setUserSettings()" >
           </select>
         </div>
       </div>
     </form>
+    </div></div>
+    <div class="row"><div class="col-sm-2">
      <button type="button" class="btn btn-primary btn-sm" ng-click="toggleLogMonitor()" ng-hide="logmonOn">Turn Log Monitor On</button>
   <button type="button" class="btn btn-primary btn-sm" ng-click="toggleLogMonitor()" ng-show="logmonOn">Turn Log Monitor Off</button>
-  &nbsp; &nbsp; Log Monitor is {{ logmonOn ? 'On' : 'Off' }}.
+ </div><div class="col-sm-2">
    <button type="button" class="btn btn-primary btn-sm" ng-click="toggleChat()" ng-hide="chatOn">Turn Chat On</button>
   <button type="button" class="btn btn-primary btn-sm" ng-click="toggleChat()" ng-show="chatOn">Turn Chat Off</button>
-  &nbsp; &nbsp; Chat is {{ chatOn ? 'On' : 'Off' }}.
+ </div></div>
   </div>
 </div></div>
 

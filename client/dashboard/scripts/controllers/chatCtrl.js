@@ -31,13 +31,15 @@ angular.module('dimsDashboard.controllers').
 
     // Hide the window
     $scope.hide = function() {
-      $rootScope.chatMaximized = false;
+      $log.debug('chatCtrl.hide');
+      $scope.chatMaximized = false;
       $scope.chatClass = 'chatMin'
+      $log.debug('chatCtrl hide chatMaximized class ', $scope.chatMaximized, $scope.chatClass);
     };
 
     // Show the window
     $scope.show = function() {
-      $rootScope.chatMaximized = true;
+      $scope.chatMaximized = true;
       $scope.chatClass = 'chatMax'
     };
 

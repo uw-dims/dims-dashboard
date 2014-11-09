@@ -1,10 +1,7 @@
 'use strict';
 
-/* Services, factories */
-
 angular.module('dimsDashboard.services')
   
-  // .factory('AuthService', function($location, $rootScope, SessionService, User, $cookieStore) {
     .factory('AuthService', function($location, $rootScope, SessionService, $cookieStore, $log, SettingsService, ChatService, LogService, Socket) {
 
       $rootScope.currentUser = $cookieStore.get('user') || null;
@@ -61,12 +58,6 @@ angular.module('dimsDashboard.services')
             $rootScope.currentUser = resource.data.user;
             SettingsService.data = resource.data.settings;
             $rootScope.$emit('authenticated');
-
-            // UsersessionService.get(function(settings) {
-            //   $log.debug('UsersessionService.get settings are ', settings.settings);
-            //   SettingsService.data = settings.settings;
-            //   return cb();
-            // });
           });
         }
       }

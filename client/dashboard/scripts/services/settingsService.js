@@ -1,6 +1,5 @@
 'use strict';
 
-/* Services, factories */
 
 angular.module('dimsDashboard.services')
   

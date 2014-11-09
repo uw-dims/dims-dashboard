@@ -29,6 +29,7 @@ var express = require('express')
   , LocalStrategy = require('passport-local').Strategy
   , exec = require('child_process').exec
   , messages = require('./utils/messages')
+  , CryptoJS = require('crypto-js')
   , logger = require('./utils/logger');
 
 // routes
@@ -89,10 +90,8 @@ passport.serializeUser(function(user, done) {
 });
 // Deserialize the user info
 passport.deserializeUser(function(ident, done) {
-    // console.log("passport deserializeUser. ident is " + ident);
     new userdata.User({ident: ident}).fetch().then(function(user) {
         // user here is retrieved from database so can use .get functions
-        // returning user - should it be user.get('ident')?
         return done(null, user);
     }, function(error) {
         return done(error);
@@ -105,9 +104,14 @@ passport.use(new LocalStrategy({
 },function(username, password, done) {
     // Look up the user corresponding to the supplied username
     new userdata.User({ident: username}).fetch({require: true}).then(function(user) {
-      // Call perl crypt to check password since we are using passwords generated using crypt
-        var pw = user.get('password');        
-        var program = 'perl ./utils/getPass.pl ' + password + ' ' + '\''+pw+'\'';
+        // Decrypt password received via http post
+        var decrypted = CryptoJS.AES.decrypt(password, config.passSecret).toString(CryptoJS.enc.Utf8);
+        logger.debug('password sent via POST ', password);
+        logger.debug('decrypted password ', decrypted);
+        // Get the user's hashed password from the datastore
+        var pw = user.get('password');   
+        // Call perl crypt to check password since we are using passwords generated using crypt     
+        var program = 'perl ./utils/getPass.pl ' + decrypted + ' ' + '\''+pw+'\'';
         exec(program, function(error, stdout, stderr) {
             logger.debug('5 passport.use: perl stderr ' , stderr);
             if (error !== null) {
@@ -203,18 +207,9 @@ var ensureAuthenticated = function(req, res, next) {
   }
 };
 
-// logger.debug('app.js. Start pubsub');
-// var Publisher = require('./services/publisher.js');
-// var Subscriber = require('./services/subscriber.js');
-// var chatReceiver = new Subscriber('chat');
-// var chatPublisher = new Publisher('chat');
-// chatReceiver.start();
-// chatPublisher.start();
-
 var router = express.Router();
 router.post('/upload', ensureAuthenticated, files.upload);
 router.get('/files', ensureAuthenticated, files.files);
-// app.get('/ipgrep', ipgrep.call);
 router.get('/cifbulk', ensureAuthenticated, cifbulk.list);
 router.get('/crosscor', ensureAuthenticated, crosscor.list);
 router.post('/anon', ensureAuthenticated, anon.list);

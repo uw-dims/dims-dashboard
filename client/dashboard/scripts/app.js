@@ -1,7 +1,7 @@
 /*global angular */
 'use strict';
 
-var dimsDashboardConfig = function($provide, $routeProvider, $locationProvider, $cryptoProvider, datepickerConfig, datepickerPopupConfig) {
+var dimsDashboardConfig = function($provide, $routeProvider, $locationProvider, datepickerConfig, datepickerPopupConfig) {
   $routeProvider.when('/', {
     controller: 'MainCtrl',
     templateUrl: 'views/partials/main.html'
@@ -46,7 +46,6 @@ var dimsDashboardConfig = function($provide, $routeProvider, $locationProvider, 
     redirectTo: '/'
   });
   $locationProvider.html5Mode(true);
-  $cryptoProvider.setCryptographyKey('84jd$#lk903jcy2AUEI2j4nsKLJ!lIY'.toString());
   // Datepicker configurations
   datepickerConfig.minDate = '1960-01-01';
   datepickerConfig.showWeeks = false;
@@ -131,7 +130,7 @@ var rpcClientOptions = {
 };
 
 var dimsDashboard = angular.module('dimsDashboard', 
-  ['ngRoute','angularFileUpload','ui.bootstrap','ui.bootstrap.showErrors','ngGrid', 'ngAnimate', 'ngResource','mdo-angular-cryptography','http-auth-interceptor',
+  ['ngRoute','angularFileUpload','ui.bootstrap','ui.bootstrap.showErrors','ngGrid', 'ngAnimate', 'ngResource','http-auth-interceptor',
     'ngCookies','btford.socket-io','truncate', 'dimsDashboard.controllers', 'dimsDashboard.directives', 'dimsDashboard.services'])
   .config(dimsDashboardConfig);
 
@@ -150,7 +149,7 @@ dimsDashboard.run(function($rootScope, $location, $log, AuthService, SettingsSer
     // will trigger 401s if user does not have a valid session
     $log.debug('Run: watch currentUser handler. currentUser is ',currentUser);
     $log.debug('Run: watch currentUser handler. path is ', $location.path());
-    if (!currentUser && (['/','/login'].indexOf($location.path()) == -1 )) {
+    if (!currentUser && (['/login'].indexOf($location.path()) == -1 )) {
       $log.debug('Run: watch currentUser handler. First if. No currentUser and not on login page. Call AuthService.currentUser()');
       AuthService.currentUser();
     } else if (['/login'].indexOf($location.path()) == 0 ) {

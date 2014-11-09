@@ -1,8 +1,7 @@
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller('AnonCtrl', ['$scope', 'Utils', 'FileService', '$http', 'DateService', 'SettingsService', 'AnonService', '$location', '$routeParams', 
-    function ($scope, Utils, FileService, $http, DateService, SettingsService, AnonService, $location, $routeParams) {
-    console.log('In crosscor controller');
+  controller('AnonCtrl', ['$scope', 'Utils', 'FileService', '$http', 'DateService', '$log','SettingsService', 'AnonService', '$location', '$routeParams', 
+    function ($scope, Utils, FileService, $http, DateService, $log, SettingsService, AnonService, $location, $routeParams) {
 
     // Set up form data
     $scope.formData = {};
@@ -22,29 +21,18 @@ angular.module('dimsDashboard.controllers').
     $scope.showMaps = false;
 
     FileService.getFileList('data_files').then(function(result) {
-      console.log(result);
         $scope.fileNames = result.fileNames;
         $scope.filePath = result.filePath;
         $scope.showFiles = true;
     });
 
     FileService.getFileList('map_files').then(function(result) {
-      console.log(result);
         $scope.mapNames = result.fileNames;
         $scope.mapPath = result.filePath;
         $scope.showMaps = true;
     });
 
     $scope.settings = SettingsService.get();
-
-    // SettingsService.getSettings('0').then(function(result){
-    //   console.log('getSettings result');
-    //   console.log(result);
-    //   $scope.anonymize = result.anonymize;
-    //   $scope.rpcDebug = result.rpcDebug;
-    //   $scope.rpcVerbose = result.rpcVerbose;
-    // });
-    
 
     // Other setup
     $scope.showResults = false;
@@ -53,7 +41,7 @@ angular.module('dimsDashboard.controllers').
     $scope.resultsMsg = 'Results';
 
     /**
-     *  callClient function
+     *  Setup up parameters and make the HTTP request
      */
     $scope.callClient = function() {
 
@@ -85,8 +73,7 @@ angular.module('dimsDashboard.controllers').
       Utils.setConfig(clientConfig, $scope.settings.rpcVerbose, 'verbose');
       Utils.setConfig(clientConfig, $scope.settings.rpcDebug, 'debug');
 
-      console.log(clientConfig);
-      console.log('Now sending http get request');
+      $log.debug('AnonCtrl.callClient. Ready to send request. clientConfig: ', clientConfig);
 
       $scope.resultsMsg = 'Results - Waiting...';
       
@@ -96,13 +83,11 @@ angular.module('dimsDashboard.controllers').
           params: clientConfig
         } ).
         success(function(data, status, headers, config) {
-          console.log('anon returned data');
-          console.log(status);
+          $log.debug('AnonCtrl.callClient. HTTP success callback. Status: ', status);
           $scope.rawData = data.data;
           $scope.pid = data.pid;
-          console.log($scope.rawData);
-          console.log($scope.pid);
-         
+          $log.debug('AnonCtrl.callClient. HTTP success callback. rawData: ', rawData);
+          $log.debug('AnonCtrl.callClient. HTTP success callback. pid: ', pid);         
           $scope.showResults = true;
 
           $scope.resultsMsg = 'Results'; 
@@ -112,9 +97,7 @@ angular.module('dimsDashboard.controllers').
           
         }).
         error(function(data, status, headers, config) {
-          console.log('rwfind Error');
-          console.log(data);
-          console.log(status);
+          $log.debug('AnonCtrl.callClient. HTTP error callback. Data: ', data, 'Status: ', status);
           $scope.showFormError = true;
           $scope.formErrorMsg = 'Your request did not get a result. Status: '+status;
           $scope.resultsMsg = 'Results';
