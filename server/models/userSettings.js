@@ -18,7 +18,6 @@ function UserSettings(client, user, userSettings) {
 	self.keySet = 'userSettings';
 
 	self.update = function(settings) {
-		logger.debug('self.update');
 		var deferred = q.defer();
 		self.client.hmset(self.key, settings, function(err, data) {
 			if (err) deferred.reject(err);
@@ -28,7 +27,6 @@ function UserSettings(client, user, userSettings) {
 	};
 
 	self.get = function() {
-		logger.debug('self.get');
 		var deferred = q.defer();
 		self.client.hgetall(self.key, function(err,data) {
 			if (err) deferred.reject(err);
@@ -42,11 +40,9 @@ function UserSettings(client, user, userSettings) {
 // Will retrieve settings for logged in user. If settings do not
 // exist, create settings using default.
 UserSettings.prototype.getSettings = function() {
-	logger.debug('prototype.getSettings');
 	var self = this;
 	var deferred = q.defer();
 	self.get().then(function(data) {
-		logger.debug('prototype.getSettings. data is ', data);
 		if (data) deferred.resolve(data);
 		else {
 			var settingsObject = config.defaultUserSettings;
@@ -62,7 +58,6 @@ UserSettings.prototype.getSettings = function() {
 
 // Updates settings for current logged in user
 UserSettings.prototype.updateSettings = function() {
-	logger.debug('prototype.updateSettings');
 	var self = this;
 	var deferred = q.defer();
 	self.update(self.userSettings).then(function(data){
@@ -78,7 +73,6 @@ UserSettings.prototype.getAllKeys = function() {
 };
 
 UserSettings.prototype.updateKey = function() {
-	logger.debug('prototype.updateKey');
 	var self = this;
 	self.client.sadd(self.keySet, self.key);
 };

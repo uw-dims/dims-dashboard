@@ -8,16 +8,6 @@ module.exports = function(Bookshelf) {
     tableName: 'member'
   });
 
-  // Test it
-  // new User({'ident':'lparsons'}).fetch()
-  //   .then(function(user) {
-  //     console.log('User fetched');
-  //     console.log(user.get('ident'));
-  //   })
-  //   .catch(function(err) {
-  //     console.log(error);
-  //   });
-
   return model;
-}
+};
 

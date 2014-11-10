@@ -7,7 +7,6 @@ angular.module('dimsDashboard.services')
 
             encryptAES: function(message, key) {
                 var result = CryptoJS.AES.encrypt(message, key).toString(CryptoJS.enc.Utf8);
-                $log.debug('encryptAES is ', result);
                 return CryptoJS.AES.encrypt(message, key).toString();
             },
 

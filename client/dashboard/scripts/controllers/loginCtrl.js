@@ -9,9 +9,7 @@ angular.module('dimsDashboard.controllers').
 
     $scope.login = function(form) {
       var userPass = $scope.user.password.toString();
-      $log.debug('userPass is ', userPass);
       var encPass = CryptoService.encryptAES(userPass, constants.PASS_SECRET);
-      $log.debug('encrypted password is: ', encPass);
       
       AuthService.login('password', {
         'username': $scope.user.username,
@@ -23,6 +21,7 @@ angular.module('dimsDashboard.controllers').
         if (!err) {
           $location.path('/');
           // Emit event so socket can resolve
+          $log.debug('LoginCtrl.login: Broadcast authenticated');
           $rootScope.$broadcast('authenticated');
           
         } else {

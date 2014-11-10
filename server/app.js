@@ -106,14 +106,11 @@ passport.use(new LocalStrategy({
     new userdata.User({ident: username}).fetch({require: true}).then(function(user) {
         // Decrypt password received via http post
         var decrypted = CryptoJS.AES.decrypt(password, config.passSecret).toString(CryptoJS.enc.Utf8);
-        logger.debug('password sent via POST ', password);
-        logger.debug('decrypted password ', decrypted);
         // Get the user's hashed password from the datastore
         var pw = user.get('password');   
         // Call perl crypt to check password since we are using passwords generated using crypt     
         var program = 'perl ./utils/getPass.pl ' + decrypted + ' ' + '\''+pw+'\'';
         exec(program, function(error, stdout, stderr) {
-            logger.debug('5 passport.use: perl stderr ' , stderr);
             if (error !== null) {
                 logger.error('passport.use: exec error: ' , error);
                 return done(null, false, 'Perl error');

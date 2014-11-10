@@ -80,7 +80,7 @@ angular.module('dimsDashboard.controllers').
      };
 
     var formatter = function(date, message) {
-      return date.toLocaleTimeString() + ' - ' + message + '\n';
+      return date.toLocaleTimeString() + ' ' + message + '\n';
     };
 
     var sendformatter = function(text) {
