@@ -1,7 +1,7 @@
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller('DataFilesCtrl', ['fileSourceMap', 'Utils', '$scope', '$http', '$log', '$location', '$routeParams', 
-      function (fileSourceMap, Utils, $scope, $http, $log, $location, $routeParams) {
+  controller('DataFilesCtrl', ['fileSourceMap', 'Utils', '$scope', '$http', '$log', '$location', '$routeParams', 'SettingsService',
+      function (fileSourceMap, Utils, $scope, $http, $log, $location, $routeParams, SettingsService) {
     console.log('In DataFiles controller');
     // Setup form data
     $scope.formData = {};

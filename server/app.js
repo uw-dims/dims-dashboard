@@ -258,6 +258,35 @@ if (config.sslOn) {
 // Set up socket.io to listen on same port as https
 var io = socket.listen(server);
 
+// var events = require('events');
+// var eventEmitter = new events.EventEmitter();
+RabbitSocket = require('./services/rabbitSocket');
+var chatPublisher = new RabbitSocket('chat', 'publisher');
+
+var chat = io
+  .of('/chat')
+  .on('connection', function(socket) {
+    logger.debug('Chat socket.io. Received client connection event');
+    socket.on('chat:client', function(msg) {
+      logger.debug('Chat socket.io: Received client event from client, msg is ', msg);
+      // var emitted = eventEmitter.emit('chat:client', msg);
+      // logger.debug('Chat socket.io: Did event have listener? ', emitted);
+      chatPublisher.send(msg);
+    });
+    socket.on('disconnect', function() {
+      logger.debug('Chat socket.io: Received disconnect event from client');
+    });
+  });
+
+var logs = io
+  .of('/logs')
+  .on('connection', function(socket) {
+    logger.debug('Logs socket.io. Received client connection event');
+    socket.on('disconnect', function() {
+      logger.debug('Logs socket.io: Received disconnect event from client');
+    });
+  });
+
 // io.sockets.on('connection', function(socket) {
 //     logger.debug('socket.io: Received connection event from client. Total sockets: ', io.sockets.sockets.length);
 //     socket.on('chat:receive', function(from, msg) {
@@ -276,11 +305,8 @@ var io = socket.listen(server);
 
 server.listen(port);
 
-RabbitSocket = require('./services/rabbitSocket');
-
-var chatPublisher = new RabbitSocket('chat', 'publisher', io);
-var chatSubscriber = new RabbitSocket('chat', 'subscriber', io);
-var logSubscriber = new RabbitSocket('logs', 'subscriber', io);
+var chatSubscriber = new RabbitSocket('chat', 'subscriber', chat);
+var logSubscriber = new RabbitSocket('logs', 'subscriber', logs);
 
 
 

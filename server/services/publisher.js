@@ -33,7 +33,7 @@ Publisher.prototype.start = function() {
   logger.debug('Publisher: ' + self.name + ': starting...');
   if (self.running) {
     logger.debug('Publisher: ' + self.name + ': already running');
-    console.log(self);
+    // console.log(self);
   } else {
     // create the RabbitConnection
     self.rabbit = new RabbitConnection(self.name, self.type);

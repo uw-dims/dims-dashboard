@@ -20,6 +20,10 @@ module.exports = function (grunt) {
     dist: '../server/dist'
   };
 
+  // Get URL for deployment from command line
+  var deployedURL = grunt.option('url') || 'localhost';
+  var deployedPort = grunt.option('port') || '3030';
+
   // Define the configuration for all the tasks
   grunt.initConfig({
     appConfig: appConfig,

@@ -62,14 +62,14 @@ RabbitConnection.prototype.subscribe = function() {
 
         self.ch.on('close', function() {
           logger.debug('RabbitConnection received channel close event');
-          console.log(this);
+          // console.log(this);
           self.ch = null;
           self.emit('channelClose');
         });
 
         self.ch.on('error', function(err) {
           logger.debug('RabbitConnection received channel error event', err);
-          console.log(this);
+          // console.log(this);
           self.emit('channelError', err);
         });
 
@@ -143,14 +143,14 @@ RabbitConnection.prototype.subscribe = function() {
 
         self.ch.on('close', function() {
           logger.debug('RabbitConnection received channel close event');
-          console.log(this);
+          // console.log(this);
           self.ch = null;
           self.emit('channelClose');
         });
 
         self.ch.on('error', function(err) {
           logger.debug('RabbitConnection received channel error event', err);
-          console.log(this);
+          // console.log(this);
           self.emit('channelError', err);
         });
 

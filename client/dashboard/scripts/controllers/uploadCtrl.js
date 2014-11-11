@@ -1,6 +1,7 @@
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller ('UploadCtrl', ['$scope', '$http', '$timeout', '$upload', 'Utils', function($scope, $http, $timeout, $upload, Utils) {
+  controller ('UploadCtrl', ['$scope', '$http', '$timeout', '$upload', 'Utils', 'SettingsService', 
+    function($scope, $http, $timeout, $upload, Utils, SettingsService) {
 console.log('In UploadController');
 
   $scope.usingFlash = FileAPI && FileAPI.upload !== null;

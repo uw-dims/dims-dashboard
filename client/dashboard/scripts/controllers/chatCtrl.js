@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('dimsDashboard.controllers').
-  controller('ChatCtrl', function($scope, $location, $log, ChatService, $rootScope, Socket) {
+  controller('ChatCtrl', function($scope, $location, $log, ChatService, $rootScope) {
 
     $log.debug('chatCtrl. scope.currentUser is ', $scope.currentUser);
 
@@ -55,7 +55,7 @@ angular.module('dimsDashboard.controllers').
           return;
         }
         $scope.$apply(function() {
-          $scope.messages = formatter(new Date(), data) + $scope.messages;
+          $scope.messages = $scope.messages +receiveFormatter(new Date(), data);
         });
       });
      };
@@ -63,13 +63,7 @@ angular.module('dimsDashboard.controllers').
      $scope.send = function() {
         var message = sendformatter($scope.text);
         $scope.text = '';
-        // ChatService.send(message);
-        Socket.then(function(socket) {
-          $log.debug('chatCtrl.send, sending message ');
-          socket.emit('chat:client', {
-            message: message
-          });
-        });
+        ChatService.send(message);
      };
 
      $scope.stop = function() {
@@ -79,14 +73,12 @@ angular.module('dimsDashboard.controllers').
       ChatService.setRunning(false);
      };
 
-    var formatter = function(date, message) {
+    var receiveFormatter = function(date, message) {
       return date.toLocaleTimeString() + ' ' + message + '\n';
     };
 
     var sendformatter = function(text) {
       return $scope.currentUser.name + ': ' + text;
     };
-
-
 
   });

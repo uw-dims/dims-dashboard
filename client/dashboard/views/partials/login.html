@@ -9,8 +9,8 @@
                 <form class="form-signin"
                       name="form"
                       ng-submit="login(form)"
-                      novalidate>
-                    <div >
+                      >
+                    <div class="form-group" show-errors >
                         <input type="text"
                                class="form-control"
                                placeholder="Username"
@@ -20,23 +20,29 @@
                                autofocus
                                >
                     </div>
+                    <!-- <div class="has-error">
+                    <span class="help-block" ng-show="form.username.$error.required && !form.username.$pristine ">
+      Username is required</span></div> -->
 
-                    <div>
+                    <div class="form-group" show-errors>
                         <input type="password"
                                class="form-control"
                                placeholder="Password"
                                name="password"
                                ng-model="user.password"
                                required
-                               mongoose-error>
-                        
+                                >  
+                    </div>
+                    <div class="form-group has-error">
+                        <p class="help-block">{{ error }}</p>
                     </div>
 
-                    <button class="btn btn-lg btn-primary btn-block" type="submit"> Sign in </button>
+                    <button class="btn btn-lg btn-primary btn-block" type="submit" ng-disabled="isUnchanged(user)"> Sign in </button>
 
                     <span class="clearfix"></span>
                 </form>
             </div>
+            
         </div>
     </div>
 </div>

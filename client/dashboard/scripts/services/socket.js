@@ -2,27 +2,61 @@
 
 angular.module('dimsDashboard.services')
 
-  .factory('Socket', function($q, $rootScope, socketFactory, $timeout, $log) {
+  .factory('ChatSocket', function($q, $rootScope, SocketFactory, $timeout, $log) {
     
     var socket = $q.defer();
+    var hasRun = 0;
     // Set up the socket and return the promise when we receive an authenticated event
     $rootScope.$on('authenticated', function() {
-
-      $log.debug('Socket rootScope received authenticated event');
-
-      var myIoSocket = io.connect(constants.SOCKETIO_URL);
-      var mySocket = socketFactory({
-        ioSocket: myIoSocket
-      });
-      // Broadcast events to $rootScope
-      mySocket.forward('chat:data');
-      mySocket.forward('logs:data');
-      socket.resolve(mySocket);
+      hasRun++ ;
+      // If this has already run once, we only need to connect and set the listener
+      // Need to do it this way to avoid creating extra sockets
+      if (hasRun > 1) {
+        socket.promise.then(function(socket) {
+          socket.connect();
+          socket.forward('chat:data');
+        });
+      } else {
+        var myIoSocket = io.connect(constants.SOCKETIO_URL+'/chat', {forceNew: true});
+        var mySocket = SocketFactory({
+          ioSocket: myIoSocket
+        });
+        // Broadcast events to $rootScope
+        mySocket.forward('chat:data');
+        socket.resolve(mySocket);
+      }
     });
     return socket.promise;
   })
 
-  .factory('ChatService', function($log, Socket) {
+  .factory('LogSocket', function($q, $rootScope, SocketFactory, $timeout, $log) {
+    
+    var socket = $q.defer();
+    var hasRun = 0;
+    // Set up the socket and return the promise when we receive an authenticated event
+    $rootScope.$on('authenticated', function() {
+      hasRun++ ;
+      // If this has already run once, we only need to connect and set the listener
+      // Need to do it this way to avoid creating extra sockets
+      if (hasRun > 1) {
+        socket.promise.then(function(socket) {
+          socket.connect();
+          socket.forward('logs:data');
+        });
+      } else {
+        var myIoSocket = io.connect(constants.SOCKETIO_URL+'/logs', {forceNew: true});
+        var mySocket = SocketFactory({
+          ioSocket: myIoSocket
+        });
+        // Broadcast events to $rootScope
+        mySocket.forward('logs:data');
+        socket.resolve(mySocket);
+      }
+    });
+    return socket.promise;
+  })
+
+  .factory('ChatService', function($log, ChatSocket) {
       var chatService = {
         // True if chat running ($scope is listening on socket) or false if it is not
         running: false,
@@ -61,7 +95,7 @@ angular.module('dimsDashboard.services')
         // Send a message
         send: function(message) {
           $log.debug('ChatService sending message', message);
-          Socket.then(function(socket) {
+          ChatSocket.then(function(socket) {
             socket.emit('chat:client', message, function(message) {
               $log.debug('ChatService emitted message', message);
             });
@@ -71,7 +105,7 @@ angular.module('dimsDashboard.services')
       return chatService;
   })
 
-  .factory('LogService', function($log, Socket) {
+  .factory('LogService', function($log, LogSocket) {
       var logService = {
         // True if logging running ($scope is listening on socket) or false if it is not
         running: false,

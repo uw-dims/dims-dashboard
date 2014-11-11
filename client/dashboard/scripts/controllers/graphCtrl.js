@@ -1,7 +1,7 @@
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller('GraphCtrl', ['$scope','$http','FileService', 'DataService', '$location', '$routeParams', 
-      function($scope, $http, FileService, DataService, $location, $routeParams) {
+  controller('GraphCtrl', ['$scope','$http','FileService', 'DataService', '$location', '$routeParams', 'SettingsService',
+      function($scope, $http, FileService, DataService, $location, $routeParams, SettingsService) {
 
     console.log('In GraphCtrl');
     $scope.settings = SettingsService.get();
