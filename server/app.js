@@ -258,26 +258,25 @@ if (config.sslOn) {
 // Set up socket.io to listen on same port as https
 var io = socket.listen(server);
 
-// var events = require('events');
-// var eventEmitter = new events.EventEmitter();
+// Set up sockets
 RabbitSocket = require('./services/rabbitSocket');
+// Create publishers first so their publish method can be added as event listeners
 var chatPublisher = new RabbitSocket('chat', 'publisher');
-
+// Set up chat socket
 var chat = io
   .of('/chat')
   .on('connection', function(socket) {
     logger.debug('Chat socket.io. Received client connection event');
+    // Send message to fanout when received from client on socket
     socket.on('chat:client', function(msg) {
       logger.debug('Chat socket.io: Received client event from client, msg is ', msg);
-      // var emitted = eventEmitter.emit('chat:client', msg);
-      // logger.debug('Chat socket.io: Did event have listener? ', emitted);
       chatPublisher.send(msg);
     });
     socket.on('disconnect', function() {
       logger.debug('Chat socket.io: Received disconnect event from client');
     });
   });
-
+// Set up logs socket
 var logs = io
   .of('/logs')
   .on('connection', function(socket) {
@@ -287,24 +286,9 @@ var logs = io
     });
   });
 
-// io.sockets.on('connection', function(socket) {
-//     logger.debug('socket.io: Received connection event from client. Total sockets: ', io.sockets.sockets.length);
-//     socket.on('chat:receive', function(from, msg) {
-//       logger.debug('socket.io: Received message event from client', from, msg);
-
-//     });
-//   });
-
-//   io.sockets.on('disconnect', function() {
-//     logger.debug('socket.io: Received disconnect event from client');
-//   })
-
-//   io.sockets.on('chat:receive', function() {
-//     logger.debug('socket.io: Received message event from client');
-//   });
-
 server.listen(port);
 
+// Create subscribers
 var chatSubscriber = new RabbitSocket('chat', 'subscriber', chat);
 var logSubscriber = new RabbitSocket('logs', 'subscriber', logs);
 

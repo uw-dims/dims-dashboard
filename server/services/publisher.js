@@ -33,7 +33,6 @@ Publisher.prototype.start = function() {
   logger.debug('Publisher: ' + self.name + ': starting...');
   if (self.running) {
     logger.debug('Publisher: ' + self.name + ': already running');
-    // console.log(self);
   } else {
     // create the RabbitConnection
     self.rabbit = new RabbitConnection(self.name, self.type);
@@ -43,13 +42,7 @@ Publisher.prototype.start = function() {
     self.rabbit.on('connectionError', self.onError.bind(self));
     self.rabbit.on('channelClose', self.onChannelClosed.bind(self));
     self.rabbit.on('channelError', self.onChannelError.bind(self));
-
-    // self.rabbit.on('msg', function(msg) {
-    //   logger.debug('Publisher: ' + self.name + ': message received', msg);
-    //   self.emit('msg', msg);
-    // });
-    // self.rabbit.on('msg', self.onMessage);
-    // Subscribe
+    // Initialize
     self.rabbit.initPublish();
   }
   
@@ -83,12 +76,6 @@ Publisher.prototype.status = function() {
   var self = this;
   return (self.running) ? 'started' : 'stopped';
 };
-
-// Publisher.prototype.onMessage = function(msg) {
-//   // Pass on event
-//   logger.debug('Publisher: ' + self.name + ': message received');
-//   //self.emit('msg', msg);
-// };
 
 // Listener for the ready event emitted by a RabbitConnection object
 Publisher.prototype.onReady = function() {

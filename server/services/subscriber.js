@@ -33,7 +33,6 @@ Subscriber.prototype.start = function() {
   logger.debug('Subscriber: ' + self.name + ': starting...');
   if (self.running) {
     logger.debug('Subscriber: ' + self.name + ': already running');
-    // console.log(self);
   } else {
     // create the RabbitConnection
     self.rabbit = new RabbitConnection(self.name, self.type);
@@ -49,7 +48,6 @@ Subscriber.prototype.start = function() {
       logger.debug('Subscriber: ' + self.name + ': message received', msg);
       self.emit(self.name+':receive', msg);
     });
-    // self.rabbit.on('msg', self.onMessage);
     // Subscribe
     self.rabbit.subscribe();
   }

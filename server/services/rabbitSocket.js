@@ -29,6 +29,8 @@ function RabbitSocket(name, type, io) {
 
   if (type === 'publisher') {
     self.connection = new Publisher(name);
+    // Publishes a message to the exchange. This will be the handler called when
+    // messages are recevied from a client via a socket
     self.send = function(msg) {
       logger.debug('Publisher: Received client event from client '+name+', msg is ', msg.message);
       self.connection.publish(msg.message);
@@ -44,20 +46,6 @@ function RabbitSocket(name, type, io) {
       logger.debug('Socket: Subscriber noop send method called.');
     };
   }
-
-  // io.sockets.on('connection', function(socket) {
-  //   logger.debug('socket.io: Received connection event from client '+name+'. Total sockets: ', io.sockets.sockets.length);
-  //   // Add a listener for events from the client so it can publish them
-  //   if (type === 'publisher') {
-  //     socket.on(self.clientEvent, function(msg) {
-  //       logger.debug('socket.io: Received client event from client '+name+', msg is ', msg.message);
-  //       self.connection.publish(msg.message);
-  //     });
-  //   }
-  //   socket.on('disconnect', function() {
-  //     logger.debug('socket.io: Received disconnect event from client');
-  //   });
-  // });
 
   self.connection.start();
 };

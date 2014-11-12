@@ -72,7 +72,7 @@ var constants = {
   'CIF' : 'cifbulk',
   'CORRELATE' : 'crosscor',
   'ANONYMIZE' : 'anon',
-  'SOCKETIO_URL' : 'https://lpsrv1:3030',
+  // 'SOCKETIO_URL' : 'https://lpsrv1:3030',
   'PASS_SECRET' : '84jd$#lk903jcy2AUEI2j4nsKLJ!lIY'
 };
 
@@ -131,7 +131,7 @@ var rpcClientOptions = {
 
 var dimsDashboard = angular.module('dimsDashboard', 
   ['ngRoute','angularFileUpload','ui.bootstrap','ui.bootstrap.showErrors','ngGrid', 'ngAnimate', 'ngResource','http-auth-interceptor',
-    'ngCookies','truncate', 'dimsDashboard.controllers', 'dimsDashboard.directives', 'dimsDashboard.services'])
+    'ngCookies','truncate', 'dimsDashboard.controllers', 'dimsDashboard.directives', 'dimsDashboard.services','dimsDashboard.config'])
   .config(dimsDashboardConfig);
 
 dimsDashboard.constant(constants);
@@ -141,6 +141,8 @@ angular.module('dimsDashboard.controllers', []);
 angular.module('dimsDashboard.services', []);
 angular.module('dimsDashboard.directives', []);
 angular.module('dimsDashboard.filters', []);
+// This is populated by Grunt
+angular.module('dimsDashboard.config',[]);
 
 dimsDashboard.run(function($rootScope, $location, $log, AuthService, SettingsService) {
   //watching the value of the currentUser variable.

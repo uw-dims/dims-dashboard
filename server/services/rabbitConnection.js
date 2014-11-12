@@ -157,51 +157,12 @@ RabbitConnection.prototype.subscribe = function() {
         return self.pubExchange = ch.assertExchange(self.name, self.type, {durable: self.durable});
       });
     });
-        // ok = ok.then(function() {
-        //   logger.debug('RabbitConnection:subscribe: Exchange Asserted');
-        //   return ch.assertQueue('', {exclusive: true});
-        // });
-
-        // ok = ok.then(function(qok) {
-        //   logger.debug('RabbitConnection:publish: Queue asserted', qok);
-        //   // qok contains queue (aka name), messageCount, consumerCount
-
-
-        //   return ch.bindQueue(qok.queue, self.name, '').then(function() {
-        //     logger.debug('RabbitConnection:subscribe: Bind queue');
-        //     self.queueName = qok.queue;
-        //     return qok.queue;
-        //   });
-        // });
-
-        // ok = ok.then(function(queue) {
-        //   logger.debug('RabbitConnection:subscribe: Consume Queue.');
-        //   return ch.consume(queue, logMessage, {noAck: true});
-        // });
-
-        // return self.pubsubexchange.then(function() {
-        //   self.ch.publish(self.name, '', new Buffer(message));
-        //   // Waiting for logs
-        //   // Emit the ready event to notify listeners
-        //   logger.debug('RabbitConnection:publish: Send mesage: ',message);
-        //   // self.emit('ready', {'queue': self.queueName, 'ch': self.ch.ch });
-        // });
-
-        // function logMessage(msg) {
-        //   // Need to output this somewhere else
-        //   // Will use socket.io
-        //   //console.log(" [x] '%s'", msg.content.toString());
-        //   logger.debug('RabbitConnection:subscribe: Msg', msg.content.toString());
-        //   self.emit('msg', msg.content.toString());
-        // }
-      };
+   };
 
 RabbitConnection.prototype.publish = function(message) {
   var self = this;
   return self.pubExchange.then(function() {
           self.ch.publish(self.name, '', new Buffer(message));
-          // Waiting for logs
-          // Emit the ready event to notify listeners
           logger.debug('RabbitConnection:publish: Send mesage: ',message);
           // self.emit('ready', {'queue': self.queueName, 'ch': self.ch.ch });
         });

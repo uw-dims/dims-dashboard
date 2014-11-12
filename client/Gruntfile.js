@@ -28,6 +28,23 @@ module.exports = function (grunt) {
   grunt.initConfig({
     appConfig: appConfig,
     // Watches files for changes and runs tasks based on the changed files
+    ngconstant: {
+      options: {
+        space: '  ',
+         wrap: '"use strict";\n\n {%= __ngModule %}',
+        name: 'dimsDashboard.config',
+        deps: false,
+        dest: '<%= appConfig.app %>/scripts/config.js',
+        constants: {
+          ENV: {
+            SOCKETIO_URL: 'https://' + deployedURL + ':' + deployedPort
+          }
+        }
+      },
+      build: {
+      }
+    },
+
     watch: {
       bower: {
         files: ['bower.json'],
@@ -431,6 +448,7 @@ module.exports = function (grunt) {
 
     grunt.task.run([
       'clean:server',
+      'ngconstant',
       'wiredep',
       'autoprefixer',
       'connect:livereload',
@@ -445,6 +463,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('test', [
     'clean:server',
+    'ngconstant',
     'autoprefixer',
     'connect:test',
     'karma'
@@ -452,6 +471,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build', [
     'clean:dist',
+    'ngconstant',
     'wiredep',
     'less',
     'useminPrepare',
