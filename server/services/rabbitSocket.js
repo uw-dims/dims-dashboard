@@ -39,7 +39,7 @@ function RabbitSocket(name, type, io) {
   } else {
     self.connection = new Subscriber(name);
     self.connection.on(self.receiveEvent, function(msg) {
-      logger.debug('Socket: Subscriber received message. Need to emit to client. Msg: ', msg);
+      // logger.debug('Socket: Subscriber received message. Need to emit to client. Msg: ', msg);
       io.emit(self.IO_MSG_TYPE, msg);
     });
     self.send = function(msg) {

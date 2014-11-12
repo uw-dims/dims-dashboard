@@ -45,7 +45,7 @@ Subscriber.prototype.start = function() {
     // Received subscribe receive event from rabbit
     // Propogate it up
     self.rabbit.on(self.name+':receive', function(msg) {
-      logger.debug('Subscriber: ' + self.name + ': message received', msg);
+      // logger.debug('Subscriber: ' + self.name + ': message received', msg);
       self.emit(self.name+':receive', msg);
     });
     // Subscribe
@@ -77,11 +77,11 @@ Subscriber.prototype.status = function() {
   return (self.running) ? 'started' : 'stopped';
 };
 
-Subscriber.prototype.onMessage = function(msg) {
-  // Pass on event
-  logger.debug('Subscriber: ' + self.name + ': message received');
-  //self.emit('msg', msg);
-};
+// Subscriber.prototype.onMessage = function(msg) {
+//   // Pass on event
+//   logger.debug('Subscriber: ' + self.name + ': message received');
+//   //self.emit('msg', msg);
+// };
 
 // Listener for the ready event emitted by a RabbitConnection object
 Subscriber.prototype.onReady = function() {

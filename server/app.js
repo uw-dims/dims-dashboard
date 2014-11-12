@@ -108,11 +108,9 @@ passport.use(new LocalStrategy({
         var decrypted = CryptoJS.AES.decrypt(password, config.passSecret).toString(CryptoJS.enc.Utf8);
         // Get the user's hashed password from the datastore
         var pw = user.get('password'); 
-        logger.debug('passport.use dirname is ', __dirname);  
         // Call perl crypt to check password since we are using passwords generated using crypt     
         var program = 'perl ' + __dirname + '/utils/getPass.pl ' + decrypted + ' ' + '\''+pw+'\'';
         var child= exec(program, function(error, stdout, stderr) {
-            logger.debug('passport.use: stdout ', stdout);
             logger.debug('passport.use: stderr ', stderr);
             if (error !== null) {
                 logger.error('passport.use: exec error: ' , error);
