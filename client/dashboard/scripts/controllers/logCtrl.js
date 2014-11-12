@@ -44,7 +44,6 @@ angular.module('dimsDashboard.controllers').
     	$scope.messages = ''; // Re-initialize messages
     	// Add listener for socket:logs:data broadcast
     	$scope.offListen = $scope.$on('socket:logs:data', function(event, data) {
-	      $log.debug('LogCtrl: got a message ', event.name, data);
 	      if (!data) {
 	        $log.error('LogCtrl: Invalid message. ', 'event: ', event, 'data: ', JSON.stringify(data));
 	        return;
