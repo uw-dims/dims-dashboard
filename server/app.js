@@ -107,14 +107,16 @@ passport.use(new LocalStrategy({
         // Decrypt password received via http post
         var decrypted = CryptoJS.AES.decrypt(password, config.passSecret).toString(CryptoJS.enc.Utf8);
         // Get the user's hashed password from the datastore
-        var pw = user.get('password');   
+        var pw = user.get('password'); 
+        logger.debug('passport.use dirname is ', __dirname);  
         // Call perl crypt to check password since we are using passwords generated using crypt     
-        var program = 'perl ./utils/getPass.pl ' + decrypted + ' ' + '\''+pw+'\'';
-        logger.debug('5 passport.use: perl command: ', program);
-        exec(program, function(error, stdout, stderr) {
+        var program = 'perl ' + __dirname + '/utils/getPass.pl ' + decrypted + ' ' + '\''+pw+'\'';
+        var child= exec(program, function(error, stdout, stderr) {
+            logger.debug('passport.use: stdout ', stdout);
+            logger.debug('passport.use: stderr ', stderr);
             if (error !== null) {
                 logger.error('passport.use: exec error: ' , error);
-                return done(null, false, 'Perl error');
+                return done(null, false, error);
             } 
             if (pw === stdout) {
               logger.debug('6 passport.use: Passwords match. Return user');
