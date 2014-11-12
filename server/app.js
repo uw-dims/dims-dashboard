@@ -110,6 +110,7 @@ passport.use(new LocalStrategy({
         var pw = user.get('password');   
         // Call perl crypt to check password since we are using passwords generated using crypt     
         var program = 'perl ./utils/getPass.pl ' + decrypted + ' ' + '\''+pw+'\'';
+        logger.debug('5 passport.use: perl command: ', program);
         exec(program, function(error, stdout, stderr) {
             if (error !== null) {
                 logger.error('passport.use: exec error: ' , error);
