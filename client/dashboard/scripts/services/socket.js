@@ -96,7 +96,7 @@ angular.module('dimsDashboard.services')
         send: function(message) {
           $log.debug('ChatService sending message', message);
           ChatSocket.then(function(socket) {
-            socket.emit('chat:client', message, function(message) {
+            socket.emit('chat:client', { message: message}, function(message) {
               $log.debug('ChatService emitted message', message);
             });
           });

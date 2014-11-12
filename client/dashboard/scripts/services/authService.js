@@ -37,11 +37,11 @@ angular.module('dimsDashboard.services')
           ChatService.stop();
           LogService.stop();
           ChatSocket.then(function(socket) {
-            // socket.removeAllListeners('chat:data');
-            // socket.removeAllListeners('logs:data');
+            socket.removeAllListeners('chat:data');
             socket.disconnect();
           });
           LogSocket.then(function(socket) {
+            socket.removeAllListeners('logs:data');
             socket.disconnect();
           })
           SessionService.delete(function(res) {

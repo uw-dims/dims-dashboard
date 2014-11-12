@@ -47,7 +47,6 @@ exports.logout = function(req,res) {
 // Login user
 exports.login = function(req,res,next) {
   logger.debug('1 auth/session.login');
-  logger.debug('auth/session password', req.body);
   passport.authenticate('local', function(err, user, info) {
     // Info contains messages regarding why login was unsuccessful   
     if (err || !user) {
