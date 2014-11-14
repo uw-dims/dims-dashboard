@@ -16,6 +16,8 @@ config.ca_name = process.env.CA_NAME || 'dims-ca';
 
 config.cert_name = process.env.CERT_NAME || process.env.HOSTNAME || 'localhost';
 
+config.sessionTimeout = 60000; //1800000; // 30 minutes
+
 config.sessionSecret = '3xueis763$%STID47373deC!!QUsT8J4$';
 
 config.cookieSecret = 'Xu9J35bq!5#kNY*n3v04aSPxoURx98wQZW';

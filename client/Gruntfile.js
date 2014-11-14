@@ -31,7 +31,7 @@ module.exports = function (grunt) {
     ngconstant: {
       options: {
         space: '  ',
-         wrap: '"use strict";\n\n {%= __ngModule %}',
+         wrap: '\'use strict\';\n\n {%= __ngModule %}\n\n',
         name: 'dimsDashboard.config',
         deps: false,
         dest: '<%= appConfig.app %>/scripts/config.js',
