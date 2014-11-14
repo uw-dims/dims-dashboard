@@ -155,7 +155,7 @@ app.use(session({
     port: 6379,
     client: redisClient,
     // Session time to live - one hour for now - will force logout regardless of activity
-    ttl: 3600
+    ttl: config.sessionTTL
   }),
   saveUninitialized: false, // don't create session until something stored
   resave: false // don't save session if unmodified

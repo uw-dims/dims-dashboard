@@ -16,7 +16,7 @@ config.ca_name = process.env.CA_NAME || 'dims-ca';
 
 config.cert_name = process.env.CERT_NAME || process.env.HOSTNAME || 'localhost';
 
-config.sessionTimeout = 60000; //1800000; // 30 minutes
+config.sessionTTL = 7200; //Redis session expiration. 2 hours, in seconds
 
 config.sessionSecret = '3xueis763$%STID47373deC!!QUsT8J4$';
 
