@@ -1,24 +1,45 @@
+'use strict';
+var redisScheme = {
 
-var redisScheme = {};
+  'types': {
+    'userSettings': {
+      'set': 'userSettings',
+      'prefix': 'userSetting'
+    },
+    'tickets': {
+      'set': 'tickets',
+      'prefix': 'ticket',
+      'counter': '.__counter'
+    },
+    'topics': {
+      'counter': '.__counter',
+      'timestamp': '.__timestamp'
+    }
+  },
 
-redisScheme.types = {
-  'userSettings': {
-  	'set': 'userSettings',
-  	'prefix': 'userSetting'
-  }
+  'counterSuffix': '.__counter',
+  'timestampSuffix': '.__timestamp',
+  'topicSuffix': '.__topics',
+
   'tickets': {
-  	'set': 'tickets',
-  	'prefix': 'ticket'
-  }
+    'setName': 'tickets',
+    'prefix': 'ticket'
+  },
+
+  'userSettings': {
+    'setName': 'userSettings',
+    'prefix': 'userSetting'
+  },
+
+
+
+  'topicTypes': ['silk', 'cif', 'crosscor', 'cidrs', 'data'],
+
+  'delimiter': ':'
+
 };
 
-redisScheme.ticketAspectTypes = ['silk', 'cif', 'crosscor', 'cidrs', 'data'];
-
-redisScheme.ticketMetadataType = 'metadata';
-
-redisScheme.delimiter = ':';
-
-return redisScheme;
+module.exports = redisScheme;
 
 /**
 	* =====================================

@@ -4,7 +4,7 @@
 // Queries redis to read/update/create user settings
 
 var config = require('../config');
-var redisScheme = require('../redisScheme');
+var c = require('../config/redisScheme');
 var logger = require('../utils/logger');
 var q = require('q');
 
@@ -17,9 +17,9 @@ function UserSettings(client, user, userSettings) {
 	self.userSettings = userSettings || {};
 
 	// Redis set that holds all keys for userSettings
-	self.keySet = redisScheme.userSettings.set;
+	self.keySet = c.userSettings.setName;
 	// Construct key for this user
-	self.key = redisScheme.userSettings.prefix + redisScheme.delimiter + user;
+	self.key = c.userSettings.prefix + c.delimiter + user;
 
 	// Update a setting
 	self.update = function(settings) {

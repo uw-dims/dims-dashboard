@@ -9,7 +9,7 @@ module.exports = function(grunt) {
     app: 'server'
   };
 
-  var node_env = grunt.option('node_env') || 'development';
+  var node_env = grunt.option('node_env') || 'test';
   var log_level = grunt.option('log_level') || 'debug';
   var cert_directory = grunt.option('cert_directory') || 'certs/';
   var cert_name = grunt.option('cert_name') || 'localhost';
