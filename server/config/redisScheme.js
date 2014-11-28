@@ -33,7 +33,7 @@ var redisScheme = {
 
 
 
-  'topicTypes': ['silk', 'cif', 'crosscor', 'cidrs', 'data'],
+  'topicTypes': ['silk', 'cif', 'crosscor', 'cidrs', 'mitigation', 'data'],
 
   'delimiter': ':'
 

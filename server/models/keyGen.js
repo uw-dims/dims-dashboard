@@ -29,7 +29,7 @@ var KeyGen = {
   // Key to list of topics associated to a ticket
   // "ticket:num:username.__topics"
   topicListKey: function(ticket) {
-    return this.ticketKey(ticket) + c.ticket.topicSuffix;
+    return this.ticketKey(ticket) + c.topicSuffix;
   },
 
   // Key to a topic counter
