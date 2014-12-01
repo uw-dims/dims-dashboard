@@ -25,7 +25,7 @@ exports.upload = function(req, res){
     var filename, 
         tmp_path,
         data = {},
-        extensionAllowed = [".txt", ".json", ".log"],
+        extensionAllowed = [".txt", ".json", ".log", ".yml"],
         maxSizeOfFile = config.maxUploadFileSize,
         // myDirectory = './mydata/',
         // target_path = './upload/',
