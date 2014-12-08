@@ -53,7 +53,8 @@ var sslOptions = {
   //rejectUnauthorized: false
 };
 
-var redisClient = redis.createClient();
+// var redisClient = redis.createClient();
+var redisClient = require('./utils/redisDB');
 
 var app = module.exports = express();
 var env = process.env.NODE_ENV || 'development';

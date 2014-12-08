@@ -43,22 +43,22 @@ describe('models/Topic', function() {
     });
   });
 
-  describe('#create', function(done) {
-    it('should save the topic dataType', function(done) {
-      var ticket = new Ticket();
-      var expectedDataType = topicDataType1;
-      ticket.create({creator: user, type: 'mitigation'}).then(function(ticket) {
-        debugTicketCounter(ticket);
-        ticket.addTopic(topicName1, topicDataType1, topicContents1).then(function(topic) {
-            var key = KeyGen.topicTypeKey(topic);
-            db.get(key).then(function(reply) {
-              expect(reply).to.equal(expectedDataType);
-              done();
-            })
-        });
-      });
-    });
-  });
+  // describe('#create', function(done) {
+  //   it('should save the topic dataType', function(done) {
+  //     var ticket = new Ticket();
+  //     var expectedDataType = topicDataType1;
+  //     ticket.create({creator: user, type: 'mitigation'}).then(function(ticket) {
+  //       debugTicketCounter(ticket);
+  //       ticket.addTopic(topicName1, topicDataType1, topicContents1).then(function(topic) {
+  //           var key = KeyGen.topicTypeKey(topic);
+  //           db.get(key).then(function(reply) {
+  //             expect(reply).to.equal(expectedDataType);
+  //             done();
+  //           })
+  //       });
+  //     });
+  //   });
+  // });
 
   describe('#getDataType', function(done) {
     it('should return the topic dataType', function(done) {

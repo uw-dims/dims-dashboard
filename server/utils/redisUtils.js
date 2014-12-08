@@ -20,7 +20,8 @@ var hmset = q.nbind(redisDB.hmset, redisDB),
     hgetall = q.nbind(redisDB.hgetall, redisDB),
     zadd = q.nbind(redisDB.zadd, redisDB),
     zrange = q.nbind(redisDB.zrange, redisDB),
-    zrank = q.nbind(redisDB.zrank, redisDB);
+    zrank = q.nbind(redisDB.zrank, redisDB),
+    type = q.nbind(redisDB.type, redisDB);
 
 // Get all data from redis for different datatypes
 // hash, set, sorted set
@@ -108,6 +109,7 @@ var functions = {
   zadd: zadd,
   zrange: zrange,
   zrank: zrank,
+  type: type,
   getAllData: getAllData,
   setData: setData
 };

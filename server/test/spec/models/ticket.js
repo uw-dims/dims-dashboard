@@ -3,6 +3,7 @@
 var Ticket = require('../../../models/ticket');
 var db = require('../../../utils/redisUtils');
 var redisDB = require('../../../utils/redisDB');
+// var redisDB = require('../config');
 var redis = require('redis');
 var logger = require('../../../utils/logger');
 var KeyGen = require('../../../models/keyGen');
@@ -25,10 +26,12 @@ var topicName1 = 'topicHashData',
 var createCounter;
 
 // Perform first before first test starts
-before(function() {
+before(function(done) {
   // Get the redis db
+  logger.debug('TEST: Performing before functions');
   redisDB.select(4, function(err, reply) {
-    logger.debug('TEST: redis select reply', reply);
+    logger.debug('TEST: redis has selected db, reply is ', reply);
+    done();
   });
   redis.debug_mode = false;
   redisDB.on('error', function(err) {
@@ -40,6 +43,7 @@ before(function() {
 // Perform after all tests done
 after(function(done) {
   logger.debug('Quitting redis');
+  
   redisDB.flushdb(function(reply) {
     logger.debug('flushdb reply ',reply);
     redisDB.quit(function(err, reply) {

@@ -30,7 +30,7 @@ Topic.prototype.setDataType = function(dataType) {
 Topic.prototype.getDataType = function() {
   var self = this;
   var deferred = q.defer();
-  db.get(KeyGen.topicTypeKey(self))
+  db.type(KeyGen.topicKey(self))
   .then (function(reply) {
     deferred.resolve(reply);
   }, function(err, reply) {
@@ -70,10 +70,8 @@ Topic.prototype.create = function(content, score) {
   // save the data
   self.setData(content, score)
   .then(function(reply) {
-    // save the dataType
-    return db.set(KeyGen.topicTypeKey(self), self.dataType);
-  })
-  .then(function(reply) {
+    // save the dataType - don't need this
+    // return db.set(KeyGen.topicTypeKey(self), self.dataType);
     deferred.resolve(reply);
   }, function(err, reply) {
     deferred.reject(err.toString());
