@@ -4,6 +4,7 @@
 // Queries redis to read/update/create user settings
 
 var config = require('../config');
+var c = require('../config/redisScheme');
 var logger = require('../utils/logger');
 var q = require('q');
 
@@ -14,9 +15,13 @@ function UserSettings(client, user, userSettings) {
 	self.client = client;
 	self.user = user;
 	self.userSettings = userSettings || {};
-	self.key = 'userSetting:' + user;
-	self.keySet = 'userSettings';
 
+	// Redis set that holds all keys for userSettings
+	self.keySet = c.userSettings.setName;
+	// Construct key for this user
+	self.key = c.userSettings.prefix + c.delimiter + user;
+
+	// Update a setting
 	self.update = function(settings) {
 		var deferred = q.defer();
 		self.client.hmset(self.key, settings, function(err, data) {
@@ -25,7 +30,7 @@ function UserSettings(client, user, userSettings) {
 		});
 		return deferred.promise;
 	};
-
+	// Get a setting for the logged in user
 	self.get = function() {
 		var deferred = q.defer();
 		self.client.hgetall(self.key, function(err,data) {
@@ -43,10 +48,14 @@ UserSettings.prototype.getSettings = function() {
 	var self = this;
 	var deferred = q.defer();
 	self.get().then(function(data) {
+		// Settings exist, so resolve promise
 		if (data) deferred.resolve(data);
 		else {
+			// Settings do not exist - create them
 			var settingsObject = config.defaultUserSettings;
+			// Create the setting
 			self.update(settingsObject);
+			// Add the key to the keyset
 			self.updateKey();
 			deferred.resolve(settingsObject);
 		}
@@ -66,10 +75,6 @@ UserSettings.prototype.updateSettings = function() {
 		return deferred.reject(err);
 	});
 	return deferred.promise;
-};
-
-UserSettings.prototype.getAllKeys = function() {
-
 };
 
 UserSettings.prototype.updateKey = function() {

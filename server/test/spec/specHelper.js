@@ -1,7 +1,7 @@
 
 
-var app = require('../../../server'),
-    chai = require('chai'),
+// var app = require('../../../server');
+var chai = require('chai'),
     sinonChai = require('sinon-chai');
 
 global.expect = chai.expect;

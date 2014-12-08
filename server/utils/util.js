@@ -147,4 +147,12 @@ var writeSettings = function(json) {
 
 exports.writeSettings = writeSettings;
 
+// Create a timestamp, UTC, milliseconds from epoch
+var createTimestamp = function() {
+  var now = new Date().getTime();
+  return now;
+};
+
+exports.createTimestamp = createTimestamp;
+
 

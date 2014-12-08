@@ -229,6 +229,11 @@ router.get('/data', ensureAuthenticated, data.list);
 router.get('/settings', ensureAuthenticated, settings.get);
 router.post('/settings', ensureAuthenticated, settings.update);
 
+// Tickets
+router.get('/tickets', require('./routes/tickets').list);
+router.get('/tickets/:id', require('./routes/tickets').show);
+// router.post('/tickets', require('./routes/tickets').create);
+
 // authorization
 router.get('/auth/session', ensureAuthenticated, require('./routes/session').session);
 router.post('/auth/session', require('./routes/session').login);
