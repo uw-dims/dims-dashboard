@@ -20,7 +20,7 @@ var topicName1 = 'topicHashData',
     },
     topicName2 = 'topicSetData',
     topicDataType2 = 'set',
-    topicContents2 = [ 'aaaaa', 'bbbbb'];
+    topicContents2 = [ 'aaaaa'];
 
 var createCounter = 0;
 

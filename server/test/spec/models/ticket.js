@@ -21,7 +21,8 @@ var topicName1 = 'topicHashData',
     },
     topicName2 = 'topicSetData',
     topicDataType2 = 'set',
-    topicContents2 = [ 'aaaaa', 'bbbbb'];
+    // Set to one value until jenkins redis is updated from 2.2.10
+    topicContents2 = [ 'aaaaa'];
 
 var createCounter;
 

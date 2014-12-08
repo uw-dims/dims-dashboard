@@ -46,7 +46,7 @@ var getAllData = function(key, dataType) {
       deferred.reject(err.toString());
     });
 
-  } else if (dataType === 'sortedSet') {
+  } else if (dataType === 'zset') {
     zrange(key, 0, -1).then(function(reply) {
       deferred.resolve(reply);
     }, function(err, reply) {
@@ -81,7 +81,7 @@ var setData = function(key, dataType, content, score) {
       logger.error('redisUtils.setData.sadd had an err returned from redis', err, reply);
       deferred.reject(err.toString());
     });
-  } else if (dataType === 'sortedSet') {
+  } else if (dataType === 'zset') {
     // Uses current time as the score if it is not supplied
     var itemScore = score || 0;
     if (itemScore === 0) {
