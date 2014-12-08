@@ -10,9 +10,6 @@ exports.list = function(req,res) {
 
   logger.debug('anon:list - Request: ', req.query);
 
-
-  console.log(req.query );
-
   var fullBody = '';
 
   req.on('data', function(chunk)

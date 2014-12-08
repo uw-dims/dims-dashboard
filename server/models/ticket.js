@@ -1,153 +1,195 @@
 'use strict';
 
-// ticket model
+/** 
+  * file: models/ticket.js
+  */
+
 var config = require('../config');
 var c = require('../config/redisScheme');
 var KeyGen = require('./keyGen');
 var logger = require('../utils/logger');
 var Topic = require('./topic');
 var q = require('q');
-var redis = require('redis');
+var redisDB = require('../utils/redisDB');
+var db = require('../utils/redisUtils');
+var dimsUtils = require('../utils/util');
+var redisUtils = require('../utils/redisUtils');
 
 exports = module.exports = Ticket;
 
-function Ticket(client, user) {
+// constructor
+function Ticket() {
 	var self = this;
-  // redis client
-	self.client = client;
-  // logged in user
-	self.name = user;
+  // Construct a config with ticket metadata
 };
 
-Ticket.prototype.create = function() {
+// Get metadata from ticket and put in config
+Ticket.prototype.getTicketMetadata = function() {
+    var config = {},
+        self = this;
+    config.num = self.num;
+    config.creator = self.creator;
+    config.type = self.type;
+    config.createdTime = self.createdTime;
+    config.open = self.open;
+    return config;
+  };
+
+// Populate a ticket object with its stored metadata
+Ticket.prototype.getTicket = function(key) {
   var self = this;
   var deferred = q.defer();
-  var ticketCounterKey = KeyGen.ticketCounterKey();
-  // Increment the ticket counter and save as number
-  self.client.incr(ticketCounterKey, function(err,data) {
-    if (err) { 
-      deferred.reject(err);
-    } else {
-      // self.num is number (integer)
-      self.num = data;
-      // Get the key for the ticket
-      var key = KeyGen.ticketKey(self);
-      // Set the value of the key to default
-      self.client.set(key, '', function(err, data) {
-        if (err) { 
-          deferred.reject(err); 
-        } else {
-          // Add the key to the set of ticket keys
-          self.client.sadd(KeyGen.ticketSetKey(), key, function(err, data) {
-            if (err) {
-              deferred.reject(err);
-            } else {
-              deferred.resolve(self);
-            }
-          });
-        }
-      });
-    }
+  db.hgetall(key).then(function(reply) {
+      var keyArray = key.split(':');
+      self.num = keyArray[1];
+      self.creator = reply.creator;
+      self.type = reply.type;
+      self.createdTime = reply.createdTime;
+      self.open = reply.open;
+      deferred.resolve(self);
+  }, function(err, reply) {
+      deferred.reject(err.toString());
   });
   return deferred.promise;
 };
 
-Ticket.prototype.addTopic = function(topicName, contents) {
+// Get an array of all tickets
+Ticket.prototype.getAllTickets = function() {
   var self = this;
   var deferred = q.defer();
-  // Increment the topic counter
-  var topicCounterKey = KeyGen.topicCounterKey(self, topicName);
-  self.client.incr(topicCounterKey, function(err,data) {
-    if (err) { deferred.reject(err); }
-    else {
-      // Date returned is value of the counter
-      var topicCounterValue = data;
-      // Get the key for the list of topics for this ticket
-      var topicListKey = KeyGen.topicListKey(self);
-      // Push the "full name" of the topic on the list of topics
-      self.client.rpush(topicListKey, self.getTopicFullName(topicName,topicCounterValue), function(err, data) {
-        if (err) deferred.reject(err);
-        else {
-          var topic = new Topic(self,topicName,topicCounterValue);
-          // Generate the topicKey
-          var topicKey = KeyGen.topicKey(topic);
-          // Store the contents
-          self.client.hmset(topicKey, contents, function(err, data) {
-            if (err) { deferred.reject(err); }
-            else {
-              // Get the key for the timestamp for this topic
-              var topicTimestampKey = KeyGen.topicTimestampKey(topic);
-              // Generate the current time
-              var now = new Date().getTime();
-              var secsSinceEpoch = Math.floor(now/1000);
-              self.client.set(topicTimestampKey, secsSinceEpoch.toString(), function(err,data) {
-                // promise will return the topic
-                if (err) { deferred.reject(err); }
-                else {
-                  deferred.resolve(topic);
-                }  
-              });
-            }  
-          });
-        }
-      });
-    }
+  db.zrange(KeyGen.ticketSetKey(), 0, -1).then(function(reply) {
+    deferred.resolve(reply);
+  }, function(err, reply) {
+      deferred.reject(err.toString());
+  });
+  return deferred.promise;
+};
+
+
+Ticket.prototype.create = function(context) {
+  var self = this;
+  var deferred = q.defer();
+  // Process arguments in context object
+  var args = context || {};
+  self.creator = args.creator || '';
+  self.type = args.type || '';
+  self.open = true;
+  self.createdTime = dimsUtils.createTimestamp();
+  // Get the counter key
+  var ticketCounterKey = KeyGen.ticketCounterKey();
+  var key, value;
+  // Increment the ticket counter 
+  db.incr(ticketCounterKey)
+  .then(function(reply) {
+    // Save it
+    self.num = reply;
+    // Get the ticket key
+    key = KeyGen.ticketKey(self);
+    // Get metadata
+    value = self.getTicketMetadata();
+    // Save the data to datastore
+    return db.hmset(key, value);
+  })
+  .then(function(result) {
+    // Add the key to the sorted set of tickets. score is created time
+    return db.zadd(KeyGen.ticketSetKey(), self.createdTime, key);
+  })
+  .then(function(reply) {
+    // return the newly created ticket
+    deferred.resolve(self);
+  }, function(err, reply) {
+    logger.debug('Ticket.create had an err returned from redis', err, reply);
+    deferred.reject(err.toString());
+  });
+  return deferred.promise;
+};
+
+// Add a topic to the ticket
+Ticket.prototype.addTopic = function(topicName, dataType, content, numbered) {
+  var self = this;
+  var deferred = q.defer();
+  // Create the topic object
+  var topic = new Topic(self, self.type, topicName, dataType);
+  // Save the topic
+  topic.create(content)
+    .then(function(reply) {
+      // Add the topic key to the sorted set of keys
+      // The score is the created timestamp, so we don't need to save that
+      // elsewhere - can get the score from the set
+      return db.zadd(KeyGen.topicListKey(self), dimsUtils.createTimestamp(), KeyGen.topicKey(topic));
+  })
+    .then(function(reply) {
+      deferred.resolve(topic);
+  }, function(err, reply) {
+    logger.debug('Ticket.addTopic had an err returned from redis', err, reply);
+      deferred.reject(err.toString());
   });
   return deferred.promise; 
 };
 
-// Get all the topic names for this ticket. Returns a promise with an array of topic names
-Ticket.prototype.getTopicNames = function() {
-  logger.debug('Ticket.getTopicNames');
+// Get all the topic keys for this ticket. Returns a promise with an array of topic keys
+Ticket.prototype.getTopicKeys = function() {
   var self = this;
   var deferred = q.defer();
-  // Get the key for the list of topics for this ticket
-  var topicListKey = KeyGen.topicListKey(self);
-  self.client.lrange(topicListKey, 0, -1, function(err, data) {
-    if (err) { 
-      logger.debug('Ticket.getTopicNames: error ', err);
-      deferred.reject(err); }
-    else {
-      logger.debug('Ticket.getTopicNames: data is ', data);
-      deferred.resolve(data);
-    }
-  });
+  // Get the keys
+  db.zrange(KeyGen.topicListKey(self), 0, -1)
+  .then(function(reply){
+      deferred.resolve(reply);
+    }, function(err, reply) {
+      deferred.reject(err.toString());
+    });
   return deferred.promise;
 };
 
 // Get all the topics in a ticket. Returns a promise with an array of topics.
+// This does not retrieve the topic content
 Ticket.prototype.getTopics = function() {
-  logger.debug('Ticket.getTopics');
   var self = this;
   var deferred = q.defer();
   var topics = [];
-  var topicsRetrieved = 0;
-
-  self.getTopicNames().then(function(topicNames) {
-      for (var i=0; i< topicNames.length; i++) {
-        var nameArray = topicNames[i].split('.');
-        if (nameArray.length < 2) {
-          logger.warn('Ticket.getTopics: Invalid topic full name ', topicNames[i]);
-          continue; // Skip this topic
-        }
-        var topicNum = parseInt(nameArray[1]);
-        if (isNaN(topicNum)) {
-          logger.warn('Ticket.getTopics: Invalid counter ', nameArray[1]);
-          continue;
-        }
-        var topic = new Topic (self, nameArray[0], topicNum);
-        topics.push(topic);
+  var promises = [];
+  // 
+  self.getTopicKeys()
+  .then(function(topicKeys) {
+      for (var i=0; i< topicKeys.length; i++) {
+        var topicPromise = self.topicFromKey(topicKeys[i]);
+        promises.push(topicPromise);
       }
-      deferred.resolve(topics);
+      q.all(promises).then(function(array) {
+        topics = array;
+        deferred.resolve(topics);
+      });
+      
+    });
+  return deferred.promise;
+};
+
+// Derive topic object from its key 
+Ticket.prototype.topicFromKey = function(key) {
+  var self = this;
+  var deferred = q.defer();
+  var ticketKey = KeyGen.ticketKey(self);
+  // Remove the parent key
+  var topicInfo = key.replace(ticketKey, '');
+  topicInfo = topicInfo.substring(1, topicInfo.length);
+  var topicData = topicInfo.split(c.delimiter);
+  var topic = new Topic(self, self.type, topicData[1]);
+  topic.getDataType()
+    .then(function(reply) {
+      topic.setDataType(reply);
+      deferred.resolve(topic);
+    }, function(err, reply) {
+      deferred.reject(err.toString());
     });
   return deferred.promise;
 };
 
 Ticket.prototype.paramString = function() {
   var self = this;
-  return self.num + ',' + self.name;
+  return self.num + ',' + self.type + ',' + self.creator + ',' + self.createdTime + ',' + self.open;
 };
 
 Ticket.prototype.getTopicFullName = function(name, num) {
   return name+'.'+num;
 };
+

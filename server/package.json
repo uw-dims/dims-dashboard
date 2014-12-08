@@ -3,6 +3,9 @@
   "main": "app.js",
   "version": "1.0.0",
   "private": true,
+  "scripts": {
+    "test": "./node_modules/.bin/mocha --recursive -R xunit test/ > test-reports.xml"
+  },
   "dependencies": {
     "JSONStream": "0.8.4",
     "async": "0.9.0",
@@ -60,6 +63,7 @@
     "time-grunt": "0.3.2",
     "grunt-env": "0.4.2",
     "chai": "1.9.2",
-    "sinon-chai":"2.5.0"
+    "sinon-chai":"2.5.0",
+    "mocha":"2.0.1"
   }
 }

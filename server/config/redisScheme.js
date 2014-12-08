@@ -20,9 +20,11 @@ var redisScheme = {
   'counterSuffix': '.__counter',
   'timestampSuffix': '.__timestamp',
   'topicSuffix': '.__topics',
+  'typeSuffix' : '.__type',
 
   'tickets': {
-    'setName': 'tickets',
+    'setName': 'ticket.__tickets',
+    'counter': 'ticket.__counter',
     'prefix': 'ticket'
   },
 
@@ -30,8 +32,6 @@ var redisScheme = {
     'setName': 'userSettings',
     'prefix': 'userSetting'
   },
-
-
 
   'topicTypes': ['silk', 'cif', 'crosscor', 'cidrs', 'mitigation', 'data'],
 

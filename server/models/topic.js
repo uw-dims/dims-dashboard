@@ -1,44 +1,101 @@
 'use strict';
 
-// ticket model
+// topic model
 var config = require('../config');
 var c = require('../config/redisScheme');
-var keyGen = require('./keyGen');
+var KeyGen = require('./keyGen');
 var logger = require('../utils/logger');
 var q = require('q');
+var db = require('../utils/redisUtils');
+
 
 exports = module.exports = Topic;
 
 // parent: parent Ticket
 // name: name of topic
-// num: topic counter
-function Topic(parent, name, num) {
-  var self = this;
+// type: type of ticket/topic
+function Topic(parent,type,name,dataType) {
+  var self=this;
   self.parent = parent;
+  self.type = type;
   self.name = name;
-  self.num = num;
+  self.dataType = dataType;
 };
 
-// Return name.counter
+Topic.prototype.setDataType = function(dataType) {
+  var self = this;
+  self.dataType = dataType;
+};
+
+Topic.prototype.getDataType = function() {
+  var self = this;
+  var deferred = q.defer();
+  db.get(KeyGen.topicTypeKey(self))
+  .then (function(reply) {
+    deferred.resolve(reply);
+  }, function(err, reply) {
+    deferred.reject(err.toString());
+  });
+  return deferred.promise;
+};
+
+// Return readable name
 Topic.prototype.getName = function() {
   var self = this;
-  return self.name + '.' + self.num;
+  return self.type + ':' + self.name;
 };
 
-// Get the contents of the hash (fields, values) stored at topic key
+// Get the contents stored at topic key
 Topic.prototype.getContents = function() {
   var self = this;
   var deferred = q.defer();
   // Get the key for this topic
-  var key = keyGen.topicKey(self);
-  // Return all fields and values in the hash
-  self.parent.client.hgetall(key, function(err, data) {
-    if (err) deferred.reject(err);
-    else {
-      deferred.resolve(data);
-    }
+  var key = KeyGen.topicKey(self);
+  self.getDataType().then(function(reply) {
+    self.dataType = reply;
+    return db.getAllData(key, self.dataType);
+  })
+  .then(function(reply) {
+    deferred.resolve(reply);
+  }, function(err, reply) {
+    deferred.reject(err.toString());
   });
   return deferred.promise;
+};
+
+// Save a new topic
+Topic.prototype.create = function(content, score) {
+  var self = this;
+  var deferred = q.defer();
+  // save the data
+  self.setData(content, score)
+  .then(function(reply) {
+    // save the dataType
+    return db.set(KeyGen.topicTypeKey(self), self.dataType);
+  })
+  .then(function(reply) {
+    deferred.resolve(reply);
+  }, function(err, reply) {
+    deferred.reject(err.toString());
+  });
+  return deferred.promise;
+};
+
+Topic.prototype.setData = function(content, score) {
+  var self = this;
+  var deferred = q.defer();
+  db.setData(KeyGen.topicKey(self), self.dataType, content, score).then(function(reply) {
+    deferred.resolve(reply);
+  }, function(err, reply) {
+    deferred.reject(err.toString());
+  });
+  return deferred.promise;
+};
+
+// Add incremented counter to the topic key
+// Not all topics need a counter 
+Topic.prototype.addCounter = function() {
+
 };
 
 // Get the timestamp stored at the topic timestamp key
@@ -46,14 +103,13 @@ Topic.prototype.getTimeStamp = function() {
   var self = this;
   var deferred = q.defer();
   // Get the key for the topic timestamp
-  var key = keyGen.topicTimestampKey(self);
+  var key = KeyGen.topicTimestampKey(self);
   // Get the value stored at the timestampkey
- self.parent.client.get(key, function(err, data) {
-    if (err) return deferred.reject(err);
-    else {
-      deferred.resolve(data);
-    }
- });
+  db.get(key).then(function(reply) {
+    deferred.resolve(reply);
+  }, function(err, reply) {
+    deferred.reject(err.toString());
+  });
   return deferred.promise;
 };
 
@@ -61,11 +117,16 @@ Topic.prototype.getTimeStamp = function() {
 Topic.prototype.paramString = function() {
   var self = this;
   var deferred = q.defer();
-  var ok = self.getContents();
-  ok.then(function(err, contents) {
-    self.getTimeStamp().then(function(err, timestamp) {
-      self.resolve(self.getName() + ',' + timestamp + ' -> ' + contents );
-    })
+  var contents, timestamp;
+  self.getContents().then(function(reply) {
+    contents = reply;
+    return self.getTimeStamp();
   })
+  .then(function(reply) {
+    timestamp = reply;
+    q.resolve(self.getName() + ',' + timestamp + '->' + contents);
+  }, function(err, reply) {
+      deferred.reject(err.toString());
+  });
   return deferred.promise;
 };

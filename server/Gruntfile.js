@@ -30,7 +30,7 @@ module.exports = function(grunt) {
     mochaTest: {
       test: {
         options: {
-          reporter: 'spec'
+          reporter: 'xunit'
         },
         src: ['test/spec/specHelper.js','test/**/*.js']
       }
