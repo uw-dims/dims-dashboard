@@ -48,6 +48,7 @@ Ticket.prototype.getTicket = function(key) {
       self.open = reply.open;
       deferred.resolve(self);
   }, function(err, reply) {
+      logger.error('Ticket.getTicket had an err returned from redis', err, reply);
       deferred.reject(err.toString());
   });
   return deferred.promise;
@@ -60,6 +61,7 @@ Ticket.prototype.getAllTickets = function() {
   db.zrange(KeyGen.ticketSetKey(), 0, -1).then(function(reply) {
     deferred.resolve(reply);
   }, function(err, reply) {
+      logger.error('Ticket.getAllTickets had an err returned from redis', err, reply);
       deferred.reject(err.toString());
   });
   return deferred.promise;
@@ -98,7 +100,7 @@ Ticket.prototype.create = function(context) {
     // return the newly created ticket
     deferred.resolve(self);
   }, function(err, reply) {
-    logger.debug('Ticket.create had an err returned from redis', err, reply);
+    logger.error('Ticket.create had an err returned from redis', err, reply);
     deferred.reject(err.toString());
   });
   return deferred.promise;
@@ -121,7 +123,7 @@ Ticket.prototype.addTopic = function(topicName, dataType, content, numbered) {
     .then(function(reply) {
       deferred.resolve(topic);
   }, function(err, reply) {
-    logger.debug('Ticket.addTopic had an err returned from redis', err, reply);
+    logger.error('Ticket.addTopic had an err returned from redis', err, reply);
       deferred.reject(err.toString());
   });
   return deferred.promise; 
@@ -136,6 +138,7 @@ Ticket.prototype.getTopicKeys = function() {
   .then(function(reply){
       deferred.resolve(reply);
     }, function(err, reply) {
+      logger.error('Ticket.getTopicKeys had an err returned from redis', err, reply);
       deferred.reject(err.toString());
     });
   return deferred.promise;
@@ -160,6 +163,9 @@ Ticket.prototype.getTopics = function() {
         deferred.resolve(topics);
       });
       
+    }, function(err, reply) {
+      logger.error('Ticket.getTopics had an err returned from redis', err, reply);
+      deferred.reject(err.toString());
     });
   return deferred.promise;
 };
@@ -179,6 +185,7 @@ Ticket.prototype.topicFromKey = function(key) {
       topic.setDataType(reply);
       deferred.resolve(topic);
     }, function(err, reply) {
+      logger.error('Ticket.topicFromKey had an err returned from redis', err, reply);
       deferred.reject(err.toString());
     });
   return deferred.promise;

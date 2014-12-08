@@ -74,6 +74,7 @@ Topic.prototype.create = function(content, score) {
     // return db.set(KeyGen.topicTypeKey(self), self.dataType);
     deferred.resolve(reply);
   }, function(err, reply) {
+    logger.error('Topic.create had an err returned from redis', err, reply);
     deferred.reject(err.toString());
   });
   return deferred.promise;
@@ -85,6 +86,7 @@ Topic.prototype.setData = function(content, score) {
   db.setData(KeyGen.topicKey(self), self.dataType, content, score).then(function(reply) {
     deferred.resolve(reply);
   }, function(err, reply) {
+    logger.error('Topic.setData had an err returned from redis', err, reply);
     deferred.reject(err.toString());
   });
   return deferred.promise;
@@ -106,6 +108,7 @@ Topic.prototype.getTimeStamp = function() {
   db.get(key).then(function(reply) {
     deferred.resolve(reply);
   }, function(err, reply) {
+    logger.error('Topci.getTimeStamp had an err returned from redis', err, reply);
     deferred.reject(err.toString());
   });
   return deferred.promise;
@@ -124,6 +127,7 @@ Topic.prototype.paramString = function() {
     timestamp = reply;
     q.resolve(self.getName() + ',' + timestamp + '->' + contents);
   }, function(err, reply) {
+    logger.error('Topic.paramstring had an err returned from redis', err, reply);
       deferred.reject(err.toString());
   });
   return deferred.promise;

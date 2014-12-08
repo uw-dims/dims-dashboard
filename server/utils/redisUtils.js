@@ -34,6 +34,7 @@ var getAllData = function(key, dataType) {
     hgetall(key).then(function(reply) {
       deferred.resolve(reply);
     }, function(err, reply) {
+      logger.error('redisUtils.getAllData.hgetall had an err returned from redis', err, reply);
       deferred.reject(err.toString());
     });
 
@@ -41,6 +42,7 @@ var getAllData = function(key, dataType) {
     smembers(key).then(function(reply) {
       deferred.resolve(reply);
     }, function(err, reply) {
+      logger.error('redisUtils.getAllData.smembers had an err returned from redis', err, reply);
       deferred.reject(err.toString());
     });
 
@@ -48,12 +50,14 @@ var getAllData = function(key, dataType) {
     zrange(key, 0, -1).then(function(reply) {
       deferred.resolve(reply);
     }, function(err, reply) {
+      logger.error('redisUtils.getAllData.zrange had an err returned from redis', err, reply);
       deferred.reject(err.toString());
     });
   } else {
     get(key).then(function(reply) {
       deferred.resolve(reply);
     }, function(err, reply) {
+      logger.error('redisUtils.getAllData.get had an err returned from redis', err, reply);
       deferred.reject(err.toString());
     });
   }
@@ -66,6 +70,7 @@ var setData = function(key, dataType, content, score) {
     hmset(key, content).then(function(reply) {
       deferred.resolve(reply);
     }, function(err, reply) {
+      logger.error('redisUtils.setData.hgetall had an err returned from redis', err, reply);
       deferred.reject(err.toString());
     });
 
@@ -73,6 +78,7 @@ var setData = function(key, dataType, content, score) {
     sadd(key, content).then(function(reply) {
       deferred.resolve(reply);
     }, function(err, reply) {
+      logger.error('redisUtils.setData.sadd had an err returned from redis', err, reply);
       deferred.reject(err.toString());
     });
   } else if (dataType === 'sortedSet') {
@@ -82,6 +88,7 @@ var setData = function(key, dataType, content, score) {
       itemScore = dimsUtils.createTimestamp();
     };
     zadd(key, score, content).then(function(reply) {
+      logger.error('redisUtils.setData.zadd had an err returned from redis', err, reply);
       deferred.resolve(reply);
     }, function(err, reply) {
       deferred.reject(err.toString());
@@ -90,6 +97,7 @@ var setData = function(key, dataType, content, score) {
     get(key).then(function(reply) {
       deferred.resolve(reply);
     }, function(err, reply) {
+      logger.error('redisUtils.setData.get had an err returned from redis', err, reply);
       deferred.reject(err.toString());
     });
   }
