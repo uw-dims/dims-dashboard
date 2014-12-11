@@ -20,7 +20,7 @@ exports = module.exports = Ticket;
 // constructor
 function Ticket() {
 	var self = this;
-  // Construct a config with ticket metadata
+  // Not doing anything in constructor right now
 };
 
 // Get metadata from ticket and put in config
@@ -54,6 +54,7 @@ Ticket.prototype.getTicket = function(key) {
   return deferred.promise;
 };
 
+
 // Get an array of all tickets
 Ticket.prototype.getAllTickets = function() {
   var self = this;
@@ -67,8 +68,9 @@ Ticket.prototype.getAllTickets = function() {
   return deferred.promise;
 };
 
-
+// Create a ticket and save metadata
 Ticket.prototype.create = function(context) {
+  logger.debug('models/Ticket.create start');
   var self = this;
   var deferred = q.defer();
   // Process arguments in context object
@@ -100,32 +102,48 @@ Ticket.prototype.create = function(context) {
     // return the newly created ticket
     deferred.resolve(self);
   }, function(err, reply) {
-    logger.error('Ticket.create had an err returned from redis', err, reply);
+    logger.error('models/Ticket.create had an err returned from redis', err, reply);
     deferred.reject(err.toString());
   });
   return deferred.promise;
 };
 
-// Add a topic to the ticket
+// Add a topic to the ticket and save contents
 Ticket.prototype.addTopic = function(topicName, dataType, content, numbered) {
   var self = this;
   var deferred = q.defer();
   // Create the topic object
   var topic = new Topic(self, self.type, topicName, dataType);
-  // Save the topic
-  topic.create(content)
-    .then(function(reply) {
-      // Add the topic key to the sorted set of keys
-      // The score is the created timestamp, so we don't need to save that
-      // elsewhere - can get the score from the set
-      return db.zadd(KeyGen.topicListKey(self), dimsUtils.createTimestamp(), KeyGen.topicKey(topic));
-  })
-    .then(function(reply) {
-      deferred.resolve(topic);
+  logger.debug('models/Ticket.addTopic. Content is ', content);
+  // Check to see if it already exists
+  topic.exists().then(function(reply){
+    logger.debug('models/Ticket.addTopic. Reply from topic.exists is ', reply);
+    if (reply) { 
+      logger.debug('models/Ticket.addTopic. Topic already exists. Return rejection to caller ');
+      return deferred.reject('Topic already exists.');
+    }
+    else { 
+      logger.debug('models/Ticket.addTopic. Topic does not exist. Create it. ');
+      topic.create(content). then(function(reply) {
+          // Add the topic key to the sorted set of keys
+          // The score is the created timestamp, so we don't need to save that
+          // elsewhere - can get the score from the set
+          logger.debug('models/Ticket.addTopic. Reply from create is ', reply);
+          return db.zadd(KeyGen.topicListKey(self), dimsUtils.createTimestamp(), KeyGen.topicKey(topic));
+      })
+        .then(function(reply) {
+          logger.debug('models/Topic.addTopic. Final reply from add to set is ', ', Now resolve with topic');
+          deferred.resolve(topic);
+      }, function(err, reply) {
+          logger.error('models/Ticket.addTopic had an err returned from redis', err, reply);
+          deferred.reject(err.toString());
+      }); 
+    }
   }, function(err, reply) {
-    logger.error('Ticket.addTopic had an err returned from redis', err, reply);
-      deferred.reject(err.toString());
-  });
+          logger.error('models/Ticket.addTopic had an err returned from redis', err, reply);
+          deferred.reject(err.toString());
+      }); 
+    
   return deferred.promise; 
 };
 
@@ -138,7 +156,7 @@ Ticket.prototype.getTopicKeys = function() {
   .then(function(reply){
       deferred.resolve(reply);
     }, function(err, reply) {
-      logger.error('Ticket.getTopicKeys had an err returned from redis', err, reply);
+      logger.error('models/Ticket.getTopicKeys had an err returned from redis', err, reply);
       deferred.reject(err.toString());
     });
   return deferred.promise;
@@ -175,14 +193,23 @@ Ticket.prototype.topicFromKey = function(key) {
   var self = this;
   var deferred = q.defer();
   var ticketKey = KeyGen.ticketKey(self);
+  logger.debug('Ticket.topicFromKey: ticketKey is', ticketKey);
   // Remove the parent key
-  var topicInfo = key.replace(ticketKey, '');
-  topicInfo = topicInfo.substring(1, topicInfo.length);
+  var index = ticketKey.length + 1;
+  var topicInfo = key.substring(index, key.length);
+  logger.debug('Ticket.topicFromKey: topicInfo is ', topicInfo);
   var topicData = topicInfo.split(c.delimiter);
-  var topic = new Topic(self, self.type, topicData[1]);
+  logger.debug('Ticket.topicFromKey: topicData is ', topicData);
+  index = topicData[0].length +1;
+  var topicName = topicInfo.substring(index, topicInfo.length);
+  logger.debug('Ticket.topicFromKey: topicName is ', topicName);
+  var topic = new Topic(self, self.type, topicName);
+  logger.debug('Ticket.topicFromKey: topic is ', topic);
   topic.getDataType()
     .then(function(reply) {
+      logger.debug('Ticket.topicFromKey:reply from getDataType ', reply);
       topic.setDataType(reply);
+      logger.debug('ticket.topicFromKey datatype ', topic.dataType);
       deferred.resolve(topic);
     }, function(err, reply) {
       logger.error('Ticket.topicFromKey had an err returned from redis', err, reply);

@@ -14,11 +14,11 @@ var failOnError = function(err) {
 describe('utils/redisUtils', function() {
 
   // Perform first - flush the database
-  before(function(done) {
-    redisDB.flushdb(function(reply) {
-      done();
-    });
-  });
+  // before(function(done) {
+  //   redisDB.flushdb(function(reply) {
+  //     done();
+  //   });
+  // });
 
   describe('#hmset', function(done) {
     it('should receive success reply of ok', function(done) {

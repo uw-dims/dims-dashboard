@@ -1,5 +1,7 @@
 'use strict';
 
+// Currently not used
+
 var logger = require('../utils/logger');
 
 // Get the session data for the logged in user

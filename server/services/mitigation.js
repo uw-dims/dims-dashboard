@@ -7,12 +7,6 @@ var KeyGen = require('../models/keyGen');
 var db = require('../utils/redisUtils');
 var redisDB = require('../utils/redisDB');
 
-// Use DB 4 for initial debugging and testing
-redisDB.select(4, function(err, reply) {
-      console.log('err ', err);
-      console.log('reply', reply);
-    });
-
 exports.getTicket = function(key, user) {
   var metadata,
       dataKey,

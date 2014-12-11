@@ -19,10 +19,10 @@ var topicName1 = 'topicHashData',
       'field1':'value1',
       'field2':'value2'
     },
-    topicName2 = 'topicSetData',
-    topicDataType2 = 'set',
+    topicName2 = 'topicStringData',
+    topicDataType2 = 'string',
     // Set to one value until jenkins redis is updated from 2.2.10
-    topicContents2 = [ 'aaaaa'];
+    topicContents2 = 'aaaaaa';
 
 var createCounter;
 
@@ -30,15 +30,9 @@ var createCounter;
 before(function(done) {
   // Get the redis db
   logger.debug('TEST: Performing before functions');
-  redisDB.select(4, function(err, reply) {
-    logger.debug('TEST: redis has selected db, reply is ', reply);
-    done();
-  });
   redis.debug_mode = false;
-  redisDB.on('error', function(err) {
-    logger.error('Received error event: ', err);
-  });
   createCounter = 0;
+  done();
 });
 
 // Perform after all tests done
@@ -66,7 +60,6 @@ var failOnError = function(err) {
 
 describe('models/Ticket', function() {
 
-  // Test the create method
   describe('#create', function(done) {
     it('should have a creator if one is supplied', function(done) {
       var ticket = new Ticket();
@@ -180,6 +173,19 @@ describe('models/Ticket', function() {
         });
       });
     });
+    it('should return update the calling object', function(done) {
+      var ticket = new Ticket();
+      ticket.create({creator: user, type: 'mitigation'}).then(function(ticket) {
+        debugTicketCounter(ticket);
+        var key = KeyGen.ticketKey(ticket);
+        var lookedupTicket = new Ticket();
+        lookedupTicket.getTicket(key).then(function(reply) {
+          expect(lookedupTicket.creator).to.equal('testUser');
+          expect(lookedupTicket.type).to.equal('mitigation');
+          done();
+        });
+      });
+    });
   });
 
   describe('#getAllTickets', function(done) {
@@ -193,7 +199,7 @@ describe('models/Ticket', function() {
   });
 
   describe('#addTopic', function(done) {
-    it('should return a topic object', function(done) {
+    it('should return a topic object when the content', function(done) {
       var ticket = new Ticket();
       ticket.create({creator: user, type: 'mitigation'}).then(function(ticket) {
         debugTicketCounter(ticket);
@@ -210,7 +216,7 @@ describe('models/Ticket', function() {
       });
     });
 
-    it('should save the content to the database correctly', function(done) {
+    it('should save the content to the database correctly when dataType is hash', function(done) {
       var ticket = new Ticket();
       ticket.create({creator: user, type: 'mitigation'}).then(function(ticket) {
         debugTicketCounter(ticket);
@@ -219,6 +225,23 @@ describe('models/Ticket', function() {
             var key = KeyGen.topicKey(reply);
             db.hgetall(key).then(function(reply) {
               expect(reply).to.eql(topicContents1);
+              done();
+            }, function(err, reply) {
+              failOnError(err.toString());
+            }).done();
+          });
+      });
+    });
+
+    it('should save the content to the database correctly when dataType is string', function(done) {
+      var ticket = new Ticket();
+      ticket.create({creator: user, type: 'mitigation'}).then(function(ticket) {
+        debugTicketCounter(ticket);
+        ticket.addTopic(topicName2, topicDataType2, topicContents2)
+          .then(function(reply) {
+            var key = KeyGen.topicKey(reply);
+            db.get(key).then(function(reply) {
+              expect(reply).to.equal(topicContents2);
               done();
             }, function(err, reply) {
               failOnError(err.toString());

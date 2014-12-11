@@ -86,7 +86,7 @@ var userdata = require('./models/user')(Bookshelf);
 // Passport functions - will put in separate file later
 // Serialize the user info
 passport.serializeUser(function(user, done) {
-  logger.debug('10 passport.serializeUser. user ident is ', user.get('ident'));
+  logger.debug('app/passport.serializeUser. user ident is ', user.get('ident'));
   done(null, user.get('ident'));
 });
 // Deserialize the user info
@@ -112,20 +112,22 @@ passport.use(new LocalStrategy({
         // Call perl crypt to check password since we are using passwords generated using crypt     
         var program = 'perl ' + __dirname + '/utils/getPass.pl ' + decrypted + ' ' + '\''+pw+'\'';
         var child= exec(program, function(error, stdout, stderr) {
-            logger.debug('passport.use: stderr ', stderr);
+            logger.debug('app/passport.use. getPass results. error, stdout, stderr', error, stdout, stderr);
             if (error !== null) {
-                logger.error('passport.use: exec error: ' , error);
+                logger.error('app/passport.use: exec error. user, error ' , username, error);
                 return done(null, false, error);
             } 
             if (pw === stdout) {
-              logger.debug('6 passport.use: Passwords match. Return user');
+              logger.debug('app/passport.use: Passwords match. Return user');
               // We are passing back user record
                 return done(null, user);
             }
+            logger.debug('app/passport.use: Passwords did not match. ', pw);
             return done(null, false, 'Invalid password');
         });
         
     }, function(error) {
+        logger.debug('app/passport.use. Unknown user ', username);
         return done(null, false, 'Unknown user');
     });
 }));
@@ -218,6 +220,7 @@ router.get('/rwfind', ensureAuthenticated, rwfind.list);
 router.get('/data', ensureAuthenticated, data.list);
 
 // Set up routes for rabbitmq connection for logging and chat
+// Not used - deprecated
 // router.get('/start-logmonitor', ensureAuthenticated, logmon.start);
 // router.get('/stop-logmonitor', ensureAuthenticated, logmon.stop);
 // router.get('/status-logmonitor', ensureAuthenticated, logmon.status);
@@ -231,9 +234,24 @@ router.get('/settings', ensureAuthenticated, settings.get);
 router.post('/settings', ensureAuthenticated, settings.update);
 
 // Tickets
-router.get('/tickets', require('./routes/tickets').list);
-router.get('/tickets/:id', require('./routes/tickets').show);
-// router.post('/tickets', require('./routes/tickets').create);
+// Get all tickets (ticket objects) 
+router.get('/api/ticket', require('./routes/ticket').list);
+// Create a ticket
+router.post('/api/ticket', require('./routes/ticket').create);
+// Get one ticket (ticket object, ticket key, array of topic keys)
+router.get('/api/ticket/:id', require('./routes/ticket').show);
+// Update one ticket
+router.put('/api/ticket/:id', require('./routes/ticket').update);
+// Delete one ticket
+router.delete('/api/ticket/:id', require('./routes/ticket').delete);
+// Add a new topic to a ticket
+router.post('/api/ticket/:id/topic', require('./routes/ticket').addTopic);
+// Get one topic (ticket object, topic object, contents)
+router.get('/api/ticket/topic/:id', require('./routes/ticket').showTopic);
+// Update one topic 
+router.put('/api/ticket/topic/:id', require('./routes/ticket').updateTopic);
+// Delete a topic
+router.delete('/api/ticket/topic/:id', require('./routes/ticket').deleteTopic);
 
 // authorization
 router.get('/auth/session', ensureAuthenticated, require('./routes/session').session);
@@ -241,7 +259,7 @@ router.post('/auth/session', require('./routes/session').login);
 router.delete('/auth/session', require('./routes/session').logout);
 
 // user session - will delete
-router.get('/session', ensureAuthenticated, require('./routes/usersession').session);
+// router.get('/session', ensureAuthenticated, require('./routes/usersession').session);
 router.get('/*', ensureAuthenticated, routes.index);
 
 app.use('/', router);
@@ -275,23 +293,33 @@ var chatPublisher = new RabbitSocket('chat', 'publisher');
 var chat = io
   .of('/chat')
   .on('connection', function(socket) {
-    logger.debug('Chat socket.io. Received client connection event');
+    
+    var info = {
+      connectionID: socket.conn.id,
+      serverAddr: socket.conn.remoteAddress
+    };
+    logger.debug('Chat socket.io. Received client connection event: ', info);
     // Send message to fanout when received from client on socket
     socket.on('chat:client', function(msg) {
-      logger.debug('Chat socket.io: Received client event from client, msg is ', msg);
+      logger.debug('Chat socket.io: Received client event from client. ConnectionID: ', socket.conn.id, ' msg: ', msg);
       chatPublisher.send(msg);
     });
-    socket.on('disconnect', function() {
-      logger.debug('Chat socket.io: Received disconnect event from client');
+    socket.on('disconnect', function(evt) {
+      logger.debug('Chat socket.io: Received disconnect event from client. ConnectionID: ', socket.conn.id);
     });
   });
 // Set up logs socket
 var logs = io
   .of('/logs')
   .on('connection', function(socket) {
-    logger.debug('Logs socket.io. Received client connection event');
-    socket.on('disconnect', function() {
-      logger.debug('Logs socket.io: Received disconnect event from client');
+    
+    var info = {
+      connectionID: socket.conn.id,
+      serverAddr: socket.conn.remoteAddress
+    };
+    logger.debug('Logs socket.io. Received client connection event: ', info);
+    socket.on('disconnect', function(evt) {
+      logger.debug('Logs socket.io: Received disconnect event from client. ConnectionID: ', socket.conn.id);
     });
   });
 

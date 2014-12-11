@@ -1,3 +1,6 @@
+ /**
+  * currently not used - deprecated
+
 var config = require('../config');
 var logger = require('../utils/logger');
 var Fanout = require('../services/fanout.js');
@@ -55,3 +58,6 @@ exports.stop = function(req, res) {
 exports.status = function(req, res) {
   return res.status(200).send('Logmonitor status: ' + logmon.status() + '\n');
 };
+
+*/
+

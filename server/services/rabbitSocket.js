@@ -32,7 +32,7 @@ function RabbitSocket(name, type, io) {
     // Publishes a message to the exchange. This will be the handler called when
     // messages are recevied from a client via a socket
     self.send = function(msg) {
-      logger.debug('Publisher: Received client event from client '+name+', msg is ', msg.message);
+      logger.debug('services/RabbitSocket publisher: Received client event from client '+name+', msg is ', msg.message);
       self.connection.publish(msg.message);
     };
 
@@ -43,8 +43,11 @@ function RabbitSocket(name, type, io) {
       io.emit(self.IO_MSG_TYPE, msg);
     });
     self.send = function(msg) {
-      logger.debug('Socket: Subscriber noop send method called.');
+      logger.debug('services/RabbitSocket: Subscriber noop.');
     };
+    self.connection.on('fanout:' + name + ':started', function(ev) {
+      logger.debug('services/RabbitSocket subscriber received started event for ', name, 'ev=', ev);
+    });
   }
 
   self.connection.start();

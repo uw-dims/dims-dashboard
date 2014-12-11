@@ -18,6 +18,8 @@ config.cert_name = process.env.CERT_NAME || process.env.HOSTNAME || 'localhost';
 
 config.redisHost = process.env.REDIS_HOST || 'localhost';
 
+config.redisDatabase = process.env.REDIS_DATABASE || 0;
+
 config.sessionTTL = 7200; //Redis session expiration. 2 hours, in seconds
 
 config.sessionSecret = '3xueis763$%STID47373deC!!QUsT8J4$';
@@ -31,6 +33,12 @@ config.bin = '/opt/dims/bin/';
 config.rpcPath = '/opt/dims/src/prisem/rpc'
 
 config.rpcServer = 'rabbitmq.prisem.washington.edu';
+
+config.rpcUser = 'rpc_user';
+
+config.rpcPass = 'rpcm3pwd';
+
+config.rpcPort = '5672';
 
 config.mapfile = '/etc/ipgrep_networks.txt';
 

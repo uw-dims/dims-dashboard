@@ -37,11 +37,11 @@ var failOnError = function(err) {
 describe('models/Topic', function() {
 
   // Perform first - flush the database
-  before(function(done) {
-    redisDB.flushdb(function(reply) {
-      done();
-    });
-  });
+  // before(function(done) {
+  //   redisDB.flushdb(function(reply) {
+  //     done();
+  //   });
+  // });
 
   // describe('#create', function(done) {
   //   it('should save the topic dataType', function(done) {

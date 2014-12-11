@@ -1,7 +1,6 @@
 var amqp = require('amqplib');
 var logger = require('../utils/logger');
 var config = require('../config');
-// var net = require('net');
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 util.inherits(RabbitConnection, EventEmitter);
@@ -10,9 +9,12 @@ exports = module.exports = RabbitConnection;
 
 function RabbitConnection(name, type) {
   var self = this;
-  self.user = 'rpc_user';
-  self.pwd = 'rpcm3pwd';
-  self.port = '5672';
+  self.user = config.rpcUser;
+  self.pwd = config.rpcPass;
+  self.port = config.rpcPort;
+  // self.user = 'rpc_user';
+  // self.pwd = 'rpcm3pwd';
+  // self.port = '5672';
   // self.server = 'rabbitmq.prisem.washington.edu';
   self.server = config.rpcServer;
   
@@ -30,127 +32,121 @@ function RabbitConnection(name, type) {
 
   self.open = amqp.connect('amqp://'+ self.user+':'+self.pwd+'@'+self.server);
 
-  logger.debug('New RabbitConnection called');
+  logger.debug('services/RabbitConnection: New RabbitConnection called');
 };
 
 RabbitConnection.prototype.subscribe = function() {
 
     var self = this;
-    logger.debug('RabbitConnection.subscribe started');
+    logger.debug('services/RabbitConnection.subscribe started');
+    // self.open contains promise containing the connection
     self.open.then(function(conn) {
       // Save the connection so it can be closed later
-      logger.debug('RabbitConnect.subscribe: open promise');
       self.conn = conn;
+      // Add listeners
       self.conn.on('close', function() {
-        logger.debug('RabbitConnection received connection close event');
+        logger.debug('services/RabbitConnection received connection close event');
         self.emit('connectionClose');
       });
 
       self.conn.on('error', function(err) {
-        logger.debug('RabbitConnection received connection error event', err);
+        logger.debug('services/RabbitConnection received connection error event', err);
         self.emit('connectionError', err);
       });
-
-      logger.debug('RabbitConnection:subscribe: Connection Opened');
       
       // Create the channel
-      var ok = self.conn.createChannel();
-
-      ok = ok.then(function(ch) {
+      return conn.createChannel().then(function(ch) {
+        // save the channel so we can close it
         self.ch = ch;
-        logger.debug('RabbitConnection:subscribe: Channel created, number: ',ch.ch);
+        // save the channel number
+        self.channel = ch.ch;
+        logger.debug('services/RabbitConnection:subscribe: Channel created, number: ',ch.ch);
 
+        // Add listeners
         self.ch.on('close', function() {
-          logger.debug('RabbitConnection received channel close event');
-          // console.log(this);
+          logger.debug('services/RabbitConnection received channel close event');
           self.ch = null;
           self.emit('channelClose');
         });
 
         self.ch.on('error', function(err) {
-          logger.debug('RabbitConnection received channel error event', err);
-          // console.log(this);
+          logger.debug('services/RabbitConnection received channel error event', err);
           self.emit('channelError', err);
         });
 
-        var ok = ch.assertExchange(self.name, self.type, {durable: self.durable});
-        self.pubsubexchange = ok;
-        ok = ok.then(function() {
-          logger.debug('RabbitConnection:subscribe: Exchange Asserted');
-          return ch.assertQueue('', {exclusive: true});
-        });
-
-        ok = ok.then(function(qok) {
-          logger.debug('RabbitConnection:subscribe: Queue asserted', qok);
+        // Assert the exchange
+        return ch.assertExchange(self.name, self.type, {durable: self.durable});
+      
+      }).then(function(reply){
+          logger.debug('services/RabbitConnection:subscribe: Exchange Asserted ', reply.exchange);
+          self.exchange = reply.exchange; // should be the same as self.name
+          // Assert the queue
+          return self.ch.assertQueue('', {exclusive: true});
+      
+      }).then(function(qok) {
+          logger.debug('services/RabbitConnection:subscribe: Queue asserted. queue=', qok.queue, ' exchange=', self.exchange);
           // qok contains queue (aka name), messageCount, consumerCount
-          return ch.bindQueue(qok.queue, self.name, '').then(function() {
-            logger.debug('RabbitConnection:subscribe: Bind queue');
-            self.queueName = qok.queue;
-            return qok.queue;
-          });
-        });
-
-        ok = ok.then(function(queue) {
-          logger.debug('RabbitConnection:subscribe: Consume Queue.');
-          return ch.consume(queue, logMessage, {noAck: true});
-        });
-
-        return ok.then(function() {
+          self.queue = qok.queue;
+          // Bind the queue
+          return self.ch.bindQueue(qok.queue, self.name, '');
+        
+        }).then(function(reply) {
+          // reply is empty object here
+          logger.debug('services/RabbitConnection:subscribe: Queue bound. queue=', self.queue, ' exchange=', self.exchange);
+          return self.ch.consume(self.queue, logMessage, {noAck: true});
+        
+        }).then(function(reply) {
           // Waiting for logs
           // Emit the ready event to notify listeners
-          logger.debug('RabbitConnection:subscribe: Ready.');
-          self.emit('ready', {'queue': self.queueName, 'ch': self.ch.ch });
+          self.consumerTag = reply.consumerTag;
+          logger.debug('services/RabbitConnection.subscribe: Ready. queue=', self.queue, ' exchange=', self.exchange, ' consumerTag=', self.consumerTag);
+          // Send event indicated we are ready
+          self.emit('ready', {'queue': self.queue, 'ch': self.ch.ch, 'exchange': self.exchange, 'consumerTag': self.consumerTag });
         });
 
+        // This function handles incoming messages
+        // Emits as event 
         function logMessage(msg) {
-          // Need to output this somewhere else
-          // Will use socket.io
-          //console.log(" [x] '%s'", msg.content.toString());
-          logger.debug('RabbitConnection:subscribe: Msg', msg.content.toString());
           self.emit(self.name+':receive', msg.content.toString());
         }
       });
 
-    }).then(null, console.warn);
+    //})//.then(null, console.warn);
   };
 
   RabbitConnection.prototype.initPublish = function() {
 
     var self = this;
-    logger.debug('RabbitConnection.publish started');
+    logger.debug('services/RabbitConnection.publish started');
     self.open.then(function(conn) {
       // Save the connection so it can be closed later
-      logger.debug('RabbitConnect.publish: open promise');
       self.conn = conn;
       self.conn.on('close', function() {
-        logger.debug('RabbitConnection received connection close event');
+        logger.debug('services/RabbitConnection received connection close event');
         self.emit('connectionClose');
       });
 
       self.conn.on('error', function(err) {
-        logger.debug('RabbitConnection received connection error event', err);
+        logger.debug('services/RabbitConnection received connection error event', err);
         self.emit('connectionError', err);
       });
-
-      logger.debug('RabbitConnection:publish: Connection Opened');
       
       // Create the channel
       var ok = self.conn.createChannel();
 
       ok = ok.then(function(ch) {
         self.ch = ch;
-        logger.debug('RabbitConnection:publish: Channel created, number: ',ch.ch);
+        self.channel = ch.ch;
+        logger.debug('services/RabbitConnection.publish: Channel created, number: ',ch.ch);
 
         self.ch.on('close', function() {
-          logger.debug('RabbitConnection received channel close event');
-          // console.log(this);
+          logger.debug('services/RabbitConnection received channel close event');
           self.ch = null;
           self.emit('channelClose');
         });
 
         self.ch.on('error', function(err) {
-          logger.debug('RabbitConnection received channel error event', err);
-          // console.log(this);
+          logger.debug('services/RabbitConnection received channel error event', err);
           self.emit('channelError', err);
         });
 
@@ -161,9 +157,9 @@ RabbitConnection.prototype.subscribe = function() {
 
 RabbitConnection.prototype.publish = function(message) {
   var self = this;
-  return self.pubExchange.then(function() {
+  return self.pubExchange.then(function(reply) {
+          self.exchange = reply.exchange;
           self.ch.publish(self.name, '', new Buffer(message));
-          logger.debug('RabbitConnection:publish: Send mesage: ',message);
           // self.emit('ready', {'queue': self.queueName, 'ch': self.ch.ch });
         });
 };

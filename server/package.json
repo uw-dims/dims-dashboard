@@ -64,6 +64,7 @@
     "grunt-env": "0.4.2",
     "chai": "1.9.2",
     "sinon-chai":"2.5.0",
-    "mocha":"2.0.1"
+    "mocha":"2.0.1",
+    "supertest":"0.15.0"
   }
 }

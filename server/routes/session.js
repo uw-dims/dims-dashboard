@@ -20,7 +20,7 @@ exports.session = function(req,res) {
   var username = req.user.get('ident');
   var name = req.user.get('descr');
   var client = req.app.get('client');
-  logger.debug('auth/session.session start username,name ', username, name );
+  logger.debug('routes/session.session. username, name ', username, name );
 
   // Get associated settings
   var userSettings = new UserSettings(client, username);
@@ -34,7 +34,7 @@ exports.session = function(req,res) {
 
 // Logout user
 exports.logout = function(req,res) {
-  logger.debug('auth/session.logout');
+  logger.debug('routes/session.logout', req.user.get('ident'));
   if (req.user) {
     req.logout();
     req.flash('info','You are now logged out.');
@@ -46,10 +46,10 @@ exports.logout = function(req,res) {
 
 // Login user
 exports.login = function(req,res,next) {
-  logger.debug('1 auth/session.login');
   passport.authenticate('local', function(err, user, info) {
-    // Info contains messages regarding why login was unsuccessful   
+    // Info contains messages regarding why login was unsuccessful  
     if (err || !user) {
+      logger.debug('routes/session.login. Unsuccessful Response from passport.authenticate. err, info: ', err, info); 
       var message = (info !== null && info !== undefined) ? info : '';
       message = message + ((err !== null && err !== undefined) ? err : '');
       req.flash('username', req.body.username);
@@ -57,6 +57,7 @@ exports.login = function(req,res,next) {
       req.flash('info', info);
       return res.status(400).send(message);
     }
+    logger.debug('routes/session.login. Successful response from passport.authenticate. err, user, info: ', err, user.get('ident'), info); 
     // Puts the logged in user in the session and then return user and settings
     req.logIn(user, function(err) {
 
@@ -67,7 +68,7 @@ exports.login = function(req,res,next) {
       var username = req.user.get('ident');
       var name = req.user.get('descr');
       var client = req.app.get('client');
-      logger.debug('13 auth/session.login req.logIn callback. user: ', username, name);
+      logger.debug('routes/session.login. Get user settings for user ', username);
 
       var userSettings = new UserSettings(client,username);      
       userSettings.getSettings().then(function(data) {

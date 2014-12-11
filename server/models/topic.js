@@ -30,13 +30,26 @@ Topic.prototype.setDataType = function(dataType) {
 Topic.prototype.getDataType = function() {
   var self = this;
   var deferred = q.defer();
+  logger.debug('models/Topic.getDataType topic key is ', KeyGen.topicKey(self));
+  logger.debug('models/Topic.getDataType self is ', self);
   db.type(KeyGen.topicKey(self))
   .then (function(reply) {
+    logger.debug('models/Topic.getDataType reply is ', reply);
     deferred.resolve(reply);
   }, function(err, reply) {
     deferred.reject(err.toString());
   });
   return deferred.promise;
+};
+
+Topic.prototype.getTopicMetadata = function() {
+  var self = this,
+      config = {};
+  config.parent = self.parent;
+  config.type = self.type;
+  config.name = self.name;
+  config.dataType = self.dataType;
+  return config;
 };
 
 // Return readable name
@@ -70,11 +83,10 @@ Topic.prototype.create = function(content, score) {
   // save the data
   self.setData(content, score)
   .then(function(reply) {
-    // save the dataType - don't need this
-    // return db.set(KeyGen.topicTypeKey(self), self.dataType);
+
     deferred.resolve(reply);
   }, function(err, reply) {
-    logger.error('Topic.create had an err returned from redis', err, reply);
+    logger.error('models/Topic.create had an err returned from redis', err, reply);
     deferred.reject(err.toString());
   });
   return deferred.promise;
@@ -86,7 +98,27 @@ Topic.prototype.setData = function(content, score) {
   db.setData(KeyGen.topicKey(self), self.dataType, content, score).then(function(reply) {
     deferred.resolve(reply);
   }, function(err, reply) {
-    logger.error('Topic.setData had an err returned from redis', err, reply);
+    logger.error('models/Topic.setData had an err returned from redis', err, reply);
+    deferred.reject(err.toString());
+  });
+  return deferred.promise;
+};
+
+Topic.prototype.exists = function() {
+  var self = this;
+  var deferred = q.defer();
+  db.zrank(KeyGen.topicListKey(self.parent), KeyGen.topicKey(self)).then(function(reply) {
+    logger.debug('models/Topic.exists. reply from zrank ', reply);
+    if (reply === null || reply === 'undefined') {
+      logger.debug('models/Topic.exists. Topic does not exist. Resolve with false ');
+      deferred.resolve(false);
+    }
+    else { 
+      logger.debug('models/Topic.exists. Topic exists. Resolve with true ');
+      deferred.resolve(true);
+    }
+  }, function(err, reply) {
+    logger.error('models/Topic.exists had an err returned from redis', err, reply);
     deferred.reject(err.toString());
   });
   return deferred.promise;
@@ -108,7 +140,7 @@ Topic.prototype.getTimeStamp = function() {
   db.get(key).then(function(reply) {
     deferred.resolve(reply);
   }, function(err, reply) {
-    logger.error('Topci.getTimeStamp had an err returned from redis', err, reply);
+    logger.error('models/Topic.getTimeStamp had an err returned from redis', err, reply);
     deferred.reject(err.toString());
   });
   return deferred.promise;
@@ -127,7 +159,7 @@ Topic.prototype.paramString = function() {
     timestamp = reply;
     q.resolve(self.getName() + ',' + timestamp + '->' + contents);
   }, function(err, reply) {
-    logger.error('Topic.paramstring had an err returned from redis', err, reply);
+    logger.error('models/Topic.paramstring had an err returned from redis', err, reply);
       deferred.reject(err.toString());
   });
   return deferred.promise;

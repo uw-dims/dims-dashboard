@@ -1,3 +1,6 @@
+/**
+  * Not used
+
 var RabbitConnection = require('../services/rabbitConnection');
 var config = require('../config');
 var logger = require('../utils/logger');
@@ -122,3 +125,4 @@ Fanout.prototype.onChannelError = function(err) {
   console.log(self);
 };
 
+*/

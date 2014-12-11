@@ -58,8 +58,21 @@ var KeyGen = {
     return this.topicKey(topic) + c.timestampSuffix;
   },
 
-  topicTypeKey: function(topic) {
-    return this.topicKey(topic) + c.typeSuffix;
+  // Parse a topic key into two parts - ticket and topic
+  parseTopicKey: function(topicKey) {
+    logger.debug('KeyGen.parseTopicKey: key is ', topicKey);
+    var keyArray = topicKey.split(c.delimiter);
+    logger.debug('KenGen.parseTopicKey: keyArray is ', keyArray);
+    var ticketKey = keyArray[0] + c.delimiter + keyArray[1];
+    var topicSubKey = '';
+    for (var i=2; i< keyArray.length; i++ ) {
+      topicSubKey += keyArray[i];
+      if (i = keyArray.length - 1) { topicSubKey += c.delimiter; }
+    }
+    return {
+      ticketKey: ticketKey,
+      topicSubKey: topicSubKey
+    };
   }
 
 };

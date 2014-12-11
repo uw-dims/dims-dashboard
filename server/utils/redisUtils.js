@@ -70,7 +70,7 @@ var setData = function(key, dataType, content, score) {
     hmset(key, content).then(function(reply) {
       deferred.resolve(reply);
     }, function(err, reply) {
-      logger.error('redisUtils.setData.hgetall had an err returned from redis', err, reply);
+      logger.error('redisUtils.setData.hmset had an err returned from redis', err, reply);
       deferred.reject(err.toString());
     });
 
@@ -94,7 +94,7 @@ var setData = function(key, dataType, content, score) {
       deferred.reject(err.toString());
     });
   } else {
-    get(key).then(function(reply) {
+    set(key, content).then(function(reply) {
       deferred.resolve(reply);
     }, function(err, reply) {
       logger.error('redisUtils.setData.get had an err returned from redis', err, reply);
