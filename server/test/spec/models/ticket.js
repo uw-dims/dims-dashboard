@@ -22,7 +22,8 @@ var topicName1 = 'topicHashData',
     topicName2 = 'topicStringData',
     topicDataType2 = 'string',
     // Set to one value until jenkins redis is updated from 2.2.10
-    topicContents2 = 'aaaaaa';
+    topicContents2 = 'aaaaaa',
+    ticketType1 = 'data';
 
 var createCounter;
 
@@ -61,53 +62,55 @@ var failOnError = function(err) {
 describe('models/Ticket', function() {
 
   describe('#create', function(done) {
-    it('should have a creator if one is supplied', function(done) {
+    it('should have a creator', function(done) {
       var ticket = new Ticket();
-      ticket.create({creator: user}).then(function(ticket) {
+      ticket.create(ticketType1, user).then(function(ticket) {
         debugTicketCounter(ticket);
-        expect(ticket.creator).to.equal('testUser');
+        expect(ticket.creator).to.equal(user);
         done();
       }, function(err) {
         failOnError(err.toString());
       }).done();
     });
 
-    it('should have a blank creator if one is not supplied', function(done) {
+    // Need to fix this
+    // it('should fail if creator not supplied', function(done) {
+    //   var ticket = new Ticket();
+    //   ticket.create().then(function(ticket) {
+    //     debugTicketCounter(ticket);
+    //     expect(ticket.creator).to.equal('');
+    //     done();
+    //   }, function(err) {
+    //     failOnError(err.toString());
+    //   }).done();
+    // });
+
+    it('should have a type', function(done) {
       var ticket = new Ticket();
-      ticket.create().then(function(ticket) {
+      ticket.create(ticketType1, user).then(function(ticket) {
         debugTicketCounter(ticket);
-        expect(ticket.creator).to.equal('');
+        expect(ticket.type).to.equal(ticketType1);
         done();
       }, function(err) {
         failOnError(err.toString());
       }).done();
     });
 
-    it('should have a type if one is supplied', function(done) {
-      var ticket = new Ticket();
-      ticket.create({type: 'mitigation'}).then(function(ticket) {
-        debugTicketCounter(ticket);
-        expect(ticket.type).to.equal('mitigation');
-        done();
-      }, function(err) {
-        failOnError(err.toString());
-      }).done();
-    });
-
-    it('should have a blank type if one is not supplied', function(done) {
-      var ticket = new Ticket();
-      ticket.create().then(function(ticket) {
-        debugTicketCounter(ticket);
-        expect(ticket.type).to.equal('');
-        done();
-      }, function(err) {
-        failOnError(err.toString());
-      }).done();
-    });
+    // Need to fix this
+    // it('should fail if type not supplied', function(done) {
+    //   var ticket = new Ticket();
+    //   ticket.create().then(function(ticket) {
+    //     debugTicketCounter(ticket);
+    //     expect(ticket.type).to.equal('');
+    //     done();
+    //   }, function(err) {
+    //     failOnError(err.toString());
+    //   }).done();
+    // });
 
     it('should generate a counter for the ticket', function(done) {
       var ticket = new Ticket();
-      ticket.create().then(function(ticket) {
+      ticket.create(ticketType1, user).then(function(ticket) {
         debugTicketCounter(ticket);
         var key = KeyGen.ticketCounterKey();
         // Get the generated counter
@@ -124,7 +127,7 @@ describe('models/Ticket', function() {
 
     it('should save the ticket key in the tickets set', function(done) {
       var ticket = new Ticket();
-      ticket.create().then(function(ticket) {
+      ticket.create(ticketType1, user).then(function(ticket) {
         debugTicketCounter(ticket);
         // Key to set of tickets
         var setKey = KeyGen.ticketSetKey();
@@ -142,14 +145,14 @@ describe('models/Ticket', function() {
 
     it('should set the ticket value correctly', function(done) {
       var ticket = new Ticket();
-      ticket.create({ creator: user, type: 'mitigation'}).then(function(ticket) {
+      ticket.create(ticketType1, user).then(function(ticket) {
         debugTicketCounter(ticket);
         // Key to this ticket
         var ticketKey = KeyGen.ticketKey(ticket);
         // Get the value pointed to by the key
         db.hgetall(ticketKey).then(function(reply){
-          expect(reply.type).to.equal('mitigation');
-          expect(reply.creator).to.equal('testUser');
+          expect(reply.type).to.equal(ticketType1);
+          expect(reply.creator).to.equal(user);
           done();
         }, function(err) {
           failOnError(err.toString());
@@ -162,26 +165,26 @@ describe('models/Ticket', function() {
 
     it('should return the stored ticket data', function(done) {
       var ticket = new Ticket();
-      ticket.create({creator: user, type: 'mitigation'}).then(function(ticket) {
+      ticket.create(ticketType1, user).then(function(ticket) {
         debugTicketCounter(ticket);
         var key = KeyGen.ticketKey(ticket);
         var lookedupTicket = new Ticket();
         lookedupTicket.getTicket(key).then(function(ticket2) {
-          expect(ticket2.creator).to.equal('testUser');
-          expect(ticket2.type).to.equal('mitigation');
+          expect(ticket2.creator).to.equal(user);
+          expect(ticket2.type).to.equal(ticketType1);
           done();
         });
       });
     });
     it('should return update the calling object', function(done) {
       var ticket = new Ticket();
-      ticket.create({creator: user, type: 'mitigation'}).then(function(ticket) {
+      ticket.create(ticketType1, user).then(function(ticket) {
         debugTicketCounter(ticket);
         var key = KeyGen.ticketKey(ticket);
         var lookedupTicket = new Ticket();
         lookedupTicket.getTicket(key).then(function(reply) {
-          expect(lookedupTicket.creator).to.equal('testUser');
-          expect(lookedupTicket.type).to.equal('mitigation');
+          expect(lookedupTicket.creator).to.equal(user);
+          expect(lookedupTicket.type).to.equal(ticketType1);
           done();
         });
       });
@@ -201,14 +204,14 @@ describe('models/Ticket', function() {
   describe('#addTopic', function(done) {
     it('should return a topic object when the content', function(done) {
       var ticket = new Ticket();
-      ticket.create({creator: user, type: 'mitigation'}).then(function(ticket) {
+      ticket.create(ticketType1, user).then(function(ticket) {
         debugTicketCounter(ticket);
         ticket.addTopic(topicName1, topicDataType1, topicContents1)
           .then(function(reply) {
-            expect(reply.parent.creator).to.equal('testUser');
-            expect(reply.parent.type).to.equal('mitigation');
+            expect(reply.parent.creator).to.equal(user);
+            expect(reply.parent.type).to.equal(ticketType1);
             expect(reply.parent.num).to.equal(createCounter);
-            expect(reply.type).to.equal('mitigation');
+            expect(reply.type).to.equal(ticketType1);
             expect(reply.name).to.equal(topicName1);
             expect(reply.dataType).to.equal(topicDataType1);
             done();
@@ -218,7 +221,7 @@ describe('models/Ticket', function() {
 
     it('should save the content to the database correctly when dataType is hash', function(done) {
       var ticket = new Ticket();
-      ticket.create({creator: user, type: 'mitigation'}).then(function(ticket) {
+      ticket.create(ticketType1, user).then(function(ticket) {
         debugTicketCounter(ticket);
         ticket.addTopic(topicName1, topicDataType1, topicContents1)
           .then(function(reply) {
@@ -235,7 +238,7 @@ describe('models/Ticket', function() {
 
     it('should save the content to the database correctly when dataType is string', function(done) {
       var ticket = new Ticket();
-      ticket.create({creator: user, type: 'mitigation'}).then(function(ticket) {
+      ticket.create(ticketType1, user).then(function(ticket) {
         debugTicketCounter(ticket);
         ticket.addTopic(topicName2, topicDataType2, topicContents2)
           .then(function(reply) {
@@ -252,7 +255,7 @@ describe('models/Ticket', function() {
 
     it('should save the topic key to the set of topics', function(done) {
       var ticket = new Ticket();
-      ticket.create({creator: user, type: 'mitigation'}).then(function(ticket) {
+      ticket.create(ticketType1, user).then(function(ticket) {
         debugTicketCounter(ticket);
         ticket.addTopic(topicName1, topicDataType1, topicContents1)
           .then(function(reply) {
@@ -272,7 +275,7 @@ describe('models/Ticket', function() {
    
     it('should retrieve all topic keys from a ticket', function(done) {
       var ticket = new Ticket();
-      ticket.create({creator: user, type: 'mitigation'}).then(function(ticket) {
+      ticket.create(ticketType1, user).then(function(ticket) {
         debugTicketCounter(ticket);
         ticket.addTopic(topicName1, topicDataType1, topicContents1).then(function(topic1) {
           // Get the topics
@@ -300,7 +303,7 @@ describe('models/Ticket', function() {
     it('should return the topic object ', function(done) {
       var ticket = new Ticket();
       var expectedTopic = {};
-      ticket.create({creator: user, type: 'mitigation'}).then(function(ticket) {
+      ticket.create(ticketType1, user).then(function(ticket) {
         debugTicketCounter(ticket);
         ticket.addTopic(topicName1, topicDataType1, topicContents1).then(function(topic) {
           expectedTopic = topic;
@@ -319,7 +322,7 @@ describe('models/Ticket', function() {
   describe('#getTopics', function(done) {
     it('should retrieve all topics from a ticket', function(done) {
       var ticket = new Ticket();
-      ticket.create({creator: user, type: 'mitigation'}).then(function(ticket) {
+      ticket.create(ticketType1, user).then(function(ticket) {
         debugTicketCounter(ticket);
         ticket.addTopic(topicName1, topicDataType1, topicContents1).then(function(topic1) {
           // Add another topic

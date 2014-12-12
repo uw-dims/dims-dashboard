@@ -69,14 +69,12 @@ Ticket.prototype.getAllTickets = function() {
 };
 
 // Create a ticket and save metadata
-Ticket.prototype.create = function(context) {
+Ticket.prototype.create = function(type, creator) {
   logger.debug('models/Ticket.create start');
   var self = this;
   var deferred = q.defer();
-  // Process arguments in context object
-  var args = context || {};
-  self.creator = args.creator || '';
-  self.type = args.type || '';
+  self.creator = creator;
+  self.type = type;
   self.open = true;
   self.createdTime = dimsUtils.createTimestamp();
   // Get the counter key

@@ -148,6 +148,7 @@ module.exports.show = function(req, res) {
   *                ignored if user logged in)
   */
 module.exports.create = function(req, res) {
+  // Check for missing inputs
   var creator = _getCreator(req);
   if (creator === -1) {
     res.status(400).send('Error: Creator not supplied.');
@@ -156,16 +157,16 @@ module.exports.create = function(req, res) {
     if (type === -1) {
       res.status(400).send('Error: Type not supplied.');
     } else {
-      var ticket = new Ticket();
-      logger.debug('ticket.create creating ticket');
-      ticket.create({creator: creator, type: type}).then(function(reply){
-        var data = {};
-        data.ticket = reply;
-        data.key = KeyGen.ticketKey(ticket);
-        res.status(201).send({data: data});
+      logger.debug('routes/ticket content param ', req.body.content);
+      var content = (req.body.content !== null && typeof req.body.content === undefined) ? req.body.content : null;
+      // Create the ticket and get the data to return
+      ticketService.createTicket(type, creator, content).then(function(reply) {
+        logger.debug('routes/ticket reply from ticketService.createTicket ', reply);
+        res.status(201).send({data: reply});
       }, function(err,reply) {
           res.status(400).send(err.toString());
         });
+      logger.debug('routes/ticket Got to here 1');
     }
   }
 };
