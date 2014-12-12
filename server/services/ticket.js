@@ -14,7 +14,7 @@ var redisDB = require('../utils/redisDB');
 var q = require('q');
 
 /** Creates a ticket plus associated topics if required by supplied ticket type */
-module.exports.createTicket = function(type, creator) {
+exports.createTicket = function(type, creator, content) {
   var deferred = q.defer();
   var ticket = new Ticket();
   var data;
@@ -24,7 +24,7 @@ module.exports.createTicket = function(type, creator) {
     logger.debug('services/ticket.createTicket Reply from ticket create is ', reply);
     if (type === 'mitigation') {
       // process a mitigation ticket - add required topics
-      mitigation.processNewTicket(reply).then(function(reply) {
+      mitigation.processNewTicket(reply, content).then(function(reply) {
         data = mitigation.packageTicket(reply);
         deferred.resolve(data);
       });

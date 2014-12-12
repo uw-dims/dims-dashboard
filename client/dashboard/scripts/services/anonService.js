@@ -2,7 +2,7 @@
 
 angular.module('dimsDashboard.services')
   
-  .factory('AnonService', function($http, $q) {
+  .factory('AnonService', function($http, $q, $log) {
 
     var anonymize = function(anonymize, data, pid) {
       var deferred = $q.defer(); 
@@ -11,7 +11,8 @@ angular.module('dimsDashboard.services')
       };  
 
       if (anonymize === 'true')  {
-        console.log('Call anonymize function');
+        $log.debug('services/anonService: Call anonymize function');
+        $log.debug('service/anonService. params ', config, ', data: ', data);
         $http ({
           method: 'POST',
           url: '/anon',
@@ -20,6 +21,7 @@ angular.module('dimsDashboard.services')
 
         }).success(function(data,status,headers,config){
               console.log('Anonymized results received');
+              console.log(data);
               deferred.resolve(data);
         }).error(function(data,status,headers,config) {
               console.log('Anonymize error ' + status);

@@ -5,21 +5,38 @@ var fs = require('fs');
 var dimsutil = require('../utils/util');
 var logger = require('../utils/logger');
 var config = require('../config');
+var _ = require('lodash');
 
 exports.list = function(req,res) {
 
-  logger.debug('anon:list - Request: ', req.query);
-
+  logger.debug('routes/anon.list - Request: ', req.query);
+  logger.debug('routes/anon.list - body is ');
+  console.log(req.body);
   var fullBody = '';
 
-  req.on('data', function(chunk)
-    {
-      // append current chunk
-      fullBody += chunk.toString();
-    });
+  logger.debug('type of fullbody is ', typeof fullBody);
+  logger.debug('type of req.body is ', typeof req.body);
+  logger.debug('req.body is null ', req.body === null);
+  logger.debug('req body undefined ', req.body == undefined);
+  logger.debug('req.body is empty object ', _.isEmpty(req.body));
+  logger.debug('null is empy object ', _.isEmpty(null));
 
-  req.on('end', function() {
+  if (!_.isEmpty(req.body) ) {
+    logger.debug('routes/anon.list - setting fullbody');
+    if (typeof req.body === 'object' ) fullBody = JSON.stringify(req.body);
+    else fullBody = req.body;
+  }
 
+  // req.on('data', function(chunk)
+  //   {
+  //     // append current chunk
+  //     // logger.debug('routes/anon req.on.data ', fullBody);
+  //     fullBody += chunk.toString();
+  //     logger.debug('routes/anon req.on.data ', fullBody);
+  //   });
+
+  // req.on('end', function() {
+    logger.debug('routes/anon.list - req.on.end reached');
     var rpcQueuebase = config.rpcQueueNames['anon'],
       rpcClientApp = 'anon_client',
       ipgrepApp = 'ipgrep';
@@ -43,6 +60,11 @@ exports.list = function(req,res) {
       if (req.query.mapName !== undefined) {
         inputArray.push('-m');
         inputArray.push(req.query.mapName);
+      } else {
+        // This may be temporary - anon service is not working with new .yml file in /etc
+        // so we will explicitly require it
+        inputArray.push('-m');
+        inputArray.push('/etc/ipgrep_networks.yml');
       }
       if (req.query.fileName !== undefined) {
         inputArray.push('-r');
@@ -50,9 +72,11 @@ exports.list = function(req,res) {
       }
     }
 
+    logger.debug('routes/anon req.on end event; input Array before async is ', inputArray);
     async.waterfall([
       function(callback) {
          if (fullBody !== '') {
+          logger.debug('routes/anon req.on end event. fullbody not blank');
           tmp.file(function _tempFileCreated(err, path, fd) {
             callback(err,path,fd);
           });
@@ -93,7 +117,7 @@ exports.list = function(req,res) {
       }
     ]); 
 
-  });
+  // });
 
    
 

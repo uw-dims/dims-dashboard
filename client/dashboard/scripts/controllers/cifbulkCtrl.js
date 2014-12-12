@@ -82,6 +82,7 @@ angular.module('dimsDashboard.controllers').
     var prepareData = function(data, status, headers, config) {
       $log.debug('Data in prepareData is ', data);
       $scope.rawData = data.data;
+      $log.debug('Data.data in preparData is ', $scope.rawData);
       $scope.noResults = [];
       $scope.showResults = true;
       $scope.resultsMsg = 'Results';

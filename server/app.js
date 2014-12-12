@@ -143,7 +143,8 @@ app.set('view engine', 'html');
 app.use(json());
 app.use(methodOverride());
 app.use(bodyParser.urlencoded({
-  extended: false
+  extended: false,
+  limit: '50mb'
 }));
 app.use(bodyParser.json());
 app.use(flash());
