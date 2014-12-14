@@ -6,10 +6,11 @@ var dimsutil = require('../utils/util');
 var logger = require('../utils/logger');
 var config = require('../config');
 var settings = require('../services/settings');
+var tools = require('../services/tools');
 
 exports.list = function(req,res) {
 
-  logger.debug('rwfind:list - Request query is: ', req.query);
+  logger.debug('routes/rwfind.list - Request query is: ', req.query);
 
   if (!req.user) return res.status(500).send('Error: user is not defined in request');
   var id = req.user.get('ident');
@@ -82,13 +83,24 @@ exports.list = function(req,res) {
 
        }, function(callback) {  
             
-          logger.debug('rwfind:list - Input to python child process: ', inputArray);
+          logger.debug('routes/rwfind.list - Input to python child process: ', inputArray);
           
-          var python = spawn(
-            'python',
-            inputArray
-            );
-          dimsutil.processPython(python, req, res);
+          tools.getData('python', inputArray, id)
+
+            .then(function(reply) {
+              console.log(reply);
+              logger.debug('routes/rwfind.list - Send 200 reply');
+              return res.status(200).send(reply);
+            }, function(err, reply) {
+              logger.debug('routes/rwfind.list - Send 500 reply');
+              return res.status(500).send(reply);
+            });
+          
+          // var python = spawn(
+          //   'python',
+          //   inputArray
+          //   );
+          // dimsutil.processPython(python, req, res);
           callback(null, 'done');
         }, function(err,result) {
         }

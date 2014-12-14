@@ -92,8 +92,7 @@ angular.module('dimsDashboard.controllers').
       $log.debug('status: '+status);
       $log.debug('data: ');
       $log.debug(data);
-      $scope.rawData = data.data;
-      $scope.pid = data.pid;
+      $scope.rawData = data;
       $scope.flowItems=[];
       var flowsFound = -1;
        if ($scope.formData.outputType === 'json') {

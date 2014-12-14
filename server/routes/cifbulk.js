@@ -87,18 +87,18 @@ exports.list = function(req,res) {
             console.log(rawData);
             userSettings.then(function(reply) {
               logger.debug('routes/cifbulk.list User settings are ', reply);
-              if (reply.anonymize) {
+              if (reply.anonymize === 'false') {
                 // Send back the raw data
                 return res.status(200).send(rawData);
               } else {
                 logger.debug('routes/cifbulk.list Now will call anonymize.setup. id is ', id);
                 // Need to anonymize before sending back
-                anonymize.setup({data: rawData, useFile: false, type: 'anon'}, settings.get(id)).then(function(reply) {
+                anonymize.setup({data: rawData, useFile: false, type: 'anon'}, id).then(function(reply) {
                   logger.debug('routes/cifbulk.list Back from anonymize.setup');
                   inputArray = reply;
                   var anonChild = new ChildProcess();
                   anonChild.startProcess('python', inputArray).then(function(reply){
-                    logger.debug('cifbulk anon reply is ');
+                    logger.debug('routes/cifbulk.list anon reply is ');
                     console.log(reply);
                     return res.status(200).send(reply);
                   }, function(err, reply) {

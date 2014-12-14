@@ -18,7 +18,7 @@ exports.anonymize = function(req,res) {
 
   if (!req.user) return res.status(500).send('Error: user is not defined in request');
   var id = req.user.get('ident');
-  var userSettings = settings.get(id); // Promise with user settings
+  var userSettings = settings.get(id); // Promise with user settings - this or id passed?
   
 
   logger.debug('routes/anon.anonymize - Request: ', req.query);
@@ -44,7 +44,7 @@ exports.anonymize = function(req,res) {
 
   if (_.isEmpty(params.type)) params.type = 'anon';
 
-  anonymize.setup(params, userSettings).then(function(reply) {
+  anonymize.setup(params, id).then(function(reply) {
     inputArray = reply;
     logger.debug('routes/anon.anonymize. Response from anonymize.setup: inputArray = ', inputArray);
     if (req.query.type === 'ipgrep') {

@@ -6,6 +6,7 @@ var q = require('q');
 var _ = require('lodash');
 var tmp = require('tmp');
 var fs = require('fs');
+var settings = require('./settings');
 
 /**
   * @param {string} params.type "ipgrep" or "anon" or undefined (default is anon). 
@@ -17,14 +18,16 @@ var fs = require('fs');
   * @param {string} params.mapName  Path to map to use instead of default
   * @param {string} params.data Data or path to file containing data to be anonymized
   * @param {boolean} params.useFile True if data is in a file
+  * @param {string} id  ID of logged in user
   */
 
-exports.setup = function(params, settings) {
+exports.setup = function(params, user) {
   var deferred = q.defer();
 
   var data = params.data;
+  var id = user;
 
-  logger.debug('services/anonymize.setup start');
+  logger.debug('services/anonymize.setup start. id is ', id);
 
   if (!params.useFile) {
     logger.debug('services/anonymize.setup - not using file');
@@ -32,7 +35,7 @@ exports.setup = function(params, settings) {
     logger.debug('services/anonymize.setup - data is ', data);
   }
 
-  _setInputs(params, settings).then(function(inputArray) {
+  _setInputs(params, id).then(function(inputArray) {
     logger.debug('services/anonymize.setup setInputs returned ', inputArray);
     return _setFileInput(inputArray, params.type, params.useFile, data);
 
@@ -80,11 +83,11 @@ var _writeTempFile = function(content) {
 };
 
 /** Sets up the inputArray. Returns promise with inputArray */
-var _setInputs = function(params, settings) {
+var _setInputs = function(params, id) {
 
   var deferred = q.defer();
-  logger.debug('services/anonymize._setInputs params are ');
-  console.log(params);
+  logger.debug('services/anonymize._setInputs start: type ', params.type, ' id ', id, ' stats ', params.stats);
+  // console.log(params);
   var rpcQueuebase = config.rpcQueueNames['anon'],
       rpcClientApp = 'anon_client',
       ipgrepApp = 'ipgrep';
@@ -94,7 +97,8 @@ var _setInputs = function(params, settings) {
       var inputArray = [config.bin + ipgrepApp, '-a', '--context', '-v', '-n', '/etc/ipgrep_networks.yml'];
       deferred.resolve(inputArray);
     } else {
-      settings.then(function(settings) {
+      logger.debug('services/anonymize._setInputs. Not ipgrep, so get settings for ', id);
+      settings.get(id).then(function(settings) {
         logger.debug('service/anonymize._setInputs settings are ', settings);
         var inputArray = [config.bin + rpcClientApp, '--server', config.rpcServer,
             '--queue-base', rpcQueuebase]; 
