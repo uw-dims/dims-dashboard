@@ -81,11 +81,11 @@ angular.module('dimsDashboard.controllers').
     $scope.flowStats = [];
     // $scope.flowStatsGridOptions = { data: 'flowStats' };
 
-    var anonymizeData = function(data,status,headers,config) {
-       $log.debug('Call anonymize service');
-       AnonService.anonymize($scope.settings.anonymize, data.data, data.pid)
-              .then(prepareData);
-            };
+    // var anonymizeData = function(data,status,headers,config) {
+    //    $log.debug('Call anonymize service');
+    //    AnonService.anonymize($scope.settings.anonymize, data.data, data.pid)
+    //           .then(prepareData);
+    //         };
 
     var prepareData = function(data, status, headers, config) {
       $log.debug('rwfind returned data - in prepareData');
@@ -161,10 +161,7 @@ angular.module('dimsDashboard.controllers').
         }
 
       }).success(function(data, status, headers, config) {
-        var fileData = {};
-        fileData.data = data;
-        fileData.status = status;
-        anonymizeData(fileData,status,headers,config)
+        prepareData(data,status,headers,config)
       })
         .error(function(data, status, headers, config) {
           console.log(data);
@@ -246,7 +243,7 @@ angular.module('dimsDashboard.controllers').
           url: '/rwfind', 
           params: clientConfig
         } ).
-        success(anonymizeData).
+        success(prepareData).
         error(function(data, status, headers, config) {
           $scope.showFormError = true;
           $scope.formErrorMsg = 'Your request did not get a result. Status: '+status;

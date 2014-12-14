@@ -13,7 +13,6 @@ var q = require('q');
 var redisDB = require('../utils/redisDB');
 var db = require('../utils/redisUtils');
 var dimsUtils = require('../utils/util');
-var redisUtils = require('../utils/redisUtils');
 
 exports = module.exports = Ticket;
 

@@ -216,7 +216,7 @@ router.post('/upload', ensureAuthenticated, files.upload);
 router.get('/files', ensureAuthenticated, files.files);
 router.get('/cifbulk', ensureAuthenticated, cifbulk.list);
 router.get('/crosscor', ensureAuthenticated, crosscor.list);
-router.post('/anon', ensureAuthenticated, anon.list);
+router.post('/anon', ensureAuthenticated, anon.anonymize);
 router.get('/rwfind', ensureAuthenticated, rwfind.list);
 router.get('/data', ensureAuthenticated, data.list);
 

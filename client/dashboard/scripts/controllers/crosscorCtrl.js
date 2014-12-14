@@ -68,11 +68,11 @@ angular.module('dimsDashboard.controllers').
     //       {field: 'percent', displayName:'Percent'}
     //     ]};
     
-    var anonymizeData = function(data,status,headers,config) {
-       $log.debug('Call anonymize service');
-       AnonService.anonymize($scope.settings.anonymize, data.data, data.pid)
-              .then(prepareData);
-            };
+    // var anonymizeData = function(data,status,headers,config) {
+    //    $log.debug('Call anonymize service');
+    //    AnonService.anonymize($scope.settings.anonymize, data.data, data.pid)
+    //           .then(prepareData);
+    //         };
 
     var prepareData = function(data, status, headers, config) {
       $log.debug('crosscor returned data');
@@ -131,7 +131,7 @@ angular.module('dimsDashboard.controllers').
           url: '/crosscor', 
           params: clientConfig
         } ).
-        success(anonymizeData).
+        success(prepareData).
         error(function(data, status, headers, config) {
           console.log('rwfind Error');
           console.log(data);

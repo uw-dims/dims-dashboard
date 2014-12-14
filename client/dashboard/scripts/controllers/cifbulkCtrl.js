@@ -72,17 +72,16 @@ angular.module('dimsDashboard.controllers').
     //       {field: 'weight', displayName: 'Weight'}
     //     ];
 
-    var anonymizeData = function(data,status,headers,config) {
-       $log.debug('Call anonymize service');
-       AnonService.anonymize($scope.settings.anonymize, data.data, data.pid)
-              .then(prepareData);
-            };
+    // var anonymizeData = function(data,status,headers,config) {
+    //    $log.debug('Call anonymize service');
+    //    AnonService.anonymize($scope.settings.anonymize, data.data, data.pid)
+    //           .then(prepareData);
+    //         };
 
     // Prepare incoming data
     var prepareData = function(data, status, headers, config) {
       $log.debug('Data in prepareData is ', data);
-      $scope.rawData = data.data;
-      $log.debug('Data.data in preparData is ', $scope.rawData);
+      $scope.rawData = data;
       $scope.noResults = [];
       $scope.showResults = true;
       $scope.resultsMsg = 'Results';
@@ -125,9 +124,9 @@ angular.module('dimsDashboard.controllers').
       //   } )
         }).success(function(data, status, headers, config) {
             var fileData = {};
-            fileData.data = data;
-            fileData.status = status;
-            anonymizeData(fileData,status,headers,config)
+            // fileData.data = data;
+            // fileData.status = status;
+            prepareData(data,status,headers,config)
           })
         .error(function(data, status, headers, config) {
           console.log(data);
@@ -203,7 +202,7 @@ angular.module('dimsDashboard.controllers').
           params: clientConfig
         } )
 
-        .success(anonymizeData)
+        .success(prepareData)
 
         .error(function(data, status, headers, config) {
           console.log('cifbulk Error');

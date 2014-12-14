@@ -23,7 +23,7 @@ exports.session = function(req,res) {
   logger.debug('routes/session.session. username, name ', username, name );
 
   // Get associated settings
-  var userSettings = new UserSettings(client, username);
+  var userSettings = new UserSettings(username);
   userSettings.getSettings().then(function(data) {
       var object = sessionObject(username,name,data);
       res.status(200).send({data: object});
@@ -70,7 +70,7 @@ exports.login = function(req,res,next) {
       var client = req.app.get('client');
       logger.debug('routes/session.login. Get user settings for user ', username);
 
-      var userSettings = new UserSettings(client,username);      
+      var userSettings = new UserSettings(username);      
       userSettings.getSettings().then(function(data) {
           var object = sessionObject(username,name,data);
           res.status(200).send({data: object});

@@ -1,11 +1,12 @@
 var fs = require('fs');
 var dimsutil = require('../utils/util');
 var config = require('../config');
-var yaml = require('js-yaml');
+// var yaml = require('js-yaml');
 var JSONStream = require('JSONStream');
+var logger = require('../utils/logger');
 
 exports.list = function(req, res){
-  console.log ('in data.list');
+  logger.debug('routes/data.list start');
   path = req.query.source;
   var source = fs.createReadStream(path);
   source.pipe(dimsutil.createParser())

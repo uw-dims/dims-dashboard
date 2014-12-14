@@ -84,10 +84,8 @@ angular.module('dimsDashboard.controllers').
         } ).
         success(function(data, status, headers, config) {
           $log.debug('AnonCtrl.callClient. HTTP success callback. Status: ', status);
-          $scope.rawData = data.data;
-          $scope.pid = data.pid;
-          $log.debug('AnonCtrl.callClient. HTTP success callback. rawData: ', $scope.rawData);
-          $log.debug('AnonCtrl.callClient. HTTP success callback. pid: ', $scope.pid);         
+          $log.debug('AnonCtrl.callClient. HTTP success callback. Data: ', data);
+          $scope.rawData = data;         
           $scope.showResults = true;
 
           $scope.resultsMsg = 'Results'; 

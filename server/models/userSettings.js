@@ -1,3 +1,5 @@
+// File: models/userSettings.js
+
 'use strict';
 
 // userSettings model
@@ -7,12 +9,12 @@ var config = require('../config');
 var c = require('../config/redisScheme');
 var logger = require('../utils/logger');
 var q = require('q');
+var client = require('../utils/redisDB');
 
 exports = module.exports = UserSettings;
 
-function UserSettings(client, user, userSettings) {
+function UserSettings(user, userSettings) {
 	var self = this;
-	self.client = client;
 	self.user = user;
 	self.userSettings = userSettings || {};
 
@@ -24,7 +26,7 @@ function UserSettings(client, user, userSettings) {
 	// Update a setting
 	self.update = function(settings) {
 		var deferred = q.defer();
-		self.client.hmset(self.key, settings, function(err, data) {
+		client.hmset(self.key, settings, function(err, data) {
 			if (err) deferred.reject(err);
 			else deferred.resolve(data);
 		});
@@ -33,7 +35,7 @@ function UserSettings(client, user, userSettings) {
 	// Get a setting for the logged in user
 	self.get = function() {
 		var deferred = q.defer();
-		self.client.hgetall(self.key, function(err,data) {
+		client.hgetall(self.key, function(err,data) {
 			if (err) deferred.reject(err);
 			else deferred.resolve(data);
 		});
@@ -79,6 +81,6 @@ UserSettings.prototype.updateSettings = function() {
 
 UserSettings.prototype.updateKey = function() {
 	var self = this;
-	self.client.sadd(self.keySet, self.key);
+	client.sadd(self.keySet, self.key);
 };
 

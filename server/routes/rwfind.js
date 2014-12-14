@@ -5,10 +5,15 @@ var fs = require('fs');
 var dimsutil = require('../utils/util');
 var logger = require('../utils/logger');
 var config = require('../config');
+var settings = require('../services/settings');
 
 exports.list = function(req,res) {
 
   logger.debug('rwfind:list - Request query is: ', req.query);
+
+  if (!req.user) return res.status(500).send('Error: user is not defined in request');
+  var id = req.user.get('ident');
+  var userSettings = settings.get(id); // Promise with user settings
 
   var rpcQueuebase = config.rpcQueueNames['rwfind'],
       rpcClientApp = 'rwfind_client',
