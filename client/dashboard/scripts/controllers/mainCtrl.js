@@ -176,31 +176,6 @@ angular.module('dimsDashboard.controllers').
       $log.debug('query panel toggle called');
     };
 
-    // Set the tool selected in the Tools panel
-    $scope.setTool = function(tool, row) {
-      $log.debug('setTool called: ' , tool);
-      $scope.currentSelectedTool = tool;
-      var filtered = $filter('filter')($scope.availableTools, {'selected': 'active'}, true);
-      $log.debug('filtered ', filtered);
-      angular.forEach(filtered, function(value,index) {
-        value.selected = '';
-      });
-      $scope.availableTools[row].selected = 'active';
-      
-    };
-
-    // Set the saved query selected in the saved queries panel
-    $scope.setQuery = function(query, row) {
-      $log.debug('setQuery called: ',query, row);
-      $scope.currentSelectedQuery = query;
-      var filtered = $filter('filter')($scope.savedQueries, {'selected': 'active'}, true);
-      $log.debug('filtered ', filtered);
-      angular.forEach(filtered, function(value,index) {
-        value.selected = '';
-      });
-      $scope.savedQueries[row].selected = 'active';
-    };
-
     // Tools button was clicked
     $scope.getTools = function() {
       // Toggle if collapsed or if Tools are already selected
@@ -267,15 +242,27 @@ angular.module('dimsDashboard.controllers').
       $scope.showTickets = true;
       $scope.ticketBtnClass = 'query-btn-active';
       TicketService.getTickets().then(function(reply) {
-        $scope.tickets = TicketService.tickets;
+        $scope.tickets = reply;
         $log.debug('mainCtrl. tickets are ', $scope.tickets);
       });
       
     };
 
-    // Set the ticket selected in the tickets panel
-    $scope.setTickets = function(query, row) {
-      $log.debug('setTickets called: ',query, row);
+    // Set the tool selected in the Tools panel
+    $scope.setTool = function(tool, row) {
+      $log.debug('setTool called: ' , tool);
+      $scope.currentSelectedTool = tool;
+      var filtered = $filter('filter')($scope.availableTools, {'selected': 'active'}, true);
+      $log.debug('filtered ', filtered);
+      angular.forEach(filtered, function(value,index) {
+        value.selected = '';
+      });
+      $scope.availableTools[row].selected = 'active';
+    };
+
+    // Set the saved query selected in the saved queries panel
+    $scope.setQuery = function(query, row) {
+      $log.debug('setQuery called: ',query, row);
       $scope.currentSelectedQuery = query;
       var filtered = $filter('filter')($scope.savedQueries, {'selected': 'active'}, true);
       $log.debug('filtered ', filtered);
@@ -283,6 +270,23 @@ angular.module('dimsDashboard.controllers').
         value.selected = '';
       });
       $scope.savedQueries[row].selected = 'active';
+    };
+
+    // Set the ticket selected in the tickets panel
+    $scope.setTicket = function(ticket, row) {
+      $log.debug('setTickets called: ',ticket, row);
+      $scope.currentSelectedTicket = ticket;
+      var filtered = $filter('filter')($scope.tickets, {'selected': 'active'}, true);
+      $log.debug('filtered ', filtered);
+      angular.forEach(filtered, function(value,index) {
+        value.selected = '';
+      });
+      $scope.tickets[row].selected = 'active';
+      TicketService.getTicket($scope.tickets[row].key).then(function(reply) {
+        $scope.ticketDescription = reply.description;
+        $scope.ticketShortDesc = reply.shortDesc;
+        $scope.ticketContent = reply.data;
+      });
     };
 
     // Set current value of socket states

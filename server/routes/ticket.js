@@ -62,6 +62,7 @@ var _getType = function(req) {
   * @return HTTP Status code and string reply.
   */
 exports.list = function(req, res) {
+  logger.debug('routes/ticket GET');
   var ticket = new Ticket();
   ticket.getAllTickets().then(function(reply) {
     res.status(200).send({data: reply});
@@ -97,6 +98,7 @@ exports.list = function(req, res) {
   * @param {string} id Ticket key in format ticket:<num>
   */
 module.exports.show = function(req, res) {
+  logger.debug('routes/ticket SHOW, id: ', req.params.id);
   var ticket = new Ticket();
   // Get the ticket object and stored metadata. returns ticket object.
   ticket.getTicket(req.params.id).then(function(reply) {
@@ -148,6 +150,7 @@ module.exports.show = function(req, res) {
   *                ignored if user logged in)
   */
 module.exports.create = function(req, res) {
+  logger.debug('routes/ticket CREATE');
   // Check for missing inputs
   var creator = _getCreator(req);
   if (creator === -1) {
@@ -173,6 +176,7 @@ module.exports.create = function(req, res) {
 
 // Not implemented
 module.exports.update = function(req, res) {
+  logger.debug('routes/ticket UPDATE, not implemented ');
     var data = {};
     res.status(405).send('Ticket update not yet implemented.');
   // }, function(err,reply) {
@@ -182,6 +186,7 @@ module.exports.update = function(req, res) {
 
 // Not implemented
 module.exports.delete = function(req, res) {
+  logger.debug('routes/ticket DELETE, not implemented' );
   var data = {};
   res.status(405).send('Ticket delete not yet implemented.');
   // }, function(err,reply) {
@@ -254,6 +259,7 @@ module.exports.delete = function(req, res) {
   * exists
   */
 module.exports.addTopic = function(req, res) {
+  logger.debug('routes/ticket addTopic, id: ', req.params.id);
   var data = {};
   var ticketKey = req.params.id;
   var name = req.body.name;
@@ -318,6 +324,7 @@ module.exports.addTopic = function(req, res) {
   * @return HTTP Status code and string reply.
   */
 module.exports.showTopic = function(req, res) {
+  logger.debug('routes/ticket showTopic, id: ', req.params.id);
   var ticket = new Ticket();
   var topic;
   var topicKey = req.params.id;
@@ -391,6 +398,7 @@ module.exports.showTopic = function(req, res) {
   *
   */
 module.exports.updateTopic = function(req, res) {
+  logger.debug('routes/ticket updateTopic, id: ', req.params.id);
   var ticket = new Ticket();
   var topic;
   var topicKey = req.params.id;
@@ -424,6 +432,7 @@ module.exports.updateTopic = function(req, res) {
 };
 
 module.exports.deleteTopic = function(req, res) {
+  logger.debug('routes/ticket deleteTopic, not yet implemented');
   var data = {};
   res.status(405).send('Ticket deleteTopic not yet implemented.');
 };
