@@ -24,6 +24,7 @@
     "nvd3": "~1.1.15",
     "regression-js": "1.2.0",
     "lodash": "2.4.1",
+    "underscore.string" : "2.4.0",
     "respond": "1.4.2",
     "angular-bootstrap": "0.11.0",
     "angular-bootstrap-show-errors": "1.0.4",

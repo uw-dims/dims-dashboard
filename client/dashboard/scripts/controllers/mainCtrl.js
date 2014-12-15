@@ -16,8 +16,11 @@ angular.module('dimsDashboard.controllers').
     $scope.showSavedQueries = false;
     $scope.savedBtnClass = 'query-btn-inactive';
     // Tickets panel
+    $scope.tickets = null; // initialize
     $scope.showTickets = false;
     $scope.ticketBtnClass = 'query-btn-inactive';
+    $scope.showTopicList = false;
+    $scope.showTopic = false;
 
     $scope.showSettings = false;
     $scope.settingsBtnClass = 'query-btn-inactive';
@@ -191,6 +194,8 @@ angular.module('dimsDashboard.controllers').
       $scope.showSettings = false;
       $scope.settingsBtnClass = 'query-btn-inactive';
       $scope.showTickets = false;
+      $scope.showTopicList = false;
+      $scope.showTopic = false;
       $scope.ticketBtnClass = 'query-btn-inactive';
 
     };
@@ -208,6 +213,8 @@ angular.module('dimsDashboard.controllers').
       $scope.showSettings = false;
       $scope.settingsBtnClass = 'query-btn-inactive';
       $scope.showTickets = false;
+      $scope.showTopicList = false;
+      $scope.showTopic = false;
       $scope.ticketBtnClass = 'query-btn-inactive';
     };
 
@@ -224,6 +231,8 @@ angular.module('dimsDashboard.controllers').
       $scope.showSettings = true;
       $scope.settingsBtnClass = 'query-btn-active';
       $scope.showTickets = false;
+      $scope.showTopicList = false;
+      $scope.showTopic = false;
       $scope.ticketBtnClass = 'query-btn-inactive';
     };
 
@@ -241,10 +250,13 @@ angular.module('dimsDashboard.controllers').
       $scope.settingsBtnClass = 'query-btn-inactive';
       $scope.showTickets = true;
       $scope.ticketBtnClass = 'query-btn-active';
-      TicketService.getTickets().then(function(reply) {
-        $scope.tickets = reply;
-        $log.debug('mainCtrl. tickets are ', $scope.tickets);
-      });
+      if ($scope.tickets === null) {
+        TicketService.getTickets().then(function(reply) {
+          $scope.tickets = reply;
+          $log.debug('mainCtrl. tickets are ', $scope.tickets);
+        });
+      }
+      
       
     };
 
@@ -283,10 +295,19 @@ angular.module('dimsDashboard.controllers').
       });
       $scope.tickets[row].selected = 'active';
       TicketService.getTicket($scope.tickets[row].key).then(function(reply) {
-        $scope.ticketDescription = reply.description;
-        $scope.ticketShortDesc = reply.shortDesc;
-        $scope.ticketContent = reply.data;
+        // Returns object with ticket metadata, key, array of topics
+        $scope.currentSelectedTicket.ticket = reply.ticket;
+        $scope.currentSelectedTicket.topics = reply.topics;
+        $log.debug('currentSelectedTicket is ', $scope.currentSelectedTicket);
+        $scope.showTopicList = true;
+        // $scope.ticketDescription = reply.description;
+        // $scope.ticketShortDesc = reply.shortDesc;
+        // $scope.ticketContent = reply.data;
       });
+    };
+
+    $scope.getTopic = function(topicKey, row) {
+
     };
 
     // Set current value of socket states
@@ -338,5 +359,5 @@ angular.module('dimsDashboard.controllers').
         $log.debug('setUserSettings error', err);
       });
     };
-    
+
   }]);

@@ -20,6 +20,24 @@ angular.module('dimsDashboard.services')
           list.push({name: 'DIMS-'+ticketKeyArray[1], num:ticketKeyArray[1], key:ticket, selected: ''});
         });
         return list;
+      },
+      parseTicketObject: function(ticketObject) {
+        $log.debug('TicketUtils.parseTicketObject. Object is ', ticketObject);
+        var list = [];
+        var type = _.capitalize(ticketObject.ticket.type);
+        var ticketKey = ticketObject.key;
+        angular.forEach(ticketObject.topics, function(topicKey,key) {
+          var topicKeyArrayConfig = {};
+          topicKeyArrayConfig.type = type;
+          topicKeyArrayConfig.ticketKey = ticketKey;
+          var index = ticketKey.length + type.length + 2
+          topicKeyArrayConfig.name = topicKey.substring(index, topicKey.length);
+          topicKeyArrayConfig.topicKey = topicKey;
+          list.push(topicKeyArrayConfig);
+        });
+        ticketObject.topics = list; //replace the original list
+        ticketObject.ticket.type = type; // replace with capitalized for display
+        return ticketObject;
       }
     }
     return TicketUtils;
@@ -33,6 +51,7 @@ angular.module('dimsDashboard.services')
       data: {},
       tickets: {},
 
+      // Get array of existing ticket keys from rest api
       getTickets: function() {
         $log.debug('TicketService.getTickets start');
         var deferred = $q.defer();
@@ -54,6 +73,7 @@ angular.module('dimsDashboard.services')
         return deferred.promise;
       },
 
+      // Get one ticket - key, ticket metadata, array of topic keys
       getTicket: function(ticketKey) {
         $log.debug('TicketService.getTicket start. TicketKey is ', ticketKey);
         var deferred = $q.defer();
@@ -61,7 +81,10 @@ angular.module('dimsDashboard.services')
 
         function(resource) {
           $log.debug('TicketService.getTicket success callback data is ', resource.data);
-          deferred.resolve(resource.data);
+          // Massage the topic list in the ticket
+          var parsedTicket = TicketUtils.parseTicketObject(resource.data);
+          $log.debug('TicketService.getTicket parsed ticket object is ', parsedTicket);
+          deferred.resolve(parsedTicket);
          },
 
         function(err) {

@@ -144,6 +144,8 @@ angular.module('dimsDashboard.services', []);
 angular.module('dimsDashboard.directives', []);
 angular.module('dimsDashboard.filters', []);
 
+ _.mixin(_.string.exports());
+
 dimsDashboard.run(function($rootScope, $location, $log, AuthService) {
   //watching the value of the currentUser variable.
   $rootScope.$watch('currentUser', function(currentUser) {

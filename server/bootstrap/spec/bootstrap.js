@@ -24,11 +24,11 @@ var ticketConfig = [
 
   {
     user: users[1],
-    type: 'data'
+    type: 'analysis'
   },
   {
     user: users[2],
-    type: 'analysis'
+    type: 'data'
   },
   {
     user: users[3],
@@ -52,24 +52,24 @@ var topicConfig = [
     description: ''
   },
   {
-    topic: 'cif:testcif1.txt',
+    topic: 'cif:65% Confidence',
     dataType: 'hash',
     data: 'data/prisemTestData/testcif1.txt',
     shortDesc: 'CIF 65% confidence results JSON',
     description: ''
   },
   {
-    topic: 'cif:testcif3a.txt',
+    topic: 'cif:APT 1 intrusion set',
     dataType: 'hash',
     data: 'data/prisemTestData/testcif3a.txt',
-    shortDesc: 'APT 1 intrusion set obtained via cross-correlation',
+    shortDesc: 'APT 1 intrusion set obtained via cross-correlation, testcif3',
     description: ''
   },
   {
-    topic: 'cif:testcif3.txt',
+    topic: 'cif:APT 1 instrusion search',
     dataType: 'hash',
-    data: 'data/prisemTestData/testcif3a.txt',
-    shortDesc: 'APT 1 intrusion set CIF search results',
+    data: 'data/prisemTestData/testcif3.txt',
+    shortDesc: 'APT 1 intrusion set CIF search results, testcif3',
     description: ''
   }
 ]
@@ -139,8 +139,10 @@ describe('models/Ticket', function() {
     var ticket = new Ticket();
     var topic1 = topicConfig[2];
     var topic2 = topicConfig[3];
+    var topic3 = topicConfig[4];
     var stringData1 = fs.readFileSync(ROOT_DIR+topic1.data, {encoding: 'utf-8'});
     var stringData2 = fs.readFileSync(ROOT_DIR+topic2.data, {encoding: 'utf-8'});
+    var stringData3 = fs.readFileSync(ROOT_DIR+topic3.data, {encoding: 'utf-8'});
     var data1 = {
       shortDesc: topic1.shortDesc,
       description: topic1.description,
@@ -151,14 +153,24 @@ describe('models/Ticket', function() {
       description: topic2.description,
       data: stringData2
     };
+    var data3 = {
+      shortDesc: topic3.shortDesc,
+      description: topic3.description,
+      data: stringData3
+    };
     ticket.create(ticketConfig[1].type, ticketConfig[1].user).then(function(ticket) {
       debugTicketCounter(ticket);
       ticket.addTopic(topic1.topic, topic1.dataType, data1)
         .then(function(reply) {
-          expect(reply.parent.creator).to.equal(ticketConfig[0].user);
+          logger.debug('Added topic 1 to ticket 2, reply is ', reply);
           
           ticket.addTopic(topic2.topic, topic2.dataType, data2).then(function(reply) {
-            done();
+            logger.debug('Added topic 2 to ticket 2, reply is ', reply);
+            ticket.addTopic(topic3.topic, topic3.dataType, data3).then(function(reply) {
+              logger.debug('Added topic 3 to ticket 2, reply is ', reply);
+              done();
+            })
+            
           });
         });
     });

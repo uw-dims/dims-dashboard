@@ -20,7 +20,7 @@
 <div class="col-xs-2" >
 <div style="border: 1px solid #ddd;" ng-show="showTools">
 <div class="list-group" style="margin-bottom: 0px;"><a href="#" class="list-group-item disabled">
-<h4 class="list-group-item-heading">Choose a Tool</h4>
+<h5 class="list-group-item-heading">Choose a Tool</h5>
 </a></div>
 <div class="list-group" style="margin-bottom: 0px;">
 <a href="#" class="list-group-item {{t.selected}}" ng-repeat="t in availableTools" ng-click="setTool(t, $index)">{{t.desc}}</a>
@@ -37,7 +37,7 @@
 <div class="col-xs-2" >
 <div style="border: 1px solid #ddd;" ng-show="showSavedQueries">
 <div class="list-group" style="margin-bottom: 0px;"><a href="#" class="list-group-item disabled">
-<h4 class="list-group-item-heading">Saved Queries</h4>
+<h5 class="list-group-item-heading">Saved Queries</h5>
 </a></div>
 <div class="list-group saved-query-group" style="margin-bottom: 0px;" >
 <a href="#" class="list-group-item {{q.selected}}" ng-repeat="q in savedQueries" ng-click="setQuery(q, $index)" >{{q.name}}</a>
@@ -58,7 +58,7 @@
 <div class="col-xs-2" >
 <div style="border: 1px solid #ddd;" ng-show="showTickets">
 <div class="list-group" style="margin-bottom: 0px;"><a href="#" class="list-group-item disabled">
-<h4 class="list-group-item-heading">Tickets</h4>
+<h5 class="list-group-item-heading">Tickets</h5>
 </a></div>
 <div class="list-group ticket-group" style="margin-bottom: 0px;" >
 <a href="#" class="list-group-item {{t.selected}}" ng-repeat="t in tickets" ng-click="setTicket(t, $index)" >{{t.name}}</a>
@@ -66,16 +66,43 @@
 </div> <!-- End enclosing div -->
 </div> <!-- End first col div -->
 
-<div class="col-xs-10" >
-<!-- <div class="panel panel-default" ng-show="currentSelectedQuery.name !== undefined && showSavedQueries">
+<div class="col-xs-2">
+<div style="border: 1px solid #ddd;" ng-show="showTopicList && showTickets">
+<div class="list-group" style="margin-bottom: 0px;"><a href="#" class="list-group-item disabled">
+<h5 class="list-group-item-heading">{{ currentSelectedTicket.name }} Topics</h5>
+</a></div>
+<div class="list-group ticket-group" style="margin-bottom: 0px;" >
+<a href="#" class="list-group-item {{p.selected}}" ng-repeat="p in currentSelectedTicket.topics" ng-click="setTopic(p, $index)" >{{p.name}}</a>
+</div> <!-- End main list-group div -->
+</div> <!-- End enclosing div -->  
+
+<div ng-show="(!showTopicList && !showTopic) && showTickets">
+<h4>Tickets</h4>
+<p>To select a ticket, click its name in the list.</p>
+</div>
+
+</div>
+
+<div class="col-xs-8" >
+
+<div ng-show="currentSelectedTicket.name !== undefined && showTopicList">
+  <!-- <div class="panel-body" > -->
+  <h4>{{currentSelectedTicket.name}}: {{ currentSelectedTicket.ticket.type }} Ticket</h4>
+  <p>Created {{ currentSelectedTicket.ticket.createdTime | date : 'medium' }} by {{ currentSelectedTicket.ticket.creator }}<br/>
+  Status: {{ currentSelectedTicket.ticket.open ? 'Open' : 'Closed'}}</p>
+  
+  <!-- </div> -->
+</div>
+
+<div class="panel panel-default" ng-show="currentSelectedTopic.name !== undefined && showTopic">
   <div class="panel-body" >
   <h4>{{currentSelectedQuery.name}}</h4>
   <p>{{currentSelectedQuery.desc}}</p>
   <button type="button" class="btn btn-primary btn-sm" ng-click="callClient()">Show Data</button>
   </div>
-</div> -->
 </div>
 
+</div>
 
 
 
