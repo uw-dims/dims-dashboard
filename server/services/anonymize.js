@@ -11,14 +11,14 @@ var settings = require('./settings');
 /**
   * @param {string} params.type "ipgrep" or "anon" or undefined (default is anon). 
   * @param {object} params
-  * @param {boolean} params.debug True if debug mode requested
-  * @param {boolean} params.verbose True if verbose mode requested
-  * @param {boolean} params.stats True if stats requested
+  * @param {string} params.debug True if debug mode requested
+  * @param {string} params.verbose True if verbose mode requested
+  * @param {string} params.stats True if stats requested
   * @param {string} params.outputType 'json' if Json output requested
   * @param {string} params.mapName  Path to map to use instead of default
   * @param {string} params.data Data or path to file containing data to be anonymized
   * @param {boolean} params.useFile True if data is in a file
-  * @param {string} id  ID of logged in user
+  * @param {string} user  ID of logged in user
   */
 
 exports.setup = function(params, user) {

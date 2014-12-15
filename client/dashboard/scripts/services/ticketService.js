@@ -10,7 +10,23 @@ angular.module('dimsDashboard.services')
     return $resource('/api/ticket/topic');
   })
 
-  .factory('TicketService', function(TicketApi, $log, $q) {
+  .factory('TicketUtils', function($log) {
+
+    var TicketUtils = {
+      parseTicketList: function(tickets) {
+        var list = [];
+        angular.forEach(tickets, function(ticket, key) {
+          var ticketKeyArray = ticket.split(':'); // Split on :
+          list.push({name: 'DIMS-'+ticketKeyArray[1], num:ticketKeyArray[1]});
+        });
+        return list;
+      }
+    }
+    return TicketUtils;
+
+  })
+
+  .factory('TicketService', function(TicketApi, TicketUtils, $log, $q) {
 
     var TicketService = {
 
@@ -25,7 +41,7 @@ angular.module('dimsDashboard.services')
         function(resource) {
           $log.debug('TicketService.getTickets success callback data is ', resource.data);
           TicketService.tickets = resource.data;
-          deferred.resolve(resource.data);
+          deferred.resolve(TicketUtils.parseTicketList(resource.data));
         },
 
         function(err) {

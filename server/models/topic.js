@@ -14,12 +14,14 @@ exports = module.exports = Topic;
 // parent: parent Ticket
 // name: name of topic
 // type: type of ticket/topic
-function Topic(parent,type,name,dataType) {
+function Topic(parent,type,name,dataType,shortDesc, description) {
   var self=this;
   self.parent = parent;
   self.type = type;
   self.name = name;
-  self.dataType = dataType;
+  self.dataType = dataType || 'hash';
+  // self.description = description;
+  // self.shortDesc = shortDesc;
 };
 
 Topic.prototype.setDataType = function(dataType) {
@@ -49,6 +51,8 @@ Topic.prototype.getTopicMetadata = function() {
   config.type = self.type;
   config.name = self.name;
   config.dataType = self.dataType;
+  // config.description = self.description;
+  // config.shortDesc = self.shortDesc;
   return config;
 };
 
