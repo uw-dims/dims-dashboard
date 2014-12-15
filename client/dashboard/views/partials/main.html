@@ -1,17 +1,21 @@
 
-<div class="query-tray-icon"><div style="width: 10px;"> <span class="glyphicon glyphicon-folder-close query-tray-btn"  ng-click="queryToggle()" ng-show="isCollapsed"></span>
-<span class="glyphicon glyphicon-folder-open query-tray-btn" ng-click="queryToggle()" ng-show="!isCollapsed"></span>
-<span class="glyphicon glyphicon-search query-tray-btn" ng-click="getTools()" ></span>
-<span class="glyphicon glyphicon-list query-tray-btn" ng-click="getSavedQueries()" ></span>
-<span class="glyphicon glyphicon-cog query-tray-btn" ng-click="getSettings()" ></span>
-<span class="glyphicon glyphicon-tasks query-tray-btn" ng-click="getTickets()" ></span>
+<div class="query-tray-icon">
+<div style="width: 10px;">
+<!--  <span class="glyphicon glyphicon-folder-close query-tray-btn"  ng-click="queryToggle()" ng-show="isCollapsed"></span>
+<span class="glyphicon glyphicon-folder-open query-tray-btn" ng-click="queryToggle()" ng-show="!isCollapsed"></span> -->
+<span class="glyphicon glyphicon-search query-tray-btn {{ toolBtnClass }}" ng-click="getTools()" tooltip="{{ buttonTooltips.tools }}" tooltip-append-to-body="true" tooltip-placement="right"></span>
+<span class="glyphicon glyphicon-tasks query-tray-btn {{ ticketBtnClass }}" ng-click="getTickets()" tooltip="{{ buttonTooltips.tickets }}" tooltip-append-to-body="true" tooltip-placement="right"></span>
+<span class="glyphicon glyphicon-list query-tray-btn {{ savedBtnClass }}" ng-click="getSavedQueries()" tooltip="{{ buttonTooltips.saved }}" tooltip-append-to-body="true" tooltip-placement="right"></span>
+<span class="glyphicon glyphicon-cog query-tray-btn {{ settingsBtnClass }}" ng-click="getSettings()" tooltip="{{ buttonTooltips.settings }}" tooltip-append-to-body="true" tooltip-placement="right"></span>
+
 </div>
 </div>
 
 <div class="container main">
-<h1>Current Activity</h1>
+<h1>{{title}}</h1>
 
 <div class="row" collapse="isCollapsed">
+
 <!-- Tools -->
 <div class="col-xs-2" >
 <div style="border: 1px solid #ddd;" ng-show="showTools">
@@ -49,6 +53,31 @@
   <button type="button" class="btn btn-primary btn-sm" ng-click="callClient()">Show Data</button>
   </div>
 </div></div>
+
+<!-- Tickets -->
+<div class="col-xs-2" >
+<div style="border: 1px solid #ddd;" ng-show="showTickets">
+<div class="list-group" style="margin-bottom: 0px;"><a href="#" class="list-group-item disabled">
+<h4 class="list-group-item-heading">Tickets</h4>
+</a></div>
+<div class="list-group ticket-group" style="margin-bottom: 0px;" >
+<a href="#" class="list-group-item {{q.selected}}" ng-repeat="q in tickets" ng-click="setTicket(q, $index)" >{{q}}</a>
+</div> <!-- End main list-group div -->
+</div> <!-- End enclosing div -->
+</div> <!-- End first col div -->
+
+<div class="col-xs-10" >
+<!-- <div class="panel panel-default" ng-show="currentSelectedQuery.name !== undefined && showSavedQueries">
+  <div class="panel-body" >
+  <h4>{{currentSelectedQuery.name}}</h4>
+  <p>{{currentSelectedQuery.desc}}</p>
+  <button type="button" class="btn btn-primary btn-sm" ng-click="callClient()">Show Data</button>
+  </div>
+</div> -->
+</div>
+
+
+
 
 <!-- Settings -->
 <div class="col-xs-12 settings">

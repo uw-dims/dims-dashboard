@@ -1,17 +1,34 @@
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller('MainCtrl', ['$scope', 'LogService','ChatService','$cookies','$location', '$routeParams', '$log', '$filter', '$http', 'SettingsService','$rootScope',
-      function ($scope, LogService, ChatService, $cookies, $location, $routeParams, $log, $filter, $http, SettingsService, $rootScope) {
-    // write Ctrl here
-    $log.debug('In MainCtrl');
+  controller('MainCtrl', ['$scope', 'TicketService', 'LogService','ChatService','$cookies','$location', '$routeParams', '$log', '$filter', '$http', 'SettingsService','$rootScope',
+      function ($scope, TicketService, LogService, ChatService, $cookies, $location, $routeParams, $log, $filter, $http, SettingsService, $rootScope) {
+
+    $scope.title = 'DIMS Main';
 
     $scope.settings = SettingsService.get();
     $scope.settingsFormData = SettingsService.get();
 
     $scope.isCollapsed = true;
+    // Tools panel
     $scope.showTools = false;
+    $scope.toolsBtnClass = 'query-btn-inactive';
+    // Saved Queries panel
     $scope.showSavedQueries = false;
-    $scope.showActivities = false;
+    $scope.savedBtnClass = 'query-btn-inactive';
+    // Tickets panel
+    $scope.showTickets = false;
+    $scope.ticketBtnClass = 'query-btn-inactive';
+
+    $scope.showSettings = false;
+    $scope.settingsBtnClass = 'query-btn-inactive';
+
+    $scope.buttonTooltips = {
+      tools: 'Show query tools',
+      saved: 'Show my saved queries',
+      tickets: 'Show tickets',
+      settings: 'Show settings'
+    }
+
     // $scope.logmonOn = false;
     $scope.logs = [];
     $scope.currentSelectedQuery = {};
@@ -132,13 +149,13 @@ angular.module('dimsDashboard.controllers').
         'selected': ''
       });
      
-      for (var i=2; i<$scope.demoActivitiesNum; i++) {
-        $scope.savedDemoQueries.push({
-          'name' : 'Demo Query '+ i,
-          'key' : 'key'+i,
-          'selected' : ''
-        });
-      }
+      // for (var i=2; i<$scope.demoActivitiesNum; i++) {
+      //   $scope.savedDemoQueries.push({
+      //     'name' : 'Demo Query '+ i,
+      //     'key' : 'key'+i,
+      //     'selected' : ''
+      //   });
+      // }
     };
 
     var initializeQueryList = function() {
@@ -153,11 +170,13 @@ angular.module('dimsDashboard.controllers').
     
     $log.debug('Saved queries: ', $scope.savedQueries);
 
+    // Toggles the panel open and closed
     $scope.queryToggle = function() {
       $scope.isCollapsed = !$scope.isCollapsed;
       $log.debug('query panel toggle called');
     };
 
+    // Set the tool selected in the Tools panel
     $scope.setTool = function(tool, row) {
       $log.debug('setTool called: ' , tool);
       $scope.currentSelectedTool = tool;
@@ -170,6 +189,7 @@ angular.module('dimsDashboard.controllers').
       
     };
 
+    // Set the saved query selected in the saved queries panel
     $scope.setQuery = function(query, row) {
       $log.debug('setQuery called: ',query, row);
       $scope.currentSelectedQuery = query;
@@ -181,32 +201,88 @@ angular.module('dimsDashboard.controllers').
       $scope.savedQueries[row].selected = 'active';
     };
 
-
+    // Tools button was clicked
     $scope.getTools = function() {
+      // Toggle if collapsed or if Tools are already selected
       if ($scope.isCollapsed) {
+        $scope.queryToggle();
+      } else if ($scope.showTools) {
         $scope.queryToggle();
       }
       $scope.showTools = true;
+      $scope.toolBtnClass = 'query-btn-active';
       $scope.showSavedQueries = false;
+      $scope.savedBtnClass = 'query-btn-inactive';
       $scope.showSettings = false;
+      $scope.settingsBtnClass = 'query-btn-inactive';
+      $scope.showTickets = false;
+      $scope.ticketBtnClass = 'query-btn-inactive';
+
     };
 
     $scope.getSavedQueries = function() {
       if ($scope.isCollapsed) {
         $scope.queryToggle();
+      } else if ($scope.showSavedQueries) {
+        $scope.queryToggle();
       }
       $scope.showTools = false;
+      $scope.toolBtnClass = 'query-btn-inactive';
       $scope.showSavedQueries = true;
+      $scope.savedBtnClass = 'query-btn-active';
       $scope.showSettings = false;
+      $scope.settingsBtnClass = 'query-btn-inactive';
+      $scope.showTickets = false;
+      $scope.ticketBtnClass = 'query-btn-inactive';
     };
 
     $scope.getSettings = function() {
       if ($scope.isCollapsed) {
         $scope.queryToggle();
+      } else if ($scope.showSettings) {
+        $scope.queryToggle();
       }
       $scope.showTools = false;
+      $scope.toolBtnClass = 'query-btn-inactive';
       $scope.showSavedQueries = false;
+      $scope.savedBtnClass = 'query-btn-inactive';
       $scope.showSettings = true;
+      $scope.settingsBtnClass = 'query-btn-active';
+      $scope.showTickets = false;
+      $scope.ticketBtnClass = 'query-btn-inactive';
+    };
+
+    $scope.getTickets = function() {
+      if ($scope.isCollapsed) {
+        $scope.queryToggle();
+      } else if ($scope.showTickets) {
+        $scope.queryToggle();
+      }
+      $scope.showTools = false;
+      $scope.toolBtnClass = 'query-btn-inactive';
+      $scope.showSavedQueries = false;
+      $scope.savedBtnClass = 'query-btn-inactive';
+      $scope.showSettings = false;
+      $scope.settingsBtnClass = 'query-btn-inactive';
+      $scope.showTickets = true;
+      $scope.ticketBtnClass = 'query-btn-active';
+      TicketService.getTickets().then(function(reply) {
+        $scope.tickets = TicketService.tickets;
+        $log.debug('mainCtrl. tickets are ', $scope.tickets);
+      });
+      
+    };
+
+    // Set the ticket selected in the tickets panel
+    $scope.setTickets = function(query, row) {
+      $log.debug('setTickets called: ',query, row);
+      $scope.currentSelectedQuery = query;
+      var filtered = $filter('filter')($scope.savedQueries, {'selected': 'active'}, true);
+      $log.debug('filtered ', filtered);
+      angular.forEach(filtered, function(value,index) {
+        value.selected = '';
+      });
+      $scope.savedQueries[row].selected = 'active';
     };
 
     // Set current value of socket states
