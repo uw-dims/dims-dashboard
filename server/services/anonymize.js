@@ -32,7 +32,7 @@ exports.setup = function(params, user) {
   if (!params.useFile) {
     logger.debug('services/anonymize.setup - not using file');
     if (typeof params.data === 'object' ) data = JSON.stringify(data);
-    logger.debug('services/anonymize.setup - data is ', data);
+    // logger.debug('services/anonymize.setup - data is ', data);
   }
 
   _setInputs(params, id).then(function(inputArray) {
@@ -56,6 +56,7 @@ var _setFileInput = function(inputArray, type, useFile, data) {
   } else {
     _writeTempFile(data).then(function(path) {
       inputArray.push(path);
+      logger.debug('services/anonymize._setFileInput after writeTempFile. path is ', path);
       deferred.resolve(inputArray);
     }, function(err,reply) {
       deferred.reject(err);

@@ -14,6 +14,8 @@ var c = require('../../config/redisScheme');
 var q = require('q');
 var fs = require('fs');
 var config = require('../../config');
+var anonymize = require('../../services/anonymize');
+var ChildProcess = require('../../services/childProcess');
 
 var users = ['lparsons', 'dittrich', 'eliot', 'stuart'];
 
@@ -205,9 +207,63 @@ describe('models/Ticket', function() {
     var ticket = new Ticket();
     ticket.create('mitigation', 'lparsons').then(function(ticket) {
       ticket.addTopic(initialTopic.topic, initialTopic.dataType, initialData).then(function(reply) {
-        logger.debug('reply from creating mitigation initial ips topic', reply);
+        // logger.debug('reply from creating mitigation initial ips topic', reply);
 
-        done();
+        anonymize.setup({data: ipData, useFile: false, type: 'anon', mapName: mapPath, outputType:'json'}, 'lparsons').then(function(reply) {
+          logger.debug('bootstrap mitigation Back from anonymize.setup. reply is ', reply);
+          var inputArray = reply;
+          var anonChild = new ChildProcess();
+          anonChild.startProcess('python', inputArray).then(function(reply){
+            logger.debug('bootstrap mitigation anon reply');
+            // console.log(reply);
+            var userIps = JSON.parse(reply);
+            console.log(userIps);
+            var lparsonsIps = JSON.stringify(userIps.matching.lparsons);
+            var dittrichIps = JSON.stringify(userIps.matching.dittrich);
+            var stuartIps = JSON.stringify(userIps.matching.stuart);
+            console.log('stuartIps');
+            console.log(stuartIps);
+            var eliotIps = JSON.stringify(userIps.matching.eliot);
+            
+            ticket.addTopic('user:dittrich', 'hash', {
+                data: dittrichIps,
+                shortDesc: 'IPs assigned to dittrich',
+                description: '',
+                displayType: 'mitigation'
+            
+            }).then(function(reply){
+
+              ticket.addTopic('user:stuart', 'hash', {
+                data: stuartIps,
+                shortDesc: 'IPs assigned to lparsons',
+                description: '',
+                displayType: 'mitigation'
+              }).then(function(reply) {
+                console.log('reply from stuart');
+                console.log(reply);
+                ticket.addTopic('user:eliot', 'hash', {
+                  data: eliotIps,
+                  shortDesc: 'IPs assigned to eliot',
+                  description: '',
+                  displayType: 'mitigation'
+                  }).then(function(reply){
+
+                    ticket.addTopic('user:lparsons', 'hash', {
+                      data: lparsonsIps,
+                      shortDesc: 'IPs assigned to lparsons',
+                      description: '',
+                      displayType: 'mitigation'
+                    }).then(function(reply){
+                      done();
+                    })
+                    
+                  
+                });
+              });
+            });
+          });
+        });
+
       });
     });
   });
