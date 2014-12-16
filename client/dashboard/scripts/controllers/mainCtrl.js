@@ -23,6 +23,7 @@ angular.module('dimsDashboard.controllers').
     $scope.showTopic = false;
 
     $scope.showCif = false;
+    $scope.displayData = {};
 
     $scope.showSettings = false;
     $scope.settingsBtnClass = 'query-btn-inactive';
@@ -199,6 +200,8 @@ angular.module('dimsDashboard.controllers').
       $scope.showTopicList = false;
       $scope.showTopic = false;
       $scope.ticketBtnClass = 'query-btn-inactive';
+      $scope.showResults=false;
+      $scope.showCif = false;
 
     };
 
@@ -218,6 +221,8 @@ angular.module('dimsDashboard.controllers').
       $scope.showTopicList = false;
       $scope.showTopic = false;
       $scope.ticketBtnClass = 'query-btn-inactive';
+      $scope.showResults=false;
+      $scope.showCif = false;
     };
 
     $scope.getSettings = function() {
@@ -236,6 +241,8 @@ angular.module('dimsDashboard.controllers').
       $scope.showTopicList = false;
       $scope.showTopic = false;
       $scope.ticketBtnClass = 'query-btn-inactive';
+      $scope.showResults=false;
+      $scope.showCif = false;
     };
 
     $scope.getTickets = function() {
@@ -317,22 +324,50 @@ angular.module('dimsDashboard.controllers').
       angular.forEach(filtered, function(value,index) {
         value.selected = '';
       });
+      $scope.rawData = '';
       $scope.currentSelectedTicket.topics[row].selected = 'active';
       TicketService.getTopic(topic.topicKey).then(function(reply) {
         $log.debug('reply is ', reply);
+        $scope.rawData = reply.content.data;
         $scope.currentSelectedTopic.description = reply.content.description;
         $scope.currentSelectedTopic.shortDesc = reply.content.shortDesc;
         $scope.currentSelectedTopic.data = reply.content.data;
         $log.debug('currentSelectedTopic is ', $scope.currentSelectedTopic);
         $scope.showTopic = true;
-
+        $scope.showResults=true;
+        $scope.isRaw = true;
+        $scope.currentSelectedTopic.responseType = reply.content.type;
         // Check to see if we can display data
         var checkTopic = $scope.currentSelectedTopic.name.split(':');
         if (checkTopic[0] === 'cif') {
           $scope.showCif = true;
+          if ($scope.currentSelectedTopic.responseType === 'json') {
+            $scope.displayData = {};
+            $scope.noResults = [];
+            $scope.displayData.iff = $scope.currentSelectedTopic.data.iff;
+            $scope.displayData.program = $scope.currentSelectedTopic.data.program;
+            $scope.displayData.time = $scope.currentSelectedTopic.data.time;
+            $scope.displayData.results=[];
+            for (var i=0; i < $scope.currentSelectedTopic.data.results.length; i++) {
+              if ($scope.currentSelectedTopic.data.results[i].results.length === 0) {
+                $scope.noResults.push({searchitem: $scope.currentSelectedTopic.data.results[i].searchitem});
+              } else {
+                for (var j=0; j < $scope.currentSelectedTopic.data.results[i].results.length; j++) {
+                  // var detectDate = new Date($scope.currentSelectedTopic.data.results[i].results[j].detecttime*1000);
+                  // var createdDate = new Date($scope.currentSelectedTopic.data.results[i].results[j].created*1000);
+                  // $scope.currentSelectedTopic.data.results[i].results[j].detecttime = detectDate;
+                  // $scope.currentSelectedTopic.data.results[i].results[j].created = createdDate;
+                }
+                $scope.displayData.results.push($scope.currentSelectedTopic.data.results[i]);
+              }
+            }
+            $log.debug('cif display data is ', $scope.displayData);
+          }
         } else {
           $scope.showCif = false;
         }
+
+        $log.debug('raw data is ', $scope.rawData);
 
 
       });

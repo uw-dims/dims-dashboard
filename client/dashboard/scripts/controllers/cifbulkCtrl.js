@@ -103,6 +103,7 @@ angular.module('dimsDashboard.controllers').
           $scope.data.results.push($scope.rawData.results[i]);
         }
       }
+      $log.debug('$scope.data is ', $scope.data);
     };
 
     var getDemo = function(file) {
