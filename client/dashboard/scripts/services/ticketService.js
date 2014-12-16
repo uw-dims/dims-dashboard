@@ -102,15 +102,20 @@ angular.module('dimsDashboard.services')
         function(resource) {
           $log.debug('TicketService.getTopic success callback data is ', resource.data);
           var jsonData;
+          resource.data.content.responseType = 'txt';
+
           try {
             jsonData = JSON.parse(resource.data.content.data);
             resource.data.content.data = jsonData;
-            resource.data.content.type = 'json';
+            resource.data.content.responseType = 'json';
           } catch (e) {
-            $log.debug('data is not json');
-            resource.data.content.type = 'txt';
+            $log.debug('TicketService.getTopic data is not json');
           }
+          $log.debug('TicketService.getTopic data response type is ', resource.data.content.responseType);
+          
           deferred.resolve(resource.data);
+          
+          
         }, 
 
         function(err) {

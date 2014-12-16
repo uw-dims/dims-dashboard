@@ -169,9 +169,18 @@
 
 </div> <!-- end of row -->
 
+<!-- Show graph -->
+<div ng-if="showResults && showGraph">
+<div id="chart" class="with-3d-shadow with-transitions" >
+    <svg style="height: 500px;"></svg>
+  </div>
+  </div>
+
+<!-- End show Graph-->
+
 <div class="row" style="margin-top: 20px;" ng-if="showCif"><div class="col-xs-12" >
 <h2>Current Results</h2>
-<div class="row"><div class="col-sm-12 "><strong>{{ resultsMsg }}</strong></div></div>
+<div class="row"><div class="col-sm-12 "><strong>{{ bob }}</strong></div></div>
 <div class="table-responsive" ng-repeat="dr in displayData.results" ng-show="currentSelectedTopic.responseType === 'json'">
 <table class="table table-striped table-hover table-bordered" ><tbody>
 <tr>
@@ -208,10 +217,14 @@
 <!-- </tr> -->
 </tbody></table>
 </div>
-
-<dims-raw-results></dims-raw-results>
 </div>
+</div>
+
+<div class="row" style="margin-top: 10px;"><div class="col-xs-12">
+<dims-raw-results></dims-raw-results>
 </div></div>
+
+</div>
 
 <!-- <div class="row" style="margin-top: 20px;"><div class="col-xs-12" >
 <div class="panel panel-default">

@@ -13,6 +13,7 @@ var KeyGen = require('../../models/keyGen');
 var c = require('../../config/redisScheme');
 var q = require('q');
 var fs = require('fs');
+var config = require('../../config');
 
 var users = ['lparsons', 'dittrich', 'eliot', 'stuart'];
 
@@ -42,35 +43,40 @@ var topicConfig = [
     dataType: 'hash',
     data: 'data/prisemTestData/logcenter-sizes-2.txt',
     shortDesc: 'Logcenter data usage vs. date',
-    description: ''
+    description: '',
+    displayType: 'double-time-series'
   },
   {
     topic: 'storage:silk:silk-sizes-2.txt',
     dataType: 'hash',
     data: 'data/prisemTestData/silk-sizes-2.txt',
     shortDesc: 'SiLK data usage vs. date',
-    description: ''
+    description: '',
+    displayType: 'double-time-series'
   },
   {
     topic: 'cif:65% Confidence',
     dataType: 'hash',
     data: 'data/prisemTestData/testcif1.txt',
     shortDesc: 'CIF 65% confidence results JSON',
-    description: ''
+    description: '',
+    displayType: 'cif'
   },
   {
     topic: 'cif:APT 1 intrusion set',
     dataType: 'hash',
     data: 'data/prisemTestData/testcif3a.txt',
     shortDesc: 'APT 1 intrusion set obtained via cross-correlation, testcif3',
-    description: ''
+    description: '',
+    displayType: 'cif'
   },
   {
     topic: 'cif:APT 1 intrusion search',
     dataType: 'hash',
     data: 'data/prisemTestData/testcif3.txt',
     shortDesc: 'APT 1 intrusion set CIF search results, testcif3',
-    description: ''
+    description: '',
+    displayType: 'cif'
   }
 ]
 
@@ -114,12 +120,14 @@ describe('models/Ticket', function() {
     var data1 = {
       shortDesc: topic1.shortDesc,
       description: topic1.description,
+      displayType: topic1.displayType,
       data: stringData1
     };
     var data2 = {
       shortDesc: topic2.shortDesc,
       description: topic2.description,
-      data: stringData2
+      data: stringData2,
+      displayType: topic2.displayType
     };
     ticket.create(ticketConfig[0].type, ticketConfig[0].user).then(function(ticket) {
       debugTicketCounter(ticket);
@@ -146,17 +154,20 @@ describe('models/Ticket', function() {
     var data1 = {
       shortDesc: topic1.shortDesc,
       description: topic1.description,
-      data: stringData1
+      data: stringData1,
+      displayType: topic1.displayType
     };
     var data2 = {
       shortDesc: topic2.shortDesc,
       description: topic2.description,
-      data: stringData2
+      data: stringData2,
+      displayType: topic2.displayType
     };
     var data3 = {
       shortDesc: topic3.shortDesc,
       description: topic3.description,
-      data: stringData3
+      data: stringData3,
+      displayType: topic3.displayType
     };
     ticket.create(ticketConfig[1].type, ticketConfig[1].user).then(function(ticket) {
       debugTicketCounter(ticket);
@@ -176,4 +187,30 @@ describe('models/Ticket', function() {
     });
   });
 
+  it('should create a mitigation ticket 1 ', function(done) {
+    var mapPath = ROOT_DIR+'mydata/mapFiles/userAttributes.yml';
+    var ipPath = ROOT_DIR+'mydata/ipFiles/mitigation_ips.txt';
+    // var mapData = fs.readFileSync(mapPath, {encoding: 'utf-8'});
+    var ipData = fs.readFileSync(ipPath, {encoding: 'utf-8'});
+    var initialTopic =  {
+      topic: 'inital_ips',
+      dataType: 'hash'
+    };
+    var initialData = {
+      data: ipData,
+      shortDesc: 'Initial Set of IPs to mitigate',
+      description: '',
+      displayType: 'mitigation'
+    };
+    var ticket = new Ticket();
+    ticket.create('mitigation', 'lparsons').then(function(ticket) {
+      ticket.addTopic(initialTopic.topic, initialTopic.dataType, initialData).then(function(reply) {
+        logger.debug('reply from creating mitigation initial ips topic', reply);
+
+        done();
+      });
+    });
+  });
+
 });
+
