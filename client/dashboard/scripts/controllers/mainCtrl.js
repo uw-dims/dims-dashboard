@@ -1,7 +1,7 @@
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller('MainCtrl', ['$scope', 'TicketService', 'LogService','ChatService','$cookies','$location', '$routeParams', '$log', '$filter', '$http', 'SettingsService','$rootScope',
-      function ($scope, TicketService, LogService, ChatService, $cookies, $location, $routeParams, $log, $filter, $http, SettingsService, $rootScope) {
+  controller('MainCtrl', ['$scope', 'DataService', 'TicketService', 'LogService','ChatService','$cookies','$location', '$routeParams', '$log', '$filter', '$http', 'SettingsService','$rootScope',
+      function ($scope, DataService, TicketService, LogService, ChatService, $cookies, $location, $routeParams, $log, $filter, $http, SettingsService, $rootScope) {
 
     $scope.title = 'DIMS Main';
 
@@ -299,6 +299,8 @@ angular.module('dimsDashboard.controllers').
       $scope.currentSelectedTicket = ticket;
       $scope.currentSelectedTopic = null;
       $scope.showTopic = false;
+      $scope.showResults = false;
+      $scope.rawResults = '';
       var filtered = $filter('filter')($scope.tickets, {'selected': 'active'}, true);
       $log.debug('filtered ', filtered);
       angular.forEach(filtered, function(value,index) {
@@ -325,6 +327,7 @@ angular.module('dimsDashboard.controllers').
         value.selected = '';
       });
       $scope.rawData = '';
+      $scope.showGraph = false;
       $scope.currentSelectedTicket.topics[row].selected = 'active';
       TicketService.getTopic(topic.topicKey).then(function(reply) {
         $log.debug('reply is ', reply);
@@ -332,14 +335,15 @@ angular.module('dimsDashboard.controllers').
         $scope.currentSelectedTopic.description = reply.content.description;
         $scope.currentSelectedTopic.shortDesc = reply.content.shortDesc;
         $scope.currentSelectedTopic.data = reply.content.data;
+        $scope.currentSelectedTopic.displayType = reply.content.displayType;
         $log.debug('currentSelectedTopic is ', $scope.currentSelectedTopic);
         $scope.showTopic = true;
         $scope.showResults=true;
         $scope.isRaw = true;
-        $scope.currentSelectedTopic.responseType = reply.content.type;
+        $scope.currentSelectedTopic.responseType = reply.content.responseType;
         // Check to see if we can display data
-        var checkTopic = $scope.currentSelectedTopic.name.split(':');
-        if (checkTopic[0] === 'cif') {
+        // var checkTopic = $scope.currentSelectedTopic.name.split(':');
+        if ($scope.currentSelectedTopic.displayType === 'cif') {
           $scope.showCif = true;
           if ($scope.currentSelectedTopic.responseType === 'json') {
             $scope.displayData = {};
@@ -367,7 +371,16 @@ angular.module('dimsDashboard.controllers').
           $scope.showCif = false;
         }
 
-        $log.debug('raw data is ', $scope.rawData);
+        if ($scope.currentSelectedTopic.displayType === 'double-time-series' &&
+                $scope.currentSelectedTopic.responseType !== 'json') {
+          $scope.currentSelectedTopic.data = DataService.parseTimeSeries($scope.rawData);
+        $scope.showResults = true;
+        $scope.showGraph = false;
+        $scope.graphData($scope.currentSelectedTopic.data);
+        }
+
+
+        // $log.debug('raw data is ', $scope.rawData);
 
 
       });
@@ -423,5 +436,96 @@ angular.module('dimsDashboard.controllers').
         $log.debug('setUserSettings error', err);
       });
     };
+
+    $scope.graphData = function(result) {
+      $scope.showResults = true;
+      $scope.showGraph = true;
+      $scope.resultsMsg = 'Results;';
+      var chart = null;
+      // Empty any existing chart
+      $('#chart svg').empty();
+
+      
+          $scope.graphDataPoints = [
+            {
+              'key': 'MB',
+              'values': result
+            }
+          // Massage data
+          ].map(function(series) {
+            series.values = series.values.map(function(d) { return {x: d[0], y: d[1] }; });
+            return series;
+          });
+
+          $scope.showResults = true;
+          
+          nv.addGraph(function() {
+            console.log('in nv.addGraph');
+            chart = nv.models.lineWithFocusChart()
+                // .useInteractiveGuideline(true)
+                .margin({top: 30, right: 30, bottom: 60, left: 100})
+                // .margin2({top: 0, right: 30, bottom: 60, left: 60})
+                // x: function(d,i) { return i},
+                // showXAxis: true,
+                // showYAxis: true,
+                .transitionDuration(250)
+                // .interpolate("basis")
+                .color(d3.scale.category10().range());
+
+            // $scope.chart.dispatch.on('renderEnd', function(){
+            //       console.log('rendered');
+            //   });
+
+            // chart sub-models (ie. xAxis, yAxis, etc) when accessed directly, return themselves, not the parent chart, so need to chain separately
+            chart.xAxis
+              .tickFormat($scope.xAxisTickFormatFunction())
+              .tickPadding('8')
+              .axisLabel('Date');
+
+            chart.x2Axis
+              .tickFormat($scope.xAxisTickFormatFunction())
+              .tickPadding(8)
+              .axisLabel('Click and drag to select date range');
+
+            chart.yAxis
+              .tickFormat($scope.yAxisTickFormatFunction())
+              .tickPadding(4)
+              .axisLabel('Storage in MBytes')
+              .axisLabelDistance(0);
+
+            chart.y2Axis
+              .tickFormat($scope.yAxisTickFormatFunction())
+              .tickPadding('4');
+
+            d3.select('#chart svg')
+              .datum($scope.graphDataPoints)
+              .call(chart);
+
+            //TODO: Figure out a good way to do this automatically
+            nv.utils.windowResize(chart.update);
+            //nv.utils.windowResize(function() { d3.select('#chart1 svg').call(chart) });
+
+            // chart.dispatch.on('stateChange', function(e) { nv.log('New State:', JSON.stringify(e)); });
+
+            return chart;
+          });
+    };
+
+    $scope.xAxisTickFormatFunction = function() {
+      return function(d) {
+        return d3.time.format('%x')(new Date(d));
+      };
+
+    };
+
+    $scope.yAxisTickFormatFunction = function() {
+      return function(d) {
+        return d3.format(',.3f')(d/1000000);
+      };
+      
+    };
+
+
+
 
   }]);
