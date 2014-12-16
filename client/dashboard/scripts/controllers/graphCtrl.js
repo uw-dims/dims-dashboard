@@ -26,6 +26,7 @@ angular.module('dimsDashboard.controllers').
 
       DataService.getData($scope.filePath+$scope.formData.fileName).
         then (function(result) {
+          console.log(result);
           $scope.graphDataPoints = [
             {
               'key': 'MB',

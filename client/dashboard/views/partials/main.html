@@ -90,16 +90,14 @@
   <h4>{{currentSelectedTicket.name}}: {{ currentSelectedTicket.ticket.type }} Ticket</h4>
   <p>Created {{ currentSelectedTicket.ticket.createdTime | date : 'medium' }} by {{ currentSelectedTicket.ticket.creator }}<br/>
   Status: {{ currentSelectedTicket.ticket.open ? 'Open' : 'Closed'}}</p>
+  <!-- Topic info here -->
+  <div ng-show="showTopic">
+  <h4>{{ currentSelectedTopic.name }} </h4>
+    <p>{{ currentSelectedTopic.shortDesc}}</p>
+  </div>
+
   
   <!-- </div> -->
-</div>
-
-<div class="panel panel-default" ng-show="currentSelectedTopic.name !== undefined && showTopic">
-  <div class="panel-body" >
-  <h4>{{currentSelectedQuery.name}}</h4>
-  <p>{{currentSelectedQuery.desc}}</p>
-  <button type="button" class="btn btn-primary btn-sm" ng-click="callClient()">Show Data</button>
-  </div>
 </div>
 
 </div>
@@ -171,7 +169,51 @@
 
 </div> <!-- end of row -->
 
-<div class="row" style="margin-top: 20px;"><div class="col-xs-12" >
+<div class="row" style="margin-top: 20px;" ng-if="blah"><div class="col-xs-12" >
+<!-- <h2>Results</h2> -->
+<div class="row"><div class="col-sm-12 well  well-sm"><strong>{{ resultsMsg }}</strong></div></div>
+<div class="table-responsive" ng-repeat="d in currentSelectedTopic.data">
+<table class="table table-striped table-hover table-bordered" ><tbody>
+<tr>
+<th>Address</th>
+<th>Prefix</th>
+<th>Report Time</th>
+<th>Restriction</th>
+<th>Confidence</th>
+
+<th>ASN</th>
+<th>CC</th>
+<th>ASN Desc</th>
+<th>Description</th>
+<th>ID</th>
+<th>Related ID</th>
+<th>Alt ID</th>
+
+</tr>
+<tr ng-repeat="r in in currentSelectedTopic.data">
+<td>{{ r.address }}</td>
+<td>{{ r.prefix }}</td>
+<td>{{ r.reporttime }}</td>
+<td>{{ r.restriction }}</td>
+<td>{{ r.confidence }}</td>
+
+<td>{{ r.asn }}</td>
+<td>{{ r.cc }}</td>
+<td>{{ r.asn_desc | characters:25 }}</td>
+<td>{{ r.description | characters:25 }}</td>
+<td>{{ r.id }}</td>
+<td>{{ r.relatedid }}</td>
+<td>{{ r.alternativeid | characters:25 }}
+
+</tr>
+</tbody></table>
+</div>
+
+<dims-raw-results></dims-raw-results>
+</div>
+</div></div>
+
+<!-- <div class="row" style="margin-top: 20px;"><div class="col-xs-12" >
 <div class="panel panel-default">
   <div class="panel-body">Current Main Graph</div>
 </div>  
@@ -181,5 +223,5 @@
   <div class="panel-body">Current Data</div>
 </div>  
 </div></div>  
-
+ -->
 </div>

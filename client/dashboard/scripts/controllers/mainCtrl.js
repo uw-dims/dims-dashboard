@@ -8,9 +8,9 @@ angular.module('dimsDashboard.controllers').
     $scope.settings = SettingsService.get();
     $scope.settingsFormData = SettingsService.get();
 
-    $scope.isCollapsed = true;
+    $scope.isCollapsed = false;
     // Tools panel
-    $scope.showTools = false;
+    $scope.showTools = true;
     $scope.toolsBtnClass = 'query-btn-inactive';
     // Saved Queries panel
     $scope.showSavedQueries = false;
@@ -21,6 +21,8 @@ angular.module('dimsDashboard.controllers').
     $scope.ticketBtnClass = 'query-btn-inactive';
     $scope.showTopicList = false;
     $scope.showTopic = false;
+
+    $scope.showCif = false;
 
     $scope.showSettings = false;
     $scope.settingsBtnClass = 'query-btn-inactive';
@@ -286,8 +288,10 @@ angular.module('dimsDashboard.controllers').
 
     // Set the ticket selected in the tickets panel
     $scope.setTicket = function(ticket, row) {
-      $log.debug('setTickets called: ',ticket, row);
+      $log.debug('setTickets scalled: ',ticket, row);
       $scope.currentSelectedTicket = ticket;
+      $scope.currentSelectedTopic = null;
+      $scope.showTopic = false;
       var filtered = $filter('filter')($scope.tickets, {'selected': 'active'}, true);
       $log.debug('filtered ', filtered);
       angular.forEach(filtered, function(value,index) {
@@ -306,7 +310,32 @@ angular.module('dimsDashboard.controllers').
       });
     };
 
-    $scope.getTopic = function(topicKey, row) {
+    $scope.setTopic = function(topic, row) {
+      $log.debug('setTopic called. topic is ', topic, 'row is ', row);
+      $scope.currentSelectedTopic = topic;
+      var filtered = $filter('filter')($scope.currentSelectedTicket.topics, {'selected': 'active'}, true);
+      angular.forEach(filtered, function(value,index) {
+        value.selected = '';
+      });
+      $scope.currentSelectedTicket.topics[row].selected = 'active';
+      TicketService.getTopic(topic.topicKey).then(function(reply) {
+        $log.debug('reply is ', reply);
+        $scope.currentSelectedTopic.description = reply.content.description;
+        $scope.currentSelectedTopic.shortDesc = reply.content.shortDesc;
+        $scope.currentSelectedTopic.data = reply.content.data;
+        $log.debug('currentSelectedTopic is ', $scope.currentSelectedTopic);
+        $scope.showTopic = true;
+
+        // Check to see if we can display data
+        var checkTopic = $scope.currentSelectedTopic.name.split(':');
+        if (checkTopic[0] === 'cif') {
+          $scope.showCif = true;
+        } else {
+          $scope.showCif = false;
+        }
+
+
+      });
 
     };
 
