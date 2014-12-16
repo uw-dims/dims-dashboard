@@ -66,7 +66,7 @@ var topicConfig = [
     description: ''
   },
   {
-    topic: 'cif:APT 1 instrusion search',
+    topic: 'cif:APT 1 intrusion search',
     dataType: 'hash',
     data: 'data/prisemTestData/testcif3.txt',
     shortDesc: 'APT 1 intrusion set CIF search results, testcif3',

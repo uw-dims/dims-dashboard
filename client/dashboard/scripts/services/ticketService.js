@@ -44,7 +44,7 @@ angular.module('dimsDashboard.services')
 
   })
 
-  .factory('TicketService', function(TicketApi, TicketUtils, $log, $q) {
+  .factory('TicketService', function(TicketApi, TopicApi, TicketUtils, $log, $q) {
 
     var TicketService = {
 
@@ -95,6 +95,29 @@ angular.module('dimsDashboard.services')
       },
 
       getTopic: function(topicKey) {
+        $log.debug('TicketService.getTopic start. TopicKey is ', topicKey);
+        var deferred = $q.defer();
+        TopicApi.get({id:topicKey},
+
+        function(resource) {
+          $log.debug('TicketService.getTopic success callback data is ', resource.data);
+          var jsonData;
+          try {
+            jsonData = JSON.parse(resource.data.content.data);
+            resource.data.content.data = jsonData;
+            resource.data.content.type = 'json';
+          } catch (e) {
+            $log.debug('data is not json');
+            resource.data.content.type = 'txt';
+          }
+          deferred.resolve(resource.data);
+        }, 
+
+        function(err) {
+          $log.debug('TicketService.getTopic failure callback err is ', err);
+          deferred.reject(err);
+        });
+        return deferred.promise;
 
       }
 
