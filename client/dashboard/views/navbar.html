@@ -48,6 +48,8 @@
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
+        <li ng-show="currentUser"><a ng-click="messaging()">Messaging</a></li>
+        <li ng-show="currentUser"><a ng-click="settings()">Settings</a></li>
         <li ng-show="currentUser"><a ng-click="logout()"> Logout</a></li>
       </ul>
       <p class="navbar-right navbar-text" ng-show="currentUser">&nbsp;</p>

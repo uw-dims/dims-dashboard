@@ -5,8 +5,8 @@ angular.module('dimsDashboard.controllers').
 
     $scope.title = 'DIMS Main';
 
-    $scope.settings = SettingsService.get();
-    $scope.settingsFormData = SettingsService.get();
+    // $scope.settings = SettingsService.get();
+    // $scope.settingsFormData = SettingsService.get();
 
     $scope.isCollapsed = false;
     // Tools panel
@@ -25,22 +25,21 @@ angular.module('dimsDashboard.controllers').
     $scope.showCif = false;
     $scope.displayData = {};
 
-    $scope.showSettings = false;
-    $scope.settingsBtnClass = 'query-btn-inactive';
+    // $scope.showSettings = false;
+    // $scope.settingsBtnClass = 'query-btn-inactive';
 
     $scope.buttonTooltips = {
       tools: 'Show query tools',
       saved: 'Show my saved queries',
-      tickets: 'Show tickets',
-      settings: 'Show settings'
+      tickets: 'Show tickets'
     }
 
     // $scope.logmonOn = false;
-    $scope.logs = [];
+    // $scope.logs = [];
     $scope.currentSelectedQuery = {};
     $scope.currentSelectedTool = {};
     // $scope.settings = {};
-    $scope.settingsUrl = '/settings/' 
+    // $scope.settingsUrl = '/settings/' 
     $scope.demoActivitiesNum = 10;
     $scope.savedDemoQueries = [];
     $scope.savedQueries = [] || $scope.savedQueries;
@@ -65,50 +64,7 @@ angular.module('dimsDashboard.controllers').
     ];
 
 
-    // $scope.Socket = Socket;
-
-    // SocketService.on('logmon:data', function(data) {
-    //       $scope.logs = $scope.logs.concat(data);
-    //       // $log.debug(data);
-    //     });
-
-    $scope.cifbulkQueueValues = [{
-      value: 'cifbulk_v1',
-      label: 'cifbulk_v1 - default'
-    },{
-      value: 'cifbulk_v1_test',
-      label: 'cifbulk_v1 - default with debug and verbose'
-    },{
-      value: 'cifbulk_v1_demo',
-      label: 'cifbulk_v1_demo - alternate queue'
-    },{
-      value: 'cifbulk_v1_demo_test',
-      label: 'cifbulk_v1_demo_test - alternate queue with debug and verbose'
-    }];
-
-    $scope.anonymizeValues =[{
-      value: 'true',
-      label: 'Anonymization On'
-    },{
-      value: 'false',
-      label: 'Anonymization Off'
-    }];
-
-    $scope.rpcDebugValues = [{
-      value: 'true',
-      label: 'RPC Client Debug On'
-    },{
-      value: 'false',
-      label: 'RPC Client Debug Off'
-    }];
-
-    $scope.rpcVerboseValues = [{
-      value: 'true',
-      label: 'RPC Client Verbose On'
-    },{
-      value: 'false',
-      label: 'RPC Client Verbose Off'
-    }];
+    
 
     var initializeTools = function() {
       angular.forEach($scope.initialTools, function(value, index) {
@@ -155,13 +111,6 @@ angular.module('dimsDashboard.controllers').
         'selected': ''
       });
      
-      // for (var i=2; i<$scope.demoActivitiesNum; i++) {
-      //   $scope.savedDemoQueries.push({
-      //     'name' : 'Demo Query '+ i,
-      //     'key' : 'key'+i,
-      //     'selected' : ''
-      //   });
-      // }
     };
 
     var initializeQueryList = function() {
@@ -194,8 +143,8 @@ angular.module('dimsDashboard.controllers').
       $scope.toolBtnClass = 'query-btn-active';
       $scope.showSavedQueries = false;
       $scope.savedBtnClass = 'query-btn-inactive';
-      $scope.showSettings = false;
-      $scope.settingsBtnClass = 'query-btn-inactive';
+      // $scope.showSettings = false;
+      // $scope.settingsBtnClass = 'query-btn-inactive';
       $scope.showTickets = false;
       $scope.showTopicList = false;
       $scope.showTopic = false;
@@ -215,28 +164,8 @@ angular.module('dimsDashboard.controllers').
       $scope.toolBtnClass = 'query-btn-inactive';
       $scope.showSavedQueries = true;
       $scope.savedBtnClass = 'query-btn-active';
-      $scope.showSettings = false;
-      $scope.settingsBtnClass = 'query-btn-inactive';
-      $scope.showTickets = false;
-      $scope.showTopicList = false;
-      $scope.showTopic = false;
-      $scope.ticketBtnClass = 'query-btn-inactive';
-      $scope.showResults=false;
-      $scope.showCif = false;
-    };
-
-    $scope.getSettings = function() {
-      if ($scope.isCollapsed) {
-        $scope.queryToggle();
-      } else if ($scope.showSettings) {
-        $scope.queryToggle();
-      }
-      $scope.showTools = false;
-      $scope.toolBtnClass = 'query-btn-inactive';
-      $scope.showSavedQueries = false;
-      $scope.savedBtnClass = 'query-btn-inactive';
-      $scope.showSettings = true;
-      $scope.settingsBtnClass = 'query-btn-active';
+      // $scope.showSettings = false;
+      // $scope.settingsBtnClass = 'query-btn-inactive';
       $scope.showTickets = false;
       $scope.showTopicList = false;
       $scope.showTopic = false;
@@ -255,8 +184,8 @@ angular.module('dimsDashboard.controllers').
       $scope.toolBtnClass = 'query-btn-inactive';
       $scope.showSavedQueries = false;
       $scope.savedBtnClass = 'query-btn-inactive';
-      $scope.showSettings = false;
-      $scope.settingsBtnClass = 'query-btn-inactive';
+      // $scope.showSettings = false;
+      // $scope.settingsBtnClass = 'query-btn-inactive';
       $scope.showTickets = true;
       $scope.ticketBtnClass = 'query-btn-active';
       if ($scope.tickets === null) {
@@ -374,67 +303,13 @@ angular.module('dimsDashboard.controllers').
         if ($scope.currentSelectedTopic.displayType === 'double-time-series' &&
                 $scope.currentSelectedTopic.responseType !== 'json') {
           $scope.currentSelectedTopic.data = DataService.parseTimeSeries($scope.rawData);
-        $scope.showResults = true;
-        $scope.showGraph = false;
-        $scope.graphData($scope.currentSelectedTopic.data);
+          $scope.showResults = true;
+          $scope.showGraph = false;
+          $scope.graphData($scope.currentSelectedTopic.data);
         }
 
-
-        // $log.debug('raw data is ', $scope.rawData);
-
-
       });
 
-    };
-
-    // Set current value of socket states
-    $rootScope.logmonOn = LogService.isRunning();
-    $rootScope.chatOn = ChatService.isRunning();
-
-    $log.debug('Log and Chat are ', $scope.logmonOn, $scope.chatOn);
-
-    $scope.toggleLogMonitor = function() {
-      if ($scope.logmonOn) {
-        // Turn it off
-        $rootScope.logmonOn = false;
-        $
-        $log.debug('Turning log monitor off');
-        LogService.stop();
-      } else {
-        // Turn it on
-        $rootScope.logmonOn = true;
-        $log.debug('Turning log monitor on');
-        LogService.start();
-      }
-    };
-
-    $scope.toggleChat = function() {
-      if ($scope.chatOn) {
-        // Turn it off
-        $rootScope.chatOn = false;
-        $log.debug('Turning chat off');
-        ChatService.stop();
-      } else {
-        // Turn it on
-        $rootScope.chatOn = true;
-        $log.debug('Turning chat on');
-        ChatService.start();
-      }
-    };
-
-    $scope.setUserSettings = function() {
-      var settings = {};
-      // settings.anonymize = $scope.settings.anonymize === 'false' ? 'true' : 'false';
-      settings.anonymize = $scope.settingsFormData.anonymize;
-      settings.cifbulkQueue = $scope.settingsFormData.cifbulkQueue;
-      settings.rpcDebug = $scope.settingsFormData.rpcDebug;
-      settings.rpcVerbose = $scope.settingsFormData.rpcVerbose;
-
-      SettingsService.update(settings).then(function(resource) {
-        $log.debug('success setting, data is ', resource.data);
-      }), (function(err) {
-        $log.debug('setUserSettings error', err);
-      });
     };
 
     $scope.graphData = function(result) {
@@ -524,8 +399,5 @@ angular.module('dimsDashboard.controllers').
       };
       
     };
-
-
-
 
   }]);

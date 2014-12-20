@@ -17,25 +17,30 @@ var sessionObject = function(username, name, settings) {
 
 // Return login session data - user plus settings
 exports.session = function(req,res) {
-  var username = req.user.get('ident');
-  var name = req.user.get('descr');
-  var client = req.app.get('client');
-  logger.debug('routes/session.session. username, name ', username, name );
 
-  // Get associated settings
-  var userSettings = new UserSettings(username);
-  userSettings.getSettings().then(function(data) {
-      var object = sessionObject(username,name,data);
-      res.status(200).send({data: object});
-    }).then(function(err) {
-      return res.status(400).send(err);
-    });
+  if (req.user) {
+    var username = req.user.get('ident');
+    var name = req.user.get('descr');
+    var client = req.app.get('client');
+    logger.debug('routes/session.session. username, name ', username, name );
+
+    // Get associated settings
+    var userSettings = new UserSettings(username);
+    userSettings.getSettings().then(function(data) {
+        var object = sessionObject(username,name,data);
+        res.status(200).send({data: object});
+      }).then(function(err) {
+        return res.status(400).send(err);
+      });
+    } else {
+      return res.status(401).send('User not logged in');
+    }
 };
 
 // Logout user
 exports.logout = function(req,res) {
-  logger.debug('routes/session.logout', req.user.get('ident'));
   if (req.user) {
+    logger.debug('routes/session.logout', req.user.get('ident'));
     req.logout();
     req.flash('info','You are now logged out.');
     res.status(200).send('Successfully logged out');

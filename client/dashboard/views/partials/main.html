@@ -6,7 +6,7 @@
 <span class="glyphicon glyphicon-search query-tray-btn {{ toolBtnClass }}" ng-click="getTools()" tooltip="{{ buttonTooltips.tools }}" tooltip-append-to-body="true" tooltip-placement="right"></span>
 <span class="glyphicon glyphicon-tasks query-tray-btn {{ ticketBtnClass }}" ng-click="getTickets()" tooltip="{{ buttonTooltips.tickets }}" tooltip-append-to-body="true" tooltip-placement="right"></span>
 <span class="glyphicon glyphicon-list query-tray-btn {{ savedBtnClass }}" ng-click="getSavedQueries()" tooltip="{{ buttonTooltips.saved }}" tooltip-append-to-body="true" tooltip-placement="right"></span>
-<span class="glyphicon glyphicon-cog query-tray-btn {{ settingsBtnClass }}" ng-click="getSettings()" tooltip="{{ buttonTooltips.settings }}" tooltip-append-to-body="true" tooltip-placement="right"></span>
+<!-- <span class="glyphicon glyphicon-cog query-tray-btn {{ settingsBtnClass }}" ng-click="getSettings()" tooltip="{{ buttonTooltips.settings }}" tooltip-append-to-body="true" tooltip-placement="right"></span> -->
 
 </div>
 </div>
@@ -110,60 +110,23 @@
   <div class="panel-body" >
 
   <h3>Settings</h3>
-  <div class="row"><div class="col-sm-6">
-  <form role="form" class="form-horizontal">
-    <div class="form-group">
-      <label class="col-sm-4">Toggle Anonymization</label>
-      <div class="col-sm-7">
-        <select class="form-control" ng-model="settingsFormData.anonymize" ng-options="f.value as f.label for f in anonymizeValues" ng-change="setUserSettings()" >
-        </select>
-      </div>
-    </div>
-  </form>
-  </div>
+  
+  
 
-  <div class="col-sm-6">
-    <form role="form" class="form-horizontal">
-      <div class="form-group">
-        <label class="col-sm-4">Toggle RPC client debug flag</label>
-        <div class="col-sm-7">
-          <select class="form-control" ng-model="settingsFormData.rpcDebug" ng-options="f.value as f.label for f in rpcDebugValues" ng-change="setUserSettings()" >
-          </select>
-        </div>
-      </div>
-    </form>   
-  </div></div>
+  <div class="row"> <!-- Start of Messaging -->
 
-  <div class="row"><div class="col-sm-6">
-    <form role="form" class="form-horizontal">
-      <div class="form-group">
-        <label class="col-sm-4">Choose cifbulk queue</label>
-        <div class="col-sm-7">
-          <select class="form-control" ng-model="settingsFormData.cifbulkQueue" ng-options="f.value as f.label for f in cifbulkQueueValues" ng-change="setUserSettings()" >
-          </select>
-        </div>
-      </div>
-    </form>
+    <div class="col-sm-2">
+      <button type="button" class="btn btn-primary btn-sm" ng-click="toggleLogMonitor()" ng-hide="logmonOn">Turn Log Monitor On</button>
+      <button type="button" class="btn btn-primary btn-sm" ng-click="toggleLogMonitor()" ng-show="logmonOn">Turn Log Monitor Off</button>
     </div>
-   
-    <div class="col-sm-6">
-    <form role="form" class="form-horizontal">
-      <div class="form-group">
-        <label class="col-sm-4">Toggle RPC client verbose flag</label>
-        <div class="col-sm-7">
-          <select class="form-control" ng-model="settingsFormData.rpcVerbose" ng-options="f.value as f.label for f in rpcVerboseValues" ng-change="setUserSettings()" >
-          </select>
-        </div>
-      </div>
-    </form>
-    </div></div>
-    <div class="row"><div class="col-sm-2">
-     <button type="button" class="btn btn-primary btn-sm" ng-click="toggleLogMonitor()" ng-hide="logmonOn">Turn Log Monitor On</button>
-  <button type="button" class="btn btn-primary btn-sm" ng-click="toggleLogMonitor()" ng-show="logmonOn">Turn Log Monitor Off</button>
- </div><div class="col-sm-2">
-   <button type="button" class="btn btn-primary btn-sm" ng-click="toggleChat()" ng-hide="chatOn">Turn Chat On</button>
-  <button type="button" class="btn btn-primary btn-sm" ng-click="toggleChat()" ng-show="chatOn">Turn Chat Off</button>
- </div></div>
+
+    <div class="col-sm-2">
+      <button type="button" class="btn btn-primary btn-sm" ng-click="toggleChat()" ng-hide="chatOn">Turn Chat On</button>
+      <button type="button" class="btn btn-primary btn-sm" ng-click="toggleChat()" ng-show="chatOn">Turn Chat Off</button>
+    </div>
+  </div> <!-- End of Messaging -->
+
+
   </div>
 </div></div>
 
