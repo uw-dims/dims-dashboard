@@ -14,33 +14,22 @@ angular.module('dimsDashboard.controllers').
     $scope.showDemoFiles = false;
 
     FileService.getFileList('ip_lists').then(function(result) {
-      console.log(result);
       $scope.fileNames = result.fileNames;
       $scope.filePath = result.filePath;
       $scope.showFiles = true;
     });
 
     FileService.getDemoList('cifbulk').then(function(result) {
-      console.log(result);
       $scope.demoPath = result.filePath;
       $scope.demoNames = result.fileNames;
       $scope.showDemoFiles = true;
     });
 
+    // Get the current user settings
     $scope.settings = SettingsService.get();
-
-    // SettingsService.getSettings('0').then(function(result){
-    //   console.log('getSettings result');
-    //   console.log(result);
-    //   $scope.anonymize = result.anonymize;
-    //   $scope.rpcDebug = result.rpcDebug;
-    //   $scope.rpcVerbose = result.rpcVerbose;
-    //   $scope.cifbulkQueue = result.cifbulkQueue;
-    // });
 
     // Setup date
     $scope.dateConfig = DateService.dateConfig;
-
     $scope.open = function($event, datePicker) {
       var result = DateService.open($event, datePicker);
       $scope.dateConfig.startOpened = result[0];
@@ -50,10 +39,10 @@ angular.module('dimsDashboard.controllers').
     // Other setup
     $scope.showResults = false;
     $scope.result = null;
-    $scope.resultsMsg = 'Results';
+    $scope.resultsMsg = '';
     $scope.rawData = '';
-
     $scope.data = {};
+
     // Set up ng-grid - currently this has been superseded but may be used later
     // $scope.columnDefs =  [
     //       {field: 'address', displayName: 'CIDR'},
@@ -72,15 +61,9 @@ angular.module('dimsDashboard.controllers').
     //       {field: 'weight', displayName: 'Weight'}
     //     ];
 
-    // var anonymizeData = function(data,status,headers,config) {
-    //    $log.debug('Call anonymize service');
-    //    AnonService.anonymize($scope.settings.anonymize, data.data, data.pid)
-    //           .then(prepareData);
-    //         };
 
     // Prepare incoming data
     var prepareData = function(data, status, headers, config) {
-      $log.debug('Data in prepareData is ', data);
       $scope.rawData = data;
       $scope.noResults = [];
       $scope.showResults = true;
@@ -95,10 +78,10 @@ angular.module('dimsDashboard.controllers').
           $scope.noResults.push({searchitem: $scope.rawData.results[i].searchitem});
         } else {
           for (var j=0; j < $scope.rawData.results[i].results.length; j++) {
-            var detectDate = new Date($scope.rawData.results[i].results[j].detecttime*1000);
-            var createdDate = new Date($scope.rawData.results[i].results[j].created*1000);
+            var detectDate = new Date($scope.rawData.results[i].results[j].detecttime);
             $scope.rawData.results[i].results[j].detecttime = detectDate;
-            $scope.rawData.results[i].results[j].created = createdDate;
+            var reportDate = new Date($scope.rawData.results[i].results[j].reporttime);
+            $scope.rawData.results[i].results[j].reporttime = reportDate;
           }
           $scope.data.results.push($scope.rawData.results[i]);
         }
@@ -106,34 +89,34 @@ angular.module('dimsDashboard.controllers').
       $log.debug('$scope.data is ', $scope.data);
     };
 
-    var getDemo = function(file) {
-      $scope.showResults = false;
-      $scope.data = {};
-      return $http({
-        method: 'GET',
-        url: '/files',
-        params: {
-          action: 'read',
-          file: file,
-          source: 'default_data'
-        }
+    // var getDemo = function(file) {
+    //   $scope.showResults = false;
+    //   $scope.data = {};
+    //   return $http({
+    //     method: 'GET',
+    //     url: '/files',
+    //     params: {
+    //       action: 'read',
+    //       file: file,
+    //       source: 'default_data'
+    //     }
 
-      // }).success(function(data, status, headers, config) {
-      //   var serverData = {};
-      //   serverData.data = data;
-      //   prepareData(serverData, status, headers, config);
-      //   } )
-        }).success(function(data, status, headers, config) {
-            var fileData = {};
-            // fileData.data = data;
-            // fileData.status = status;
-            prepareData(data,status,headers,config)
-          })
-        .error(function(data, status, headers, config) {
-          console.log(data);
-          console.log(status);
-        });
-    };
+    //   // }).success(function(data, status, headers, config) {
+    //   //   var serverData = {};
+    //   //   serverData.data = data;
+    //   //   prepareData(serverData, status, headers, config);
+    //   //   } )
+    //     }).success(function(data, status, headers, config) {
+    //         var fileData = {};
+    //         // fileData.data = data;
+    //         // fileData.status = status;
+    //         prepareData(data,status,headers,config)
+    //       })
+    //     .error(function(data, status, headers, config) {
+    //       console.log(data);
+    //       console.log(status);
+    //     });
+    // };
 
     /**
      *  callClient function

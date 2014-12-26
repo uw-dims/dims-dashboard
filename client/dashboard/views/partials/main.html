@@ -30,8 +30,13 @@
 </div> <!-- End first col div -->
 
 <div class="col-xs-10" >
-<dims-search-form ng-show="currentSelectedTool.name !== undefined && showTools" tool="currentSelectedTool"></dims-search-form>
+<dims-search-form ng-show="currentSelectedTool.name !== undefined && showTools" tool="currentSelectedTool" callback="callClient"></dims-search-form>
 </div>
+
+<!-- <div class="row">
+<dims-test-form tool="currentSelectedTool" current="availableTools[0]" collapsed="isCollapsed" ></dims-test-form> -->
+<!-- <dims-test-form tool="availableTools[1]" currentTool="currentSelectedTool" isCollapsed="isCollapsed" ng-show="currentSelectedTool.name === 'cifbulk' && showTools"></dims-test-form>
+</div> -->
 
 <!-- Saved Queries -->
 <div class="col-xs-2" >
@@ -50,7 +55,7 @@
   <div class="panel-body" >
   <h4>{{currentSelectedQuery.name}}</h4>
   <p>{{currentSelectedQuery.desc}}</p>
-  <button type="button" class="btn btn-primary btn-sm" ng-click="callClient()">Show Data</button>
+  <button type="button" class="btn btn-primary btn-sm" ng-click="placeholder()">Show Data</button>
   </div>
 </div></div>
 

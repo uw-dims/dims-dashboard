@@ -4,15 +4,15 @@
   
   <div class="col-xs-5" ng-show="showLeftCol">
     <div class="form-group" show-errors>
-      <label for="startDateTime" class="col-xs-5 control-label">Start Date</label>
+      <label for="startDate" class="col-xs-5 control-label">Start Date</label>
       <div class="col-xs-7">
-        <input type="text" class="form-control input-sm" ng-model="formData.startDateTime" name="startDate"/>
+        <input type="text" class="form-control input-sm" ng-model="formData.startDate" name="startDate" placeholder="Date or Date/Time in ISO 8601 format" popover-html-unsafe="{{tooltips.htmlDate}}"  popover-trigger="mouseenter"/>
       </div>
     </div>
     <div class="form-group" show-errors>
-      <label for="endDateTime" class="col-xs-5 control-label">End Date</label>
+      <label for="endDate" class="col-xs-5 control-label">End Date</label>
       <div class="col-xs-7">
-        <input type="text" class="form-control input-sm" ng-model="formData.endDateTime" name="startDate"/>
+        <input type="text" class="form-control input-sm" ng-model="formData.endDate" name="startDate" placeholder="Date or Date/Time in ISO 8601 format" popover-html-unsafe="{{tooltips.htmlDate}}"  popover-trigger="mouseenter"/>
       </div>
     </div>
     <div class="form-group" show-errors>
@@ -89,7 +89,7 @@
   <div class="col-xs-2">
     <div class="form-group pull-right">
   
-    <button type="button" class="btn btn-primary btn-sm" ng-click="callClient()"><span class="glyphicon glyphicon-flash"></span>{{tool.desc}}</button>
+    <button type="button" class="btn btn-primary btn-sm" ng-click="callback(tool,formData)"><span class="glyphicon glyphicon-flash"></span>{{tool.desc}}</button>
     </div>
   </div>
   <div class="col-xs-5" ng-show="!showLeftCol"></div>

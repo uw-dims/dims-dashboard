@@ -200,7 +200,7 @@ angular.module('dimsDashboard.controllers').
 
     // Set the tool selected in the Tools panel
     $scope.setTool = function(tool, row) {
-      $log.debug('setTool called: ' , tool);
+      $log.debug('setTool called. currentSelectedTool.name is ' , tool.name);
       $scope.currentSelectedTool = tool;
       var filtered = $filter('filter')($scope.availableTools, {'selected': 'active'}, true);
       $log.debug('filtered ', filtered);
@@ -398,6 +398,11 @@ angular.module('dimsDashboard.controllers').
         return d3.format(',.3f')(d/1000000);
       };
       
+    };
+
+    $scope.callClient = function(tool, formData){
+      $log.debug('controllers/mainCtrl.callClient. tool is ', tool, 'formData is ', formData);
+
     };
 
   }]);
