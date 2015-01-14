@@ -14,15 +14,13 @@
     <div class="col-sm-1">
       <input type="checkbox" ng-model="formData.stats" name="stats" class="form-control"  />
   </div>
-  </div>
+  </div> 
 
   <div class="form-group">
     
     <label  class="col-sm-2 control-label">File to correlate</label>
     <div class="col-sm-3" ng-show="showFiles">
-      <select class="form-control" ng-model="formData.fileName" ng-options="n.name for n in fileNames" >
-        <option></option>
-      </select>
+      <dims-select-files file-source="data_files" file-type="file" picker-model="formData.fileName"></dims-select-files>
     </div>
     <p class="help-block">Choose a file from your data_files directory. If it isn't there already, upload it using the upload page. </p>
   </div>
@@ -31,9 +29,7 @@
     
     <label  class="col-sm-2 control-label">Map File</label>
     <div class="col-sm-3" ng-show="showFiles">
-      <select class="form-control" ng-model="formData.mapName" ng-options="m.name for m in mapNames" >
-        <option></option>
-      </select>
+      <dims-select-files file-source="map_files" file-type="file" picker-model="formData.mapName"></dims-select-files>
     </div>
     <p class="help-block">Choose a map file if you don't want to use the default. </p>
   </div>

@@ -40,15 +40,13 @@ angular.module('dimsDashboard.controllers').
         }       
       }).
         success(function(data, status, headers, config) {
-          $scope.gridData = data.result;
+          $scope.gridData = data.files;
           $scope.filePath = data.path;
           $scope.fileSource = config.params.source;
           $scope.showFiles = true;
         }).
         error(function(data, status, headers, config) {
-          console.log('Error getting file list');
-          console.log(data);
-          console.log(status);
+          $log.error('Error getting file list', data, status, config);
         });
     };
 
@@ -89,9 +87,7 @@ angular.module('dimsDashboard.controllers').
         }).
         error(function(data, status, headers, config) {
           $scope.loading = false;
-          console.log('Error getting file contents');
-          console.log(data);
-          console.log(status);
+          $log.error('Error getting file contents', data, status, config);
         });
     };
 

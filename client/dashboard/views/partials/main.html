@@ -30,12 +30,21 @@
 </div> <!-- End first col div -->
 
 <div class="col-xs-10" >
-<dims-search-form ng-show="currentSelectedTool.name !== undefined && showTools" tool="currentSelectedTool" callback="callClient"></dims-search-form>
+<dims-search-form ng-show="currentSelectedTool.name === availableTools[0].name && showTools" tool="availableTools[0]" callback="callClient"></dims-search-form>
+<dims-search-form ng-show="currentSelectedTool.name === availableTools[1].name && showTools" tool="availableTools[1]" callback="callClient"></dims-search-form>
+<dims-search-form ng-show="currentSelectedTool.name === availableTools[2].name && showTools" tool="availableTools[2]" callback="callClient"></dims-search-form>
+<dims-search-form ng-show="currentSelectedTool.name === availableTools[3].name && showTools" tool="availableTools[3]" callback="callClient"></dims-search-form>
+
 </div>
 
 <!-- <div class="row">
-<dims-test-form tool="currentSelectedTool" current="availableTools[0]" collapsed="isCollapsed" ></dims-test-form> -->
-<!-- <dims-test-form tool="availableTools[1]" currentTool="currentSelectedTool" isCollapsed="isCollapsed" ng-show="currentSelectedTool.name === 'cifbulk' && showTools"></dims-test-form>
+<dims-test-form current="currentSelectedTool" tool="availableTools[0]" ></dims-test-form>
+<dims-test-form current="currentSelectedTool" tool="availableTools[1]"></dims-test-form>
+<dims-select-files file-source="ip_lists" file-type="file" picker-model="fileTestData.name"></dims-select-files>
+<dims-select-files file-source="map_files" file-type="map" picker-model="mapTestData.name"></dims-select-files>
+
+<p>fileModel: {{ fileTestData }} </p>
+<p>mapModel: {{ mapTestData }}
 </div> -->
 
 <!-- Saved Queries -->

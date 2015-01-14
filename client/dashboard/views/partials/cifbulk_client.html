@@ -53,9 +53,10 @@
     
     <label  class="col-sm-2 control-label">Or Choose File</label>
     <div class="col-sm-3" ng-show="showFiles">
-      <select class="form-control input-sm" ng-model="formData.fileName" ng-options="n.name for n in fileNames" >
+    <dims-select-files file-source="ip_lists" file-type="file" picker-model="formData.fileName"></dims-select-files>
+      <!-- <select class="form-control input-sm" ng-model="formData.fileName" ng-options="n.name for n in fileNames" >
         <option></option>
-      </select>
+      </select> -->
     </div>
   </div>
 

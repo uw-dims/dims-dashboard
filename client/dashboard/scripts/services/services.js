@@ -79,11 +79,7 @@ angular.module('dimsDashboard.services')
             action: 'list'
           }
         }).success(function(data,status,headers,config){
-              var result = {
-                fileNames: data.result,
-                filePath: data.path
-              };
-              deferred.resolve(result);
+              deferred.resolve(data);
         }).error(function(data,status,headers,config) {
               deferred.reject('No results. Status: '+ status);
         });
@@ -95,15 +91,15 @@ angular.module('dimsDashboard.services')
         getFileList('default_data').then(function(data) {
           var j = 0,
               names = [];
-          for (var i=0; i < data.fileNames.length; i++){
-            if (data.fileNames[i].type === type) {
-                names[j] = data.fileNames[i].name;
+          for (var i=0; i < data.files.length; i++){
+            if (data.files[i].type === type) {
+                names[j] = data.files[i].name;
                 j++;
             }
           }
           var result = {
             fileNames: names,
-            filePath: data.filePath
+            filePath: data.path
           };
           deferred.resolve(result);
         });

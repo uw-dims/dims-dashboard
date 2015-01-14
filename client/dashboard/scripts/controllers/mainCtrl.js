@@ -5,6 +5,11 @@ angular.module('dimsDashboard.controllers').
 
     $scope.title = 'DIMS Main';
 
+    $scope.mapTestData = {};
+    $scope.fileTestData = {};
+    $scope.mapTestData.name;
+    $scope.fileTestData.name;
+
     // $scope.settings = SettingsService.get();
     // $scope.settingsFormData = SettingsService.get();
 

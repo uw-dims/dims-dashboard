@@ -1,87 +1,83 @@
 
-<form class="form-horizontal" role="form" name="{{selectedTool.name}}Form">
+<form class="form-horizontal" role="form" name="{{vm.tool.name}}Form">
   <div class="alert alert-danger form-group" ng-show="showFormError">{{formErrorMsg}}</div>
   
-  <div class="col-xs-5" ng-show="showLeftCol">
+  <div class="col-xs-5" ng-if="vm.showLeftCol">
     <div class="form-group" show-errors>
       <label for="startDate" class="col-xs-5 control-label">Start Date</label>
       <div class="col-xs-7">
-        <input type="text" class="form-control input-sm" ng-model="formData.startDate" name="startDate" placeholder="Date or Date/Time in ISO 8601 format" popover-html-unsafe="{{tooltips.htmlDate}}"  popover-trigger="mouseenter"/>
+        <input type="text" class="form-control input-sm" ng-model="vm.formData.startDate" name="startDate" placeholder="Date or Date/Time in ISO 8601 format" popover-html-unsafe="{{tooltips.htmlDate}}"  popover-trigger="mouseenter"/>
       </div>
     </div>
     <div class="form-group" show-errors>
       <label for="endDate" class="col-xs-5 control-label">End Date</label>
       <div class="col-xs-7">
-        <input type="text" class="form-control input-sm" ng-model="formData.endDate" name="startDate" placeholder="Date or Date/Time in ISO 8601 format" popover-html-unsafe="{{tooltips.htmlDate}}"  popover-trigger="mouseenter"/>
+        <input type="text" class="form-control input-sm" ng-model="vm.formData.endDate" name="startDate" placeholder="Date or Date/Time in ISO 8601 format" popover-html-unsafe="{{tooltips.htmlDate}}"  popover-trigger="mouseenter"/>
       </div>
     </div>
     <div class="form-group" show-errors>
       <label for="numDays" class="col-xs-5 control-label">Number of Days</label>
       <div class="col-xs-7">
-        <input type="number" class="form-control input-sm" ng-model="formData.numDays" name="numDays" min="1" integer/>
+        <input type="number" class="form-control input-sm" ng-model="vm.formData.numDays" name="numDays" min="1" integer/>
       </div>
     </div> 
     <div class="form-group" show-errors>
        <label for="hitLimit" class="col-xs-5 control-label">Hit Limit</label>
       <div class="col-xs-7">
-        <input type="number" class="form-control input-sm" ng-model="formData.hitLimit" name="hitLimit" min="1" integer />
+        <input type="number" class="form-control input-sm" ng-model="vm.formData.hitLimit" name="hitLimit" min="1" integer />
       </div>
     </div>
     <div class="form-group" show-errors>
       <label  for="header" class="col-xs-5 control-label">Show Header?</label>
       <div class="col-xs-7">
-        <input type="checkbox" ng-model="formData.header" name="header" class="form-control input-sm"  />
+        <input type="checkbox" ng-model="vm.formData.header" name="header" class="form-control input-sm"  />
       </div>
     </div>
   </div> <!-- End left div col-xs-4 -->
 
   <div class="col-xs-5">
 
-    <div class="form-group" ng-show="show.ips">
+    <div class="form-group" ng-if="vm.show.ips">
       <label for="ips" class="col-xs-5 control-label">IP/CIDR/Domains</label>
       <div class="col-xs-7">
-        <textarea class="form-control input-sm" rows="3" ng-model="formData.ips" id="ipsId" name="ips"></textarea>
+        <textarea class="form-control input-sm" rows="3" ng-model="vm.formData.ips" id="ipsId" name="ips"></textarea>
       </div>
     </div>
-    <div class="form-group" ng-show="show.fileName">
+    <div class="form-group" ng-if="vm.show.fileName">
       <label  class="col-xs-5 control-label">File</label>
-      <div class="col-xs-7" ng-show="showFiles">
-        <select class="form-control input-sm" ng-model="formData.fileName" ng-options="n.name for n in fileNames" >
-          <option></option>
-        </select>
+      <div class="col-xs-7" >
+        <dims-select-files file-source="ip_lists" file-type="file" picker-model="vm.formData.fileName"></dims-select-files>   
       </div>
     </div>
 
-    <div class="form-group" ng-show="show.mapName"> 
+    <div class="form-group" ng-if="vm.show.mapName"> 
       <label  class="col-xs-5 control-label">Map File</label>
-      <div class="col-xs-7" ng-show="showFiles">
-        <select class="form-control input-sm" ng-model="formData.mapName" ng-options="m.name for m in mapNames" >
-          <option></option>
-        </select>
+      <div class="col-xs-7" >
+        <dims-select-files file-source="map_files" file-type="map" picker-model="vm.formData.mapName"></dims-select-files>
       </div>
     </div>
 
-    <div class="form-group" ng-show="show.outputType">
+    <div class="form-group" ng-if="vm.show.outputType">
       <label  class="col-xs-5 control-label">Output Type</label>
       <div class="col-xs-7">
-        <select class="form-control input-sm" ng-model="formData.outputType" ng-options="o.value as o.label for o in outputTypes"> 
+        <select class="form-control input-sm" ng-model="vm.formData.outputType" ng-options="o.value as o.label for o in outputTypes"> 
         </select>
       </div> 
     </div>
 
-    <div class="form-group" ng-show="show.iff">
+    <div class="form-group" ng-if="vm.show.iff">
     <label  class="col-xs-5 control-label">Friend or Foe</label>
       <div class="col-xs-7">
-        <select class="form-control input-sm" ng-model="formData.iff" ng-options="f.value as f.label for f in iffs" >
+        <select class="form-control input-sm" ng-model="vm.formData.iff" ng-options="f.value as f.label for f in iffs" >
           <option></option>
         </select>
       </div>
     </div>
 
-    <div class="form-group" ng-show="show.stats">
+    <div class="form-group" ng-if="vm.show.stats">
       <label for="stats" class="col-xs-5 control-label">Show Stats?</label>
       <div class="col-xs-7">
-        <input type="checkbox" ng-model="formData.stats" name="stats" class="form-control input-sm"  />
+        <input type="checkbox" ng-model="vm.formData.stats" name="stats" class="form-control input-sm"  />
       </div>
     </div>
 
@@ -89,8 +85,8 @@
   <div class="col-xs-2">
     <div class="form-group pull-right">
   
-    <button type="button" class="btn btn-primary btn-sm" ng-click="callback(tool,formData)"><span class="glyphicon glyphicon-flash"></span>{{tool.desc}}</button>
+    <button type="button" class="btn btn-primary btn-sm" ng-click="vm.callback(vm.tool.name,vm.formData)"><span class="glyphicon glyphicon-flash"></span>{{tool.desc}}</button>
     </div>
   </div>
-  <div class="col-xs-5" ng-show="!showLeftCol"></div>
+  <div class="col-xs-5" ng-if="!vm.showLeftCol"></div>
 </form>

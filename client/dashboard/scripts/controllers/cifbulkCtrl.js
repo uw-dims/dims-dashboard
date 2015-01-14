@@ -9,21 +9,21 @@ angular.module('dimsDashboard.controllers').
 
     // Set up file pickers
     $scope.fileNames = [];
-    $scope.showFiles = false;
+    $scope.showFiles = true;
     $scope.demoNames = [];
     $scope.showDemoFiles = false;
 
-    FileService.getFileList('ip_lists').then(function(result) {
-      $scope.fileNames = result.fileNames;
-      $scope.filePath = result.filePath;
-      $scope.showFiles = true;
-    });
+    // FileService.getFileList('ip_lists').then(function(result) {
+    //   $scope.fileNames = result.fileNames;
+    //   $scope.filePath = result.filePath;
+    //   $scope.showFiles = true;
+    // });
 
-    FileService.getDemoList('cifbulk').then(function(result) {
-      $scope.demoPath = result.filePath;
-      $scope.demoNames = result.fileNames;
-      $scope.showDemoFiles = true;
-    });
+    // FileService.getDemoList('cifbulk').then(function(result) {
+    //   $scope.demoPath = result.filePath;
+    //   $scope.demoNames = result.fileNames;
+    //   $scope.showDemoFiles = true;
+    // });
 
     // Get the current user settings
     $scope.settings = SettingsService.get();
@@ -130,12 +130,12 @@ angular.module('dimsDashboard.controllers').
       $scope.showFormError = false;
       $scope.formErrorMsg = '';
 
-      // User wants demo data - get data and return
-      if ($scope.formData.demoName !== null && $scope.formData.demoName !== undefined) {
-        $scope.resultsMsg = 'Results - Waiting...';
-        getDemo($scope.formData.demoName);
-        return;
-      }
+      // User wants demo data - get data and return - TODO remove
+      // if ($scope.formData.demoName !== null && $scope.formData.demoName !== undefined) {
+      //   $scope.resultsMsg = 'Results - Waiting...';
+      //   getDemo($scope.formData.demoName);
+      //   return;
+      // }
 
       // Catch some input errors
       if (!Utils.inputPresent($scope.formData.ips) && !Utils.inputPresent($scope.formData.fileName)) {
@@ -149,32 +149,32 @@ angular.module('dimsDashboard.controllers').
         return;
       }
       
-      if ((!Utils.inputPresent($scope.formData.startDate) && Utils.inputPresent($scope.formData.startHour)) ||
-       (!Utils.inputPresent($scope.formData.endDate) && Utils.inputPresent($scope.formData.endHour))) {
-        $scope.showFormError = true;
-        $scope.formErrorMsg = 'If you enter a value for the hour, also enter a value for the date.';
-        return;
-      }
+      // if ((!Utils.inputPresent($scope.formData.startDate) && Utils.inputPresent($scope.formData.startHour)) ||
+      //  (!Utils.inputPresent($scope.formData.endDate) && Utils.inputPresent($scope.formData.endHour))) {
+      //   $scope.showFormError = true;
+      //   $scope.formErrorMsg = 'If you enter a value for the hour, also enter a value for the date.';
+      //   return;
+      // }
 
       // Setup the config to send to the server
       var clientConfig = {};
-      var startTime = (Utils.inputPresent($scope.formData.startDate)) ? $scope.formData.startDate.getTime()/1000 : null;
-      var endTime = (Utils.inputPresent($scope.formData.endDate)) ? $scope.formData.endDate.getTime()/1000 : null;      
-      startTime = (Utils.inputPresent($scope.formData.startHour)) ? startTime + $scope.formData.startHour*60*60 : startTime;
-      endTime = (Utils.inputPresent($scope.formData.endHour)) ? endTime + $scope.formData.endHour*60*60 : endTime;
-      Utils.setConfig(clientConfig, startTime, 'startTime');
-      Utils.setConfig(clientConfig, endTime, 'endTime');
-      Utils.setConfig(clientConfig, $scope.formData.numDays, 'numDays');
+      // var startTime = (Utils.inputPresent($scope.formData.startDate)) ? $scope.formData.startDate.getTime()/1000 : null;
+      // var endTime = (Utils.inputPresent($scope.formData.endDate)) ? $scope.formData.endDate.getTime()/1000 : null;      
+      // startTime = (Utils.inputPresent($scope.formData.startHour)) ? startTime + $scope.formData.startHour*60*60 : startTime;
+      // endTime = (Utils.inputPresent($scope.formData.endHour)) ? endTime + $scope.formData.endHour*60*60 : endTime;
+      // Utils.setConfig(clientConfig, startTime, 'startTime');
+      // Utils.setConfig(clientConfig, endTime, 'endTime');
+      // Utils.setConfig(clientConfig, $scope.formData.numDays, 'numDays');
       Utils.setConfig(clientConfig, $scope.formData.ips, 'ips');
-      Utils.setConfig(clientConfig, $scope.formData.stats, 'stats');
-      Utils.setConfig(clientConfig, $scope.formData.header, 'header');
-      Utils.setConfig(clientConfig, $scope.settings.rpcVerbose, 'verbose');
-      Utils.setConfig(clientConfig, $scope.settings.rpcDebug, 'debug');
-      Utils.setConfig(clientConfig, $scope.settings.cifbulkQueue, 'queue');
-      if (Utils.inputPresent($scope.formData.fileName)) {
-        Utils.setConfig(clientConfig, $scope.filePath+$scope.formData.fileName.name, 'fileName');
-      }
-    
+      // Utils.setConfig(clientConfig, $scope.formData.stats, 'stats');
+      // Utils.setConfig(clientConfig, $scope.formData.header, 'header');
+      Utils.setConfig(clientConfig, $scope.formData.rpcVerbose, 'verbose');
+      Utils.setConfig(clientConfig, $scope.formData.rpcDebug, 'debug');
+      Utils.setConfig(clientConfig, $scope.formData.cifbulkQueue, 'queue');
+      Utils.setConfig(clientConfig, $scope.formData.anonymize, 'anonymize');
+      Utils.setConfig(clientConfig, $scope.formData.fileName, 'fileName');
+ 
+     
       console.log(clientConfig);
       console.log('Now sending http get request');
 
