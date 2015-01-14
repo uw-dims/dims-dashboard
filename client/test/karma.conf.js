@@ -35,6 +35,7 @@ module.exports = function(config) {
       'bower_components/angular-http-auth/src/http-auth-interceptor.js',
       'bower_components/lodash/dist/lodash.js',
       'bower_components/underscore.string/dist/underscore.string.min.js',
+      'bower_components/angu-fixed-header-table/angu-fixed-header-table.js',
       'dashboard/scripts/**/*.js',
       'test/mock/**/*.js',
       'test/spec/**/*.js'
