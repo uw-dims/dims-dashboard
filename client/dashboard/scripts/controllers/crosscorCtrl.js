@@ -18,20 +18,20 @@ angular.module('dimsDashboard.controllers').
     // Set up file picker
     $scope.fileNames = [];
     $scope.mapNames = [];
-    $scope.showFiles = false;
-    $scope.showMaps = false;
+    $scope.showFiles = true;
+    $scope.showMaps = true;
 
-    FileService.getFileList('data_files').then(function(result) {
-        $scope.fileNames = result.fileNames;
-        $scope.filePath = result.filePath;
-        $scope.showFiles = true;
-    });
+    // FileService.getFileList('data_files').then(function(result) {
+    //     $scope.fileNames = result.fileNames;
+    //     $scope.filePath = result.filePath;
+    //     $scope.showFiles = true;
+    // });
 
-    FileService.getFileList('map_files').then(function(result) {
-        $scope.mapNames = result.fileNames;
-        $scope.mapPath = result.filePath;
-        $scope.showMaps = true;
-    });
+    // FileService.getFileList('map_files').then(function(result) {
+    //     $scope.mapNames = result.fileNames;
+    //     $scope.mapPath = result.filePath;
+    //     $scope.showMaps = true;
+    // });
 
     $scope.settings = SettingsService.get();
 
@@ -111,12 +111,8 @@ angular.module('dimsDashboard.controllers').
      
       Utils.setConfig(clientConfig, $scope.formData.stats, 'stats');
       Utils.setConfig(clientConfig, $scope.formData.iff, 'iff');
-      if (Utils.inputPresent($scope.formData.mapName)) {
-        Utils.setConfig(clientConfig, $scope.mapPath+$scope.formData.mapName.name, 'mapName');
-      }
-      if (Utils.inputPresent($scope.formData.fileName)) {
-        Utils.setConfig(clientConfig, $scope.filePath+$scope.formData.fileName.name, 'fileName');
-      }
+      Utils.setConfig(clientConfig, $scope.formData.mapName, 'mapName');
+      Utils.setConfig(clientConfig, $scope.formData.fileName, 'fileName');
       Utils.setConfig(clientConfig, $scope.settings.rpcVerbose, 'verbose');
       Utils.setConfig(clientConfig, $scope.settings.rpcDebug, 'debug');
 

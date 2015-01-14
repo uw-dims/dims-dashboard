@@ -247,13 +247,12 @@ exports.files = function(req,res) {
                 if (req.query.truncate) {
                     fs.stat(directory, function(err, stats) {
                         if (err) {
-                            console.log('fs.stat error');
-                            console.log(err);
+                            logger.error('fs.stat error', err);
                             return res.status(500).send(err);
                         } 
                         fs.open(directory, 'r', function(err, fd) {
                             if (err) {
-                                console.log('fs.open error', err);
+                                logger.error('fs.open error', err);
                                 return res.status(500).send(err);
                             } 
                             // Limit size since large files slow down page response and entire
@@ -265,15 +264,14 @@ exports.files = function(req,res) {
                                     console.log('fs.read error', err);
                                     fs.close(fd, function(err) {
                                         if (err) {
-                                          console.log("Error closing file: " + err);
+                                          logger.error("Error closing file: " + err);
                                         }
                                     });
                                     return res.status(500).send(err);
                                 }
-                                console.log('File read: ' + directory);
                                 fs.close(fd, function(err) {
                                     if (err) {
-                                      console.log("Error closing file: " + err);
+                                      logger.error("Error closing file: " + err);
                                     }
                                 });
                                 return res.status(200).send(buffer.toString());
@@ -284,7 +282,7 @@ exports.files = function(req,res) {
                 } else {
                     fs.readFile(directory, 'utf8', function(err, data) {
                         if (err) {
-                            console.log('fs.readFile error', err);
+                            logger.error('fs.readFile error', err);
                             return res.status(500).send(err);
                         } 
                         return res.status(200).send(data);
@@ -293,7 +291,7 @@ exports.files = function(req,res) {
                 }
                 
             } else {
-                console.log(directory+' does not exist');
+                logger.warn(directory+' does not exist');
                 //return res.send(400, 'File does not exist');
                 return res.status(400).send('File does not exist');
             }
@@ -301,6 +299,17 @@ exports.files = function(req,res) {
 
 
     // Request: Get directory listing
+    // Data object returned:
+    // {
+    //    files: [
+    //    {
+    //      name: name of file
+    //      type: string file type (rwfind, cif, etc)
+    //      desc: description of file     
+    //    },
+    //    path: absolute path to directory containing files
+    // }
+    //
     } else {
         fs.readFile(directory+'index.yml', 'utf8', function(err, content) {
             // Setup return data
@@ -311,33 +320,32 @@ exports.files = function(req,res) {
             if (err) {
                 fs.readdir(directory, function(err, files) {
                     if (err) {
-                        console.log('fs.readdir error');
-                        console.log(err);
+                        logger.error('fs.readdir error');
+                        logger.error(err);
                        // return res.send(500, err);
                        return res.status(500).send(err);
 
                     }
                     var len = files.length;
-                    data.result = [];
+                    data.files = [];
                     var k = 0;
                     for (var i=0; i<len; i++) {
                         if (files[i].indexOf('.') !== 0) {
-                            data.result[k] = { name: files[i], type: null, desc: null }
+                            data.files[k] = { name: files[i], type: null, desc: null }
                             k++;
                         }
                     }    
-                    //return res.send(200, data);
                     return res.status(200).send(data);
                 });
 
             } else {
                 // Use yaml file for file contents
                 try {                
-                    data.result = yaml.safeLoad(content);
+                    data.files = yaml.safeLoad(content);
                     //return res.send(200,data);
                     return res.status(200).send(data);
                 } catch (e) {
-                    console.log(e);
+                    logger.error(e);
                     //return res.send(500,e);
                     return res.status(500).send(e);
                 }              

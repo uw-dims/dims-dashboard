@@ -190,9 +190,9 @@ describe('models/Ticket', function() {
   });
 
   it('should create a mitigation ticket 1 ', function(done) {
-    var mapPath = ROOT_DIR+'mydata/mapFiles/userAttributes.yml';
-    var ipPath = ROOT_DIR+'mydata/ipFiles/mitigation_ips.txt';
-    // var mapData = fs.readFileSync(mapPath, {encoding: 'utf-8'});
+    var mapPath = __dirname + '/../userAttributes.yml';
+    var ipPath = __dirname + '/../mitigation_ips.txt';
+    logger.debug(__dirname);
     var ipData = fs.readFileSync(ipPath, {encoding: 'utf-8'});
     var initialTopic =  {
       topic: 'inital_ips',
@@ -239,8 +239,6 @@ describe('models/Ticket', function() {
                 description: '',
                 displayType: 'mitigation'
               }).then(function(reply) {
-                console.log('reply from stuart');
-                console.log(reply);
                 ticket.addTopic('user:eliot', 'hash', {
                   data: eliotIps,
                   shortDesc: 'IPs assigned to eliot',

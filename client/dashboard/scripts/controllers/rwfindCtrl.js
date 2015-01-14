@@ -20,21 +20,21 @@ angular.module('dimsDashboard.controllers').
 
     // Set up file pickers
     $scope.fileNames = [];
-    $scope.showFiles = false;
+    $scope.showFiles = true;
     $scope.demoNames = [];
     $scope.showDemoFiles = false;
 
-    FileService.getFileList('ip_lists').then(function(result) {
-        $scope.fileNames = result.fileNames;
-        $scope.filePath = result.filePath;
-        $scope.showFiles = true;
-    });
+    // FileService.getFileList('ip_lists').then(function(result) {
+    //     $scope.fileNames = result.fileNames;
+    //     $scope.filePath = result.filePath;
+    //     $scope.showFiles = true;
+    // });
 
-    FileService.getDemoList('rwfind').then(function(result) {
-      $scope.demoPath = result.filePath;
-      $scope.demoNames = result.fileNames;
-      $scope.showDemoFiles = true;
-    });
+    // FileService.getDemoList('rwfind').then(function(result) {
+    //   $scope.demoPath = result.filePath;
+    //   $scope.demoNames = result.fileNames;
+    //   $scope.showDemoFiles = true;
+    // });
 
     // SettingsService.getSettings('0').then(function(result){
     //   console.log('getSettings result');
@@ -145,28 +145,28 @@ angular.module('dimsDashboard.controllers').
       $scope.start = end;
     };
 
-    var getDemo = function(file) {
-      console.log('in getDemo');
-      $scope.showResults = false;
-      $scope.showJsonResults = false;
-      $scope.data = {};
-      return $http({
-        method: 'GET',
-        url: '/files',
-        params: {
-          action: 'read',
-          file: file,
-          source: 'default_data'
-        }
+    // var getDemo = function(file) {
+    //   console.log('in getDemo');
+    //   $scope.showResults = false;
+    //   $scope.showJsonResults = false;
+    //   $scope.data = {};
+    //   return $http({
+    //     method: 'GET',
+    //     url: '/files',
+    //     params: {
+    //       action: 'read',
+    //       file: file,
+    //       source: 'default_data'
+    //     }
 
-      }).success(function(data, status, headers, config) {
-        prepareData(data,status,headers,config)
-      })
-        .error(function(data, status, headers, config) {
-          console.log(data);
-          console.log(status);
-        });
-    };
+    //   }).success(function(data, status, headers, config) {
+    //     prepareData(data,status,headers,config)
+    //   })
+    //     .error(function(data, status, headers, config) {
+    //       console.log(data);
+    //       console.log(status);
+    //     });
+    // };
     
 
     /**
@@ -182,11 +182,11 @@ angular.module('dimsDashboard.controllers').
       $scope.formErrorMsg = '';
 
       // User wants demo data - get data and return
-      if ($scope.formData.demoName !== null && $scope.formData.demoName !== undefined) {
-        $scope.resultsMsg = 'Results - Waiting...';
-        getDemo($scope.formData.demoName);
-        return;
-      }
+      // if ($scope.formData.demoName !== null && $scope.formData.demoName !== undefined) {
+      //   $scope.resultsMsg = 'Results - Waiting...';
+      //   getDemo($scope.formData.demoName);
+      //   return;
+      // }
 
       // Catch some input errors
       if (!Utils.inputPresent($scope.formData.ips) && !Utils.inputPresent($scope.formData.fileName)) {
@@ -228,9 +228,7 @@ angular.module('dimsDashboard.controllers').
       Utils.setConfig(clientConfig, $scope.formData.header, 'header');
       Utils.setConfig(clientConfig, $scope.settings.rpcVerbose, 'verbose');
       Utils.setConfig(clientConfig, $scope.settings.rpcDebug, 'debug');
-      if (Utils.inputPresent($scope.formData.fileName)) {
-        Utils.setConfig(clientConfig, $scope.filePath+$scope.formData.fileName.name, 'fileName');
-      }
+      Utils.setConfig(clientConfig, $scope.formData.fileName, 'fileName');
       $log.debug('rwfind CallClient. Finished processing config. clientConfig: ');
       $log.debug(clientConfig);
       $log.debug('rwfind CallClient: Now sending http get request');

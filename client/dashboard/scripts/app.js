@@ -131,7 +131,7 @@ var rpcClientOptions = {
 
 var dimsDashboard = angular.module('dimsDashboard', 
   ['ngRoute','angularFileUpload','ui.bootstrap','ui.bootstrap.showErrors','ngGrid', 'ngAnimate', 'ngResource','http-auth-interceptor',
-    'ngCookies','truncate', 'dimsDashboard.controllers', 'dimsDashboard.directives', 'dimsDashboard.services','dimsDashboard.config'])
+    'ngCookies','anguFixedHeaderTable', 'truncate', 'dimsDashboard.controllers', 'dimsDashboard.directives', 'dimsDashboard.services','dimsDashboard.config'])
   .config(dimsDashboardConfig);
 
 dimsDashboard.constant(constants);
