@@ -1,0 +1,14 @@
+<table class="table table-striped table-hover table-bordered" ><tbody>
+<tr><th>Source IP</th>
+<th>Destination IP</th>
+<th>Bytes</th>
+<th>Percent of Total</th>
+<th>Cumulative Percent</th>
+</tr>
+<tr ng-repeat="s in flowStats">
+<td>{{ s.sIP }}</td>
+<td>{{ s.dIP }}</td>
+<td>{{ s.Bytes }}</td>
+<td>{{ s.Percent_of_total }}</td>
+<td>{{ s.Cumulative_Percent }}</td>
+</tr></tbody></table>

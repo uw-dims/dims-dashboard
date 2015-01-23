@@ -1,0 +1,52 @@
+<div class="container main">
+<h2 class="sub-header">Upload</h2>
+
+<form role="form" class="form-horizontal" name="uploadForm">
+
+  <div class="form-group">
+  <label  class="col-sm-2 control-label">Target File Location</label>
+    <div class="col-sm-5">
+      <select class="form-control" ng-model="formData.destination" ng-options="f.value as f.label for f in destinationMap" >
+      </select>
+    </div>
+  </div>
+
+
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="inputOneFile">Choose one file</label>
+    <div class="col-sm-5">
+    <input type="file" ng-file-select="onFileSelect($files)" id="inputOneFile" class="form-control" onclick="this.value=null" />
+    </div></div>
+
+  <div class="form-group" >
+
+    <label class="col-sm-2 control-label" for="dragDropFiles">Drag and drop</label>
+    <div class="col-sm-5">
+      <div ng-show="dropSupported" class="uploadDropzone" ng-file-drop="onFileSelect($files)" ng-file-drop-available="dropSupported=true" ng-file-drag-over-class="dragOverClass($event)" ng-file-drag-over-delay="100"
+                       id="dragDropFiles">Drop files here</div>
+      <div  ng-show="!dropSupported">HTML5 Drop File is not supported!</div>
+<!--       <button ng-click="upload.abort()">Cancel Upload</button>
+ -->    </div>
+   </div>
+<div class="row" ng-show="selectedFiles != null" ><div class="col-sm-12 "><h3 class="sub-header">Files to upload</h3></div></div>
+
+<div class="form-group" ng-show="selectedFiles != null" ng-repeat="f in selectedFiles">
+  <div class="col-sm-1" ng-show="progress[$index] < 0">
+    <button class="btn btn-primary btn-sm" ng-click="start($index)"  >Start</button></div>
+  <div class="col-sm-2"  ng-show="progress[$index] >= 0 ">
+    <span class="progress {{progressClass[$index]}}" >           
+      <div style="width:{{progress[$index]}}%">{{progress[$index]}}%</div>
+    </span>     
+  </div>
+  <div class="col-sm-1"  ng-show="hasUploader($index) && progress[$index] < 100 && progress[$index] > 0"> 
+    <button class="btn btn-sm" ng-click="abort($index)" >Abort</button></div>
+  <div class="col-sm-3 sel-file">
+    {{ f.name }} - {{ f.size }} Bytes </div>
+  <div class="col-sm-3" ng-show="progress[$index] < 0"><input type="text" class="form-control" ng-model="newName[$index]" name="fileName" placeholder="Optional: New file name" />
+  </div>
+
+  <div class="col-sm-6 sel-file {{fileResponseClass[$index]}} " ng-show="uploadResult[$index]"> {{ uploadResult[$index]}}</div>
+</div>
+
+</form>
+</div>

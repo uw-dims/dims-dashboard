@@ -1,0 +1,47 @@
+<div class="container main">
+<h1 class="sub-header">Anonymize</h1>
+
+<form class="form-horizontal" role="form" name="anonForm">
+<div class="alert alert-danger form-group" ng-show="showFormError">{{formErrorMsg}}</div>
+ <div class="form-group">
+    
+    <label  class="col-sm-2 control-label">File to anonymize</label>
+    <div class="col-sm-3" ng-show="showFiles">
+    <dims-select-files file-source="data_files" file-type="file" picker-model="formData.fileName"></dims-select-files>
+    </div>
+    <p class="help-block">Choose a file from your data_files directory. If it isn't there already, upload it using the upload page. </p>
+  </div>
+
+  <div class="form-group"> 
+    <label  class="col-sm-2 control-label">Map File</label>
+    <div class="col-sm-3" ng-show="showFiles">
+    <dims-select-files file-source="map_files" file-type="file" picker-model="formData.mapName"></dims-select-files>
+    </div>
+    <p class="help-block">Choose a map file if you don't want to use the default. </p>
+  </div>
+  
+<div class="form-group">
+  <label  class="col-sm-2 control-label">Output Type</label>
+    <div class="col-sm-3">
+       <select class="form-control input-sm" ng-model="formData.outputType" ng-options="o.value as o.label for o in outputTypes"> 
+      </select>
+    </div>
+    <label  class="col-sm-2 col-sm-offset-2 control-label">Show Stats?</label>
+    <div class="col-sm-1">
+      <input type="checkbox" ng-model="formData.stats" name="stats" class="form-control"  />
+  </div>
+  </div>
+
+<div class="form-group">
+  <div class="col-sm-3 col-sm-offset-2">
+  <button type="button" class="btn btn-primary" ng-click="callClient()">Call anon</button>
+  </div></div>
+</form>
+
+<h2 class="sub-header">{{ resultsMsg }}</h2>
+
+<div class="row" ng-show="showJsonResults"><div class="col-sm-12">
+</div></div>
+
+<dims-raw-results></dims-raw-results>
+</div>

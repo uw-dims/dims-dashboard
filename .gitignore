@@ -1,6 +1,11 @@
 *.sublime-*
 .bowerrc
-.jshintrc
 node_modules/
-tmp/
-
+tmp/*
+upload/*
+server/mydata/*
+bower_components/*
+*.log
+*/dist/*
+.DS_Store
+logs/

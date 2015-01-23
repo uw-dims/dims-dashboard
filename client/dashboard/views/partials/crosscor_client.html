@@ -1,0 +1,87 @@
+<div class="container main">
+<h2 class="subheader">Cross-Correlate</h2>
+
+<form class="form-horizontal" role="form" name="crosscorForm">
+  <div class="alert alert-danger form-group" ng-show="showFormError">{{formErrorMsg}}</div>
+  <div class="form-group">
+  <label  class="col-sm-2 control-label">Friend or Foe</label>
+    <div class="col-sm-3">
+      <select class="form-control" ng-model="formData.iff" ng-options="f.value as f.label for f in iffs" >
+        <option></option>
+      </select>
+    </div>
+    <label  class="col-sm-2 control-label">Show Stats?</label>
+    <div class="col-sm-1">
+      <input type="checkbox" ng-model="formData.stats" name="stats" class="form-control"  />
+  </div>
+  </div> 
+
+  <div class="form-group">
+    
+    <label  class="col-sm-2 control-label">File to correlate</label>
+    <div class="col-sm-3" ng-show="showFiles">
+      <dims-select-files file-source="data_files" file-type="file" picker-model="formData.fileName"></dims-select-files>
+    </div>
+    <p class="help-block">Choose a file from your data_files directory. If it isn't there already, upload it using the upload page. </p>
+  </div>
+
+  <div class="form-group">
+    
+    <label  class="col-sm-2 control-label">Map File</label>
+    <div class="col-sm-3" ng-show="showFiles">
+      <dims-select-files file-source="map_files" file-type="file" picker-model="formData.mapName"></dims-select-files>
+    </div>
+    <p class="help-block">Choose a map file if you don't want to use the default. </p>
+  </div>
+  
+  <div class="form-group">
+  <div class="col-sm-3 col-sm-offset-2">
+  <button type="button" class="btn btn-primary" ng-click="callClient()">Call crosscor</button>
+  </div></div>
+</form>
+
+<h2 class="sub-header">{{ resultsMsg }}</h2>
+
+<div class="row" ng-show="showResults"><div class="col-sm-12">
+<strong>Matching</strong>
+<div class="table-responsive" >
+<table class="table table-striped table-hover table-bordered" ><tbody>
+<tr><th>IP</th>
+<th>Site</th>
+</tr>
+<tr ng-repeat="m in rawData.matching">
+<td>{{ m.ip4 }}</td>
+<td>{{ m.site }}</td>
+</tr></tbody></table>
+</div></div></div>
+
+<div class="row" ng-show="showResults"><div class="col-sm-12">
+<strong>Non-Matching</strong>
+<div class="table-responsive" >
+<table class="table table-striped table-hover table-bordered" ><tbody>
+<tr><th>IP</th>
+<th>Site</th>
+</tr>
+<tr ng-repeat="n in rawData.nonmatching">
+<td>{{ n.ip4 }}</td>
+<td>{{ n.site }}</td>
+</tr></tbody></table>
+</div></div></div>
+
+<div class="row" ng-show="showResults"><div class="col-sm-12">
+<strong>Matching Stats</strong>
+<div class="table-responsive" >
+<table class="table table-striped table-hover table-bordered" ><tbody>
+<tr><th>Count</th>
+<th>Percent</th>
+<th>Site</th>
+</tr>
+<tr ng-repeat="s in rawData.matching_stats">
+<td>{{ s.count }}</td>
+<td>{{ s.percent }}</td>
+<td>{{ s.site }}</td>
+</tr></tbody></table>
+</div></div></div>
+
+<dims-raw-results></dims-raw-results>
+</div>

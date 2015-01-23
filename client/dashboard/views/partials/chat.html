@@ -1,0 +1,26 @@
+<div ng-controller="ChatCtrl">
+<div class="{{ chatClass }}">
+<div class="popup-box chat-popup" ng-show="chatOn">
+    <div class="popup-head">
+        <div class="popup-head-left">Chat</div>
+        <div class="popup-head-right">
+	        <span class="glyphicon glyphicon-chevron-down popup-btn" ng-click="hide()" ng-show="chatMaximized"></span>
+	        <span class="glyphicon glyphicon-chevron-up popup-btn" ng-click="show()" ng-hide="chatMaximized"></span>
+	        <span class="glyphicon glyphicon-remove popup-btn" ng-click="close()"></span>
+				</div>
+        <div style="clear: both"></div>
+    </div>
+    <div class="message-container" ng-show="chatMaximized">
+    <div class="popup-messages-chat" style="white-space: pre;" ng-show="chatMaximized">{{ messages }}</div>
+    	<div class="chat-send" ng-show="chatMaximized">
+    	<form class="form chat" role="form" ng-submit="send()">
+        <div class="form-group chat-input">
+    		<input type="text" class="form-control" placeholder="Enter message" ng-model="text">
+<!--             <button type="submit" class="btn btn-primary btn-sm" ng-click="send()">Send</button>
+ -->    </div></form>
+    	</div>
+   
+    </div>
+</div>
+</div>
+</div>

@@ -1,0 +1,36 @@
+<div class="container main">
+<h2 class="subheader">Time-Series Graph Demo</h2>
+<p>Choose a data set and click Graph Data to display a time-series graph.</p>
+<form role="form" class="form-inline">
+ <div class="form-group">
+  <label  class="control-label inline-group">Data Set</label>
+      <select class="form-control inline-group" ng-model="formData.fileName" ng-options="n for n in fileNames" >
+      </select>
+  </div>
+  <button type="button" class="btn btn-primary btn-sm inline-group" ng-click="graphData()">Graph Data</button>
+</form>
+
+<div ng-show="showResults">
+<div id="chart" class="with-3d-shadow with-transitions" >
+    <svg style="height: 500px;"></svg>
+  </div>
+<!-- <nvd3-line-with-focus-chart
+  data="graphDataPoints"
+  id = "graphID"
+  width="400"
+  height="200"
+  margin="{left:80,top:10,bottom:10,right:50}"
+  margin2="{left:80,top:10,bottom:10,right:50}"
+  showXAxis="true"
+  showYAxis="true"
+  xAxisTickFormat="xAxisTickFormatFunction()"
+  yAxisTickFormat="yAxisTickFormatFunction()"
+  yAxisLabel="Y Axis Label"
+  xAxisLabel="X Axis Label"
+  tooltips="true"
+  >
+  <svg></svg>
+  </nvd3-line-with-focus-chart> -->
+
+</div>
+</div>

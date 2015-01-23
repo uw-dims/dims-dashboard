@@ -1,0 +1,28 @@
+<div class="container main">
+<h2 class="sub-header">View Files</h2>
+<form role="form" class="form-inline">
+ <div class="form-group">
+  <label  class="control-label inline-group">Choose Data Directory</label>
+      <select class="form-control inline-group" ng-model="formData.source" ng-options="f.value as f.label for f in sourceMap" >
+      </select>
+  </div>
+  <button type="button" class="btn btn-primary btn-sm inline-group" ng-click="getFiles()">View Data Files</button>
+</form>
+<div class="gridStyle gridStyle-short" ng-grid="gridOptions"></div>
+<div class="heading-block"><p>Click on a file name to display contents. Files larger than 1 megabyte are truncated.</p></div>
+<div ng-show="showData">
+<div class="heading-block">
+<span class="inline-group"><strong>File Contents</strong></span>
+<button type="button" class="btn btn-primary btn-sm inline-group" ng-click="showPrettyResults()" ng-show="isRaw && isJson">Pretty Print</button>
+<button type="button" class="btn btn-primary btn-sm inline-group" ng-click="showRawData()" ng-hide="isRaw">Show Raw Data</button>
+
+<span class="inline-group">{{prettyMsg}}</span>
+<span class="inline-group" ng-show="loading">Loading data...</span>
+</div>
+
+<div class="dataPanel">
+<pre> {{singleFile}} </pre>
+</div>
+
+</div>
+</div>

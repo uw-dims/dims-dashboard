@@ -1,0 +1,26 @@
+<table class="table table-striped table-hover table-bordered table-condensed" ><tbody >
+<tr><th>Index</th>
+<th>Type</th>
+<th>Description</th>
+<th>Event</th>
+<th>Source IP</th>
+<th>Destination IP</th>
+<th>Destination Port</th>
+<th>Device</th>
+<th>Timestamp</th>
+<th>User</th>
+</tr>
+<tr ng-repeat="f in lmItems track by $index" ng-init="rowindex = $index" >
+<td>{{rowindex}}</td>
+<td>{{ f.CUSTOM3 }}</td>
+<td>{{ f.description }}</td>
+<td>{{ f.event_name }}</td>
+<td>{{ f.srcip }}</td>
+<td>{{ f.dstip }}</td>
+<td>{{ f.dstport }}</td>
+<td>{{ f.report_device }}</td>
+<td>{{ f.timestamp }}</td>
+<td>{{ f.usr }}</td>
+
+</tr>
+</tbody></table>

@@ -1,16 +1,10 @@
 {
-  "name": "dims-node",
-  "version": "0.0.1",
+  "name": "dims-dashboard",
+  "version": "1.0.0",
+  "description": "DIMS Dashboard web application",
   "private": true,
-  "scripts": {
-    "start": "node app.js"
-  },
-  "dependencies": {
-    "express": "3.2.6",
-    "ejs": "*",
-    "python-shell": "0.0.2",
-    "multipart": "*",
-    "fileupload": "*",
-    "carrier": "*"
+  "repository": {
+    "type": "git",
+    "url": "git@git.prisem.washington.edu:/opt/git/dims-dashboard.git"
   }
 }

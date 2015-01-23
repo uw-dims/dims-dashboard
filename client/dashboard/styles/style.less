@@ -1,0 +1,508 @@
+// bower:less
+@import "../../bower_components/bootstrap/less/bootstrap.less";
+// endbower
+
+@import "variables.less";
+
+/* Application variables */
+@list-group-item-top-padding: 5px;
+@list-group-item-side-padding: 10px;
+//** Text color of disabled list items
+@list-group-disabled-color:      @gray;
+
+/* Move down content because we have a fixed navbar that is 50px tall */
+body {
+  padding-top: 50px;
+}
+
+/* override bootstrap container margin */
+.container {
+  margin-left: 35px; 
+  width: 93%;
+}
+
+/* override bootstrap label color */
+label {
+  color: lighten(@dims-dark, 15%);
+}
+
+/* Added as per ui.bootstrap instructiona */
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+
+/* We don't want underlines in panel title links */
+.panel-title a:hover, .panel-title a:focus {
+  text-decoration: none;
+}
+
+/* override list groups for dims */
+.list-group-item {
+  padding: @list-group-item-top-padding @list-group-item-side-padding;
+  border: none;
+  border-top: 1px solid @list-group-border;
+
+  // Do not Round the first and last items. Add border to bottom
+  &:first-child {
+    .border-top-radius(0px);
+  }
+  &:last-child {
+    margin-bottom: 0;
+    .border-bottom-radius(0px);
+  }
+}
+
+.list-group-item {
+  // Disabled state
+  &.disabled,
+  &.disabled:hover,
+  &.disabled:focus {
+    cursor: default !important;
+  }
+}
+
+/* override base panel class */
+// .panel {
+//   border: none;
+//   .box-shadow( 0 0 0 rgba(0,0,0,0));
+// }
+
+/* override form-control class */
+.form-control {
+  margin-bottom: 5px;
+}
+
+/* override form-group class */
+.form-group {
+  margin-bottom: 5px;
+}
+
+/* Alter panel color for settings */
+.settings .panel {
+  background-color: @panel-alternate;
+}
+
+
+/*
+ * Global add-ons
+ */
+
+.main {
+  h1 {
+    margin-top: 0px;
+    padding-bottom: 5px;
+  }
+  h2, h3, h4 {
+    margin-top: 0px;
+  }
+}
+
+.sub-header {
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.saved-query-group, .ticket-group {
+  height: 150px;
+  max-height: 150px;
+  overflow-y: scroll;
+}
+
+// Tables
+
+table.dataTable {
+  max-height: 400px;
+  height: 400px;
+  /*overflow-y: scroll;
+  overflow-x: visible;*/
+  // overflow:auto;
+  // margin: 10px 0px;
+  // border: 1px solid #eee;
+}
+
+
+/*
+ * Main content
+ */
+
+// .main {
+//   padding: 20px;
+// }
+// @media (min-width: 768px) {
+//   .main {
+//     padding-right: 30px;
+//     padding-left: 30px;
+//   }
+// }
+// .main .page-header {
+//   margin-top: 0;
+// }
+
+.main {
+  padding-top: 20px;
+  position: relative;
+}
+
+/*
+ * Placeholder dashboard ideas
+ */
+
+.placeholders {
+  margin-bottom: 30px;
+  text-align: center;
+}
+.placeholders h4 {
+  margin-bottom: 0;
+}
+.placeholder {
+  margin-bottom: 20px;
+}
+.placeholder img {
+  display: inline-block;
+  border-radius: 50%;
+}
+
+.gridStyle {
+    border: 1px solid rgb(212,212,212);
+    width: 100%; 
+    height: 400px;
+    margin-bottom: 15px;
+    margin-top: 10px;
+}
+.statsGridStyle {
+    height: 150px;
+} 
+
+.gridStyle-short {
+  height: 300px;
+}
+
+.dataPanel {
+  max-height: 400px;
+  /*overflow-y: scroll;
+  overflow-x: visible;*/
+  overflow:auto;
+  margin: 10px 0px;
+  border: 1px solid #eee;
+}
+
+/*
+ * Upload
+ */
+
+.uploadDropzone {
+  background: #ddd;
+    width: 300px;
+    height: 80px;
+    line-height: 50px;
+    text-align: center;
+    font-weight: bold;
+    border-radius: @border-radius-base;
+}
+.uploadDropzone-hover {
+  background: #bbb;
+}
+
+.uploadDropzone-hover-error {
+  background: #bbb;
+  border: 1px solid @brand-warning;
+}
+
+.sel-file {
+  padding: 1px 5px;
+  font-size: smaller;
+  color: gray;
+}
+
+.file-response {
+  color: @brand-success;
+}
+
+.file-response-fail {
+  color: @brand-danger;
+}
+
+.response {
+  padding-top: 30px;
+}
+
+.response>ul {
+  list-style-type: decimal;
+}
+
+.response li, .response .reqh {
+  color: blue;
+  font-size: smaller;
+  padding-bottom: 5px; 
+}
+
+.progress {
+  display: inline-block;
+  width: 100px; 
+}
+
+.progress div {
+  margin-bottom: 0; 
+  text-align: left;
+  vertical-align: middle;
+  cursor: default;
+  background-image: none; 
+  border: 1px solid transparent;
+  white-space: nowrap;
+  padding: @padding-xs-vertical @padding-xs-horizontal;
+  font-size: @font-size-small;
+  border-radius: @border-radius-small;
+  background: @brand-success;
+  color: white;
+  width: 0;
+}
+
+.progress-fail div {
+  padding: 0px;
+  color: @brand-danger;
+  background: transparent;
+}
+
+.inline-group {
+  margin-right: 10px;
+}
+
+.heading-block {
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+.page-block {
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+div.tableContainer {
+  clear:both;
+  border: 1px solid #963;
+  height: 400px;
+  overflow: auto;
+}
+
+html>body thead.fixedHeader tr {
+  display:block;
+}
+
+.scrollTable {
+
+}
+
+.fixedHeader {
+
+}
+
+html>body tbody.scrollContent {
+  display:block;
+  height: 350px;
+  overflow: auto;
+}
+
+.scrollContent {
+
+}
+
+
+.fadein,
+.fadeout {
+  -webkit-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+  -moz-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+  -o-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+  transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+}
+
+.fadein.ng-hide-remove,
+.fadeout.ng-hide-add.ng-hide-add-active {
+  opacity: 0;
+  //display: block !important;
+}
+
+.fadeout.ng-hide-add,
+.fadein.ng-hide-remove.ng-hide-remove-active {
+  opacity: 1;
+  //display: block !important;
+}
+
+.query-tray-btn {
+  cursor: pointer;
+}
+
+.query-tray-icon {
+  position: fixed;
+  left: 12px;
+  top: 73px;
+}
+
+.query-btn-active {
+  color: @brand-primary;
+}
+
+.query-btn-inactive {
+  color: black;
+}
+
+// Login Form
+.form-signin {
+  max-width: 330px;
+  padding: 15px;
+  margin: 0 auto;
+}
+.form-signin .form-signin-heading, .form-signin .checkbox {
+  margin-bottom: 10px;
+}
+.form-signin .checkbox {
+  font-weight: normal;
+}
+.form-signin .form-control {
+  position: relative;
+  font-size: 16px;
+  height: auto;
+  padding: 10px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.form-signin .form-control:focus {
+  z-index: 2;
+}
+.form-signin input[type="text"] {
+  margin-bottom: -1px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.form-signin input[type="password"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+.account-wall {
+  margin-top: 10px;
+  padding: 20px 0px 20px 0px;
+  background-color: #FFFFFF;
+  -moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
+}
+.login-title {
+  color: #555;
+  font-size: 18px;
+  font-weight: 400;
+  display: block;
+}
+
+// Chat popup styles
+.chatMin > .popup-box
+{
+    display: block;
+    position: fixed;
+    bottom: 0px;
+    right: 0px;
+    height: 25px;
+    background-color: @well-bg;
+    width: 330px;
+    border: 1px solid @well-border;
+}
+
+.chatMax > .popup-box
+{
+    display: block;
+    position: fixed;
+    bottom: 0px;
+    right: 0px;
+    height: 200px;
+    background-color: @well-bg;
+    width: 330px;
+    border: 1px solid @well-border;
+}
+
+.logMin > .popup-box
+{
+    display: block;
+    position: fixed;
+    bottom: 0px;
+    right: 335px;
+    height: 25px;
+    background-color: @well-bg;
+    width: 750px;
+    border: 1px solid @well-border;
+}
+
+.logMax > .popup-box
+{
+    display: block;
+    position: fixed;
+    bottom: 0px;
+    right: 335px;
+    height: 200px;
+    background-color: @well-bg;
+    width: 750px;
+    border: 1px solid @well-border;
+}
+
+.popup-box .popup-head
+{
+    background-color: lighten(@navbar-inverse-bg, 20%);//#51524c; //#474843;
+    padding: 4px 4px 4px 5px;
+    color: white;
+    font-weight: normal;
+    font-size: 12px;
+    clear: both;
+}
+
+.popup-box .popup-head .popup-head-left
+{
+    float: left;
+}
+
+.popup-box .popup-head .popup-head-right
+{
+    float: right;
+    opacity: 0.5;
+}
+
+.popup-box .popup-head .popup-head-right a
+{
+    text-decoration: none;
+    color: inherit;
+}
+
+.popup-box .message-container {
+    height: 100%;
+    padding: 0px;
+}
+
+.popup-box .popup-messages-chat {
+   height: 70%;
+   padding: 4px 4px 4px 5px;
+  overflow-y: scroll;
+  word-wrap: break-word;
+}
+
+.popup-box .popup-messages
+{
+    height: 100%;
+    padding: 4px 4px 4px 5px;
+    overflow-y: scroll;
+}
+
+.popup-box .chat-send {
+  height: 25px;
+  width: 327px;
+  position: fixed;
+  bottom: 4px;
+}
+
+.popup-box .chat-input {
+  width: 327px;
+//  margin: 1px;
+}
+
+.popup-btn {
+    padding: 0px 4px 0px 6px;
+    cursor: pointer;
+}
+.popup-box .chat {
+  width: 327px;
+}
