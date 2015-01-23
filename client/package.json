@@ -1,9 +1,10 @@
 {
-  "name": "dims-dashboard",
-  "version": "0.0.1",
+  "name": "dims-dashboard-client",
+  "version": "1.0.0",
+  "description": "Client module for the DIMS Dashboard",
+  "private": true,
   "dependencies": {
     "lodash" : "~2.4.1"
-    
     },
   "devDependencies": {
     "grunt": "~0.4.5",

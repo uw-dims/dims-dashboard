@@ -1,11 +1,13 @@
 {
-  "name": "DIMSDashboard",
+  "name": "dims-dashboard-server",
   "main": "app.js",
   "version": "1.0.0",
+  "description": "Server module for the DIMS Dashboard",
   "private": true,
   "scripts": {
     "test": "./node_modules/.bin/mocha --recursive -R xunit test/ > test-reports.xml"
   },
+  
   "dependencies": {
     "JSONStream": "0.8.4",
     "async": "0.9.0",

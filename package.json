@@ -1,0 +1,10 @@
+{
+  "name": "dims-dashboard",
+  "version": "1.0.0",
+  "description": "DIMS Dashboard web application",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git@git.prisem.washington.edu:/opt/git/dims-dashboard.git"
+  }
+}
