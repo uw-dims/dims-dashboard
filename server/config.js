@@ -42,17 +42,24 @@ config.rpcPort = '5672';
 
 config.mapfile = '/etc/ipgrep_networks.txt';
 
-config.inputdir = '/opt/dims/srv/input';
-
-config.outputdir = '/opt/dims/srv/output';
+// not used
+//config.inputdir = '/opt/dims/srv/input';
+// not used
+//config.outputdir = '/opt/dims/srv/output';
 
 config.data = '/opt/dims/data/sample-data/'
 
 config.serverPath = __dirname;
 
-config.userDataPath =  config.serverPath + '/mydata/';
+//config.userDataPath =  config.serverPath + '/mydata/';
 
-config.demoDatastorePath = config.serverPath + '/data/';
+//config.demoDatastorePath = config.serverPath + '/data/';
+
+
+// /opt/dims/data in the Dashboard container will map to host
+// /data/dashboard
+config.userDataPath = '/opt/dims/data/dashboard/mydata/';
+config.demoDatastorePath = '/opt/dims/data/dashboard/data/';
 
 config.directoryMapping = {
   'ip_lists': config.userDataPath+'ipFiles/',

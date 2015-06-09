@@ -8,6 +8,13 @@ ENV LAST_UPDATED 2015-06-09
 ENV NODE_VERSION 0.12.1
 ENV NPM_VERSION 2.7.3
 
+# Found out curl not installed on dims:0.2. Should we add curl to base:0.2?
+# We will leave this here for now as we discover any other missing/needed packages
+RUN apt-get update && \
+    apt-get install -y \
+       curl && \
+    rm -rf /var/lib/apt/lists/*
+
 # Node install based upon joyent/docker-node/0.12/wheezy/Dockerfile
 
 # verify gpg and sha256: http://nodejs.org/dist/v0.10.30/SHASUMS256.txt.asc
@@ -26,4 +33,16 @@ RUN curl -SLO "http://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x
 
 RUN npm install -g grunt-cli bower
 
-CMD [ "node" ]
+USER dims
+WORKDIR /opt/dims/srv/dashboard
+ADD ./server/package.json /opt/dims/srv/dashboard/server/package.json
+ADD ./client/package.json /opt/dims/srv/dashboard/client/package.json
+ADD ./client/bower.json /opt/dims/srv/dashboard/client/bower.json
+
+RUN cd server && \
+    npm install && \
+    cd ../client && \
+    npm install && \
+    bower install
+
+CMD [ "bash" ]
