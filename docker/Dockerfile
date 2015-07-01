@@ -8,8 +8,9 @@ ENV LAST_UPDATED 2015-06-09
 ENV NODE_VERSION 0.12.1
 ENV NPM_VERSION 2.7.3
 
-# Found out curl not installed on dims:0.2. Should we add curl to base:0.2?
-# We will leave this here for now as we discover any other missing/needed packages
+# Found out curl not installed on dims:0.2. Should we add curl to base:0.2? Or
+# do we use wget here?
+# We will leave this apt-get here for now as we discover any other missing/needed packages
 RUN apt-get update && \
     apt-get install -y \
        curl && \
