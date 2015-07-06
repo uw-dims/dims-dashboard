@@ -152,7 +152,12 @@ RabbitConnection.prototype.subscribe = function() {
 
         return self.pubExchange = ch.assertExchange(self.name, self.type, {durable: self.durable});
       });
-    });
+    }, function(err) {
+      logger.error('services/RabbitConnection.initPublish: Connect failed: ', err);
+    })
+      .then(null, function(err) {
+        logger.error('services/RabbitConnection.initPublish: Connect succeeded but error thrown: ', err);
+      });
    };
 
 RabbitConnection.prototype.publish = function(message) {

@@ -42,7 +42,7 @@ exports.logout = function(req,res) {
   if (req.user) {
     logger.debug('routes/session.logout', req.user.get('ident'));
     req.logout();
-    req.flash('info','You are now logged out.');
+    // req.flash('info','You are now logged out.');
     res.status(200).send('Successfully logged out');
   } else {
     res.status(400).send('Not logged in');
@@ -57,9 +57,9 @@ exports.login = function(req,res,next) {
       logger.debug('routes/session.login. Unsuccessful Response from passport.authenticate. err, info: ', err, info); 
       var message = (info !== null && info !== undefined) ? info : '';
       message = message + ((err !== null && err !== undefined) ? err : '');
-      req.flash('username', req.body.username);
-      req.flash('error', err);
-      req.flash('info', info);
+      // req.flash('username', req.body.username);
+      // req.flash('error', err);
+      // req.flash('info', info);
       return res.status(400).send(message);
     }
     logger.debug('routes/session.login. Successful response from passport.authenticate. err, user, info: ', err, user.get('ident'), info); 
@@ -67,7 +67,7 @@ exports.login = function(req,res,next) {
     req.logIn(user, function(err) {
 
       if (err !== null && err !== undefined) {
-        req.flash('error', err);
+        // req.flash('error', err);
         return res.status(400).send(err);
       }
       var username = req.user.get('ident');

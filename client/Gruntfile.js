@@ -20,9 +20,25 @@ module.exports = function (grunt) {
     dist: '../server/dist'
   };
 
-  // Get URL for deployment from command line
-  var deployedURL = grunt.option('url') || 'localhost';
-  var deployedPort = grunt.option('port') || '3030';
+  // Get variables for deployment from command line
+  // var deployedURL = grunt.option('url') || 'localhost';
+  // var deployedPort = grunt.option('port') || '3000';
+  // Refactoring
+  // We will use the environment vars:
+  // process.env.PUBLICHOST - host or ip where the socket.io server resides
+  // process.env.PUBLICPROTOCOL - protocol we're using - http or https
+  // process.env.PUBLICPORT - port
+  // When container is deployed, these environment variables need to be
+  // defined. Grunt is then run to write these values to the client config file
+  // These values are the protocol, host, and port that a client will use to 
+  // connect to the app which proxies to the Dashboard. 
+
+  // Defaults:
+
+  var publicHost = process.env.PUBLICHOST || 'localhost';
+  var publicPort = process.env.PUBLICPORT || '3000';
+  var publicProtocol = process.env.PUBLICPROTOCOL || 'http';
+
 
   // Define the configuration for all the tasks
   grunt.initConfig({
@@ -35,9 +51,13 @@ module.exports = function (grunt) {
         name: 'dimsDashboard.config',
         deps: false,
         dest: '<%= appConfig.app %>/scripts/config.js',
+
+        // Set up environment vars to be available to the client
         constants: {
           ENV: {
-            SOCKETIO_URL: 'https://' + deployedURL + ':' + deployedPort
+            PUBLICHOST: publicHost,
+            PUBLICPORT: publicPort,
+            PUBLICPROTOCOL: publicProtocol
           }
         }
       },

@@ -1,10 +1,12 @@
 var config = {};
 
-config.sslOn = process.env.SSL_ON || true;
+config.sslOn = process.env.SSL_ON || false;
 
-config.port = process.env.PORT || 3200;
+config.port = process.env.PORT || 3000;
 
 config.sslport = process.env.SSL_PORT || 3030;
+
+config.env = process.env.NODE_ENV || 'development';
 
 config.log_level = process.env.LOG_LEVEL || 'debug';
 
@@ -14,11 +16,40 @@ config.cert_dir = process.env.CERT_DIRECTORY || '/opt/dims/certs/';
 
 config.ca_name = process.env.CA_NAME || 'dims-ca';
 
-config.cert_name = process.env.CERT_NAME || process.env.HOSTNAME || 'localhost';
+config.cert_name = process.env.CERT_NAME || process.env.PUBLICHOST || 'localhost';
 
 config.redisHost = process.env.REDIS_HOST || 'localhost';
 
+config.redisPort = process.env.REDIS_PORT || 6379;
+
 config.redisDatabase = process.env.REDIS_DATABASE || 0;
+
+config.userDBHost = process.env.USER_DB_HOST || 'localhost';
+config.userDBUser = process.env.USER_DB_USER || 'dims';
+config.userDatabase = process.env.USER_DATABASE || 'ops-trust';
+
+// During development - specify user backend.
+// Possible values:
+//   'postgresql' - use postgresql database
+//   'static'  - use static config variable with users/passwords - only for 
+//       development/testing
+//   others... tba
+config.POSTGRESQL = 'postgresql';
+config.STATIC = 'static';
+
+config.userSource = process.env.USER_BACKEND || config.STATIC;
+
+// Put this here for now
+config.testUsers = {
+  'dittrich' : 'dittrich',
+  'lparsons' : 'lparsons',
+  'eliot' : 'eliot',
+  'stuart' : 'stuart',
+  'parksj' : 'parksj',
+  'mboggess' : 'mboggess',
+  'andclay' : 'andclay',
+  'testUser' : 'testUser'
+};
 
 config.sessionTTL = 7200; //Redis session expiration. 2 hours, in seconds
 

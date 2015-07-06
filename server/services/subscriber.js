@@ -86,7 +86,7 @@ Subscriber.prototype.status = function() {
 
 // Listener for the ready event emitted by a RabbitConnection object
 Subscriber.prototype.onReady = function(ev) {
-  logger.debug('services/Subscriber received ready event from RabbitConnection. Event is ', ev);
+  logger.info('services/Subscriber received ready event from RabbitConnection object. Event is ', ev);
   var self = this;
   self.ch = ev.ch;
   self.exchange = ev.exchange;
@@ -99,10 +99,10 @@ Subscriber.prototype.onReady = function(ev) {
 };
 
 // Listener for the close event emitted when a RabbitConnection closes
-Subscriber.prototype.onClosed = function() {
+Subscriber.prototype.onClosed = function(ev) {
   var self = this;
   logger.debug('services/Subscriber.onClosed:' + self.name + ': received connection close event. ch =', self.ch, 
-    'exchange =', self.exchange, 'queue =', self.queue, 'consumerTag =', self.consumerTag);
+    'exchange =', self.exchange, 'queue =', self.queue, 'consumerTag =', self.consumerTag + ' Event: ' + ev);
   self.running = false;
   // Notify others that the fanout has stopped
   self.emit(self.stopEvent);
@@ -110,7 +110,7 @@ Subscriber.prototype.onClosed = function() {
 };
 
 // Listener for the close event emitted when a RabbitConnection channel closes
-Subscriber.prototype.onChannelClosed = function() {
+Subscriber.prototype.onChannelClosed = function(ev) {
   var self = this;
   logger.debug('services/Subscriber.onChannelClosed:' + self.name + ': received channel close event. ch =', self.ch, 
     'exchange =', self.exchange, 'queue =', self.queue, 'consumerTag =', self.consumerTag);

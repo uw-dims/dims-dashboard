@@ -17,7 +17,7 @@ angular.module('dimsDashboard.services')
           socket.forward('chat:data');
         });
       } else {
-        var myIoSocket = io.connect(ENV.SOCKETIO_URL+'/chat', {forceNew: true});
+        var myIoSocket = io.connect(ENV.PUBLICPROTOCOL+'://'+ENV.PUBLICHOST+':'+ENV.PUBLICPORTL+'/chat', {forceNew: true});
         var mySocket = SocketFactory({
           ioSocket: myIoSocket
         });
@@ -44,7 +44,7 @@ angular.module('dimsDashboard.services')
           socket.forward('logs:data');
         });
       } else {
-        var myIoSocket = io.connect(ENV.SOCKETIO_URL+'/logs', {forceNew: true});
+        var myIoSocket = io.connect(ENV.PUBLICPROTOCOL+'://'+ENV.PUBLICHOST+':'+ENV.PUBLICPORT+'/logs', {forceNew: true});
         var mySocket = SocketFactory({
           ioSocket: myIoSocket
         });

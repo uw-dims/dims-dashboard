@@ -72,7 +72,6 @@ var constants = {
   'CIF' : 'cifbulk',
   'CORRELATE' : 'crosscor',
   'ANONYMIZE' : 'anon',
-  // 'SOCKETIO_URL' : 'https://lpsrv1:3030',
   'PASS_SECRET' : '84jd$#lk903jcy2AUEI2j4nsKLJ!lIY'
 };
 
@@ -80,22 +79,22 @@ var rpcClientOptions = {
   'searchFile' : {
     'flag': '-r',
     'short': true,
-    'clients': [constants.ANON, constants.SILK, constants.CIF, constants.CORRELATE]
+    'clients': [constants.ANONYMIZE, constants.SILK, constants.CIF, constants.CORRELATE]
   },
   'mapFile': {
     'flag': '-m',
     'short': true,
-    'clients': [constants.ANON, constants.CORRELATE]
+    'clients': [constants.ANONYMIZE, constants.CORRELATE]
   },
   'showJson': {
     'flag': '-J',
     'short': true,
-    'clients': [constants.ANON, constants.SILK]
+    'clients': [constants.ANONYMIZE, constants.SILK]
   },
   'showStats': {
     'flag': '-s',
     'short': true,
-    'clients': [constants.ANON, constants.CIF, constants.CORRELATE]
+    'clients': [constants.ANONYMIZE, constants.CIF, constants.CORRELATE]
   },
   'noHeader': {
     'flag': '-H',

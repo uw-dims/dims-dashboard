@@ -16,7 +16,7 @@ logger.add(winston.transports.Syslog, {
   app_name: 'dimswebapp'
 });
 
-if (process.env.NODE_ENV === 'development') {
+if (config.env === 'development') {
   logger.add(winston.transports.Console, {
     level: 'debug',
     handleExceptions: true,

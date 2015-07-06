@@ -78,7 +78,8 @@ Publisher.prototype.status = function() {
 };
 
 // Listener for the ready event emitted by a RabbitConnection object
-Publisher.prototype.onReady = function() {
+Publisher.prototype.onReady = function(ev) {
+  logger.info('services/Publisher received ready event from RabbitConnection object. Event is ', ev);
   var self = this;
   // Set running property to indicate that this fanout is running
   self.running = true;
@@ -87,9 +88,9 @@ Publisher.prototype.onReady = function() {
 };
 
 // Listener for the close event emitted when a RabbitConnection closes
-Publisher.prototype.onClosed = function() {
+Publisher.prototype.onClosed = function(ev) {
   var self = this;
-  logger.debug('services/Publisher.onClosed: ' + self.name + ': received connection close event');
+  logger.debug('services/Publisher.onClosed: ' + self.name + ': received connection close event. ' + ev);
   self.running = false;
   // Notify others that the fanout has stopped
   self.emit(self.stopEvent);
@@ -97,9 +98,9 @@ Publisher.prototype.onClosed = function() {
 };
 
 // Listener for the close event emitted when a RabbitConnection channel closes
-Publisher.prototype.onChannelClosed = function() {
+Publisher.prototype.onChannelClosed = function(ev) {
   var self = this;
-  logger.debug('services/Publisher.onChannelClosed: ' + self.name + ': received channel close event');
+  logger.debug('services/Publisher.onChannelClosed: ' + self.name + ': received channel close event. ' + ev);
   console.log(self);
   if (self.running) {
     self.initPublish();

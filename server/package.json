@@ -20,7 +20,7 @@
     "csurf": "1.4.1",
     "ejs": "1.0.0",
     "errorhandler": "1.1.1",
-    "express": "4.8.5",
+    "express": "4.12.4",
     "express-json": "1.0.0",
     "express-session": "1.7.6",
     "fileupload": "0.3.0",
@@ -44,11 +44,11 @@
     "connect-redis": "2.1.0",
     "passport": "0.2.1",
     "passport-local": "1.0.0",
-    "connect-flash": "0.1.1",
+ //   "connect-flash": "0.1.1",
     "pg": "3.6.3",
     "sql": "0.40.0",
     "knex": "0.7.3",
-    "bookshelf":"0.7.9",
+    "bookshelf":"0.8.1",
     "q":"1.1.1",
     "crypto-js":"~3.1.2"
   },
@@ -65,8 +65,9 @@
     "time-grunt": "0.3.2",
     "grunt-env": "0.4.2",
     "chai": "1.9.2",
-    "sinon-chai":"2.5.0",
+    "sinon-chai":"2.8.0",
     "mocha":"2.0.1",
-    "supertest":"0.15.0"
+    "supertest":"0.15.0",
+    "sinon": "1.15.4"
   }
 }

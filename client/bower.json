@@ -15,7 +15,7 @@
     "angular-sanitize": "1.2.22",
     "angular-touch": "1.2.22",
     "angular-strap": "2.0.5",
-    "html5shiv-dist": "3.6.2",
+    "html5shiv": "3.7.2",
     "modernizr": "2.8.3",
     "d3": "3.4.8",
     "json3": "3.3.2",

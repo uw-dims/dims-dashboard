@@ -1,4 +1,3 @@
-
 var express = require('express')
   , bodyParser = require('body-parser')
   , compress = require('compression')
@@ -19,14 +18,11 @@ var express = require('express')
   , utils = require('./utils/util')
   , config = require('./config')
   , session = require('express-session')
-  , redis = require('redis')
   , redisStore = require('connect-redis')(session)
-  , pg = require('pg')
-  , sql = require('sql')
+  // , pg = require('pg')
+  // , sql = require('sql')
   , socket = require('socket.io')
-  , flash = require('connect-flash')
-  , passport = require('passport')
-  , LocalStrategy = require('passport-local').Strategy
+  //, flash = require('connect-flash')
   , exec = require('child_process').exec
   , messages = require('./utils/messages')
   , CryptoJS = require('crypto-js')
@@ -45,92 +41,10 @@ var routes = require('./routes')
   // , chat = require('./routes/chat')
   , settings = require('./routes/settings');
 
-var sslOptions = {
-  key: fs.readFileSync(config.server_key),
-  cert: fs.readFileSync(config.server_crt)
-  //ca: fs.readFileSync(config.server_ca)
-  //requestCert: true,
-  //rejectUnauthorized: false
-};
 
-// var redisClient = redis.createClient();
 var redisClient = require('./utils/redisDB');
 
 var app = module.exports = express();
-var env = process.env.NODE_ENV || 'development';
-
-// Set up postgresql connection data to user database
-var dbConfig = {
-  client: 'postgresql',
-  connection: {
-    host: 'localhost',
-    user: 'dims',
-    database: 'ops-trust'
-  }
-};
-
-// Initialize Bookshelf ORM and connect
-var knex = require('knex')(dbConfig);
-var Bookshelf = require('bookshelf')(knex, {debug:true});
-
-// Add virtuals plug-in
-Bookshelf.plugin('virtuals');
-// Make express setting so can be used elsewhere
-app.set('Bookshelf', Bookshelf);
-// Make redisClient available to routes:
-app.set('client', redisClient);
-
-// Get the user model so Passport can use it
-var userdata = require('./models/user')(Bookshelf);
-
-// Passport functions - will put in separate file later
-// Serialize the user info
-passport.serializeUser(function(user, done) {
-  logger.debug('app/passport.serializeUser. user ident is ', user.get('ident'));
-  done(null, user.get('ident'));
-});
-// Deserialize the user info
-passport.deserializeUser(function(ident, done) {
-    new userdata.User({ident: ident}).fetch().then(function(user) {
-        // user here is retrieved from database so can use .get functions
-        return done(null, user);
-    }, function(error) {
-        return done(error);
-    });
-});
-// Use LocalStrategy and set function to check password
-passport.use(new LocalStrategy({
-    usernameField: 'username',
-    passwordField: 'password'
-},function(username, password, done) {
-    // Look up the user corresponding to the supplied username
-    new userdata.User({ident: username}).fetch({require: true}).then(function(user) {
-        // Decrypt password received via http post
-        var decrypted = CryptoJS.AES.decrypt(password, config.passSecret).toString(CryptoJS.enc.Utf8);
-        // Get the user's hashed password from the datastore
-        var pw = user.get('password'); 
-        // Call perl crypt to check password since we are using passwords generated using crypt     
-        var program = 'perl ' + __dirname + '/utils/getPass.pl ' + decrypted + ' ' + '\''+pw+'\'';
-        var child= exec(program, function(error, stdout, stderr) {
-            logger.debug('app/passport.use. getPass results. error, stdout, stderr', error, stdout, stderr);
-            if (error !== null) {
-                logger.error('app/passport.use: exec error. user, error ' , username, error);
-                return done(null, false, error);
-            } 
-            if (pw === stdout) {
-              logger.debug('app/passport.use: Passwords match. Return user');
-              // We are passing back user record
-                return done(null, user);
-            }
-            logger.debug('app/passport.use: Passwords did not match. ', pw);
-            return done(null, false, 'Invalid password');
-        });
-        
-    }, function(error) {
-        logger.debug('app/passport.use. Unknown user ', username);
-        return done(null, false, 'Unknown user');
-    });
-}));
 
 app.engine('html', require('ejs').renderFile);
 
@@ -147,7 +61,7 @@ app.use(bodyParser.urlencoded({
   limit: '50mb'
 }));
 app.use(bodyParser.json());
-app.use(flash());
+//app.use(flash());
 
 
 // Cookies and session
@@ -155,8 +69,8 @@ app.use(cookieParser(config.cookieSecret));
 app.use(session({
   secret: config.sessionSecret,
   store: new redisStore({
-    host: 'localhost',
-    port: 6379,
+    host: config.redisHost,
+    port: config.redisPort,
     client: redisClient,
     // Session time to live - one hour for now - will force logout regardless of activity
     ttl: config.sessionTTL
@@ -165,8 +79,9 @@ app.use(session({
   resave: false // don't save session if unmodified
 }));
 
-app.use(passport.initialize());
-app.use(passport.session());
+// Set app to use Passport
+app.use(require('./services/passport.js').initialize());
+app.use(require('./services/passport.js').session());
 
 // Disabled for now - socket.io inundates the logs
 // Override Express logging - stream logs to logger
@@ -174,8 +89,9 @@ app.use(require('morgan') ('common',{
   'stream': logger.stream
 }));
 
+
 // development only
-if (env === 'development') {
+if (config.env === 'development') {
   app.set('views', path.join(__dirname, '../client/dashboard'));
   app.use(errorHandler());
   app.use(express.static(path.join(__dirname, '../client')));
@@ -190,7 +106,7 @@ if (env === 'development') {
     });
 }
 
-if (env === 'production') {
+if (config.env === 'production') {
     app.set('views', path.join(__dirname, '/dist'));
     app.use(express.static(path.join(__dirname, '/dist')));
     app.use(function(err, req, res, next) {
@@ -276,6 +192,13 @@ app.use('/', router);
   });
 */
 if (config.sslOn) {
+  var sslOptions = {
+    key: fs.readFileSync(config.server_key),
+    cert: fs.readFileSync(config.server_crt)
+    //ca: fs.readFileSync(config.server_ca)
+    //requestCert: true,
+    //rejectUnauthorized: false
+  };
   var server = https.createServer(sslOptions, app);
   var port = app.get('sslport');
 } else {
@@ -325,7 +248,7 @@ var logs = io
   });
 
 server.listen(port);
-
+logger.info('DIMS Dashboard running on port %s', server.address().port);
 // Create subscribers
 var chatSubscriber = new RabbitSocket('chat', 'subscriber', chat);
 var logSubscriber = new RabbitSocket('logs', 'subscriber', logs);
