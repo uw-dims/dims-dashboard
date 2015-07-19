@@ -59,7 +59,20 @@ module.exports = function(grunt) {
         },
         src: ['test/spec/specHelper.js','test/**/*.js']
       }
-    }
+    },
+
+    jshint: {
+      options: {
+        jshintrc: '.jshintrc',
+        reporter: require('jshint-stylish'),
+        force: true
+      },
+      all: {
+        src: [
+          'services/{,*/}*.js'
+        ]
+      }
+    },
   });
-  grunt.registerTask('default', ['env:test','mochaTest']);
+  grunt.registerTask('default', ['env:test', 'jshint', 'mochaTest']);
 };

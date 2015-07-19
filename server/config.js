@@ -40,16 +40,42 @@ config.STATIC = 'static';
 config.userSource = process.env.USER_BACKEND || config.STATIC;
 
 // Put this here for now
-config.testUsers = {
-  'dittrich' : 'dittrich',
-  'lparsons' : 'lparsons',
-  'eliot' : 'eliot',
-  'stuart' : 'stuart',
-  'parksj' : 'parksj',
-  'mboggess' : 'mboggess',
-  'andclay' : 'andclay',
-  'testUser' : 'testUser'
-};
+config.testUsers = 
+  [
+    { 
+      'ident': 'dittrich',
+      'desc': 'David Dittrich',
+      'password': 'dittrich' 
+    }, {
+      'ident': 'lparsons',
+      'desc': 'Linda Parsons',
+      'password': 'lparsons'
+    }, {
+      'ident': 'eliot',
+      'desc': 'Eliot Lim',
+      'password': 'eliot'
+    }, {
+      'ident': 'stuart',
+      'desc': 'Stuart Maclean',
+      'password': 'stuart'
+    }, {
+      'ident': 'parksj',
+      'desc': 'Jeremy Parks',
+      'password': 'parksj'
+    }, {
+      'ident': 'mboggess',
+      'desc': 'Megan Boggess',
+      'password': 'mboggess'
+    }, {
+      'ident': 'andclay',
+      'desc': 'Anderson Nascimento',
+      'password': 'andclay'
+    }, {
+      'ident': 'testuser',
+      'desc': 'Test User',
+      'password': 'testuser'
+    }
+  ];
 
 config.sessionTTL = 7200; //Redis session expiration. 2 hours, in seconds
 

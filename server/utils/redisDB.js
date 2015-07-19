@@ -12,7 +12,7 @@ var client = redis.createClient(
 );
 
 client.on('error', function(err) {
-  logger.error('utils.redisDB: redis client received error: ', err);
+  logger.error('utils.redisDB: ', err);
 });
 
 client.on('ready', function() {

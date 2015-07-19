@@ -23,7 +23,7 @@ var express = require('express')
   // , sql = require('sql')
   , socket = require('socket.io')
   //, flash = require('connect-flash')
-  , exec = require('child_process').exec
+  //, exec = require('child_process').exec
   , messages = require('./utils/messages')
   , CryptoJS = require('crypto-js')
   , logger = require('./utils/logger');
@@ -68,26 +68,23 @@ app.use(bodyParser.json());
 app.use(cookieParser(config.cookieSecret));
 app.use(session({
   secret: config.sessionSecret,
-  store: new redisStore({
-    host: config.redisHost,
-    port: config.redisPort,
-    client: redisClient,
-    // Session time to live - one hour for now - will force logout regardless of activity
-    ttl: config.sessionTTL
-  }),
+  // store: new redisStore({
+  //   host: config.redisHost,
+  //   port: config.redisPort,
+  //   client: redisClient,
+  //   // Session time to live - one hour for now - will force logout regardless of activity
+  //   ttl: config.sessionTTL
+  // }),
   saveUninitialized: false, // don't create session until something stored
   resave: false // don't save session if unmodified
 }));
 
-// Set app to use Passport
-app.use(require('./services/passport.js').initialize());
-app.use(require('./services/passport.js').session());
 
-// Disabled for now - socket.io inundates the logs
+// Disabled for now - Do we need to log http requests? This will generate a lot of output
 // Override Express logging - stream logs to logger
-app.use(require('morgan') ('common',{
-  'stream': logger.stream
-}));
+// app.use(require('morgan') ('common',{
+//   'stream': logger.stream
+// }));
 
 
 // development only
@@ -116,6 +113,15 @@ if (config.env === 'production') {
             error: {}
         });
     });
+}
+
+// Set app to use Passport depending on user backend
+if (config.userSource === config.POSTGRESQL) {
+  app.use(require('./services/passport.js').initialize());
+  app.use(require('./services/passport.js').session());
+} else {
+  app.use(require('./services/passport-static.js').initialize());
+  app.use(require('./services/passport-static.js').session());
 }
 
 // Middleware to be used for every secured route

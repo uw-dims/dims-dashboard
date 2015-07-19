@@ -3,6 +3,8 @@
 // Get the app configuration
 var config = require('../config');
 var logger = require('../utils/logger');
+var  CryptoJS = require('crypto-js');
+var exec = require('child_process').exec;
 
 var passport = require('passport')
   , LocalStrategy = require('passport-local').Strategy;
@@ -10,16 +12,12 @@ var passport = require('passport')
 // Initialize Bookshelf
 var Bookshelf = require('../utils/bookshelf');
 
-// Get the user model so Passport can use it
-if (config.userSource === config.POSTGRESQL) {
-  var userdata = require('../models/user')(Bookshelf);
-} else {
-  
-}
-
+var userdata = require('../models/user')(Bookshelf);
 
 // Specify how to serialize user info
 passport.serializeUser(function(user, done) {
+  console.log('serializeUser');
+  console.log(user);
   logger.debug('app/passport.serializeUser. user ident is ', user.get('ident'));
   done(null, user.get('ident'));
 });
@@ -28,6 +26,8 @@ passport.serializeUser(function(user, done) {
 passport.deserializeUser(function(ident, done) {
     new userdata.User({ident: ident}).fetch().then(function(user) {
         // user here is retrieved from database so can use .get functions
+        logger.debug('services/passport.deserializeUser: retrieved user ', user);
+        console.trace();
         return done(null, user);
     }, function(error) {
         return done(error);
@@ -42,13 +42,15 @@ passport.use(new LocalStrategy({
     passwordField: 'password'
 },function(username, password, done) {
     // Look up the user corresponding to the supplied username
+    logger.debug('services/passport.use Starting function for ', username);
     new userdata.User({ident: username}).fetch({require: true}).then(function(user) {
         // Decrypt password received via http post
+        logger.debug('services/passport.use Retrieved user ', user.get('ident'));
         var decrypted = CryptoJS.AES.decrypt(password, config.passSecret).toString(CryptoJS.enc.Utf8);
         // Get the user's hashed password from the datastore
         var pw = user.get('password'); 
         // Call perl crypt to check password since we are using passwords generated using crypt     
-        var program = 'perl ' + __dirname + '/utils/getPass.pl ' + decrypted + ' ' + '\''+pw+'\'';
+        var program = 'perl ' + __dirname + '/../utils/getPass.pl ' + decrypted + ' ' + '\''+pw+'\'';
         var child= exec(program, function(error, stdout, stderr) {
             logger.debug('app/passport.use. getPass results. error, stdout, stderr', error, stdout, stderr);
             if (error !== null) {
@@ -56,7 +58,7 @@ passport.use(new LocalStrategy({
                 return done(null, false, error);
             } 
             if (pw === stdout) {
-              logger.debug('app/passport.use: Passwords match. Return user');
+              logger.debug('app/passport.use: Passwords match. Return user. ');
               // We are passing back user record
                 return done(null, user);
             }
@@ -69,7 +71,7 @@ passport.use(new LocalStrategy({
         
     }).catch(function(err) {
       var errmsg = '';
-      logger.error('app/passport.use. Unknown user ', username, err);
+      logger.error('app/passport.use. Caught error ', username, err);
       // check for connection refused errors
       if (err.hasOwnProperty('code')) {
         if (err.code === 'ECONNREFUSED') {
