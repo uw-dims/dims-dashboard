@@ -7,7 +7,8 @@
   "scripts": {
     "test": "tape test/**/fileData.js | tap-spec",
     "test-ci": "tape test/**/*.js | tap-xunit",
-    "test-ticket": "tape test/**/ticket.js | tap-spec"
+    "test-ticket": "tape test/**/ticket.js | tap-spec",
+    "test-tap": "LOG_LEVEL=info tape test/**/*.js"
   },
   "dependencies": {
     "JSONStream": "0.8.4",

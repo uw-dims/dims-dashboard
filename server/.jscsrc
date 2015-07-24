@@ -4,5 +4,6 @@
     "verbose": true,
     "requireMultipleVarDecl": null,
     "disallowMultipleVarDecl": null,
-    "requireCommaBeforeLineBreak": null
+    "requireCommaBeforeLineBreak": null,
+    "disallowDanglingUnderscores": { "allExcept": ["_write", "_read"] }
 }

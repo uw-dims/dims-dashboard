@@ -1,7 +1,7 @@
 'use strict';
 
-module.exports = function(grunt) {
-  
+module.exports = function (grunt) {
+
   require('load-grunt-tasks')(grunt);
   require('time-grunt')(grunt);
 
@@ -20,8 +20,8 @@ module.exports = function(grunt) {
   // process.env.PUBLICPORT - port
   // When container is deployed, these environment variables need to be
   // defined. Grunt is then run to write these values to the client config file
-  // These values are the protocol, host, and port that a client will use to 
-  // connect to the app which proxies to the Dashboard. 
+  // These values are the protocol, host, and port that a client will use to
+  // connect to the app which proxies to the Dashboard.
 
   // Defaults:
 
