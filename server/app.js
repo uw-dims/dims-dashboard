@@ -152,12 +152,12 @@ router.get('/data', ensureAuthenticated, data.list);
 // router.get('/stop-chat', ensureAuthenticated, chat.stop);
 // router.get('/status-chat', ensureAuthenticated, chat.status);
 
-// User Settings api 
+// User Settings api
 router.get('/settings', ensureAuthenticated, settings.get);
 router.post('/settings', ensureAuthenticated, settings.update);
 
 // Tickets
-// Get all tickets (ticket objects) 
+// Get all tickets (ticket objects)
 router.get('/api/ticket', require('./routes/ticket').list);
 // Create a ticket
 router.post('/api/ticket', require('./routes/ticket').create);
@@ -171,7 +171,7 @@ router.delete('/api/ticket/:id', require('./routes/ticket').delete);
 router.post('/api/ticket/:id/topic', require('./routes/ticket').addTopic);
 // Get one topic (ticket object, topic object, contents)
 router.get('/api/ticket/topic/:id', require('./routes/ticket').showTopic);
-// Update one topic 
+// Update one topic
 router.put('/api/ticket/topic/:id', require('./routes/ticket').updateTopic);
 // Delete a topic
 router.delete('/api/ticket/topic/:id', require('./routes/ticket').deleteTopic);
@@ -223,7 +223,7 @@ var chatPublisher = new RabbitSocket('chat', 'publisher');
 var chat = io
   .of('/chat')
   .on('connection', function(socket) {
-    
+
     var info = {
       connectionID: socket.conn.id,
       serverAddr: socket.conn.remoteAddress
@@ -242,7 +242,7 @@ var chat = io
 var logs = io
   .of('/logs')
   .on('connection', function(socket) {
-    
+
     var info = {
       connectionID: socket.conn.id,
       serverAddr: socket.conn.remoteAddress

@@ -1,0 +1,8 @@
+{
+    "preset": "crockford",
+    "validateIndentation": 2,
+    "verbose": true,
+    "requireMultipleVarDecl": null,
+    "disallowMultipleVarDecl": null,
+    "requireCommaBeforeLineBreak": null
+}

@@ -21,11 +21,18 @@ var redisScheme = {
   'timestampSuffix': '.__timestamp',
   'topicSuffix': '.__topics',
   'typeSuffix' : '.__type',
+  'fileSuffix' : '.__file',
 
   'tickets': {
     'setName': 'ticket.__tickets',
     'counter': 'ticket.__counter',
     'prefix': 'ticket'
+  },
+
+  'files': {
+    'setName': 'file.__files',
+    'prefix': 'file',
+    'metaSuffix': '.__meta'
   },
 
   'userSettings': {

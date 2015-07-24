@@ -1,10 +1,14 @@
 'use strict';
 
-var db = require('../../../utils/redisUtils');
-var redisDB = require('../../../utils/redisDB');
-var redis = require('redis');
+//var redisDB = require('../../../utils/redisDB');
+//var redis = require('redis');
 var q = require('q');
 var logger = require('../../../utils/logger');
+
+// Redis mock
+var redis = require('redis-js');
+var client = redis.createClient();
+var db = require('../../../utils/redisUtils')(client);
 
 var failOnError = function(err) {
   logger.debug('TEST: Error ', err);

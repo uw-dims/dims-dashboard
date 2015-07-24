@@ -52,13 +52,21 @@ module.exports = function(grunt) {
       }
     },
 
-    mochaTest: {
-      test: {
-        options: {
-          reporter: 'xunit'
-        },
-        src: ['test/spec/specHelper.js','test/**/*.js']
-      }
+    // mochaTest: {
+    //   test: {
+    //     options: {
+    //       reporter: 'spec'
+    //     },
+    //     src: ['test/spec/specHelper.js','test/**/*.js']
+    //   }
+    // },
+
+    tape: {
+      options: {
+        pretty: false,
+        output: 'console'
+      },
+      files: ['test/**/*.js']
     },
 
     jshint: {
@@ -74,5 +82,6 @@ module.exports = function(grunt) {
       }
     },
   });
-  grunt.registerTask('default', ['env:test', 'jshint', 'mochaTest']);
+  grunt.registerTask('default', ['env:test', 'jshint', 'tape']);
+  grunt.registerTask('test', ['env:test', 'tape']);
 };

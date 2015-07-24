@@ -7,16 +7,16 @@
 // Includes
 var config = require('../config');
 var logger = require('../utils/logger');
-var Ticket = require('../models/ticket');
 var KeyGen = require('../models/keyGen');
-var db = require('../utils/redisUtils');
 var redisDB = require('../utils/redisDB');
+var db = require('../utils/redisUtils')(redisDB);
+var Ticket = require('../models/ticket')(db);
 var q = require('q');
 
 /** Creates a ticket plus associated topics if required by supplied ticket type */
 exports.createTicket = function(type, creator, content) {
   var deferred = q.defer();
-  var ticket = new Ticket();
+  var ticket = Ticket.ticketFactory();
   var data;
   logger.debug('services/ticket.createTicket creating ticket');
   ticket.create(type, creator).then(function(reply){

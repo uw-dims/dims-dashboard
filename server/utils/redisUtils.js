@@ -5,23 +5,27 @@
 var config = require('../config');
 var logger = require('./logger');
 var q = require('q');
-var redisDB = require('./redisDB');
+//var redisDB = require('./redisDB');
 var dimsUtils = require('./util');
 
-var hmset = q.nbind(redisDB.hmset, redisDB),
-    incr = q.nbind(redisDB.incr, redisDB),
-    sadd = q.nbind(redisDB.sadd, redisDB),
-    rpush = q.nbind(redisDB.rpush, redisDB),
-    set = q.nbind(redisDB.set, redisDB),
-    get = q.nbind(redisDB.get, redisDB),
-    lrange = q.nbind(redisDB.lrange, redisDB),
-    sismember = q.nbind(redisDB.sismember, redisDB),
-    smembers = q.nbind(redisDB.smembers, redisDB),
-    hgetall = q.nbind(redisDB.hgetall, redisDB),
-    zadd = q.nbind(redisDB.zadd, redisDB),
-    zrange = q.nbind(redisDB.zrange, redisDB),
-    zrank = q.nbind(redisDB.zrank, redisDB),
-    type = q.nbind(redisDB.type, redisDB);
+module.exports = function(client) {
+
+var hmset = q.nbind(client.hmset, client),
+    incr = q.nbind(client.incr, client),
+    sadd = q.nbind(client.sadd, client),
+    rpush = q.nbind(client.rpush, client),
+    set = q.nbind(client.set, client),
+    get = q.nbind(client.get, client),
+    lrange = q.nbind(client.lrange, client),
+    sismember = q.nbind(client.sismember, client),
+    smembers = q.nbind(client.smembers, client),
+    hgetall = q.nbind(client.hgetall, client),
+    zadd = q.nbind(client.zadd, client),
+    zrange = q.nbind(client.zrange, client),
+    zrank = q.nbind(client.zrank, client),
+    zscore = q.nbind(client.zscore, client),
+    zcount = q.nbind(client.zcount, client),
+    type = q.nbind(client.type, client);
 
 // Get all data from redis for different datatypes
 // hash, set, sorted set
@@ -29,11 +33,14 @@ var hmset = q.nbind(redisDB.hmset, redisDB),
 // Gets all data when operation supports returning multiple
 // (as in all hash field-value pairs)
 var getAllData = function(key, dataType) {
+  logger.debug('utils/redisUtils.getAllData. key, dataType: ', key, dataType);
   var deferred = q.defer();
   if (dataType === 'hash') {
+    logger.debug('utils/redisUtils.getAllData. hash');
     hgetall(key).then(function(reply) {
+      logger.debug('utils/redisUtils.getAllData. hash reply: ', reply);
       deferred.resolve(reply);
-    }, function(err, reply) {
+    }).catch(function(err) {
       logger.error('redisUtils.getAllData.hgetall had an err returned from redis', err, reply);
       deferred.reject(err.toString());
     });
@@ -104,23 +111,25 @@ var setData = function(key, dataType, content, score) {
   return deferred.promise;
 };
 
-var functions = {
-  hmset: hmset,
-  incr: incr,
-  sadd: sadd,
-  set: set,
-  get: get,
-  lrange: lrange,
-  hgetall: hgetall,
-  sismember: sismember,
-  smembers: smembers,
-  zadd: zadd,
-  zrange: zrange,
-  zrank: zrank,
-  type: type,
-  getAllData: getAllData,
-  setData: setData
-};
+  return {
+    hmset: hmset,
+    incr: incr,
+    sadd: sadd,
+    set: set,
+    get: get,
+    lrange: lrange,
+    hgetall: hgetall,
+    sismember: sismember,
+    smembers: smembers,
+    zadd: zadd,
+    zrange: zrange,
+    zrank: zrank,
+    zscore: zscore,
+    zcount: zcount,
+    type: type,
+    getAllData: getAllData,
+    setData: setData
+  };
 
-module.exports = functions;
+};
 

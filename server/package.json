@@ -5,9 +5,10 @@
   "description": "Server module for the DIMS Dashboard",
   "private": true,
   "scripts": {
-    "test": "./node_modules/.bin/mocha --recursive -R xunit test/ > test-reports.xml"
+    "test": "tape test/**/fileData.js | tap-spec",
+    "test-ci": "tape test/**/*.js | tap-xunit",
+    "test-ticket": "tape test/**/ticket.js | tap-spec"
   },
-  
   "dependencies": {
     "JSONStream": "0.8.4",
     "async": "0.9.0",
@@ -48,26 +49,33 @@
     "pg": "3.6.3",
     "sql": "0.40.0",
     "knex": "0.7.3",
-    "bookshelf":"0.8.1",
-    "q":"1.1.1",
-    "crypto-js":"~3.1.2"
+    "bookshelf": "0.8.1",
+    "q": "1.1.1",
+    "crypto-js": "~3.1.2"
   },
   "devDependencies": {
+    "chai": "1.9.2",
     "grunt": "0.4.5",
     "grunt-concurrent": "0.5.0",
     "grunt-contrib-clean": "0.5.0",
     "grunt-contrib-copy": "0.5.0",
     "grunt-contrib-jshint": "0.10.0",
     "grunt-contrib-watch": "0.6.1",
+    "grunt-env": "0.4.2",
     "grunt-mocha-test": "0.11.0",
+    "grunt-tape": "0.0.2",
+    "jscs": "^1.13.1",
     "jshint-stylish": "0.2.0",
     "load-grunt-tasks": "0.4.0",
-    "time-grunt": "0.3.2",
-    "grunt-env": "0.4.2",
-    "chai": "1.9.2",
-    "sinon-chai":"2.8.0",
-    "mocha":"2.0.1",
-    "supertest":"0.15.0",
-    "sinon": "1.15.4"
+    "mocha": "2.0.1",
+    "redis-js": "*",
+    "sinon": "1.15.4",
+    "sinon-chai": "2.8.0",
+    "supertest": "0.15.0",
+    "tap": "^1.3.1",
+    "tap-spec": "^4.0.2",
+    "tap-xunit": "^1.1.1",
+    "tape": "^4.0.1",
+    "time-grunt": "0.3.2"
   }
 }

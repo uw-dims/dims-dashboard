@@ -8,10 +8,11 @@
 // Includes
 var config = require('../config');
 var logger = require('../utils/logger');
-var Ticket = require('../models/ticket');
 var KeyGen = require('../models/keyGen');
-var db = require('../utils/redisUtils');
+
 var redisDB = require('../utils/redisDB');
+var db = require('../utils/redisUtils')(redisDB);
+var Ticket = require('../models/ticket')(db);
 var ticketService = require('../services/ticket');
 
 /**
@@ -63,8 +64,8 @@ var _getType = function(req) {
   */
 exports.list = function(req, res) {
   logger.debug('routes/ticket GET');
-  var ticket = new Ticket();
-  ticket.getAllTickets().then(function(reply) {
+  // var ticket = Ticket.ticketFactory();
+  Ticket.getAllTicketKeys().then(function(reply) {
     res.status(200).send({data: reply});
   }, function(err) {
     res.status(400).send(err.toString());
@@ -99,9 +100,10 @@ exports.list = function(req, res) {
   */
 module.exports.show = function(req, res) {
   logger.debug('routes/ticket SHOW, id: ', req.params.id);
-  var ticket = new Ticket();
+  // var ticket = new Ticket();
+  var ticket;
   // Get the ticket object and stored metadata. returns ticket object.
-  ticket.getTicket(req.params.id).then(function(reply) {
+  Ticket.getTicket(req.params.id).then(function(reply) {
     ticket = reply; // update the ticket
       // Get array of associated topic keys
       return ticket.getTopicKeys();
@@ -270,11 +272,13 @@ module.exports.addTopic = function(req, res) {
     content = JSON.parse(content);
   } 
   logger.debug('routes/ticket.addTopic. Content after possible parse is ', content);
-  var ticket = new Ticket();
-  var topic;
-  ticket.getTicket(ticketKey).then(function(reply) {
+  // var ticket = new Ticket();
+  var ticket,
+      topic;
+  Ticket.getTicket(ticketKey).then(function(reply) {
     // This populates the ticket object with metadata stored at the key
     // Add topic will return an error if the topic already exists
+    ticket = reply;
     return ticket.addTopic(name, dataType, content);
   }).then(function(reply) {
       var data = {};
@@ -325,13 +329,15 @@ module.exports.addTopic = function(req, res) {
   */
 module.exports.showTopic = function(req, res) {
   logger.debug('routes/ticket showTopic, id: ', req.params.id);
-  var ticket = new Ticket();
-  var topic;
+  // var ticket = new Ticket();
+  var ticket,
+      topic;
   var topicKey = req.params.id;
 
   var parsedKey = KeyGen.parseTopicKey(req.params.id);
   var ticketKey = parsedKey.ticketKey;
-  ticket.getTicket(ticketKey).then(function(reply) {
+  Ticket.getTicket(ticketKey).then(function(reply) {
+    ticket = reply;
     return ticket.topicFromKey(topicKey);
   }).then(function(reply) {
     // Reply is a topic object
@@ -399,14 +405,16 @@ module.exports.showTopic = function(req, res) {
   */
 module.exports.updateTopic = function(req, res) {
   logger.debug('routes/ticket updateTopic, id: ', req.params.id);
-  var ticket = new Ticket();
-  var topic;
+  // var ticket = new Ticket();
+  var ticket,
+      topic;
   var topicKey = req.params.id;
   var content = req.body.content;
 
   var parsedKey = KeyGen.parseTopicKey(req.params.id);
   var ticketKey = parsedKey.ticketKey;
-  ticket.getTicket(ticketKey).then(function(reply) {
+  Ticket.getTicket(ticketKey).then(function(reply) {
+    ticket = reply; 
     return ticket.topicFromKey(topicKey);
   }).then(function(reply) {
     // Reply is a topic object

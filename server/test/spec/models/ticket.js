@@ -1,14 +1,23 @@
 'use strict'
 
-var Ticket = require('../../../models/ticket');
-var db = require('../../../utils/redisUtils');
-var redisDB = require('../../../utils/redisDB');
-// var redisDB = require('../config');
-var redis = require('redis');
+var test = require('tape');
+
 var logger = require('../../../utils/logger');
-var KeyGen = require('../../../models/keyGen');
-var c = require('../../../config/redisScheme');
+var dimsUtils = require('../../../utils/util');
 var q = require('q');
+var _ = require('lodash');
+
+// Redis mock
+// We will use blocking form for simplicity in test assertions
+var redis = require('redis-js');
+var client = redis.createClient();
+
+// Need db as Ticket argument.
+var db = require('../../../utils/redisUtils')(client);
+var KeyGen = require('../../../models/keyGen');
+// var c = require('../../../config/redisScheme');
+
+var Ticket = require('../../../models/ticket')(db);
 
 // Bootstrap some data
 var user = 'testUser'; // Simulates logged in user
@@ -16,8 +25,8 @@ var user = 'testUser'; // Simulates logged in user
 var topicName1 = 'topicHashData',
     topicDataType1 = 'hash',
     topicContents1 = {
-      'field1':'value1',
-      'field2':'value2'
+      'field1': 'value1',
+      'field2': 'value2'
     },
     topicName2 = 'topicStringData',
     topicDataType2 = 'string',
@@ -25,323 +34,464 @@ var topicName1 = 'topicHashData',
     topicContents2 = 'aaaaaa',
     ticketType1 = 'data';
 
-var createCounter;
+var createCounter = 0;
+var savedTicket;
+var savedKey;
+var savedMeta;
 
-// Perform first before first test starts
-before(function(done) {
-  // Get the redis db
-  logger.debug('TEST: Performing before functions');
-  redis.debug_mode = false;
-  createCounter = 0;
-  done();
-});
-
-// Perform after all tests done
-after(function(done) {
-  logger.debug('Quitting redis');
-  
-  redisDB.flushdb(function(reply) {
-    logger.debug('flushdb reply ',reply);
-    redisDB.quit(function(err, reply) {
-      logger.debug('quit reply ',reply);
-      done();
-    });
-  });
-});
-
-var debugTicketCounter = function(ticket) {
+var debugTicketCounter = function (ticket) {
   createCounter++;
-  logger.debug('TEST:Ticket '+ createCounter +' created: ', ticket.paramString());  
+  logger.debug('TEST:Ticket ' + createCounter + ' created: ', ticket.paramString());
+  // console.log('TEST:Ticket '+ createCounter +' created: ' + ticket.paramString())
 };
 
-var failOnError = function(err) {
+var failOnError = function (err) {
   logger.debug('TEST: Error ', err);
-  expect('Error').to.equal('Success');
+  assert.fail(err);
+  assert.end();
 };
 
-describe('models/Ticket', function() {
+test('Ticket factory should return default ticket object', function (assert) {
+  assert.plan(8);
+  var newTicket = Ticket.ticketFactory();
+  assert.equal(typeof (newTicket.create), 'function');
+  assert.equal(typeof (newTicket.pullTicketMetadata), 'function');
+  assert.equal(typeof (newTicket.getTicketMetadata), 'function');
+  assert.equal(newTicket.num, null);
+  assert.equal(newTicket.creator, null);
+  assert.equal(newTicket.type, null);
+  assert.equal(newTicket.createdTime, null);
+  assert.equal(newTicket.open, true);
+});
 
-  describe('#create', function(done) {
-    it('should have a creator', function(done) {
-      var ticket = new Ticket();
-      ticket.create(ticketType1, user).then(function(ticket) {
-        debugTicketCounter(ticket);
-        expect(ticket.creator).to.equal(user);
-        done();
-      }, function(err) {
-        failOnError(err.toString());
-      }).done();
-    });
-
-    // Need to fix this
-    // it('should fail if creator not supplied', function(done) {
-    //   var ticket = new Ticket();
-    //   ticket.create().then(function(ticket) {
-    //     debugTicketCounter(ticket);
-    //     expect(ticket.creator).to.equal('');
-    //     done();
-    //   }, function(err) {
-    //     failOnError(err.toString());
-    //   }).done();
-    // });
-
-    it('should have a type', function(done) {
-      var ticket = new Ticket();
-      ticket.create(ticketType1, user).then(function(ticket) {
-        debugTicketCounter(ticket);
-        expect(ticket.type).to.equal(ticketType1);
-        done();
-      }, function(err) {
-        failOnError(err.toString());
-      }).done();
-    });
-
-    // Need to fix this
-    // it('should fail if type not supplied', function(done) {
-    //   var ticket = new Ticket();
-    //   ticket.create().then(function(ticket) {
-    //     debugTicketCounter(ticket);
-    //     expect(ticket.type).to.equal('');
-    //     done();
-    //   }, function(err) {
-    //     failOnError(err.toString());
-    //   }).done();
-    // });
-
-    it('should generate a counter for the ticket', function(done) {
-      var ticket = new Ticket();
-      ticket.create(ticketType1, user).then(function(ticket) {
-        debugTicketCounter(ticket);
-        var key = KeyGen.ticketCounterKey();
-        // Get the generated counter
-        return db.get(key);
-      })
-      .then(function(reply) {
-          var num = parseInt(reply);
-          expect(num).to.equal(ticket.num);
-          done();
-      }, function(err) {
-        failOnError(err.toString());
-      }).done();
-    });
-
-    it('should save the ticket key in the tickets set', function(done) {
-      var ticket = new Ticket();
-      ticket.create(ticketType1, user).then(function(ticket) {
-        debugTicketCounter(ticket);
-        // Key to set of tickets
-        var setKey = KeyGen.ticketSetKey();
-        // Key to this ticket
-        var ticketKey = KeyGen.ticketKey(ticket);
-        // This ticket should be in the tickets set
-        db.zrank(setKey,ticketKey).then(function(reply) {
-          expect(reply).not.to.equal(null);
-          done();
-        }, function(err) {
-          failOnError(err.toString());
-        }).done();
-      });
-    });
-
-    it('should set the ticket value correctly', function(done) {
-      var ticket = new Ticket();
-      ticket.create(ticketType1, user).then(function(ticket) {
-        debugTicketCounter(ticket);
-        // Key to this ticket
-        var ticketKey = KeyGen.ticketKey(ticket);
-        // Get the value pointed to by the key
-        db.hgetall(ticketKey).then(function(reply){
-          expect(reply.type).to.equal(ticketType1);
-          expect(reply.creator).to.equal(user);
-          done();
-        }, function(err) {
-          failOnError(err.toString());
-        }).done();
-      });
-    });
+test('Created ticket should have a creator and type as supplied', function (assert) {
+  assert.plan(2);
+  var newTicket = Ticket.ticketFactory();
+  newTicket.create(ticketType1, user)
+  .then(function (ticket) {
+    debugTicketCounter(ticket);
+    assert.equal(ticket.type, ticketType1, 'type equals ' + ticketType1);
+    assert.equal(ticket.creator, user, 'creator equals ' + user);
+  })
+  .catch(function (err) {
+    logger.debug(err);
   });
+});
 
-  describe('#getTicket', function(done) {
-
-    it('should return the stored ticket data', function(done) {
-      var ticket = new Ticket();
-      ticket.create(ticketType1, user).then(function(ticket) {
-        debugTicketCounter(ticket);
-        var key = KeyGen.ticketKey(ticket);
-        var lookedupTicket = new Ticket();
-        lookedupTicket.getTicket(key).then(function(ticket2) {
-          expect(ticket2.creator).to.equal(user);
-          expect(ticket2.type).to.equal(ticketType1);
-          done();
-        });
-      });
-    });
-    it('should return update the calling object', function(done) {
-      var ticket = new Ticket();
-      ticket.create(ticketType1, user).then(function(ticket) {
-        debugTicketCounter(ticket);
-        var key = KeyGen.ticketKey(ticket);
-        var lookedupTicket = new Ticket();
-        lookedupTicket.getTicket(key).then(function(reply) {
-          expect(lookedupTicket.creator).to.equal(user);
-          expect(lookedupTicket.type).to.equal(ticketType1);
-          done();
-        });
-      });
-    });
+test('Creating a ticket should generate a counter for the ticket', function (assert) {
+  assert.plan(1);
+  var newTicket = Ticket.ticketFactory();
+  newTicket.create(ticketType1, user)
+  .then(function (ticket) {
+    debugTicketCounter(ticket);
+    // Now retrieve the latest counter that was generated
+    var key = KeyGen.ticketCounterKey();
+    var result = client.get(key);
+    assert.equal(parseInt(result), ticket.num, 'Latest counter generated equal ticket.num');
+  })
+  .catch(function (err) {
+    logger.debug(err);
   });
+});
 
-  describe('#getAllTickets', function(done) {
-    it('should return all ticket keys', function(done) {
-      var ticket = new Ticket();
-      ticket.getAllTickets().then(function(reply) {
-        expect(reply).not.to.be.empty;
-        done();
-      });
-    });
+test('Creating a ticket should save the ticket key in the set of all ticket keys', function (assert) {
+  assert.plan(1);
+  var newTicket = Ticket.ticketFactory();
+  newTicket.create(ticketType1, user)
+  .then(function (ticket) {
+    debugTicketCounter(ticket);
+    // Key to set of tickets
+    var setKey = KeyGen.ticketSetKey();
+    // Key to this ticket
+    var ticketKey = KeyGen.ticketKey(ticket);
+    // Rank should be greater than or equal to 0.
+    assert.ok (client.zrank (setKey, ticketKey) >= 0, 'Ticket key was saved in ' + setKey);
+  })
+  .catch(function (err) {
+    logger.debug(err);
   });
+});
 
-  describe('#addTopic', function(done) {
-    it('should return a topic object when the content', function(done) {
-      var ticket = new Ticket();
-      ticket.create(ticketType1, user).then(function(ticket) {
-        debugTicketCounter(ticket);
-        ticket.addTopic(topicName1, topicDataType1, topicContents1)
-          .then(function(reply) {
-            expect(reply.parent.creator).to.equal(user);
-            expect(reply.parent.type).to.equal(ticketType1);
-            expect(reply.parent.num).to.equal(createCounter);
-            expect(reply.type).to.equal(ticketType1);
-            expect(reply.name).to.equal(topicName1);
-            expect(reply.dataType).to.equal(topicDataType1);
-            done();
-          });
-      });
-    });
-
-    it('should save the content to the database correctly when dataType is hash', function(done) {
-      var ticket = new Ticket();
-      ticket.create(ticketType1, user).then(function(ticket) {
-        debugTicketCounter(ticket);
-        ticket.addTopic(topicName1, topicDataType1, topicContents1)
-          .then(function(reply) {
-            var key = KeyGen.topicKey(reply);
-            db.hgetall(key).then(function(reply) {
-              expect(reply).to.eql(topicContents1);
-              done();
-            }, function(err, reply) {
-              failOnError(err.toString());
-            }).done();
-          });
-      });
-    });
-
-    it('should save the content to the database correctly when dataType is string', function(done) {
-      var ticket = new Ticket();
-      ticket.create(ticketType1, user).then(function(ticket) {
-        debugTicketCounter(ticket);
-        ticket.addTopic(topicName2, topicDataType2, topicContents2)
-          .then(function(reply) {
-            var key = KeyGen.topicKey(reply);
-            db.get(key).then(function(reply) {
-              expect(reply).to.equal(topicContents2);
-              done();
-            }, function(err, reply) {
-              failOnError(err.toString());
-            }).done();
-          });
-      });
-    });
-
-    it('should save the topic key to the set of topics', function(done) {
-      var ticket = new Ticket();
-      ticket.create(ticketType1, user).then(function(ticket) {
-        debugTicketCounter(ticket);
-        ticket.addTopic(topicName1, topicDataType1, topicContents1)
-          .then(function(reply) {
-            db.zrank(KeyGen.topicListKey(ticket), KeyGen.topicKey(reply)).then(function(reply) {
-              expect(reply).not.to.equal(null);
-              done();
-            }, function(err, reply) {
-              failOnError(err.toString());
-            }).done();
-          });
-      });
-    });
+test('Creating a ticket should save the ticket metadata correctly in the database', function (assert) {
+  var newTicket = Ticket.ticketFactory();
+  newTicket.create(ticketType1, user)
+  .then(function (ticket) {
+    debugTicketCounter(ticket);
+    // Key to this ticket
+    var ticketKey = KeyGen.ticketKey(ticket);
+    // Get the value pointed to by the key
+    var reply = client.hgetall(ticketKey);
+    assert.equal(reply.type, ticketType1, 'Type saved correctly');
+    assert.equal(reply.creator, user, 'Creator saved correctly');
+    assert.equal(reply.open, true, 'Open status saved correctly');
+    assert.end();
+  })
+  .catch(function (err) {
+    logger.debug(err);
   });
-    
- 
-  describe('#getTopicKeys', function(done) {   
-   
-    it('should retrieve all topic keys from a ticket', function(done) {
-      var ticket = new Ticket();
-      ticket.create(ticketType1, user).then(function(ticket) {
-        debugTicketCounter(ticket);
-        ticket.addTopic(topicName1, topicDataType1, topicContents1).then(function(topic1) {
-          // Get the topics
-          ticket.getTopicKeys().then(function(keys) {
-            expect(keys).not.to.be.empty;
-            expect(keys).to.be.instanceof(Array);
-            expect(keys).to.have.length(1);
-            // Add another topic
-            ticket.addTopic(topicName2, topicDataType2, topicContents2).then(function(topic2) {
-              ticket.getTopicKeys().then(function(keys) {
-                expect(keys).not.to.be.empty;
-                expect(keys).to.be.instanceof(Array);
-                expect(keys).to.have.length(2);
-                done();
-              });
-            });
-          });         
-        });
-      });
-    });
+});
+
+test('getAllTicket keys', function (assert) {
+  // Will report number of ticket keys we have saved so far
+  Ticket.getAllTicketKeys()
+  .then(function (reply) {
+    assert.equal(reply.length, 4, 'Array should have 4 keys');
+    assert.end();
+  })
+  .catch(function (err) {
+    logger.debug(err);
   });
+});
 
-  describe('#topicFromKey', function(done) {
+test('getTicket should return populated ticket object', function (assert) {
+  // Create the initial ticket
+  var newTicket = Ticket.ticketFactory();
+  var ticketMeta;
+  newTicket.create(ticketType1, user)
 
-    it('should return the topic object ', function(done) {
-      var ticket = new Ticket();
-      var expectedTopic = {};
-      ticket.create(ticketType1, user).then(function(ticket) {
-        debugTicketCounter(ticket);
-        ticket.addTopic(topicName1, topicDataType1, topicContents1).then(function(topic) {
-          expectedTopic = topic;
-          // Get the topic key
-          var key = KeyGen.topicKey(topic);
-          ticket.topicFromKey(key).then(function(reply) {
-            expect(reply).to.eql(expectedTopic);
-            done();
-          });
-        });
-      });
-
-    });
+  .then(function (meta) {
+    debugTicketCounter(meta);
+    var ticketKey = KeyGen.ticketKey(meta);
+    ticketMeta = meta;
+    //Now retrieve a ticket object via getTicket static method
+    return Ticket.getTicket(ticketKey)
+  })
+  .then(function (reply) {
+    // reply is the new ticket object
+    assert.deepEqual(reply, newTicket, 'Retrieved ticket object equals original object');
+    assert.end();
+  })
+  .catch(function (err) {
+    logger.debug(err);
   });
+});
 
-  describe('#getTopics', function(done) {
-    it('should retrieve all topics from a ticket', function(done) {
-      var ticket = new Ticket();
-      ticket.create(ticketType1, user).then(function(ticket) {
-        debugTicketCounter(ticket);
-        ticket.addTopic(topicName1, topicDataType1, topicContents1).then(function(topic1) {
-          // Add another topic
-            ticket.addTopic(topicName2, topicDataType2, topicContents2).then(function(topic2) {
-              ticket.getTopics().then(function(topics) {
-                expect(topics).not.to.be.empty;
-                expect(topics).to.be.instanceof(Array);
-                expect(topics).to.have.length(2);
-                expect(topics[0]).to.eql(topic1);
-                expect(topics[1]).to.eql(topic2);
-                done();
-              });
-            });       
-        });
-      });
-    });
+// We may pull this function - not sure why we need it
+// test('pullTicketMetadata should return the stored metadata and update the caller', function (assert) {
+//   assert.plan(4);
+//   var newTicket = Ticket.ticketFactory();
+//   newTicket.create(ticketType1, user). then(function (ticket) {
+//     debugTicketCounter(ticket);
+//     // Key to this ticket
+//     var ticketKey = KeyGen.ticketKey(ticket);
+//     // Get the value pointed to by the key
+//     var lookedupTicket = Ticket.ticketFactory();
+//     lookedupTicket.pullTicketMetadata(ticketKey).then(function (reply) {
+//       assert.equal(reply.creator, user);
+//       assert.equal(reply.type, ticketType1);
+//       assert.equal(lookedupTicket.creator, user);
+//       assert.equal(lookedupTicket.type, ticketType1);
+//     });
+
+//   });
+// });
+
+test('addTopic should return topic object with correct metadata', function (assert) {
+  var newTicket = Ticket.ticketFactory();
+  newTicket.create(ticketType1, user)
+  .then(function (meta) {
+    debugTicketCounter(meta);
+    return newTicket.addTopic(topicName1, topicDataType1, topicContents1);
+  })
+  .then(function (reply) {
+    assert.equal(typeof reply, 'object');
+    assert.equal(typeof (reply.save), 'function');
+    assert.equal(typeof (reply.setDataType), 'function');
+    assert.equal(typeof (reply.getDataType), 'function');
+    assert.equal(typeof (reply.setDataType), 'function');
+    assert.equal(reply.parent.creator, user);
+    assert.equal(reply.parent.type, ticketType1);
+    assert.equal(reply.parent.num, createCounter);
+    // Type of topic is same as parent
+    assert.equal(reply.type, ticketType1);
+    assert.equal(reply.name, topicName1);
+    assert.equal(reply.dataType, topicDataType1);
+    assert.end();
+  })
+  .catch(function (err) {
+    logger.debug(err);
   });
+});
 
+test('addTopic should return error if topic already exists', function (assert) {
+  var newTicket = Ticket.ticketFactory();
+  newTicket.create(ticketType1, user)
+  .then(function (meta) {
+    debugTicketCounter(meta);
+    return newTicket.addTopic(topicName1, topicDataType1, topicContents1);
+  })
+  .then(function (reply) {
+    return newTicket.addTopic(topicName1, topicDataType1, topicContents1);
+  })
+  .then(function (reply) {
+    assert.ok(reply instanceof Error, 'Add topic that already exists should return an error');
+    assert.end();
+  })
+  .catch(function (err) {
+    logger.debug(err);
+  });
+});
+
+test('addTopic should save the contents to the database correctly when dataType is hash', function (assert) {
+  var newTicket = Ticket.ticketFactory();
+  newTicket.create(ticketType1, user)
+  .then(function (meta) {
+    debugTicketCounter(meta);
+    return newTicket.addTopic(topicName1, topicDataType1, topicContents1);
+  })
+  .then(function (reply) {
+    // Topic key
+    var key = KeyGen.topicKey(reply);
+    // Get value at key (hash)
+    var result = client.hgetall(key);
+    assert.deepEqual(result, topicContents1);
+    assert.end();
+  })
+  .catch(function (err) {
+    logger.debug(err);
+  });
+});
+
+test('addTopic should save the contents to the database correctly when dataType is string', function (assert) {
+  var newTicket = Ticket.ticketFactory();
+  newTicket.create(ticketType1, user)
+  .then(function (meta) {
+    debugTicketCounter(meta);
+    return newTicket.addTopic(topicName2, topicDataType2, topicContents2);
+  })
+  .then(function (reply) {
+    // Topic key
+    var key = KeyGen.topicKey(reply);
+    // Get value at key (string)
+    var result = client.get(key);
+    assert.equal(result, topicContents2);
+    assert.end();
+  })
+  .catch(function (err) {
+    logger.debug(err);
+  });
 });
 
 
-// EOF
+test('addTopic should save the topic key to the set of topics for this ticket', function (assert) {
+  var newTicket = Ticket.ticketFactory();
+  newTicket.create(ticketType1, user)
+  .then(function (meta) {
+    debugTicketCounter(meta);
+    return newTicket.addTopic(topicName1, topicDataType1, topicContents1);
+  })
+    .then(function (reply) {
+    // reply is topic object
+    // setKey is key to set of Topics for this ticket
+    var setKey = KeyGen.topicListKey(newTicket);
+    // Key to this topic
+    var topicKey = KeyGen.topicKey(reply);
+    // Rank should be greater than or equal to 0.
+    assert.ok(client.zrank(setKey, topicKey) >= 0, 'Set of topics for the ticket contains the topic key');
+    assert.end();
+  })
+  .catch(function (err) {
+    logger.debug(err);
+  });
+});
+
+
+test('Topic.setDatatype should set the dataType of the topic object', function (assert) {
+  var newTicket = Ticket.ticketFactory();
+  newTicket.create(ticketType1, user).then(function (meta) {
+    debugTicketCounter(meta);
+    return newTicket.addTopic(topicName1, topicDataType1, topicContents1);
+  })
+  .then(function (reply) {
+    assert.equal(reply.dataType, topicDataType1);
+    reply.setDataType(topicDataType2);
+    assert.equal(reply.dataType, topicDataType2);
+    assert.end();
+  })
+  .catch(function (err) {
+    logger.debug(err);
+  });
+});
+
+test('Topic.getDataType should get the dataType from the database', function (assert) {
+  var newTicket = Ticket.ticketFactory();
+  newTicket.create(ticketType1, user).then(function (meta) {
+    debugTicketCounter(meta);
+    return newTicket.addTopic(topicName1, topicDataType1, topicContents1);
+  })
+  .then(function (reply) {
+    assert.equal(reply.dataType, topicDataType1);
+    return reply.getDataType();
+  })
+  .then(function (result) {
+    assert.equal(result, topicDataType1);
+    assert.end();
+  })
+  .catch(function (err) {
+    logger.debug(err);
+  });
+});
+
+test('Topic.getTopicMetadata should should return metadata from object', function (assert) {
+  var newTicket = Ticket.ticketFactory();
+  newTicket.create(ticketType1, user).then(function (meta) {
+    debugTicketCounter(meta);
+    return newTicket.addTopic(topicName1, topicDataType1, topicContents1);
+  })
+  .then(function (reply) {
+    var result = reply.getTopicMetadata();
+    var expected = {
+      parent: reply.parent,
+      type: reply.type,
+      name: reply.name,
+      dataType: reply.dataType
+    };
+    assert.deepEqual(result, expected);
+    assert.end();
+  })
+  .catch(function (err) {
+    logger.debug(err);
+  });
+});
+
+test('Topic.getContents should should return contents from database', function (assert) {
+  var newTicket = Ticket.ticketFactory();
+  var topicKey;
+  newTicket.create(ticketType1, user).then(function (meta) {
+    debugTicketCounter(meta);
+    return newTicket.addTopic(topicName1, topicDataType1, topicContents1);
+  })
+  .then(function (reply) {
+    topicKey = KeyGen.topicKey(reply);
+    return reply.getContents();
+  })
+  .then(function (result) {
+    // Manually for test
+    logger.debug('TEST result is ', result);
+    var hashresult = client.hgetall(topicKey, 'hash');
+    logger.debug('TEST key is ', topicKey);
+    logger.debug('TEST hashresult is ', hashresult);
+    assert.deepEqual(result, topicContents1);
+    assert.end();
+  })
+  .catch(function (err) {
+    logger.debug(err);
+  });
+});
+
+test('Topic.exists should report the existence of the topic', function (assert) {
+  var newTicket = Ticket.ticketFactory();
+  newTicket.create(ticketType1, user).then(function (meta) {
+    debugTicketCounter(meta);
+    return newTicket.addTopic(topicName1, topicDataType1, topicContents1);
+  })
+  .then(function (reply) {
+    return reply.exists()
+  })
+  .then(function (result) {
+    assert.ok(result, 'Existing topic reported as true');
+    // Create a new topic for this ticket
+    var newTopic = Ticket.topicFactory({
+      parent: newTicket,
+      type: newTicket.type,
+      name: 'bob',
+      dataType: 'string'
+    });
+    return newTopic.exists()
+  })
+  .then(function (result) {
+    assert.notOk(result, 'Nonexisting topic reported as false');
+    assert.end();
+  })
+  .catch(function (err) {
+    logger.debug(err);
+  });
+});
+
+test('Ticket.getTopicKeys should return the correct keys', function (assert) {
+  var newTicket = Ticket.ticketFactory();
+  var topicKey1,
+      topicKey2;
+  newTicket.create(ticketType1, user).then(function (meta) {
+    debugTicketCounter(meta);
+    return newTicket.addTopic(topicName2, topicDataType2, topicContents2);
+  })
+  .then(function (reply) {
+    // Save key to this topic
+    topicKey1 = KeyGen.topicKey(reply);
+    logger.debug('first key is ', topicKey1);
+    return newTicket.addTopic(topicName1, topicDataType1, topicContents1);
+  })
+  .then(function (reply) {
+    // Save key to second topic
+    topicKey2 = KeyGen.topicKey(reply);
+    logger.debug('second key is ', topicKey2);
+    return newTicket.getTopicKeys();
+  })
+  .then(function (reply) {
+    assert.ok(_.indexOf(reply,topicKey1) > -1, 'Result contains first key');
+    assert.ok(_.indexOf(reply,topicKey2) > -1, 'Result contains second key');
+    assert.equal(reply.length, 2, 'Result only contains 2 keys');
+    assert.end();
+  })
+  .catch(function (err) {
+    logger.debug(err);
+  });
+});
+
+test('Ticket.topicFromKey creates topic object from key', function (assert) {
+  var newTicket = Ticket.ticketFactory();
+  var firstTopic;
+  newTicket.create(ticketType1, user).then(function (meta) {
+    debugTicketCounter(meta);
+    return newTicket.addTopic(topicName2 + '2', topicDataType2, topicContents2);
+  })
+  .then(function (reply) {
+    // Save topic
+    firstTopic = reply;
+    // Get the key
+    var topicKey = KeyGen.topicKey(reply);
+    return newTicket.topicFromKey(topicKey);
+  })
+  .then(function (reply) {
+    // reply should equal firstTopic
+    assert.deepEqual(reply, firstTopic);
+    assert.end();
+  })
+  .catch(function (err) {
+    logger.debug(err);
+  });
+});
+
+test('Ticket.getTopics should return array of Topic objects', function (assert) {
+  var newTicket = Ticket.ticketFactory();
+  var topicKey1, topic1,
+      topicKey2, topic2;
+  newTicket.create(ticketType1, user).then(function (meta) {
+    debugTicketCounter(meta);
+    return newTicket.addTopic(topicName2, topicDataType2, topicContents2);
+  })
+  .then(function (reply) {
+    // Save the topic
+    topic1 = reply;
+    return newTicket.addTopic(topicName1, topicDataType1, topicContents1);
+  })
+  .then(function (reply) {
+    // Save second topic
+    topic2 = reply;
+    // Get the topics
+    return newTicket.getTopics();
+  })
+  .then(function (reply) {
+    assert.equal(reply.length, 2, 'Result only contains 2 topics');
+    // Set is sorted by time, so these should be in time order
+    assert.deepEqual(reply[0], topic1);
+    assert.deepEqual(reply[1], topic2);
+    assert.end();
+  })
+  .catch(function (err) {
+    logger.debug(err);
+  });
+});
+
+
