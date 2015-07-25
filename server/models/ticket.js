@@ -122,21 +122,15 @@ module.exports = function Ticket(db) {
       // Check to see if it already exists
       return topic.exists()
       .then(function (reply) {
-        logger.debug('models/Ticket.addTopic. Reply from topic.exists is ', reply);
         if (!reply) {
           logger.debug('models/Ticket.addTopic. Topic does not exist. Save it. ');
           return topic.save(content).then(function (reply) {
             // Add the topic key to the sorted set of keys
             // The score is the created timestamp, so we don't need to save that
             // elsewhere - can get the score from the set
-            logger.debug('models/Ticket.addTopic. Reply from create is ', reply);
-            logger.debug('models/Ticket.addTopic topicListKey is ', keyGen.topicListKey(self));
-            logger.debug('models/Ticket.addTopic topic key is ', keyGen.topicKey(topic));
-            logger.debug('models/Ticket.addTopic timestamp is ', dimsUtils.createTimestamp());
             return db.zadd(keyGen.topicListKey(self), dimsUtils.createTimestamp(), keyGen.topicKey(topic));
           })
           .then(function (reply) {
-            logger.debug('models/Topic.addTopic. Final reply from add to set is ', reply, ', Now resolve with topic');
             return topic;
           })
           .catch(function (err) {

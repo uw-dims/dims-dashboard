@@ -72,6 +72,14 @@ var keyGen = {
   // Key to the set of file keys
   fileSetKey: function () {
     return c.files.setName;
+  },
+
+  // Key to userSettings for a user
+  userSettingsKey: function (user) {
+    return c.userSettings.prefix + c.delimiter + user;
+  },
+  userSettingsSetKey: function () {
+    return c.userSettings.setName;
   }
 
 };

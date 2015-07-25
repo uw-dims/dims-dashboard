@@ -2,12 +2,10 @@
 
 var test = require('tape');
 
-var logger = require('../../../utils/logger');
-var dimsUtils = require('../../../utils/util');
-var q = require('q');
 var _ = require('lodash');
 var stream = require('stream');
-var util = require('util');
+
+var logger = require('../../../utils/logger');
 
 // Redis mock
 // We will use blocking form for simplicity in test assertions

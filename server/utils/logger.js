@@ -17,8 +17,8 @@ var logger = new (winston.Logger);
 // });
 
 logger.add(winston.transports.File, {
-  level: 'debug',
- // handleExceptions: true,
+  level: config.log_level,
+ handleExceptions: true,
   json: false,
   colorize: false,
   filename: 'dashboard.log',
@@ -28,7 +28,7 @@ logger.add(winston.transports.File, {
 
 if (config.env === 'development') {
   logger.add(winston.transports.Console, {
-    level: 'debug',
+    level: config.log_level,
     handleExceptions: true,
     json: false,
     colorize: true,

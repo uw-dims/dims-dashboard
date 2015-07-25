@@ -80,7 +80,7 @@ var processPython = function(python, req, res) {
       return res.status(200).json({pid: python.pid, data: jsonOutput});
     } catch (e) {
       return res.status(200).json({pid: python.pid, data: output});
-    } 
+    }
   })
 };
 
@@ -113,7 +113,7 @@ exports.processPython = processPython;
 //       } catch (e) {
 //         var result = {status: '200',pid: python.pid, data: output};
 //         return {res: res, result: result};
-//       } 
+//       }
 //     });
 //   });
 // };
@@ -129,7 +129,7 @@ var getSettings = function() {
           if (err) {
               console.log('fs.readFile error', err);
               return err;
-          } 
+          }
           return data;
       });
     } else {

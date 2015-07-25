@@ -3,7 +3,6 @@
 var test = require('tape');
 
 var logger = require('../../../utils/logger');
-var dimsUtils = require('../../../utils/util');
 var _ = require('lodash');
 
 // Redis mock
@@ -14,7 +13,6 @@ var client = redis.createClient();
 // Need db as Ticket argument.
 var db = require('../../../utils/redisUtils')(client);
 var KeyGen = require('../../../models/keyGen');
-// var c = require('../../../config/redisScheme');
 
 var Ticket = require('../../../models/ticket')(db);
 
@@ -41,7 +39,6 @@ var savedMeta;
 var debugTicketCounter = function (ticket) {
   createCounter++;
   logger.debug('TEST:Ticket ' + createCounter + ' created: ', ticket.paramString());
-  // console.log('TEST:Ticket '+ createCounter +' created: ' + ticket.paramString())
 };
 
 var failOnError = function (err) {
@@ -50,7 +47,7 @@ var failOnError = function (err) {
   assert.end();
 };
 
-test('Ticket factory should return default ticket object', function (assert) {
+test('models/ticket.js: ticketFactory should return default ticket object', function (assert) {
   assert.plan(8);
   var newTicket = Ticket.ticketFactory();
   assert.equal(typeof (newTicket.create), 'function');
@@ -63,7 +60,7 @@ test('Ticket factory should return default ticket object', function (assert) {
   assert.equal(newTicket.open, true);
 });
 
-test('Created ticket should have a creator and type as supplied', function (assert) {
+test('models/ticket.js: Created ticket should have a creator and type as supplied', function (assert) {
   assert.plan(2);
   var newTicket = Ticket.ticketFactory();
   newTicket.create(ticketType1, user)
@@ -77,7 +74,7 @@ test('Created ticket should have a creator and type as supplied', function (asse
   });
 });
 
-test('Creating a ticket should generate a counter for the ticket', function (assert) {
+test('models/ticket.js: Creating a ticket should generate a counter for the ticket', function (assert) {
   assert.plan(1);
   var newTicket = Ticket.ticketFactory();
   newTicket.create(ticketType1, user)
@@ -93,7 +90,7 @@ test('Creating a ticket should generate a counter for the ticket', function (ass
   });
 });
 
-test('Creating a ticket should save the ticket key in the set of all ticket keys', function (assert) {
+test('models/ticket.js: Creating a ticket should save the ticket key in the set of all ticket keys', function (assert) {
   assert.plan(1);
   var newTicket = Ticket.ticketFactory();
   newTicket.create(ticketType1, user)
@@ -111,7 +108,7 @@ test('Creating a ticket should save the ticket key in the set of all ticket keys
   });
 });
 
-test('Creating a ticket should save the ticket metadata correctly in the database', function (assert) {
+test('models/ticket.js: Creating a ticket should save the ticket metadata correctly in the database', function (assert) {
   var newTicket = Ticket.ticketFactory();
   newTicket.create(ticketType1, user)
   .then(function (ticket) {
@@ -130,7 +127,7 @@ test('Creating a ticket should save the ticket metadata correctly in the databas
   });
 });
 
-test('getAllTicket keys', function (assert) {
+test('models/ticket.js: getAllTicket keys', function (assert) {
   // Will report number of ticket keys we have saved so far
   Ticket.getAllTicketKeys()
   .then(function (reply) {
@@ -142,7 +139,7 @@ test('getAllTicket keys', function (assert) {
   });
 });
 
-test('getTicket should return populated ticket object', function (assert) {
+test('models/ticket.js: getTicket should return populated ticket object', function (assert) {
   // Create the initial ticket
   var newTicket = Ticket.ticketFactory();
   var ticketMeta;
@@ -165,27 +162,8 @@ test('getTicket should return populated ticket object', function (assert) {
   });
 });
 
-// We may pull this function - not sure why we need it
-// test('pullTicketMetadata should return the stored metadata and update the caller', function (assert) {
-//   assert.plan(4);
-//   var newTicket = Ticket.ticketFactory();
-//   newTicket.create(ticketType1, user). then(function (ticket) {
-//     debugTicketCounter(ticket);
-//     // Key to this ticket
-//     var ticketKey = KeyGen.ticketKey(ticket);
-//     // Get the value pointed to by the key
-//     var lookedupTicket = Ticket.ticketFactory();
-//     lookedupTicket.pullTicketMetadata(ticketKey).then(function (reply) {
-//       assert.equal(reply.creator, user);
-//       assert.equal(reply.type, ticketType1);
-//       assert.equal(lookedupTicket.creator, user);
-//       assert.equal(lookedupTicket.type, ticketType1);
-//     });
 
-//   });
-// });
-
-test('addTopic should return topic object with correct metadata', function (assert) {
+test('models/ticket.js: addTopic should return topic object with correct metadata', function (assert) {
   var newTicket = Ticket.ticketFactory();
   newTicket.create(ticketType1, user)
   .then(function (meta) {
@@ -212,7 +190,7 @@ test('addTopic should return topic object with correct metadata', function (asse
   });
 });
 
-test('addTopic should return error if topic already exists', function (assert) {
+test('models/ticket.js: addTopic should return error if topic already exists', function (assert) {
   var newTicket = Ticket.ticketFactory();
   newTicket.create(ticketType1, user)
   .then(function (meta) {
@@ -231,7 +209,7 @@ test('addTopic should return error if topic already exists', function (assert) {
   });
 });
 
-test('addTopic should save the contents to the database correctly when dataType is hash', function (assert) {
+test('models/ticket.js: addTopic should save the contents to the database correctly when dataType is hash', function (assert) {
   var newTicket = Ticket.ticketFactory();
   newTicket.create(ticketType1, user)
   .then(function (meta) {
@@ -251,7 +229,7 @@ test('addTopic should save the contents to the database correctly when dataType 
   });
 });
 
-test('addTopic should save the contents to the database correctly when dataType is string', function (assert) {
+test('models/ticket.js: addTopic should save the contents to the database correctly when dataType is string', function (assert) {
   var newTicket = Ticket.ticketFactory();
   newTicket.create(ticketType1, user)
   .then(function (meta) {
@@ -272,7 +250,7 @@ test('addTopic should save the contents to the database correctly when dataType 
 });
 
 
-test('addTopic should save the topic key to the set of topics for this ticket', function (assert) {
+test('models/ticket.js: addTopic should save the topic key to the set of topics for this ticket', function (assert) {
   var newTicket = Ticket.ticketFactory();
   newTicket.create(ticketType1, user)
   .then(function (meta) {
@@ -295,7 +273,7 @@ test('addTopic should save the topic key to the set of topics for this ticket', 
 });
 
 
-test('Topic.setDatatype should set the dataType of the topic object', function (assert) {
+test('models/ticket.js: Topic.setDatatype should set the dataType of the topic object', function (assert) {
   var newTicket = Ticket.ticketFactory();
   newTicket.create(ticketType1, user).then(function (meta) {
     debugTicketCounter(meta);
@@ -312,7 +290,7 @@ test('Topic.setDatatype should set the dataType of the topic object', function (
   });
 });
 
-test('Topic.getDataType should get the dataType from the database', function (assert) {
+test('models/ticket.js: Topic.getDataType should get the dataType from the database', function (assert) {
   var newTicket = Ticket.ticketFactory();
   newTicket.create(ticketType1, user).then(function (meta) {
     debugTicketCounter(meta);
@@ -331,7 +309,7 @@ test('Topic.getDataType should get the dataType from the database', function (as
   });
 });
 
-test('Topic.getTopicMetadata should should return metadata from object', function (assert) {
+test('models/ticket.js: Topic.getTopicMetadata should should return metadata from object', function (assert) {
   var newTicket = Ticket.ticketFactory();
   newTicket.create(ticketType1, user).then(function (meta) {
     debugTicketCounter(meta);
@@ -353,7 +331,7 @@ test('Topic.getTopicMetadata should should return metadata from object', functio
   });
 });
 
-test('Topic.getContents should should return contents from database', function (assert) {
+test('models/ticket.js: Topic.getContents should should return contents from database', function (assert) {
   var newTicket = Ticket.ticketFactory();
   var topicKey;
   newTicket.create(ticketType1, user).then(function (meta) {
@@ -378,7 +356,7 @@ test('Topic.getContents should should return contents from database', function (
   });
 });
 
-test('Topic.exists should report the existence of the topic', function (assert) {
+test('models/ticket.js: Topic.exists should report the existence of the topic', function (assert) {
   var newTicket = Ticket.ticketFactory();
   newTicket.create(ticketType1, user).then(function (meta) {
     debugTicketCounter(meta);
@@ -407,7 +385,7 @@ test('Topic.exists should report the existence of the topic', function (assert) 
   });
 });
 
-test('Ticket.getTopicKeys should return the correct keys', function (assert) {
+test('models/ticket.js: Ticket.getTopicKeys should return the correct keys', function (assert) {
   var newTicket = Ticket.ticketFactory();
   var topicKey1,
       topicKey2;
@@ -438,7 +416,7 @@ test('Ticket.getTopicKeys should return the correct keys', function (assert) {
   });
 });
 
-test('Ticket.topicFromKey creates topic object from key', function (assert) {
+test('models/ticket.js: Ticket.topicFromKey creates topic object from key', function (assert) {
   var newTicket = Ticket.ticketFactory();
   var firstTopic;
   newTicket.create(ticketType1, user).then(function (meta) {
@@ -462,7 +440,7 @@ test('Ticket.topicFromKey creates topic object from key', function (assert) {
   });
 });
 
-test('Ticket.getTopics should return array of Topic objects', function (assert) {
+test('models/ticket.js: Ticket.getTopics should return array of Topic objects', function (assert) {
   var newTicket = Ticket.ticketFactory();
   var topicKey1, topic1,
       topicKey2, topic2;
