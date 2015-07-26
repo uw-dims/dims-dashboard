@@ -4,7 +4,7 @@ var passport = require('passport');
 var logger = require('../utils/logger');
 var UserSettings = require('../models/userSettings');
 
-var sessionObject = function(username, name, settings) {
+var sessionObject = function (username, name, settings) {
   var object = {
     user: {
       username: username,
@@ -16,7 +16,7 @@ var sessionObject = function(username, name, settings) {
 };
 
 // Return login session data - user plus settings
-exports.session = function(req,res) {
+exports.session = function (req, res) {
   logger.debug('routes/session.session Starting session.');
   if (req.user) {
     // we are not using ops-trust column names any more
@@ -30,10 +30,10 @@ exports.session = function(req,res) {
 
     // Get associated settings
     var userSettings = new UserSettings(username);
-    userSettings.getSettings().then(function(data) {
+    userSettings.getSettings().then(function (data) {
         var object = sessionObject(username,name,data);
         res.status(200).send({data: object});
-      }).then(function(err) {
+      }).then(function (err) {
         return res.status(400).send(err);
       });
     } else {
@@ -42,7 +42,7 @@ exports.session = function(req,res) {
 };
 
 // Logout user
-exports.logout = function(req,res) {
+exports.logout = function (req, res) {
   if (req.user) {
     // logger.debug('routes/session.logout', req.user.get('id'));
     logger.debug('routes/session.logout', req.user.get('ident'));
@@ -55,9 +55,9 @@ exports.logout = function(req,res) {
 };
 
 // Login user
-exports.login = function(req,res,next) {
+exports.login = function (req, res, next) {
   logger.debug('in session.login');
-  passport.authenticate('local', function(err, user, info) {
+  passport.authenticate('local', function (err, user, info) {
     // Info contains messages regarding why login was unsuccessful  
     //console.trace();
     logger.debug('routes/session.login. Back from authenticate', err, user, info); 
@@ -73,7 +73,7 @@ exports.login = function(req,res,next) {
     // logger.debug('routes/session.login. Successful response from passport.authenticate. err, user, info: ', err, user.get('id'), info);
     logger.debug('routes/session.login. Successful response from passport.authenticate. err, user, info: ', err, user.get('ident'), user.get('desc'), info);  
     // Puts the logged in user in the session and then return user and settings
-    req.logIn(user, function(err) {
+    req.logIn(user, function (err) {
       logger.debug('routes/session.login. Callback from req.logIn');
       if (err !== null && err !== undefined) {
         // req.flash('error', err);
@@ -89,12 +89,12 @@ exports.login = function(req,res,next) {
       logger.debug('routes/session.login. Get user settings for user ', username);
 
       var userSettings = new UserSettings(username);      
-      userSettings.getSettings().then(function(data) {
+      userSettings.getSettings().then(function (data) {
           logger.debug('routes/session.login. callback from userSettings.getSettings. username and name are now ', username, name);
           var object = sessionObject(username,name,data);
           logger.debug('routes/session.login. object is ', object);
           res.status(200).send({data: object});
-        }).then(function(err) {
+        }).then(function (err) {
           return res.status(400).send(err);
         });
      

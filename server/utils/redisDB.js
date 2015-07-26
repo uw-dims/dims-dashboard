@@ -1,10 +1,14 @@
 'use strict';
 
+// File: server/utils/redisDB.js
+// Provides a redis client
+
 var config = require('../config');
-// This makes the client available to whoever requires this file
 var redis = require('redis');
 var logger = require('./logger');
+
 logger.info('utils.redisDB: Attempting to connect to Redis server ' + config.redisHost + ':' + config.redisPort);
+
 var client = redis.createClient(
   config.redisPort,
   config.redisHost,

@@ -4,21 +4,26 @@ var test = require('tape');
 
 var _ = require('lodash');
 var stream = require('stream');
+var proxyquire = require('proxyquire');
 
 var logger = require('../../../utils/logger');
 
 // Redis mock
 // We will use blocking form for simplicity in test assertions
-var redis = require('redis-js');
-var client = redis.createClient();
+var client = require('redis-js');
+// var client = redis.createClient();
+client['@global'] = true;
 
 // Need db as File argument.
-var db = require('../../../utils/redisUtils')(client);
+// var db = require('../../../utils/redisUtils')(client);
 var keyGen = require('../../../models/keyGen');
 var extract = require('../../../models/keyExtract');
 // var c = require('../../../config/redisScheme');
 
-var FileData = require('../../../models/fileData')(db);
+
+var FileData = proxyquire('../../../models/fileData', { 'redis': client });
+
+// var FileData = require('../../../models/fileData')();
 
 // Bootstrap some data
 var user1 = 'testUser1'; // Simulates logged in user
@@ -32,6 +37,8 @@ var fileMeta1 = {
   global: true,
   name: 'main.txt'
 };
+
+logger.debug('FileData', FileData.bob);
 
 test('FileData.fileDataFactory should return file object', function (assert) {
   var newFile = FileData.fileDataFactory(fileMeta1);
@@ -123,6 +130,4 @@ test('FileData content should handle stream', function (assert) {
   source.end();
 });
 
-// test('FileData.getMetaData should return config object from file object', function (assert) {
-//   assert.end();
-// });
+

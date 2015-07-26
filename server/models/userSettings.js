@@ -11,10 +11,10 @@ var config = require('../config'),
 
 module.exports = function UserSettings(db) {
 
-// In progress: refactoring
+  // In progress: refactoring
   var userSettingsFactory = function userSettingsFactory(user, userSettings) {
     var config = {};
-    config.userSettings = userSettings;
+    config.userSettings = userSettings; 
     config.user = user;
     return _.create(userSettingsPrototype, config);
   };
@@ -55,7 +55,19 @@ module.exports = function UserSettings(db) {
 
   // get Settings for a user
   var getSettings = function getSettings(user) {
+    // Save for later in the chain
+    var thisUser = user;
+    // Retrieve the settings for this user via user settings key if they exist
+    return get(keyGen.userSettingsKey(thisUser))
+    .then(function (reply) {
+      // Merge with default in case the settings are null
+      var settings = _.extend({}, config.defaultUserSettings, reply);
+      // Create settings object
+      var settingsObject = userSettingsFactory(thisUser, settings);
+    })
   };
+
+
   var userSettingsPrototype = {
     // Will retrieve settings for logged in user. If settings do not
     // exist, create settings using default.

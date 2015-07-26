@@ -5,10 +5,10 @@
 var config = require('../config');
 var logger = require('./logger');
 var q = require('q');
-//var redisDB = require('./redisDB');
+var client = require('./redisDB');
 var dimsUtils = require('./util');
 
-module.exports = function(client) {
+module.exports = function() {
 
 var hmset = q.nbind(client.hmset, client),
     incr = q.nbind(client.incr, client),

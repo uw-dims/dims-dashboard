@@ -13,10 +13,13 @@ var _ = require('lodash'),
     keyGen = require('./keyGen'),
     extract = require('./keyExtract'),
     logger = require('../utils/logger'),
-    dimsUtils = require('../utils/util');
+    dimsUtils = require('../utils/util'),
+    db = require('../utils/redisUtils');
 
 
-module.exports = function FileData(db) {
+module.exports = function FileData() {
+
+  logger.debug('Got to start of FileData');
 
   // Prototype for each fileData object
   var filePrototype = {
@@ -137,7 +140,8 @@ module.exports = function FileData(db) {
 
   var fileData = {
     fileDataFactory: fileDataFactory,
-    writer: contentWriterFactory
+    writer: contentWriterFactory,
+    bob: 'bob'
   };
 
   return fileData;

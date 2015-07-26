@@ -15,10 +15,9 @@ var express = require('express')
   , https = require('https')
   , fs = require('fs')
   , path = require('path')
-  , utils = require('./utils/util')
   , config = require('./config')
   , session = require('express-session')
-  , redisStore = require('connect-redis')(session)
+  , RedisStore = require('connect-redis')(session)
   // , pg = require('pg')
   // , sql = require('sql')
   , socket = require('socket.io')
@@ -41,9 +40,6 @@ var routes = require('./routes')
   // , chat = require('./routes/chat')
   , settings = require('./routes/settings');
 
-
-var redisClient = require('./utils/redisDB');
-
 var app = module.exports = express();
 
 app.engine('html', require('ejs').renderFile);
@@ -63,18 +59,19 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 //app.use(flash());
 
+//var redisClient = require('./utils/redisDB');
 
 // Cookies and session
 app.use(cookieParser(config.cookieSecret));
 app.use(session({
   secret: config.sessionSecret,
-  // store: new redisStore({
-  //   host: config.redisHost,
-  //   port: config.redisPort,
-  //   client: redisClient,
-  //   // Session time to live - one hour for now - will force logout regardless of activity
-  //   ttl: config.sessionTTL
-  // }),
+  store: new RedisStore ({
+    host: config.redisHost,
+    port: config.redisPort,
+    client: require('./utils/redisDB'),
+    // Session time to live - one hour for now - will force logout regardless of activity
+    ttl: config.sessionTTL
+  }),
   saveUninitialized: false, // don't create session until something stored
   resave: false // don't save session if unmodified
 }));
@@ -94,25 +91,25 @@ if (config.env === 'development') {
   app.use(express.static(path.join(__dirname, '../client')));
   app.use(express.static(path.join(__dirname, '.tmp')));
   app.use(express.static(path.join(__dirname, '../client/dashboard')));
-  app.use(function(err, req, res, next) {
-        res.status(err.status || 500);
-        res.render('error', {
-            message: err.message,
-            error: err
-        });
+  app.use(function (err, req, res, next) {
+    res.status(err.status || 500);
+    res.render('error', {
+      message: err.message,
+      error: err
     });
+  });
 }
 
 if (config.env === 'production') {
-    app.set('views', path.join(__dirname, '/dist'));
-    app.use(express.static(path.join(__dirname, '/dist')));
-    app.use(function(err, req, res, next) {
-        res.status(err.status || 500);
-        res.render('error', {
-            message: err.message,
-            error: {}
-        });
+  app.set('views', path.join(__dirname, '/dist'));
+  app.use(express.static(path.join(__dirname, '/dist')));
+  app.use(function (err, req, res, next) {
+    res.status(err.status || 500);
+    res.render('error', {
+      message: err.message,
+      error: {}
     });
+  });
 }
 
 // Set app to use Passport depending on user backend
@@ -125,7 +122,7 @@ if (config.userSource === config.POSTGRESQL) {
 }
 
 // Middleware to be used for every secured route
-var ensureAuthenticated = function(req, res, next) {
+var ensureAuthenticated = function (req, res, next) {
   if (!req.isAuthenticated()) {
     res.status(401).send();
   } else {
@@ -190,7 +187,7 @@ app.use('/', router);
 // Handle cross-domain requests
 // NOTE: Uncomment this function to enable cross-domain request.
 /*
-  app.options('/upload', function(req, res){
+  app.options('/upload', function (req, res){
   console.log('OPTIONS');
   res.send(true, {
   'Access-Control-Allow-Origin': '*'
@@ -222,7 +219,7 @@ var chatPublisher = new RabbitSocket('chat', 'publisher');
 // Set up chat socket
 var chat = io
   .of('/chat')
-  .on('connection', function(socket) {
+  .on('connection', function (socket) {
 
     var info = {
       connectionID: socket.conn.id,
@@ -230,25 +227,25 @@ var chat = io
     };
     logger.debug('Chat socket.io. Received client connection event: ', info);
     // Send message to fanout when received from client on socket
-    socket.on('chat:client', function(msg) {
+    socket.on('chat:client', function (msg) {
       logger.debug('Chat socket.io: Received client event from client. ConnectionID: ', socket.conn.id, ' msg: ', msg);
       chatPublisher.send(msg);
     });
-    socket.on('disconnect', function(evt) {
+    socket.on('disconnect', function (evt) {
       logger.debug('Chat socket.io: Received disconnect event from client. ConnectionID: ', socket.conn.id);
     });
   });
 // Set up logs socket
 var logs = io
   .of('/logs')
-  .on('connection', function(socket) {
+  .on('connection', function (socket) {
 
     var info = {
       connectionID: socket.conn.id,
       serverAddr: socket.conn.remoteAddress
     };
     logger.debug('Logs socket.io. Received client connection event: ', info);
-    socket.on('disconnect', function(evt) {
+    socket.on('disconnect', function (evt) {
       logger.debug('Logs socket.io: Received disconnect event from client. ConnectionID: ', socket.conn.id);
     });
   });
