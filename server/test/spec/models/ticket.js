@@ -7,8 +7,7 @@ var _ = require('lodash');
 
 // Redis mock
 // We will use blocking form for simplicity in test assertions
-var redis = require('redis-js');
-var client = redis.createClient();
+var client = require('redis-js').createClient();
 
 // Need db as Ticket argument.
 var db = require('../../../utils/redisUtils')(client);

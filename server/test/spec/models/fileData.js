@@ -4,26 +4,29 @@ var test = require('tape');
 
 var _ = require('lodash');
 var stream = require('stream');
-var proxyquire = require('proxyquire');
 
 var logger = require('../../../utils/logger');
 
 // Redis mock
 // We will use blocking form for simplicity in test assertions
-var client = require('redis-js');
-// var client = redis.createClient();
-client['@global'] = true;
+var client = require('redis-js').createClient();
 
-// Need db as File argument.
-// var db = require('../../../utils/redisUtils')(client);
 var keyGen = require('../../../models/keyGen');
 var extract = require('../../../models/keyExtract');
-// var c = require('../../../config/redisScheme');
 
+// Setup service discovery for this test
+var diContainer = require('../../../services/diContainer')();
+diContainer.factory('db', require('../../../utils/redisProxy'));
+diContainer.factory('FileData', require('../../../models/fileData'));
+diContainer.register('client', client);
+var FileData = diContainer.get('FileData');
 
-var FileData = proxyquire('../../../models/fileData', { 'redis': client });
+// var svcLoc = require('../../../utils/serviceLocator')();
+// svcLoc.factory('FileData', require('../../../models/fileData'));
+// svcLoc.factory('db', require('../../../utils/redisUtils'));
+// svcLoc.register('client', client);
 
-// var FileData = require('../../../models/fileData')();
+// var FileData = svcLoc.get('FileData');
 
 // Bootstrap some data
 var user1 = 'testUser1'; // Simulates logged in user
@@ -37,8 +40,6 @@ var fileMeta1 = {
   global: true,
   name: 'main.txt'
 };
-
-logger.debug('FileData', FileData.bob);
 
 test('FileData.fileDataFactory should return file object', function (assert) {
   var newFile = FileData.fileDataFactory(fileMeta1);

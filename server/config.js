@@ -119,13 +119,13 @@ config.userDataPath = '/opt/dims/data/dashboard/mydata/';
 config.demoDatastorePath = '/opt/dims/data/dashboard/data/';
 
 config.directoryMapping = {
-  'ip_lists': config.userDataPath+'ipFiles/',
-  'map_files': config.userDataPath+'mapFiles/',
-  'data_files': config.userDataPath+'dataFiles/'
+  'ip_lists': config.userDataPath + 'ipFiles/',
+  'map_files': config.userDataPath + 'mapFiles/',
+  'data_files': config.userDataPath + 'dataFiles/'
 };
 
 config.defaultMapping = {
-	'default_data': config.data
+  'default_data': config.data
 };
 
 config.rpcQueueNames = {
@@ -136,10 +136,10 @@ config.rpcQueueNames = {
 };
 
 config.defaultUserSettings = {
-    "anonymize": "false",
-    "rpcDebug": "true",
-    "rpcVerbose": "true",
-    "cifbulkQueue": "cifbulk_v1"
+  'anonymize': false,
+  'rpcDebug': true,
+  'rpcVerbose': true,
+  'cifbulkQueue': 'cifbulk_v1'
 };
 
 // config.keyPrefixes = {

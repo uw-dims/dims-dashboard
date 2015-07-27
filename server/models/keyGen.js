@@ -75,8 +75,8 @@ var keyGen = {
   },
 
   // Key to userSettings for a user
-  userSettingsKey: function (user) {
-    return c.userSettings.prefix + c.delimiter + user;
+  userSettingsKey: function (userSettings) {
+    return c.userSettings.prefix + c.delimiter + userSettings.user;
   },
   userSettingsSetKey: function () {
     return c.userSettings.setName;

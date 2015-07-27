@@ -40,6 +40,15 @@ var routes = require('./routes')
   // , chat = require('./routes/chat')
   , settings = require('./routes/settings');
 
+// Dependency injection container
+var diContainer = require('./services/diContainer');
+// diContainer.factory('redisClient', require('./utils/redisDB'));
+// diContainer.factory('redisUtils', require('./utils/redisUtils'));
+// diContainer.factory('db', require('./utils/redisUtils')(require('./utils/redisDB')));
+// diContainer.factory('ticket', require('./routes/ticket'));
+// diContainer.factory('ticketService', require('./services/ticketService'));
+// diContainer.factory('settingsService', require('./services/settingsService'));
+
 var app = module.exports = express();
 
 app.engine('html', require('ejs').renderFile);
