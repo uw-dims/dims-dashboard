@@ -3,7 +3,7 @@
 var test = require('tape-catch');
 
 var logger = require('../../../utils/logger');
-var _ = require('lodash');
+var _ = require('lodash-compat');
 
 // Redis mock
 // We will use blocking form for simplicity in test assertions
@@ -49,14 +49,14 @@ var failOnError = function (err) {
 test('models/ticket.js: ticketFactory should return default ticket object', function (assert) {
   assert.plan(8);
   var newTicket = Ticket.ticketFactory();
-  assert.equal(typeof (newTicket.create), 'function');
-  assert.equal(typeof (newTicket.pullTicketMetadata), 'function');
-  assert.equal(typeof (newTicket.getTicketMetadata), 'function');
-  assert.equal(newTicket.num, null);
-  assert.equal(newTicket.creator, null);
-  assert.equal(newTicket.type, null);
-  assert.equal(newTicket.createdTime, null);
-  assert.equal(newTicket.open, true);
+  assert.equal(typeof (newTicket.create), 'function', 'Ticket has create function');
+  assert.equal(typeof (newTicket.pullTicketMetadata), 'function', 'Ticket has pullTicketMetadata function');
+  assert.equal(typeof (newTicket.getTicketMetadata), 'function', 'Ticket has getTicketMetadata function');
+  assert.equal(newTicket.num, null, 'Ticket has default counter value');
+  assert.equal(newTicket.creator, null, 'Ticket has default creator value');
+  assert.equal(newTicket.type, null, 'Ticket has default type value');
+  assert.equal(newTicket.createdTime, null, 'Ticket has default createdTime');
+  assert.equal(newTicket.open, true, 'Ticket has default of open = true');
 });
 
 test('models/ticket.js: Created ticket should have a creator and type as supplied', function (assert) {
@@ -170,18 +170,17 @@ test('models/ticket.js: addTopic should return topic object with correct metadat
     return newTicket.addTopic(topicName1, topicDataType1, topicContents1);
   })
   .then(function (reply) {
-    assert.equal(typeof reply, 'object');
-    assert.equal(typeof (reply.save), 'function');
-    assert.equal(typeof (reply.setDataType), 'function');
-    assert.equal(typeof (reply.getDataType), 'function');
-    assert.equal(typeof (reply.setDataType), 'function');
-    assert.equal(reply.parent.creator, user);
-    assert.equal(reply.parent.type, ticketType1);
-    assert.equal(reply.parent.num, createCounter);
+    assert.equal(typeof reply, 'object', 'Reply is an object');
+    assert.equal(typeof (reply.save), 'function', 'Reply has save method');
+    assert.equal(typeof (reply.setDataType), 'function', 'Reply has setDataType method');
+    assert.equal(typeof (reply.getDataType), 'function', 'Reply has getDataType method');
+    assert.equal(reply.parent.creator, user, 'Reply has correct parent.creator');
+    assert.equal(reply.parent.type, ticketType1, 'Reply has correct parent.type');
+    assert.equal(reply.parent.num, createCounter, 'Reply has correct parent counter');
     // Type of topic is same as parent
-    assert.equal(reply.type, ticketType1);
-    assert.equal(reply.name, topicName1);
-    assert.equal(reply.dataType, topicDataType1);
+    assert.equal(reply.type, ticketType1, 'Reply topic type is the same as parent');
+    assert.equal(reply.name, topicName1, 'Reply has correct topic name');
+    assert.equal(reply.dataType, topicDataType1, 'Reply has correct topic dataType');
     assert.end();
   })
   .catch(function (err) {
@@ -220,7 +219,7 @@ test('models/ticket.js: addTopic should save the contents to the database correc
     var key = KeyGen.topicKey(reply);
     // Get value at key (hash)
     var result = client.hgetall(key);
-    assert.deepEqual(result, topicContents1);
+    assert.deepEqual(result, topicContents1, 'Contents were saved correctly for hash');
     assert.end();
   })
   .catch(function (err) {
@@ -240,7 +239,7 @@ test('models/ticket.js: addTopic should save the contents to the database correc
     var key = KeyGen.topicKey(reply);
     // Get value at key (string)
     var result = client.get(key);
-    assert.equal(result, topicContents2);
+    assert.equal(result, topicContents2, 'Contents were saved correctly for string');
     assert.end();
   })
   .catch(function (err) {
@@ -279,9 +278,9 @@ test('models/ticket.js: Topic.setDatatype should set the dataType of the topic o
     return newTicket.addTopic(topicName1, topicDataType1, topicContents1);
   })
   .then(function (reply) {
-    assert.equal(reply.dataType, topicDataType1);
+    assert.equal(reply.dataType, topicDataType1, 'Original dataType is correct (from parent)');
     reply.setDataType(topicDataType2);
-    assert.equal(reply.dataType, topicDataType2);
+    assert.equal(reply.dataType, topicDataType2, 'DataType was modified');
     assert.end();
   })
   .catch(function (err) {
@@ -296,11 +295,11 @@ test('models/ticket.js: Topic.getDataType should get the dataType from the datab
     return newTicket.addTopic(topicName1, topicDataType1, topicContents1);
   })
   .then(function (reply) {
-    assert.equal(reply.dataType, topicDataType1);
+    assert.equal(reply.dataType, topicDataType1, 'Original datatype as created');
     return reply.getDataType();
   })
   .then(function (result) {
-    assert.equal(result, topicDataType1);
+    assert.equal(result, topicDataType1, 'getDataType returns the topic dataType');
     assert.end();
   })
   .catch(function (err) {
@@ -322,7 +321,7 @@ test('models/ticket.js: Topic.getTopicMetadata should should return metadata fro
       name: reply.name,
       dataType: reply.dataType
     };
-    assert.deepEqual(result, expected);
+    assert.deepEqual(result, expected, 'getTopicMetadata returns metadata from object');
     assert.end();
   })
   .catch(function (err) {
@@ -343,11 +342,8 @@ test('models/ticket.js: Topic.getContents should should return contents from dat
   })
   .then(function (result) {
     // Manually for test
-    logger.debug('TEST result is ', result);
     var hashresult = client.hgetall(topicKey, 'hash');
-    logger.debug('TEST key is ', topicKey);
-    logger.debug('TEST hashresult is ', hashresult);
-    assert.deepEqual(result, topicContents1);
+    assert.deepEqual(result, topicContents1, 'Contents retrieved from database');
     assert.end();
   })
   .catch(function (err) {
@@ -395,18 +391,16 @@ test('models/ticket.js: Ticket.getTopicKeys should return the correct keys', fun
   .then(function (reply) {
     // Save key to this topic
     topicKey1 = KeyGen.topicKey(reply);
-    logger.debug('first key is ', topicKey1);
     return newTicket.addTopic(topicName1, topicDataType1, topicContents1);
   })
   .then(function (reply) {
     // Save key to second topic
     topicKey2 = KeyGen.topicKey(reply);
-    logger.debug('second key is ', topicKey2);
     return newTicket.getTopicKeys();
   })
   .then(function (reply) {
-    assert.ok(_.indexOf(reply,topicKey1) > -1, 'Result contains first key');
-    assert.ok(_.indexOf(reply,topicKey2) > -1, 'Result contains second key');
+    assert.ok(_.indexOf(reply, topicKey1) > -1, 'Result contains first key');
+    assert.ok(_.indexOf(reply, topicKey2) > -1, 'Result contains second key');
     assert.equal(reply.length, 2, 'Result only contains 2 keys');
     assert.end();
   })
@@ -431,7 +425,7 @@ test('models/ticket.js: Ticket.topicFromKey creates topic object from key', func
   })
   .then(function (reply) {
     // reply should equal firstTopic
-    assert.deepEqual(reply, firstTopic);
+    assert.deepEqual(reply, firstTopic, 'Topic created from key');
     assert.end();
   })
   .catch(function (err) {
@@ -461,8 +455,8 @@ test('models/ticket.js: Ticket.getTopics should return array of Topic objects', 
   .then(function (reply) {
     assert.equal(reply.length, 2, 'Result only contains 2 topics');
     // Set is sorted by time, so these should be in time order
-    assert.deepEqual(reply[0], topic1);
-    assert.deepEqual(reply[1], topic2);
+    assert.deepEqual(reply[0], topic1, 'First topic key in array');
+    assert.deepEqual(reply[1], topic2, 'Second topic key in array');
     assert.end();
   })
   .catch(function (err) {

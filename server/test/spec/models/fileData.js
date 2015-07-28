@@ -2,7 +2,7 @@
 
 var test = require('tape-catch');
 
-var _ = require('lodash');
+var _ = require('lodash-compat');
 var stream = require('stream');
 
 var logger = require('../../../utils/logger');

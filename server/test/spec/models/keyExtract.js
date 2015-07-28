@@ -13,17 +13,17 @@ var fileKey3 = 'file:global:boxes:remnants:partial.jpg';
 
 test('models/keyExtract.js: keyExtract should operate on file keys', function (assert) {
 
-  assert.equal(keyExtract.fileName(fileKey1), 'main.txt');
-  assert.equal(keyExtract.fileName(fileKey2), 'data.txt');
-  assert.equal(keyExtract.fileName(fileKey3), 'partial.jpg');
-  assert.ok(keyExtract.isFileGlobal(fileKey1));
-  assert.ok(keyExtract.isFileGlobal(fileKey3));
-  assert.notOk(keyExtract.isFileGlobal(fileKey2));
-  assert.equal(keyExtract.filePath(fileKey1), 'boxes/main.txt');
-  assert.equal(keyExtract.filePath(fileKey2), 'user1/cif/test1/data.txt');
-  assert.equal(keyExtract.filePath(fileKey3), 'boxes/remnants/partial.jpg');
-  assert.equal(keyExtract.fileSubPath(fileKey1), 'boxes/');
-  assert.equal(keyExtract.fileSubPath(fileKey2), 'cif/test1/');
-  assert.equal(keyExtract.fileSubPath(fileKey3), 'boxes/remnants/');
+  assert.equal(keyExtract.fileName(fileKey1), 'main.txt', 'File name extracted');
+  assert.equal(keyExtract.fileName(fileKey2), 'data.txt', 'File name extracted');
+  assert.equal(keyExtract.fileName(fileKey3), 'partial.jpg', 'File name extracted');
+  assert.ok(keyExtract.isFileGlobal(fileKey1), 'File is in global namespace');
+  assert.ok(keyExtract.isFileGlobal(fileKey3), 'File is in global namespace');
+  assert.notOk(keyExtract.isFileGlobal(fileKey2), 'File is in user namespace');
+  assert.equal(keyExtract.filePath(fileKey1), 'boxes/main.txt', 'Path to file extracted');
+  assert.equal(keyExtract.filePath(fileKey2), 'user1/cif/test1/data.txt', 'Path to file extracted');
+  assert.equal(keyExtract.filePath(fileKey3), 'boxes/remnants/partial.jpg','Path to file extracted');
+  assert.equal(keyExtract.fileSubPath(fileKey1), 'boxes/', 'Subpath extracted');
+  assert.equal(keyExtract.fileSubPath(fileKey2), 'cif/test1/', 'Subpath extracted');
+  assert.equal(keyExtract.fileSubPath(fileKey3), 'boxes/remnants/', 'Subpath extracted');
   assert.end();
 });
