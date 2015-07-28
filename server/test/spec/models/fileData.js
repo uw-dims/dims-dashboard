@@ -1,6 +1,6 @@
 'use strict'
 
-var test = require('tape');
+var test = require('tape-catch');
 
 var _ = require('lodash');
 var stream = require('stream');
@@ -41,7 +41,7 @@ var fileMeta1 = {
   name: 'main.txt'
 };
 
-test('FileData.fileDataFactory should return file object', function (assert) {
+test('models/fileData.js: FileData.fileDataFactory should return file object', function (assert) {
   var newFile = FileData.fileDataFactory(fileMeta1);
   assert.equal(typeof (newFile.save), 'function', 'Object should have save function');
   assert.equal(typeof (newFile.getFileMetadata), 'function', 'Object should have getMetaData function');
@@ -53,7 +53,7 @@ test('FileData.fileDataFactory should return file object', function (assert) {
   assert.end();
 });
 
-test('FileData.fileDataFactory should validate config and options should override defaults', function (assert) {
+test('models/fileData.js: FileData.fileDataFactory should validate config and options should override defaults', function (assert) {
   var newFile = FileData.fileDataFactory();
   assert.ok(newFile instanceof Error, 'Empty options should return error object');
   newFile = FileData.fileDataFactory({
@@ -95,7 +95,7 @@ test('FileData.fileDataFactory should validate config and options should overrid
   assert.end();
 });
 
-test('FileData save should save file contents and key', function (assert) {
+test('models/fileData.js: FileData save should save file contents and key', function (assert) {
   var newFile = FileData.fileDataFactory(fileMeta1);
   if (newFile instanceof Error) {
     assert.fail();
@@ -105,7 +105,7 @@ test('FileData save should save file contents and key', function (assert) {
       var content = client.get(keyGen.fileKey(newFile));
       assert.equal(content, contents1, 'Saved content equals expected.');
       assert.deepEqual(client.hgetall(keyGen.fileMetaKey(newFile)), newFile.getFileMetadata(), 'Saved metadata equals expected');
-      assert.ok(client.zrank(keyGen.fileSetKey(), keyGen.fileKey(newFile)) === 0, 'Key to file saved in set of keys');
+      assert.ok(client.zrank(keyGen.fileSetKey(newFile), keyGen.fileKey(newFile)) === 0, 'Key to file saved in set of keys');
       assert.end();
     }).catch(function (err) {
       logger.debug(err);
@@ -114,7 +114,7 @@ test('FileData save should save file contents and key', function (assert) {
 
 });
 
-test('FileData content should handle stream', function (assert) {
+test('models/fileData.js: FileData content should handle stream', function (assert) {
   var source = stream.PassThrough();
   var newFile = FileData.fileDataFactory(fileMeta1);
   var newWriter = FileData.writer(newFile);

@@ -30,9 +30,11 @@ var redisScheme = {
   },
 
   'files': {
-    'setName': 'file.__files',
+    // 'setName': 'file.__files',
     'prefix': 'file',
-    'metaSuffix': '.__meta'
+    'metaSuffix': '.__meta',
+    'setSuffix' : '.__files',
+    'globalRoot': 'global'
   },
 
   'userSettings': {
@@ -51,7 +53,7 @@ module.exports = redisScheme;
 /**
 	* =====================================
 	* UserSettings
-	* Keys are constructed as prefix:username, where prefix is defined in types (types.userSettings.prefix) and username is the 
+	* Keys are constructed as prefix:username, where prefix is defined in types (types.userSettings.prefix) and username is the
 	* username (userid) of the logged in user.
   * Keys are stored in a set named types.userSettings.set. Therefore, all userSetting keys can be
   * retrieved using SMEMBERS types.userSettings.set (return value is an array). You could also use

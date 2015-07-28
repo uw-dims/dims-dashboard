@@ -3,13 +3,13 @@
 var config = require('../config');
 var logger = require('../utils/logger');
 var q = require('q');
-var _ = require('lodash');
+var _ = require('lodash-compat');
 var tmp = require('tmp');
 var fs = require('fs');
 var settings = require('./settings');
 
 /**
-  * @param {string} params.type "ipgrep" or "anon" or undefined (default is anon). 
+  * @param {string} params.type "ipgrep" or "anon" or undefined (default is anon).
   * @param {object} params
   * @param {string} params.debug True if debug mode requested
   * @param {string} params.verbose True if verbose mode requested
@@ -21,7 +21,7 @@ var settings = require('./settings');
   * @param {string} user  ID of logged in user
   */
 
-exports.setup = function(params, user) {
+exports.setup = function (params, user) {
   var deferred = q.defer();
 
   var data = params.data;
@@ -31,34 +31,38 @@ exports.setup = function(params, user) {
 
   if (!params.useFile) {
     logger.debug('services/anonymize.setup - not using file');
-    if (typeof params.data === 'object' ) data = JSON.stringify(data);
+    if (typeof params.data === 'object') {
+      data = JSON.stringify(data);
+    }
     // logger.debug('services/anonymize.setup - data is ', data);
   }
 
-  _setInputs(params, id).then(function(inputArray) {
+  _setInputs(params, id).then(function (inputArray) {
     logger.debug('services/anonymize.setup setInputs returned ', inputArray);
     return _setFileInput(inputArray, params.type, params.useFile, data);
 
-  }).then(function(reply) {
-      deferred.resolve(reply);
-  }); 
+  }).then(function (reply) {
+    deferred.resolve(reply);
+  });
   return deferred.promise;
 };
 
 /** Sets up the command input for the input file. Returns a promise with inputArray. */
-var _setFileInput = function(inputArray, type, useFile, data) {
+var _setFileInput = function (inputArray, type, useFile, data) {
   var deferred = q.defer();
   logger.debug('services/anonymize._setFileInput type ', type, 'useFile ', useFile, 'inputArray ', inputArray);
-  if(type != 'ipgrep') inputArray.push('-r');
+  if (type != 'ipgrep') {
+    inputArray.push('-r');
+  }
   if (useFile) {
     inputArray.push(data);
     deferred.resolve(inputArray);
   } else {
-    _writeTempFile(data).then(function(path) {
+    _writeTempFile(data).then(function (path) {
       inputArray.push(path);
       logger.debug('services/anonymize._setFileInput after writeTempFile. path is ', path);
       deferred.resolve(inputArray);
-    }, function(err,reply) {
+    }, function (err,reply) {
       deferred.reject(err);
     });
   }
@@ -66,17 +70,21 @@ var _setFileInput = function(inputArray, type, useFile, data) {
 };
 
 /** Writes a temporary file with content. Returns promise with path. */
-var _writeTempFile = function(content) {
+var _writeTempFile = function (content) {
   var deferred = q.defer();
   var filePath;
   logger.debug('services/anonymize._writeTempFile start');
-  tmp.file(function _tempFileCreated(err,path,fd) {
-    if (err) deferred.reject(err);
-    else {
+  tmp.file(function _tempFileCreated(err, path, fd) {
+    if (err) {
+      deferred.reject(err);
+    } else {
       filePath = path;
-      fs.writeFile(filePath, content, function(err) {
-        if (err) deferred.reject(err);
-        else deferred.resolve(filePath);
+      fs.writeFile(filePath, content, function (err) {
+        if (err) {
+          deferred.reject(err);
+        } else {
+          deferred.resolve(filePath);
+        }
       });
     }
   });
@@ -84,7 +92,7 @@ var _writeTempFile = function(content) {
 };
 
 /** Sets up the inputArray. Returns promise with inputArray */
-var _setInputs = function(params, id) {
+var _setInputs = function (params, id) {
 
   var deferred = q.defer();
   logger.debug('services/anonymize._setInputs start: type ', params.type, ' id ', id, ' stats ', params.stats);
@@ -93,21 +101,23 @@ var _setInputs = function(params, id) {
       rpcClientApp = 'anon_client',
       ipgrepApp = 'ipgrep';
 
-    if (params.type === 'ipgrep') {
-      // Need to fix this - not currently using it
-      var inputArray = [config.bin + ipgrepApp, '-a', '--context', '-v', '-n', '/etc/ipgrep_networks.yml'];
-      deferred.resolve(inputArray);
-    } else {
-      logger.debug('services/anonymize._setInputs. Not ipgrep, so get settings for ', id);
-      settings.get(id).then(function(settings) {
+  if (params.type === 'ipgrep') {
+    // Need to fix this - not currently using it
+    var inputArray = [config.bin + ipgrepApp, '-a', '--context', '-v', '-n', '/etc/ipgrep_networks.yml'];
+    deferred.resolve(inputArray);
+  } else {
+    logger.debug('services/anonymize._setInputs. Not ipgrep, so get settings for ', id);
+    settings.get(id).then(function (settings) {
         logger.debug('service/anonymize._setInputs settings are ', settings);
         var inputArray = [config.bin + rpcClientApp, '--server', config.rpcServer,
-            '--queue-base', rpcQueuebase]; 
+            '--queue-base', rpcQueuebase];
         settings.rpcDebug === 'true' ? inputArray.push ('--debug') : '';
         settings.rpcVerbose === 'true' ? inputArray.push ('--verbose') : '';
 
         params.stats === 'true' ? inputArray.push('-s') : '';
-        if (params.outputType == 'json') inputArray.push('-J');   
+        if (params.outputType == 'json') {
+          inputArray.push('-J');
+        }
         if (params.mapName !== undefined) {
           inputArray.push('-m');
           inputArray.push(params.mapName);
@@ -118,8 +128,8 @@ var _setInputs = function(params, id) {
           inputArray.push('/etc/ipgrep_networks.yml');
         }
         deferred.resolve(inputArray);
-      });    
-    }  
+      });
+  }
   return deferred.promise;
 };
 

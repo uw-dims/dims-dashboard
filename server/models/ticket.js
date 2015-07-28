@@ -10,7 +10,7 @@ var config = require('../config'),
     extract = require('./keyExtract'),
     logger = require('../utils/logger'),
     q = require('q'),
-    _ = require('lodash'),
+    _ = require('lodash-compat'),
     dimsUtils = require('../utils/util');
 
 // exports = module.exports = Ticket;

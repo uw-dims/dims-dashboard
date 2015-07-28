@@ -4,7 +4,7 @@
   * file: models/fileData.js
   */
 
-var _ = require('lodash'),
+var _ = require('lodash-compat'),
     stream = require('stream'),
     util = require('util'),
 
@@ -28,8 +28,8 @@ module.exports = function FileData(db) {
       var self = this;
       self.createdTime = dimsUtils.createTimestamp();
       self.modifiedTime = self.createdTime;
-      // Convert slashes in path to delimiter (:) for key
-      self.path = pathToKey(self.path);
+      // scrub the path a bit
+      self.path = scrubPath(self.path);
 
       // Save the contents
       return db.set(keyGen.fileKey(self), content)
@@ -39,27 +39,31 @@ module.exports = function FileData(db) {
       })
       .then(function (reply) {
         // Successfully saved the file and metadata. Now add key to set of keys
-        return db.zadd(keyGen.fileSetKey(), self.createdTime, keyGen.fileKey(self));
+        return db.zadd(keyGen.fileSetKey(self), self.createdTime, keyGen.fileKey(self));
       })
       .then(function (reply) {
         // Return the file object
         return self;
       })
       .catch(function (err) {
-        logger.error('models/File.create had an err returned from redis', err, reply);
+        logger.error('models/File.create had an err returned from redis', err);
         return new Error(err.toString());
       });
     },
 
     exists: function exits() {
       var self = this;
-      return db.zrank(keyGen.fileSetKey(), keyGen.fileKey(self))
+      return db.zrank(keyGen.fileSetKey(self), keyGen.fileKey(self))
       .then(function (reply) {
         if (reply >= 0) {
           return true;
         } else {
           return false;
         }
+      })
+      .catch(function (err) {
+        logger.error('models/File.create had an err returned from redis', err);
+        return new Error(err.toString());
       });
 
     },
@@ -90,6 +94,8 @@ module.exports = function FileData(db) {
     if (validateConfig(config) instanceof Error) {
       return validateConfig(config);
     }
+    // scrub the path
+    config.path = scrubPath(config.path);
     return _.create(filePrototype, config);
   };
 
@@ -104,8 +110,9 @@ module.exports = function FileData(db) {
     return config;
   };
 
-  var pathToKey = function pathToKey(path) {
-    return path.replace('/', c.delimiter);
+  var scrubPath = function scrubPath(path) {
+    // Strip trailing and initial, replace spaces with underscores
+    return _.trim(path, ' /').replace(' ', '_');
   };
 
   // Stream writer function to receive content if it is a stream

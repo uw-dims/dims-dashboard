@@ -1,6 +1,6 @@
 'use strict'
 
-var test = require('tape');
+var test = require('tape-catch');
 
 var logger = require('../../../utils/logger');
 var _ = require('lodash');

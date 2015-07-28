@@ -1,6 +1,6 @@
 var stream = require('stream');
 var async = require('async');
-var _ = require('lodash');
+var _ = require('lodash-compat');
 var logger = require('./logger');
 var fs = require('fs');
 var config = require('../config');

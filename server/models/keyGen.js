@@ -1,5 +1,6 @@
 'use strict';
 
+var _ = require('lodash-compat');
 var config = require('../config');
 var c = require('../config/redisScheme');
 var logger = require('../utils/logger');
@@ -60,9 +61,8 @@ var keyGen = {
 
   // Key to a file - generated from a file object
   fileKey: function (file) {
-    //return c.tickets.prefix + c.delimiter + ticket.num + c.delimiter + ticket.name;
-    // return c.tickets.prefix + c.delimiter + ticket.num;
-    return c.files.prefix + c.delimiter + file.scope + c.delimiter + file.path + c.delimiter + file.name;
+    var scope = (file.global) ? c.files.globalRoot : file.creator;
+    return c.files.prefix + c.delimiter + scope + c.delimiter + scrubPath(file.path) + c.delimiter + file.name;
   },
 
   fileMetaKey: function (file) {
@@ -70,8 +70,9 @@ var keyGen = {
   },
 
   // Key to the set of file keys
-  fileSetKey: function () {
-    return c.files.setName;
+  fileSetKey: function (file) {
+    var scope = (file.global) ? c.files.globalRoot : file.creator;
+    return c.files.prefix + c.delimiter + scope + c.files.setSuffix;
   },
 
   // Key to userSettings for a user
@@ -82,6 +83,13 @@ var keyGen = {
     return c.userSettings.setName;
   }
 
+};
+
+var scrubPath = function scrubPath(path) {
+  // Converts path to format used to create key
+  var newPath = path.replace('/', c.delimiter);
+  // Strip trailing and initial, replace spaces with underscores
+  return _.trim(newPath, ' :').replace(' ', '_');
 };
 
 module.exports = keyGen;
