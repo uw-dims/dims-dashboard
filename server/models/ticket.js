@@ -95,6 +95,12 @@ module.exports = function Ticket(db) {
         self.num = parseInt(keyArray[1]);
         self.creator = reply.creator;
         self.type = reply.type;
+        reply.createdTime = _.parseInt(reply.createdTime);
+        if (reply.open === 'true') {
+          reply.open = true;
+        } else {
+          reply.open = false;
+        }
         self.createdTime = reply.createdTime;
         self.open = reply.open;
         return self;
@@ -376,11 +382,16 @@ module.exports = function Ticket(db) {
       // var deferred = q.defer();
       return db.hgetall(key).then(function (reply) {
         // Note: set num to integer since it derives from key, which is a string
+        if (reply.open === 'true') {
+          reply.open = true;
+        } else {
+          reply.open = false;
+        }
         config = {
           num: parseInt(key.split(c.delimiter)[1]),
           creator: reply.creator,
           type: reply.type,
-          createdTime: reply.createdTime,
+          createdTime: _.parseInt(reply.createdTime),
           open: reply.open
         };
         return ticketFactory(config);

@@ -21,7 +21,7 @@ test('models/keyExtract.js: keyExtract should operate on file keys', function (a
   assert.notOk(keyExtract.isFileGlobal(fileKey2), 'File is in user namespace');
   assert.equal(keyExtract.filePath(fileKey1), 'boxes/main.txt', 'Path to file extracted');
   assert.equal(keyExtract.filePath(fileKey2), 'user1/cif/test1/data.txt', 'Path to file extracted');
-  assert.equal(keyExtract.filePath(fileKey3), 'boxes/remnants/partial.jpg','Path to file extracted');
+  assert.equal(keyExtract.filePath(fileKey3), 'boxes/remnants/partial.jpg', 'Path to file extracted');
   assert.equal(keyExtract.fileSubPath(fileKey1), 'boxes/', 'Subpath extracted');
   assert.equal(keyExtract.fileSubPath(fileKey2), 'cif/test1/', 'Subpath extracted');
   assert.equal(keyExtract.fileSubPath(fileKey3), 'boxes/remnants/', 'Subpath extracted');

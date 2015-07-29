@@ -7,6 +7,7 @@
 var _ = require('lodash-compat'),
     stream = require('stream'),
     util = require('util'),
+    q = require('q'),
 
     config = require('../config'),
     c = require('../config/redisScheme'),
@@ -30,12 +31,11 @@ module.exports = function FileData(db) {
       self.modifiedTime = self.createdTime;
       // scrub the path a bit
       self.path = scrubPath(self.path);
-
       // Save the contents
       return db.set(keyGen.fileKey(self), content)
       .then(function (reply) {
         // Save metadata
-        return db.hmset(keyGen.fileMetaKey(self), self.getFileMetadata());
+        return db.hmset(keyGen.fileMetaKey(self), self.getConfig());
       })
       .then(function (reply) {
         // Successfully saved the file and metadata. Now add key to set of keys
@@ -46,38 +46,79 @@ module.exports = function FileData(db) {
         return self;
       })
       .catch(function (err) {
-        logger.error('models/File.create had an err returned from redis', err);
+        logger.error('models/fileData.js: create had an err returned from redis', err);
         return new Error(err.toString());
       });
     },
 
-    exists: function exits() {
+    // Retrieves the file content as a string from the database
+    getContent: function getContent() {
+      var self = this;
+      return db.get(keyGen.fileKey(self))
+      .then(function (reply) {
+        return q(reply);
+      })
+      .catch(function (err) {
+        logger.error('models/fileData.js: getContent had an err returned from redis', err);
+        return new Error(err.toString());
+      });
+    },
+
+    // Returns true if the file has been saved in the database
+    exists: function exists() {
       var self = this;
       return db.zrank(keyGen.fileSetKey(self), keyGen.fileKey(self))
       .then(function (reply) {
-        if (reply >= 0) {
+        if (reply >= 0 && reply !== undefined && reply !== null) {
           return true;
         } else {
           return false;
         }
       })
       .catch(function (err) {
-        logger.error('models/File.create had an err returned from redis', err);
+        logger.error('models/fileData.js: exists had an err returned from redis', err);
         return new Error(err.toString());
       });
 
     },
 
-    getFileMetadata: function getFileMetadata() {
+    // Retrieves the file metadata from database and returns it
+    getMetadata: function getMetadata() {
+      var self = this;
+      return db.hgetall(keyGen.fileMetaKey(self))
+      .then (function (reply) {
+        // Convert to integer, boolean since client returns all as string
+        reply.createdTime = _.parseInt(reply.createdTime);
+        reply.modifiedTime = _.parseInt(reply.modifiedTime);
+        if (reply.global === 'true') {
+          reply.global = true;
+        } else {
+          reply.global = false;
+        }
+        return reply;
+      })
+      .catch(function (err) {
+        logger.error('models/fileData.js: getMetadata had an err returned from redis', err);
+        return new Error(err.toString());
+      });
+    },
+
+    // Returns a config object from properties of the file object
+    getConfig: function getConfig() {
       var self = this,
       config = {
         creator: self.creator,
-        createdTime: self.createdTime,
-        modifiedTime: self.modifiedTime,
         description: self.description,
         global: self.global,
-        path: self.path
+        path: self.path,
+        name: self.name
       };
+      if (self.createdTime !== undefined) {
+        config.createdTime = self.createdTime;
+      }
+      if (self.modifiedTime !== undefined) {
+        config.modifiedTime = self.modifiedTime;
+      }
       return config;
     }
   };

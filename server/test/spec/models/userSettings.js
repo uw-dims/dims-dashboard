@@ -7,7 +7,15 @@ var logger = require('../../../utils/logger');
 
 // Redis mock
 // We will use blocking form for simplicity in test assertions
-var client = require('redis-js').createClient();
+var client = require('redis').createClient();
+client.select(10, function (err, reply) {
+  if (err) {
+    logger.error('test: redis client received error when selecting database ', err);
+  } else {
+    logger.debug('test.redisDB: redis has selected db', 10, 'reply is ', reply);
+  }
+});
+
 
 var keyGen = require('../../../models/keyGen');
 var extract = require('../../../models/keyExtract');
@@ -18,6 +26,7 @@ diContainer.factory('db', require('../../../utils/redisProxy'));
 diContainer.factory('UserSettings', require('../../../models/userSettings'));
 diContainer.register('client', client);
 var UserSettings = diContainer.get('UserSettings');
+var db = diContainer.get('db');
 
 // Some data
 var user1 = 'user1';
@@ -41,6 +50,16 @@ var settings3 = {
 var settings4 = {
   'anonymize': false,
   'rpcDebug': true
+};
+
+var getBoolean = function (stringVal) {
+  if (stringVal === 'true') {
+    return true;
+  } else if (stringVal === 'false') {
+    return false;
+  } else {
+    return stringVal;
+  }
 };
 
 test('models/userSettings: userSettingsFactory should return User Settings object', function (assert) {
@@ -68,8 +87,17 @@ test('models/userSettings: UserSettings object saveSettings method should save s
   var settings = UserSettings.userSettingsFactory(user1, settings1);
   return settings.saveSettings()
   .then(function (reply) {
-    assert.deepEqual(client.hgetall(keyGen.userSettingsKey(settings)), settings.settings, 'Settings retrieved via key were same as saved settings');
-    assert.ok(client.sismember(keyGen.userSettingsSetKey(), keyGen.userSettingsKey(settings)), 'Settings key was saved in set');
+    return db.hgetall(keyGen.userSettingsKey(settings))
+  })
+  .then(function (reply) {
+    for (var key in reply) {
+      reply[key] = getBoolean(reply[key]);
+    }
+    assert.deepEqual(reply, settings.settings, 'Settings retrieved via key were same as saved settings');
+    return db.sismember(keyGen.userSettingsSetKey(), keyGen.userSettingsKey(settings))
+  })
+  .then(function (reply) {
+    assert.ok(reply, 'Settings key was saved in set');
     assert.end();
   })
   .catch(function (err) {
@@ -121,11 +149,24 @@ test('models/userSettings: UserSettings object retrieveSettings method gets the 
   })
   .then(function (reply) {
     // Have to re-declare it here
-    var newSettings = reply;
+    for (var key in reply.settings) {
+      reply.settings[key] = getBoolean(reply.settings[key]);
+    }
     assert.deepEqual(reply.settings, settings.settings, 'Object retrieveSettings method returned the object with updated settings matching original');
     assert.end();
   })
   .catch(function (err) {
     return new Error(err.toString());
+  });
+});
+
+test('models/userSettings: finished', function (assert) {
+  logger.debug('Quitting redis');
+  client.flushdb(function (reply) {
+    logger.debug('flushdb reply ', reply);
+    client.quit(function (err, reply) {
+      logger.debug('quit reply ', reply);
+      assert.end();
+    });
   });
 });

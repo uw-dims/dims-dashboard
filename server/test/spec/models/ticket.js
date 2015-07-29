@@ -5,15 +5,30 @@ var test = require('tape-catch');
 var logger = require('../../../utils/logger');
 var _ = require('lodash-compat');
 
-// Redis mock
-// We will use blocking form for simplicity in test assertions
-var client = require('redis-js').createClient();
+
+var client = require('redis').createClient();
+client.select(10, function (err, reply) {
+  if (err) {
+    logger.error('test: redis client received error when selecting database ', err);
+  } else {
+    logger.debug('test.redisDB: redis has selected db', 10, 'reply is ', reply);
+  }
+});
+
 
 // Need db as Ticket argument.
-var db = require('../../../utils/redisUtils')(client);
+// var db = require('../../../utils/redisUtils')(client);
 var KeyGen = require('../../../models/keyGen');
 
-var Ticket = require('../../../models/ticket')(db);
+// var Ticket = require('../../../models/ticket')(db);
+
+// Setup service discovery for this test
+var diContainer = require('../../../services/diContainer')();
+diContainer.factory('db', require('../../../utils/redisProxy'));
+diContainer.factory('Ticket', require('../../../models/ticket'));
+diContainer.register('client', client);
+var Ticket = diContainer.get('Ticket');
+var db = diContainer.get('db');
 
 // Bootstrap some data
 var user = 'testUser'; // Simulates logged in user
@@ -81,8 +96,10 @@ test('models/ticket.js: Creating a ticket should generate a counter for the tick
     debugTicketCounter(ticket);
     // Now retrieve the latest counter that was generated
     var key = KeyGen.ticketCounterKey();
-    var result = client.get(key);
-    assert.equal(parseInt(result), ticket.num, 'Latest counter generated equal ticket.num');
+    return db.get(key)
+  })
+  .then(function (reply) {
+    assert.equal(parseInt(reply), newTicket.num, 'Latest counter generated equal ticket.num');
   })
   .catch(function (err) {
     logger.debug(err);
@@ -100,7 +117,10 @@ test('models/ticket.js: Creating a ticket should save the ticket key in the set 
     // Key to this ticket
     var ticketKey = KeyGen.ticketKey(ticket);
     // Rank should be greater than or equal to 0.
-    assert.ok (client.zrank (setKey, ticketKey) >= 0, 'Ticket key was saved in ' + setKey);
+    return db.zrank(setKey, ticketKey)
+  })
+  .then(function (reply) {
+    assert.ok (reply >= 0, 'Ticket key was saved');
   })
   .catch(function (err) {
     logger.debug(err);
@@ -115,10 +135,13 @@ test('models/ticket.js: Creating a ticket should save the ticket metadata correc
     // Key to this ticket
     var ticketKey = KeyGen.ticketKey(ticket);
     // Get the value pointed to by the key
-    var reply = client.hgetall(ticketKey);
+    return db.hgetall(ticketKey)
+  })
+  .then(function (reply) {
     assert.equal(reply.type, ticketType1, 'Type saved correctly');
     assert.equal(reply.creator, user, 'Creator saved correctly');
-    assert.equal(reply.open, true, 'Open status saved correctly');
+    // Note that redis client returns everything as string, so we will compare against that
+    assert.equal(reply.open, 'true', 'Open status saved correctly');
     assert.end();
   })
   .catch(function (err) {
@@ -218,8 +241,10 @@ test('models/ticket.js: addTopic should save the contents to the database correc
     // Topic key
     var key = KeyGen.topicKey(reply);
     // Get value at key (hash)
-    var result = client.hgetall(key);
-    assert.deepEqual(result, topicContents1, 'Contents were saved correctly for hash');
+    return db.hgetall(key)
+  })
+  .then(function (reply) {
+    assert.deepEqual(reply, topicContents1, 'Contents were saved correctly for hash');
     assert.end();
   })
   .catch(function (err) {
@@ -238,8 +263,10 @@ test('models/ticket.js: addTopic should save the contents to the database correc
     // Topic key
     var key = KeyGen.topicKey(reply);
     // Get value at key (string)
-    var result = client.get(key);
-    assert.equal(result, topicContents2, 'Contents were saved correctly for string');
+    return db.get(key)
+  })
+  .then(function (reply) {
+    assert.equal(reply, topicContents2, 'Contents were saved correctly for string');
     assert.end();
   })
   .catch(function (err) {
@@ -340,10 +367,11 @@ test('models/ticket.js: Topic.getContents should should return contents from dat
     topicKey = KeyGen.topicKey(reply);
     return reply.getContents();
   })
-  .then(function (result) {
-    // Manually for test
-    var hashresult = client.hgetall(topicKey, 'hash');
-    assert.deepEqual(result, topicContents1, 'Contents retrieved from database');
+  .then(function (reply) {
+    return db.hgetall(topicKey)
+  })
+  .then(function (reply) {
+    assert.deepEqual(reply, topicContents1, 'Contents retrieved from database');
     assert.end();
   })
   .catch(function (err) {
@@ -464,4 +492,13 @@ test('models/ticket.js: Ticket.getTopics should return array of Topic objects', 
   });
 });
 
-
+test('models/ticket.js: finished', function (assert) {
+  logger.debug('Quitting redis');
+  client.flushdb(function (reply) {
+    logger.debug('flushdb reply ', reply);
+    client.quit(function (err, reply) {
+      logger.debug('quit reply ', reply);
+      assert.end();
+    });
+  });
+});
