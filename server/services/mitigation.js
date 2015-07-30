@@ -1,6 +1,6 @@
 'use strict';
 
-var config = require('../config');
+var config = require('../config/config');
 var logger = require('../utils/logger');
 var Ticket = require('../models/ticket');
 var KeyGen = require('../models/keyGen');
@@ -10,14 +10,10 @@ var q = require('q');
 
 
 
-exports.processNewTicket = function(ticket, content) {
-
-	// 
-	
-
+exports.processNewTicket = function (ticket, content) {
 
 };
 
-exports.populateMitigationTicket = function(ticket) {
+exports.populateMitigationTicket = function (ticket) {
 
 };

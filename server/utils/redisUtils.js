@@ -2,7 +2,7 @@
 // These functions wrap the redis commands used by the application so
 // they return promises
 
-var config = require('../config');
+var config = require('../config/config');
 var logger = require('./logger');
 var q = require('q');
 // var client = require('./redisDB');

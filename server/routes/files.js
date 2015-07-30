@@ -1,7 +1,7 @@
 
 var fs = require('fs');
 var util = require('util');
-var config = require('../config');
+var config = require('../config/config');
 var yaml = require('js-yaml');
 var multiparty = require('multiparty');
 var logger = require('../utils/logger');
@@ -10,7 +10,7 @@ exports._deleteFiles = function(files) {
     for (var f in files) {
         logger.debug('files._deleteFiles: Path to delete: ' + files[f][0].path);
         fs.unlink(files[f][0].path, function(err) {
-            if (err) { 
+            if (err) {
                 logger.error('files._deleteFiles: fs.unlink error for path: '+ files[f][0].path +', error: ' + err);
             }
         });
@@ -22,7 +22,7 @@ exports.upload = function(req, res){
 
     logger.debug('dirname is ' + __dirname);
 
-    var filename, 
+    var filename,
         tmp_path,
         data = {},
         extensionAllowed = [".txt", ".json", ".log", ".yml"],
@@ -46,12 +46,12 @@ exports.upload = function(req, res){
         for(var i=0;i<a.length;i++) {
             o[a[i]]='';
         }
-        return o; 
+        return o;
     };
 
     var getFileExtension = function(name) {
         var i = name.lastIndexOf('.');
-        return  (i < 0) ? '' : name.substr(i);  
+        return  (i < 0) ? '' : name.substr(i);
     }
 
     form.parse(req, function(err, fields, files) {
@@ -61,9 +61,9 @@ exports.upload = function(req, res){
         if (err) {
             logger.error('files.upload form.parse - Error parsing request: '+ err.message);
             data.msg = 'Invalid request: '+ err.message;
-            return res.status(400).send(data); 
+            return res.status(400).send(data);
         }
-        
+
         if ('file' in files) {
             var file = files['file'][0];
             filename = file.originalFilename;
@@ -81,7 +81,7 @@ exports.upload = function(req, res){
             logger.debug('files.upload form.parse - target_path: ' + target_path);
 
             // Check for valid extension and size
-            if((getFileExtension(filename) in oc(extensionAllowed)) && (getFileExtension(targetFilename) in oc(extensionAllowed)) && (file.size  < maxSizeOfFile)) { 
+            if((getFileExtension(filename) in oc(extensionAllowed)) && (getFileExtension(targetFilename) in oc(extensionAllowed)) && (file.size  < maxSizeOfFile)) {
                 logger.debug('files.upload form.parse - File passed validation');
 
                 if ('destination' in fields) {
@@ -91,14 +91,14 @@ exports.upload = function(req, res){
                         }
                     }
                 }
-                
+
                 logger.debug('files.upload form.parse - now target_path: '+ target_path);
                 fs.rename(tmp_path, target_path, function(err) {
                     if (err) {
                         logger.error('files.upload form.parse - Error renaming file: ', err);
                         exports._deleteFiles(files);
                         data.msg = 'Bad destination directory specified.';
-                        return res.status(400).send(data); 
+                        return res.status(400).send(data);
                     }
                     data.msg = "File uploaded sucessfully";
                     data.path = fields['destination'][0];
@@ -156,7 +156,7 @@ exports.upload = function(req, res){
 
     // filename = (util.inspect(fields).destination !== "" && util.inspect(fields).newName !== undefined) ? util.inspect(fields).newName : req.files.file.name;
     // i = filename.lastIndexOf('.');
-    // file_extension = (i < 0) ? '' : filename.substr(i);      
+    // file_extension = (i < 0) ? '' : filename.substr(i);
     // tmp_path = req.files.file.path;
 
     // Get target path
@@ -171,17 +171,17 @@ exports.upload = function(req, res){
     // console.log("target_path: " + target_path);
     // console.log("filename: " + filename);
 
-    // if((file_extension in oc(extensionAllowed)) && ((req.files.file.size /1024 ) < maxSizeOfFile)) { 
-        
+    // if((file_extension in oc(extensionAllowed)) && ((req.files.file.size /1024 ) < maxSizeOfFile)) {
+
     //     console.log("file passed validation");
     //     fs.rename(tmp_path, target_path, function(err) {
     //         if (err) {
     //             console.log('fs.rename error: ' + err);
-    //             return res.status(400).send('Bad destination directory specified.'); 
+    //             return res.status(400).send('Bad destination directory specified.');
     //         }
-    //         // delete the temporary file, so that the explicitly set temporary upload dir does not get filled with unwanted files 
+    //         // delete the temporary file, so that the explicitly set temporary upload dir does not get filled with unwanted files
     //         fs.unlink(tmp_path, function() {
-    //             if (err) { 
+    //             if (err) {
     //             console.log('fs.unlinke error: ' + err);
     //             return res.status(500).send(err);
     //             }
@@ -193,9 +193,9 @@ exports.upload = function(req, res){
     //     console.log(data);
 
     // }  else{
-    // // delete the temporary file, so that the explicitly set temporary upload dir does not get filled with unwanted files 
+    // // delete the temporary file, so that the explicitly set temporary upload dir does not get filled with unwanted files
     //     fs.unlink(tmp_path, function(err) {
-    //         if (err) { 
+    //         if (err) {
     //             console.log('fs.unlinke error: ' + err);
     //             return res.status(500).send(err);
     //         }
@@ -212,10 +212,10 @@ exports.upload = function(req, res){
 
 
 /**
- * 
+ *
  */
 exports.files = function(req,res) {
-    
+
     var directory = -1;
     // Get the directory requested
     if (req.query.source !== null && req.query.source !== undefined) {
@@ -237,7 +237,7 @@ exports.files = function(req,res) {
     if (directory == -1) {
         // bad input
         return res.status(400).send('Bad source directory specified.');
-    } 
+    }
 
     // Request: read a file
     if (req.query.action == 'read') {
@@ -249,12 +249,12 @@ exports.files = function(req,res) {
                         if (err) {
                             logger.error('fs.stat error', err);
                             return res.status(500).send(err);
-                        } 
+                        }
                         fs.open(directory, 'r', function(err, fd) {
                             if (err) {
                                 logger.error('fs.open error', err);
                                 return res.status(500).send(err);
-                            } 
+                            }
                             // Limit size since large files slow down page response and entire
                             // content is not needed for this function
                             var size = parseInt(req.query.truncate);
@@ -284,12 +284,12 @@ exports.files = function(req,res) {
                         if (err) {
                             logger.error('fs.readFile error', err);
                             return res.status(500).send(err);
-                        } 
+                        }
                         return res.status(200).send(data);
                     });
 
                 }
-                
+
             } else {
                 logger.warn(directory+' does not exist');
                 //return res.send(400, 'File does not exist');
@@ -305,7 +305,7 @@ exports.files = function(req,res) {
     //    {
     //      name: name of file
     //      type: string file type (rwfind, cif, etc)
-    //      desc: description of file     
+    //      desc: description of file
     //    },
     //    path: absolute path to directory containing files
     // }
@@ -334,13 +334,13 @@ exports.files = function(req,res) {
                             data.files[k] = { name: files[i], type: null, desc: null }
                             k++;
                         }
-                    }    
+                    }
                     return res.status(200).send(data);
                 });
 
             } else {
                 // Use yaml file for file contents
-                try {                
+                try {
                     data.files = yaml.safeLoad(content);
                     //return res.send(200,data);
                     return res.status(200).send(data);
@@ -348,9 +348,9 @@ exports.files = function(req,res) {
                     logger.error(e);
                     //return res.send(500,e);
                     return res.status(500).send(e);
-                }              
+                }
             }
         })
-        
+
     }
 };

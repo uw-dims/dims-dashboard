@@ -1,6 +1,6 @@
 'use strict';
 
-var config = require('../config');
+var config = require('../config/config');
 var logger = require('../utils/logger');
 var q = require('q');
 var _ = require('lodash-compat');
@@ -62,7 +62,7 @@ var _setFileInput = function (inputArray, type, useFile, data) {
       inputArray.push(path);
       logger.debug('services/anonymize._setFileInput after writeTempFile. path is ', path);
       deferred.resolve(inputArray);
-    }, function (err,reply) {
+    }, function (err, reply) {
       deferred.reject(err);
     });
   }
@@ -97,7 +97,7 @@ var _setInputs = function (params, id) {
   var deferred = q.defer();
   logger.debug('services/anonymize._setInputs start: type ', params.type, ' id ', id, ' stats ', params.stats);
   // console.log(params);
-  var rpcQueuebase = config.rpcQueueNames['anon'],
+  var rpcQueuebase = config.rpcQueueNames.anon,
       rpcClientApp = 'anon_client',
       ipgrepApp = 'ipgrep';
 

@@ -8,13 +8,6 @@ var dimsUtils = require('./util');
 
 module.exports = function redisProxy(client) {
 
-  // client.set('testkey', 'bob', function (reply) {
-  //   logger.debug('testkey reply is ', reply);
-  //   client.get('testkey', function (reply) {
-  //     logger.debug('testkey get reply is ', reply);
-  //   });
-  // });
-
   var hmset = q.nbind(client.hmset, client),
       incr = q.nbind(client.incr, client),
       sadd = q.nbind(client.sadd, client),

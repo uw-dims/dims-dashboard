@@ -16,7 +16,7 @@ var KeyGen = require('../../models/keyGen');
 var c = require('../../config/redisScheme');
 var q = require('q');
 var fs = require('fs');
-var config = require('../../config');
+var config = require('../../config/config');
 var anonymize = require('../../services/anonymize');
 var ChildProcess = require('../../services/childProcess');
 
@@ -57,7 +57,7 @@ var topicConfig = [
     displayType: 'double-time-series'
   },
   {
-    
+
     topic: 'storage:silk:silk-sizes-2.txt',
     dataType: 'hash',
     data: 'data/prisemTestData/silk-sizes-2.txt',

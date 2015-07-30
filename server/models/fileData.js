@@ -9,7 +9,7 @@ var _ = require('lodash-compat'),
     util = require('util'),
     q = require('q'),
 
-    config = require('../config'),
+    config = require('../config/config'),
     c = require('../config/redisScheme'),
     keyGen = require('./keyGen'),
     extract = require('./keyExtract'),
@@ -18,8 +18,6 @@ var _ = require('lodash-compat'),
 
 // module.exports = function FileData(serviceLocator) {
 module.exports = function FileData(db) {
-
-  logger.debug('Got to start of FileData');
   // var db = serviceLocator.get('db');
 
   // Prototype for each fileData object

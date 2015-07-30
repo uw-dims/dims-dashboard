@@ -3,7 +3,7 @@ var async = require('async');
 var _ = require('lodash-compat');
 var logger = require('./logger');
 var fs = require('fs');
-var config = require('../config');
+var config = require('../config/config');
 
 var createParser = function() {
 

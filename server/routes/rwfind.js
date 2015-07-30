@@ -4,7 +4,7 @@ var async = require('async');
 var fs = require('fs');
 var dimsutil = require('../utils/util');
 var logger = require('../utils/logger');
-var config = require('../config');
+var config = require('../config/config');
 var settings = require('../services/settings');
 var tools = require('../services/tools');
 
@@ -23,7 +23,7 @@ exports.list = function(req,res) {
 
       inputArray = [config.bin + rpcClientApp, '--server', config.rpcServer,
         '--queue-base', rpcQueuebase];
-  
+
   req.query.debug === 'true' ? inputArray.push ('--debug') : '';
   req.query.verbose === 'true' ? inputArray.push ('--verbose') : '';
 
@@ -32,11 +32,11 @@ exports.list = function(req,res) {
   if (req.query.hitLimit !== undefined) {
     inputArray.push('-T')
     inputArray.push(req.query.hitLimit);
-  } 
+  }
   if (req.query.numDays !== undefined) {
     inputArray.push('-D')
     inputArray.push(req.query.numDays);
-  } 
+  }
   if (req.query.outputType === 'json') inputArray.push('-J');
   if (req.query.startTime !== undefined) {
     inputArray.push('--stime');
@@ -63,7 +63,7 @@ exports.list = function(req,res) {
           } else {
             callback(null, null, null);
           }
-          
+
         },function(path, fd, callback) {
             logger.debug('rwfind writefile path: ' + path);
             logger.debug('rwfind req.query.ips: ', req.query.ips);
@@ -81,10 +81,10 @@ exports.list = function(req,res) {
               callback(null);
             }
 
-       }, function(callback) {  
-            
+       }, function(callback) {
+
           logger.debug('routes/rwfind.list - Input to python child process: ', inputArray);
-          
+
           tools.getData('python', inputArray, id)
 
             .then(function(reply) {
@@ -95,7 +95,7 @@ exports.list = function(req,res) {
               logger.debug('routes/rwfind.list - Send 500 reply');
               return res.status(500).send(reply);
             });
-          
+
           // var python = spawn(
           //   'python',
           //   inputArray
@@ -104,6 +104,6 @@ exports.list = function(req,res) {
           callback(null, 'done');
         }, function(err,result) {
         }
-      ]);  
+      ]);
   };
 

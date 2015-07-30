@@ -6,7 +6,7 @@
 // Queries redis to read/update/create user settings
 
 var _ = require('lodash-compat'),
-    config = require('../config'),
+    config = require('../config/config'),
     logger = require('../utils/logger'),
     keyGen = require('./keyGen')
 

@@ -4,7 +4,7 @@
   * file: models/ticket.js
   */
 
-var config = require('../config'),
+var config = require('../config/config'),
     c = require('../config/redisScheme'),
     keyGen = require('./keyGen'),
     extract = require('./keyExtract'),

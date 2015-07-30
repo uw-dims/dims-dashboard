@@ -4,7 +4,7 @@ var async = require('async');
 var fs = require('fs');
 var dimsutil = require('../utils/util');
 var logger = require('../utils/logger');
-var config = require('../config');
+var config = require('../config/config');
 var settings = require('../services/settings');
 
 exports.list = function(req,res) {
@@ -25,7 +25,7 @@ exports.list = function(req,res) {
   req.query.debug === 'true' ? inputArray.push ('--debug') : '';
   req.query.verbose === 'true' ? inputArray.push ('--verbose') : '';
   req.query.stats === 'true' ? inputArray.push('-s') : "";
-  
+
   if (req.query.fileName !== undefined) {
     inputArray.push('-r');
     inputArray.push(req.query.fileName);
@@ -42,13 +42,13 @@ exports.list = function(req,res) {
   }
 
   logger.debug('crosscor:list - Input to python child process: ', inputArray);
-  
+
   var python = spawn(
     'python',
     inputArray
     );
 
   dimsutil.processPython(python, req, res);
-        
+
 };
 

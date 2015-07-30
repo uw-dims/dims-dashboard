@@ -1,7 +1,7 @@
 'use strict';
 
 var logger = require('../utils/logger');
-var config = require('../config');
+var config = require('../config/config');
 var _ = require('lodash-compat');
 var ChildProcess = require('../services/childProcess');
 var anonymize = require('../services/anonymize');

@@ -3,7 +3,7 @@
 // File: server/utils/redisDB.js
 // Provides a redis client
 
-var config = require('../config');
+var config = require('../config/config');
 var redis = require('redis');
 var logger = require('./logger');
 

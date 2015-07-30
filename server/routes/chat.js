@@ -1,16 +1,16 @@
 var rpcConnection = require('../services/rabbitConnection');
-var config = require('../config');
+var config = require('../config/config');
 
-exports.start = function(req, res) {
+exports.start = function (req, res) {
   console.log('chat start');
   // rpc = new rpcConnection.RpcConnection();
   // rpc.subscribeFanout();
 };
 
-exports.stop = function(req, res) {
+exports.stop = function (req, res) {
   console.log('chat stop');
 };
 
-exports.status = function(req, res) {
+exports.status = function (req, res) {
   console.log('chat status');
 };

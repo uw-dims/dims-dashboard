@@ -1,5 +1,5 @@
 var winston = require('winston');
-var config = require('../config');
+var config = require('../config/config');
 var os = require('os');
 
 //require('./winston-syslog').Syslog;

@@ -2,7 +2,7 @@
 
 // Settings routes - retrieve and update settings via REST api for the logged in user
 
-var config = require('../config');
+var config = require('../config/config');
 var logger = require('../utils/logger');
 var UserSettings = require('../models/userSettings')(require('../utils/redisDB'));
 var q = require('q');
@@ -14,7 +14,7 @@ module.exports.get = function (user) {
   // var userSettings = UserSetting.userSettingsFactory(user)
 
   // UserSettings.getUserSetting(user)
-  
+
 
   userSettings.getSettings().then(function (reply) {
     logger.debug('/services/settings.get reply is ', reply);

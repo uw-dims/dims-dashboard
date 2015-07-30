@@ -3,7 +3,7 @@
 var pg = require('pg');
 
 // Get the app configuration
-var config = require('../config');
+var config = require('../config/config');
 var logger = require('./logger');
 logger.info('utils.bookshelf: Setting up Bookshelf');
 // Set up postgresql connection data to user database

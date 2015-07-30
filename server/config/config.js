@@ -24,6 +24,8 @@ config.redisPort = process.env.REDIS_PORT || 6379;
 
 config.redisDatabase = process.env.REDIS_DATABASE || 0;
 
+config.testWithRedis = process.env.TEST_WITH_REDIS || false;
+
 config.userDBHost = process.env.USER_DB_HOST || 'localhost';
 config.userDBUser = process.env.USER_DB_USER || 'dims';
 config.userDatabase = process.env.USER_DATABASE || 'ops-trust';
@@ -31,7 +33,7 @@ config.userDatabase = process.env.USER_DATABASE || 'ops-trust';
 // During development - specify user backend.
 // Possible values:
 //   'postgresql' - use postgresql database
-//   'static'  - use static config variable with users/passwords - only for 
+//   'static'  - use static config variable with users/passwords - only for
 //       development/testing
 //   others... tba
 config.POSTGRESQL = 'postgresql';
@@ -40,12 +42,12 @@ config.STATIC = 'static';
 config.userSource = process.env.USER_BACKEND || config.STATIC;
 
 // Put this here for now
-config.testUsers = 
+config.testUsers =
   [
-    { 
+    {
       'ident': 'dittrich',
       'desc': 'David Dittrich',
-      'password': 'dittrich' 
+      'password': 'dittrich'
     }, {
       'ident': 'lparsons',
       'desc': 'Linda Parsons',

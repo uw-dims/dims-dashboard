@@ -1,7 +1,7 @@
  /**
   * currently not used - deprecated
 
-var config = require('../config');
+var config = require('../config/config');
 var logger = require('../utils/logger');
 var Fanout = require('../services/fanout.js');
 
@@ -14,7 +14,7 @@ var stopEvent = 'fanout:logs:stopped'
 logger.debug('logmon: logmon created new Fanout named logs.');
 
 exports.start = function(req, res) {
-  
+
   // Start the logmonitor if it is not running
   if (!logmon.running) {
     // Setup listener for successful start
@@ -25,7 +25,7 @@ exports.start = function(req, res) {
 
     // Start the logmonitor
     logmon.start();
- 
+
   } else {
     // Just return a response
     logmon.start();  // try to start it anyway - for debugging
@@ -52,7 +52,7 @@ exports.stop = function(req, res) {
     logmon.stop(); // try to stop it anyway - for debugging
     res.status(200).send('Logmonitor was not running\n');
   }
-  
+
 };
 
 exports.status = function(req, res) {

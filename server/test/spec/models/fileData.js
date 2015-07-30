@@ -1,40 +1,43 @@
-'use strict'
+'use strict';
 
 var test = require('tape-catch');
-
-var _ = require('lodash-compat');
 var stream = require('stream');
+var _ = require('lodash-compat');
 
+var config = require('../../../config/config');
 var logger = require('../../../utils/logger');
-
-var client = require('redis').createClient();
-client.select(10, function (err, reply) {
-  if (err) {
-    logger.error('test: redis client received error when selecting database ', err);
-  } else {
-    logger.debug('test: redis has selected db', 10, 'reply is ', reply);
-  }
-});
-
 var keyGen = require('../../../models/keyGen');
 var extract = require('../../../models/keyExtract');
 
-// var client = require('../redisClient');
-
-// Setup service discovery for this test
+// Enable service discovery for this test
 var diContainer = require('../../../services/diContainer')();
-diContainer.factory('db', require('../../../utils/redisProxy'));
-diContainer.factory('FileData', require('../../../models/fileData'));
+var redis = require('redis');
+var redisJS = require('redis-js');
+
+if (config.testWithRedis) {
+  // logger.debug('do the test with redis');
+  var client = redis.createClient();
+  // Add the regular proxy to diContainer
+  client.select(10, function (err, reply) {
+    if (err) {
+      logger.error('test: redis client received error when selecting database ', err);
+    } else {
+      logger.debug('test: redis has selected db', 10, 'reply is ', reply);
+    }
+  });
+  diContainer.factory('db', require('../../../utils/redisProxy'));
+} else {
+  // We'll use the mock libraries
+  // logger.debug('use mocks');
+  var client = redisJS.createClient();
+  diContainer.factory('redisProxy', require('../../../utils/redisProxy'));
+  diContainer.factory('db', require('../../redisTestProxy'));
+}
 diContainer.register('client', client);
+
+diContainer.factory('FileData', require('../../../models/fileData'));
 var FileData = diContainer.get('FileData');
 var db = diContainer.get('db');
-
-// var svcLoc = require('../../../utils/serviceLocator')();
-// svcLoc.factory('FileData', require('../../../models/fileData'));
-// svcLoc.factory('db', require('../../../utils/redisUtils'));
-// svcLoc.register('client', client);
-
-// var FileData = svcLoc.get('FileData');
 
 // Bootstrap some data
 // Use pathCounter so we will get a different key for each test run
@@ -59,7 +62,7 @@ var fileMeta2 = function (pathCounter) {
     path: 'boxes/stores' + pathCounter,
     global: false,
     name: 'main.txt'
-  }
+  };
 };
 
 test('models/fileData.js: FileData.fileDataFactory should return file object', function (assert) {
@@ -160,7 +163,7 @@ test('models/fileData.js: FileData.getContent should return content from the dat
   var newFile = FileData.fileDataFactory(fileMeta2(pathCounter));
   return newFile.save(contents2)
   .then(function (reply) {
-    return newFile.getContent()
+    return newFile.getContent();
   })
   .then(function (reply) {
     assert.equal(reply, contents2, 'getContents returned contents from database');
@@ -177,13 +180,13 @@ test('models/fileData.js: Filedata.exists should return true if the key exists i
   var newFile = FileData.fileDataFactory(fileMeta2(pathCounter));
   return newFile.save(contents2)
   .then(function (reply) {
-    return newFile.exists()
+    return newFile.exists();
   })
   .then(function (reply) {
     assert.ok(reply, 'Saved key exists in database');
     pathCounter++;
     var newFile2 = FileData.fileDataFactory(fileMeta2(pathCounter));
-    return newFile2.exists()
+    return newFile2.exists();
   })
   .then(function (reply) {
     logger.debug('TEST reply to exists = false ', reply);
@@ -200,7 +203,7 @@ test('models/fileData.js: FileData.getConfig should return the config object', f
   pathCounter++;
   var newFile = FileData.fileDataFactory(fileMeta2(pathCounter));
   var config = newFile.getConfig();
-  var expected = fileMeta2(pathCounter)
+  var expected = fileMeta2(pathCounter);
   assert.deepEqual(config, expected, 'Unsaved file config returned successfully');
   return newFile.save(contents2)
   .then(function (reply) {
@@ -209,7 +212,7 @@ test('models/fileData.js: FileData.getConfig should return the config object', f
     expected.modifiedTime = newFile.modifiedTime;
     assert.deepEqual(config, expected, 'Saved file config returned successfully');
     assert.end();
-  })
+  });
 });
 
 test('models/fileData.js: FileData.getMetadata should return metadata from database', function (assert) {
@@ -239,14 +242,16 @@ test('models/fileData.js: FileData content should handle stream', function (asse
   source.end();
 });
 
-test('models/fileData.js: Finished', function (assert) {
-  logger.debug('Quitting redis');
-  client.flushdb(function (reply) {
-    logger.debug('flushdb reply ', reply);
-    client.quit(function (err, reply) {
-      logger.debug('quit reply ', reply);
-      assert.end();
+if (config.testWithRedis) {
+  test('models/fileData.js: Finished', function (assert) {
+    logger.debug('Quitting redis');
+    client.flushdb(function (reply) {
+      logger.debug('flushdb reply ', reply);
+      client.quit(function (err, reply) {
+        logger.debug('quit reply ', reply);
+        assert.end();
+      });
     });
   });
-});
+}
 

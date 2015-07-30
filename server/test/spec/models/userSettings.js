@@ -1,30 +1,39 @@
-'use strict'
+'use strict';
 
 var test = require('tape-catch');
-
 var _ = require('lodash-compat');
 var logger = require('../../../utils/logger');
-
-// Redis mock
-// We will use blocking form for simplicity in test assertions
-var client = require('redis').createClient();
-client.select(10, function (err, reply) {
-  if (err) {
-    logger.error('test: redis client received error when selecting database ', err);
-  } else {
-    logger.debug('test.redisDB: redis has selected db', 10, 'reply is ', reply);
-  }
-});
-
-
+var config = require('../../../config/config');
 var keyGen = require('../../../models/keyGen');
 var extract = require('../../../models/keyExtract');
 
-// Setup service discovery for this test
+// Enable service discovery for this test
 var diContainer = require('../../../services/diContainer')();
-diContainer.factory('db', require('../../../utils/redisProxy'));
-diContainer.factory('UserSettings', require('../../../models/userSettings'));
+var redis = require('redis');
+var redisJS = require('redis-js');
+
+if (config.testWithRedis) {
+  // logger.debug('do the test with redis');
+  var client = redis.createClient();
+  // Add the regular proxy to diContainer
+  client.select(10, function (err, reply) {
+    if (err) {
+      logger.error('test: redis client received error when selecting database ', err);
+    } else {
+      logger.debug('test: redis has selected db', 10, 'reply is ', reply);
+    }
+  });
+  diContainer.factory('db', require('../../../utils/redisProxy'));
+} else {
+  // We'll use the mock libraries
+  // logger.debug('use mocks');
+  var client = redisJS.createClient();
+  diContainer.factory('redisProxy', require('../../../utils/redisProxy'));
+  diContainer.factory('db', require('../../redisTestProxy'));
+}
 diContainer.register('client', client);
+
+diContainer.factory('UserSettings', require('../../../models/userSettings'));
 var UserSettings = diContainer.get('UserSettings');
 var db = diContainer.get('db');
 
@@ -87,14 +96,14 @@ test('models/userSettings: UserSettings object saveSettings method should save s
   var settings = UserSettings.userSettingsFactory(user1, settings1);
   return settings.saveSettings()
   .then(function (reply) {
-    return db.hgetall(keyGen.userSettingsKey(settings))
+    return db.hgetall(keyGen.userSettingsKey(settings));
   })
   .then(function (reply) {
     for (var key in reply) {
       reply[key] = getBoolean(reply[key]);
     }
     assert.deepEqual(reply, settings.settings, 'Settings retrieved via key were same as saved settings');
-    return db.sismember(keyGen.userSettingsSetKey(), keyGen.userSettingsKey(settings))
+    return db.sismember(keyGen.userSettingsSetKey(), keyGen.userSettingsKey(settings));
   })
   .then(function (reply) {
     assert.ok(reply, 'Settings key was saved in set');
@@ -116,7 +125,7 @@ test('models/userSettings: UserSettings object setSettings method sets the objec
   assert.notOk(settings.settings.anonymize, 'New setting was applied');
   assert.ok(settings.settings.rpcDebug, 'New setting was applied');
   assert.notOk(settings.settings.rpcVerbose, 'Unchanged setting was not updated');
-  assert.equal(settings.settings.cifbulkQueue, 'cifbulk_v2', 'Unchanged setting was not updated')
+  assert.equal(settings.settings.cifbulkQueue, 'cifbulk_v2', 'Unchanged setting was not updated');
   assert.end();
 });
 
@@ -145,7 +154,7 @@ test('models/userSettings: UserSettings object retrieveSettings method gets the 
     // Get a new default object for the user
     var newSettings = UserSettings.userSettingsFactory(user1);
     assert.notDeepEqual(newSettings.settings, settings.settings, 'New object has different settings than original');
-    return newSettings.retrieveSettings()
+    return newSettings.retrieveSettings();
   })
   .then(function (reply) {
     // Have to re-declare it here
@@ -160,13 +169,15 @@ test('models/userSettings: UserSettings object retrieveSettings method gets the 
   });
 });
 
-test('models/userSettings: finished', function (assert) {
-  logger.debug('Quitting redis');
-  client.flushdb(function (reply) {
-    logger.debug('flushdb reply ', reply);
-    client.quit(function (err, reply) {
-      logger.debug('quit reply ', reply);
-      assert.end();
+if (config.testWithRedis) {
+  test('models/fileData.js: Finished', function (assert) {
+    logger.debug('Quitting redis');
+    client.flushdb(function (reply) {
+      logger.debug('flushdb reply ', reply);
+      client.quit(function (err, reply) {
+        logger.debug('quit reply ', reply);
+        assert.end();
+      });
     });
   });
-});
+}

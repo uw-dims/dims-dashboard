@@ -1,7 +1,7 @@
 'use strict';
 
 var logger = require('../utils/logger');
-var config = require('../config');
+var config = require('../config/config');
 var settings = require('../services/settings');
 var ChildProcess = require('../services/childProcess');
 var anonymize = require('../services/anonymize');
@@ -9,11 +9,11 @@ var q = require('q');
 
 /** Gets data from command line tool and anonymizes it if requested */
 exports.getData = function(command, inputArray, id) {
-	var deferred = q.defer();
-	var child = new ChildProcess();
-	// var anonymize;
-	var rawData;
-	
+  var deferred = q.defer();
+  var child = new ChildProcess();
+  // var anonymize;
+  var rawData;
+
   child.startProcess(command, inputArray).then(function(reply) {
     // reply is the data
     rawData = reply;
@@ -24,12 +24,12 @@ exports.getData = function(command, inputArray, id) {
       logger.debug('services/tools.getData User settings are ', reply);
       console.log(reply);
       if (reply.anonymize === 'false') {
-      	console.log(reply.anonymize);
-      	logger.debug('services/tools.getData  Do not anonymize - send back data');
+        console.log(reply.anonymize);
+        logger.debug('services/tools.getData  Do not anonymize - send back data');
         // Send back the raw data
         deferred.resolve(rawData);
       } else {
-      	console.log(reply.anonymize);
+        console.log(reply.anonymize);
         logger.debug('services/tools.getData Now will call anonymize.setup. id is ', id);
         // Need to anonymize before sending back
         anonymize.setup({data: rawData, useFile: false, type: 'anon'}, id).then(function(reply) {
@@ -41,7 +41,7 @@ exports.getData = function(command, inputArray, id) {
             console.log(reply);
             deferred.resolve(reply);
           }, function(err, reply) {
-          	logger.debug('services/tools.getData error from anon process ', err, reply);
+            logger.debug('services/tools.getData error from anon process ', err, reply);
             deferred.resolve(err);
           });
         }, function(err,reply) {
@@ -50,14 +50,14 @@ exports.getData = function(command, inputArray, id) {
         });
       }
     }, function(err, reply) {
-    	logger.debug('services/tools.getData error  is ', err, reply);
-    	deferred.reject(err);
+      logger.debug('services/tools.getData error  is ', err, reply);
+      deferred.reject(err);
     });
-    
+
   }, function(err, reply) {
-  	logger.debug('services/tools.getData error  is ', err, reply);
-  	deferred.reject(err);
+    logger.debug('services/tools.getData error  is ', err, reply);
+    deferred.reject(err);
   });
 
-	return deferred.promise;
+  return deferred.promise;
 };

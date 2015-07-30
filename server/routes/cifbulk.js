@@ -4,7 +4,7 @@ var async = require('async');
 var fs = require('fs');
 var dimsutil = require('../utils/util');
 var logger = require('../utils/logger');
-var config = require('../config');
+var config = require('../config/config');
 var settings = require('../services/settings');
 var ChildProcess = require('../services/childProcess');
 var anonymize = require('../services/anonymize');
@@ -27,7 +27,7 @@ exports.list = function(req,res) {
 
         inputArray = [config.bin + rpcClientApp, '--server', config.rpcServer,
           '--queue-base', rpcQueuebase];
- 
+
     req.query.debug === 'true' ? inputArray.push ('--debug') : '';
     req.query.verbose === 'true' ? inputArray.push ('--verbose') : '';
 
@@ -37,7 +37,7 @@ exports.list = function(req,res) {
     if (req.query.numDays !== undefined) {
       inputArray.push('-D')
       inputArray.push(req.query.numDays);
-    } 
+    }
     if (req.query.startTime !== undefined) {
       inputArray.push('--stime');
       inputArray.push(req.query.startTime);
@@ -53,7 +53,7 @@ exports.list = function(req,res) {
 
     var rawData; // Put here so we have access later w/in callback
     // This section is going to be converted to promises
-    
+
     async.waterfall([
         function(callback) {
            if (req.query.ips !== undefined) {
@@ -63,7 +63,7 @@ exports.list = function(req,res) {
           } else {
             callback(null, null, null);
           }
-     
+
         },function(path, fd, callback) {
             if (req.query.ips !== undefined) {
               fs.writeFile(path, req.query.ips, function(err) {
@@ -76,8 +76,8 @@ exports.list = function(req,res) {
             } else {
               callback(null);
             }
-       }, function(callback) {  
-            
+       }, function(callback) {
+
           logger.debug('cifbulk:list - Input to python child process:', inputArray);
           var child = new ChildProcess();
           child.startProcess('python', inputArray).then(function(reply) {
@@ -119,11 +119,11 @@ exports.list = function(req,res) {
           //   dimsutil.processPython(python, req, res);
           // } catch (e) {
           //   log.error(e);
-          // }   
-          
+          // }
+
           callback(null, 'done');
         }, function(err,result) {
         }
-      ]);  
+      ]);
   };
 

@@ -1,7 +1,7 @@
 'use strict';
 
 var _ = require('lodash-compat');
-var config = require('../config');
+var config = require('../config/config');
 var c = require('../config/redisScheme');
 var logger = require('../utils/logger');
 

@@ -2,7 +2,7 @@
   * Not used
 
 var RabbitConnection = require('../services/rabbitConnection');
-var config = require('../config');
+var config = require('../config/config');
 var logger = require('../utils/logger');
 var util = require('util');
 
@@ -51,7 +51,7 @@ Fanout.prototype.start = function() {
     // Subscribe
     self.rabbit.subscribe();
   }
-  
+
 };
 
 Fanout.prototype.stop = function() {

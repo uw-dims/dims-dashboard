@@ -6,7 +6,7 @@
 
 // Includes
 var diContainer = require('./diContainer');
-var config = require('../config');
+var config = require('../config/config');
 var logger = require('../utils/logger');
 var KeyGen = require('../models/keyGen');
 // var redisDB = require('../utils/redisDB');

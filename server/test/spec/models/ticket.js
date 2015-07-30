@@ -1,32 +1,40 @@
-'use strict'
+'use strict';
 
 var test = require('tape-catch');
-
-var logger = require('../../../utils/logger');
 var _ = require('lodash-compat');
 
+var logger = require('../../../utils/logger');
+var config = require('../../../config/config');
+var keyGen = require('../../../models/keyGen');
+var extract = require('../../../models/keyExtract');
 
-var client = require('redis').createClient();
-client.select(10, function (err, reply) {
-  if (err) {
-    logger.error('test: redis client received error when selecting database ', err);
-  } else {
-    logger.debug('test.redisDB: redis has selected db', 10, 'reply is ', reply);
-  }
-});
-
-
-// Need db as Ticket argument.
-// var db = require('../../../utils/redisUtils')(client);
-var KeyGen = require('../../../models/keyGen');
-
-// var Ticket = require('../../../models/ticket')(db);
-
-// Setup service discovery for this test
+// Enable service discovery for this test
 var diContainer = require('../../../services/diContainer')();
-diContainer.factory('db', require('../../../utils/redisProxy'));
-diContainer.factory('Ticket', require('../../../models/ticket'));
+var redis = require('redis');
+var redisJS = require('redis-js');
+
+if (config.testWithRedis) {
+  // logger.debug('do the test with redis');
+  var client = redis.createClient();
+  // Add the regular proxy to diContainer
+  client.select(10, function (err, reply) {
+    if (err) {
+      logger.error('test: redis client received error when selecting database ', err);
+    } else {
+      logger.debug('test: redis has selected db', 10, 'reply is ', reply);
+    }
+  });
+  diContainer.factory('db', require('../../../utils/redisProxy'));
+} else {
+  // We'll use the mock libraries
+  // logger.debug('use mocks');
+  var client = redisJS.createClient();
+  diContainer.factory('redisProxy', require('../../../utils/redisProxy'));
+  diContainer.factory('db', require('../../redisTestProxy'));
+}
 diContainer.register('client', client);
+
+diContainer.factory('Ticket', require('../../../models/ticket'));
 var Ticket = diContainer.get('Ticket');
 var db = diContainer.get('db');
 
@@ -95,8 +103,8 @@ test('models/ticket.js: Creating a ticket should generate a counter for the tick
   .then(function (ticket) {
     debugTicketCounter(ticket);
     // Now retrieve the latest counter that was generated
-    var key = KeyGen.ticketCounterKey();
-    return db.get(key)
+    var key = keyGen.ticketCounterKey();
+    return db.get(key);
   })
   .then(function (reply) {
     assert.equal(parseInt(reply), newTicket.num, 'Latest counter generated equal ticket.num');
@@ -113,11 +121,11 @@ test('models/ticket.js: Creating a ticket should save the ticket key in the set 
   .then(function (ticket) {
     debugTicketCounter(ticket);
     // Key to set of tickets
-    var setKey = KeyGen.ticketSetKey();
+    var setKey = keyGen.ticketSetKey();
     // Key to this ticket
-    var ticketKey = KeyGen.ticketKey(ticket);
+    var ticketKey = keyGen.ticketKey(ticket);
     // Rank should be greater than or equal to 0.
-    return db.zrank(setKey, ticketKey)
+    return db.zrank(setKey, ticketKey);
   })
   .then(function (reply) {
     assert.ok (reply >= 0, 'Ticket key was saved');
@@ -133,9 +141,9 @@ test('models/ticket.js: Creating a ticket should save the ticket metadata correc
   .then(function (ticket) {
     debugTicketCounter(ticket);
     // Key to this ticket
-    var ticketKey = KeyGen.ticketKey(ticket);
+    var ticketKey = keyGen.ticketKey(ticket);
     // Get the value pointed to by the key
-    return db.hgetall(ticketKey)
+    return db.hgetall(ticketKey);
   })
   .then(function (reply) {
     assert.equal(reply.type, ticketType1, 'Type saved correctly');
@@ -169,10 +177,10 @@ test('models/ticket.js: getTicket should return populated ticket object', functi
 
   .then(function (meta) {
     debugTicketCounter(meta);
-    var ticketKey = KeyGen.ticketKey(meta);
+    var ticketKey = keyGen.ticketKey(meta);
     ticketMeta = meta;
     //Now retrieve a ticket object via getTicket static method
-    return Ticket.getTicket(ticketKey)
+    return Ticket.getTicket(ticketKey);
   })
   .then(function (reply) {
     // reply is the new ticket object
@@ -239,9 +247,9 @@ test('models/ticket.js: addTopic should save the contents to the database correc
   })
   .then(function (reply) {
     // Topic key
-    var key = KeyGen.topicKey(reply);
+    var key = keyGen.topicKey(reply);
     // Get value at key (hash)
-    return db.hgetall(key)
+    return db.hgetall(key);
   })
   .then(function (reply) {
     assert.deepEqual(reply, topicContents1, 'Contents were saved correctly for hash');
@@ -261,9 +269,9 @@ test('models/ticket.js: addTopic should save the contents to the database correc
   })
   .then(function (reply) {
     // Topic key
-    var key = KeyGen.topicKey(reply);
+    var key = keyGen.topicKey(reply);
     // Get value at key (string)
-    return db.get(key)
+    return db.get(key);
   })
   .then(function (reply) {
     assert.equal(reply, topicContents2, 'Contents were saved correctly for string');
@@ -285,9 +293,9 @@ test('models/ticket.js: addTopic should save the topic key to the set of topics 
     .then(function (reply) {
     // reply is topic object
     // setKey is key to set of Topics for this ticket
-    var setKey = KeyGen.topicListKey(newTicket);
+    var setKey = keyGen.topicListKey(newTicket);
     // Key to this topic
-    var topicKey = KeyGen.topicKey(reply);
+    var topicKey = keyGen.topicKey(reply);
     // Rank should be greater than or equal to 0.
     assert.ok(client.zrank(setKey, topicKey) >= 0, 'Set of topics for the ticket contains the topic key');
     assert.end();
@@ -364,11 +372,11 @@ test('models/ticket.js: Topic.getContents should should return contents from dat
     return newTicket.addTopic(topicName1, topicDataType1, topicContents1);
   })
   .then(function (reply) {
-    topicKey = KeyGen.topicKey(reply);
+    topicKey = keyGen.topicKey(reply);
     return reply.getContents();
   })
   .then(function (reply) {
-    return db.hgetall(topicKey)
+    return db.hgetall(topicKey);
   })
   .then(function (reply) {
     assert.deepEqual(reply, topicContents1, 'Contents retrieved from database');
@@ -386,7 +394,7 @@ test('models/ticket.js: Topic.exists should report the existence of the topic', 
     return newTicket.addTopic(topicName1, topicDataType1, topicContents1);
   })
   .then(function (reply) {
-    return reply.exists()
+    return reply.exists();
   })
   .then(function (result) {
     assert.ok(result, 'Existing topic reported as true');
@@ -397,7 +405,7 @@ test('models/ticket.js: Topic.exists should report the existence of the topic', 
       name: 'bob',
       dataType: 'string'
     });
-    return newTopic.exists()
+    return newTopic.exists();
   })
   .then(function (result) {
     assert.notOk(result, 'Nonexisting topic reported as false');
@@ -418,12 +426,12 @@ test('models/ticket.js: Ticket.getTopicKeys should return the correct keys', fun
   })
   .then(function (reply) {
     // Save key to this topic
-    topicKey1 = KeyGen.topicKey(reply);
+    topicKey1 = keyGen.topicKey(reply);
     return newTicket.addTopic(topicName1, topicDataType1, topicContents1);
   })
   .then(function (reply) {
     // Save key to second topic
-    topicKey2 = KeyGen.topicKey(reply);
+    topicKey2 = keyGen.topicKey(reply);
     return newTicket.getTopicKeys();
   })
   .then(function (reply) {
@@ -448,7 +456,7 @@ test('models/ticket.js: Ticket.topicFromKey creates topic object from key', func
     // Save topic
     firstTopic = reply;
     // Get the key
-    var topicKey = KeyGen.topicKey(reply);
+    var topicKey = keyGen.topicKey(reply);
     return newTicket.topicFromKey(topicKey);
   })
   .then(function (reply) {
@@ -492,13 +500,15 @@ test('models/ticket.js: Ticket.getTopics should return array of Topic objects', 
   });
 });
 
-test('models/ticket.js: finished', function (assert) {
-  logger.debug('Quitting redis');
-  client.flushdb(function (reply) {
-    logger.debug('flushdb reply ', reply);
-    client.quit(function (err, reply) {
-      logger.debug('quit reply ', reply);
-      assert.end();
+if (config.testWithRedis) {
+  test('models/fileData.js: Finished', function (assert) {
+    logger.debug('Quitting redis');
+    client.flushdb(function (reply) {
+      logger.debug('flushdb reply ', reply);
+      client.quit(function (err, reply) {
+        logger.debug('quit reply ', reply);
+        assert.end();
+      });
     });
   });
-});
+}
