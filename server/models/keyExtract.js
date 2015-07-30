@@ -100,6 +100,7 @@ module.exports = {
   topicName: topicName,
   ticketType: ticketType,
   ticketNum: ticketNum,
+  ticketKey: ticketKey,
   filePath: filePath,
   fileSubPath: fileSubPath,
   fileName: fileName,

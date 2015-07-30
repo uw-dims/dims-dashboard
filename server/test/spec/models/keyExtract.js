@@ -36,6 +36,6 @@ test('models/keyExtract.js: keyExtract should operate on ticket keys', function 
   assert.equal(keyExtract.topicData(topicKey1), 'data:cif-results', 'Topic portion extracted from topic key');
   assert.equal(keyExtract.topicName(topicKey1), 'cif-results', 'Topic name extracted from topic key');
   assert.equal(keyExtract.ticketType(topicKey1), 'data', 'Topic/ticket type extracted from topic key');
-  assert.equal(keyExtract.tickeKey(topicKey1), 'ticket:1', 'Ticket key extracted from topic key');
+  assert.equal(keyExtract.ticketKey(topicKey1), 'ticket:1', 'Ticket key extracted from topic key');
   assert.end();
 });
