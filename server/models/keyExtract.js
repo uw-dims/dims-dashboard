@@ -9,24 +9,29 @@ var logger = require('../utils/logger');
 
 // Tickets
 
-var topicData = function topicData(topicKey, ticketKey) {
+var ticketKey = function ticketKey(topicKey) {
+  var keyArray = topicKey.split(c.delimiter);
+  return keyArray[0] + c.delimiter + keyArray[1];
+};
+
+var topicData = function topicData(topicKey) {
   // Removes the parent key portion of the topic key and returns topic portion
-  return topicKey.substring((ticketKey.length + 1), topicKey.length);
+  return topicKey.substring((ticketKey(topicKey).length + 1), topicKey.length);
 };
 
-var topicName = function topicName(topicKey, ticketKey) {
+var topicName = function topicName(topicKey) {
   // Split the topic portion of key into type and name and return name
-  return (topicData(topicKey, ticketKey).split(c.delimiter))[1];
+  return (topicData(topicKey).split(c.delimiter))[1];
 };
 
-var ticketType = function ticketType(topicKey, ticketKey) {
+var ticketType = function ticketType(topicKey) {
   // Split the topic portion of key into type and name and return name
-  return (topicData(topicKey, ticketKey).split(c.delimiter))[0];
+  return (topicData(topicKey).split(c.delimiter))[0];
 };
 
 var ticketNum = function ticketNum(ticketKey) {
   // Ticket number (integer) from ticketKey
-  return parseInt((ticketKey.split(c.delimiter))[2]);
+  return parseInt((ticketKey.split(c.delimiter))[1]);
 };
 
 // Return complete path from a file key
