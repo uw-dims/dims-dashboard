@@ -68,12 +68,12 @@ test('models/keyGen.js: keyGen should return keys for tickets and topics', funct
 });
 
 test('models/keyGen.js: keyGen should return keys for files', function (assert) {
-  assert.equal(keyGen.fileKey(fileObject1), fileKey1);
-  assert.equal(keyGen.fileKey(fileObject2), fileKey2);
-  assert.equal(keyGen.fileSetKey(fileObject1), fileSetKey1);
-  assert.equal(keyGen.fileSetKey(fileObject2), fileSetKey2);
-  assert.equal(keyGen.fileMetaKey(fileObject1), fileMetaKey1);
-  assert.equal(keyGen.fileMetaKey(fileObject2), fileMetaKey2);
+  assert.equal(keyGen.fileKey(fileObject1), fileKey1, 'Returns correct file key');
+  assert.equal(keyGen.fileKey(fileObject2), fileKey2, 'Returns correct file key');
+  assert.equal(keyGen.fileSetKey(fileObject1), fileSetKey1, 'Returns correct file set key');
+  assert.equal(keyGen.fileSetKey(fileObject2), fileSetKey2, 'Returns correct file set key');
+  assert.equal(keyGen.fileMetaKey(fileObject1), fileMetaKey1, 'Returns correct file metadata key');
+  assert.equal(keyGen.fileMetaKey(fileObject2), fileMetaKey2, 'Returns correct file metadata key');
   assert.end();
 });
 
