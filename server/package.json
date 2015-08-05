@@ -5,13 +5,14 @@
   "description": "Server module for the DIMS Dashboard",
   "private": true,
   "scripts": {
-    "test": "tape test/spec/**/*.js",
-    "test-ci": "tape test/spec/**/*.js | tap-xunit",
-    "test-tap": "tape test/spec/**/*.js",
-    "test-diff": "tape test/spec/**/*.js | tap-difflet",
-    "test-json": "tape test/spec/**/*.js | tap-json",
-    "test-spec": "tape test/spec/**/*.js | tap-spec",
-    "tap": "tap test/spec/**/*.js"
+    "test": "tape tests/spec/**/*.js",
+    "test-ci": "tape tests/spec/**/*.js | tap-xunit",
+    "test-tap": "tape tests/spec/**/*.js",
+    "test-diff": "tape tests/spec/**/*.js | tap-difflet",
+    "test-json": "tape tests/spec/**/*.js | tap-json",
+    "test-spec": "tape tests/spec/**/*.js | tap-spec",
+    "tap": "tap tests/spec/**/*.js",
+    "test-one": "tape tests/spec/**/keyExtract.js"
   },
   "dependencies": {
     "JSONStream": "^0.8.4",

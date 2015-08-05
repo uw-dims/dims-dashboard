@@ -7,12 +7,12 @@ var keyExtract = require('../../../models/keyExtract');
 var c = require('../../../config/redisScheme');
 
 // Test Data
-var fileKey1 = 'file:global:boxes:main.txt';
-var fileKey2 = 'file:user1:cif:test1:data.txt';
-var fileKey3 = 'file:global:boxes:remnants:partial.jpg';
+var fileKey1 = 'dims:file:_global:boxes:main.txt';
+var fileKey2 = 'dims:file:user1:cif:test1:data.txt';
+var fileKey3 = 'dims:file:_global:boxes:remnants:partial.jpg';
 
-var ticketKey1 = 'ticket:1';
-var topicKey1 = 'ticket:1:data:cif-results';
+var ticketKey1 = 'dims:ticket:1';
+var topicKey1 = 'dims:ticket:1:analysis:cif-results';
 
 test('models/keyExtract.js: keyExtract should operate on file keys', function (assert) {
 
@@ -33,9 +33,9 @@ test('models/keyExtract.js: keyExtract should operate on file keys', function (a
 
 test('models/keyExtract.js: keyExtract should operate on ticket keys', function (assert) {
   assert.equal(keyExtract.ticketNum(ticketKey1), 1, 'Ticket number extracted from ticket key');
-  assert.equal(keyExtract.topicData(topicKey1), 'data:cif-results', 'Topic portion extracted from topic key');
+  assert.equal(keyExtract.topicData(topicKey1), 'analysis:cif-results', 'Topic portion extracted from topic key');
   assert.equal(keyExtract.topicName(topicKey1), 'cif-results', 'Topic name extracted from topic key');
-  assert.equal(keyExtract.ticketType(topicKey1), 'data', 'Topic/ticket type extracted from topic key');
-  assert.equal(keyExtract.ticketKey(topicKey1), 'ticket:1', 'Ticket key extracted from topic key');
+  assert.equal(keyExtract.ticketType(topicKey1), 'analysis', 'ticket type extracted from topic key');
+  assert.equal(keyExtract.ticketKey(topicKey1), 'dims:ticket:1', 'Ticket key extracted from topic key');
   assert.end();
 });

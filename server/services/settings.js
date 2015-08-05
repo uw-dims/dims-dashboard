@@ -10,13 +10,12 @@ var q = require('q');
 module.exports.get = function (user) {
   var deferred = q.defer();
   logger.debug('/services/settings.get user is ', user);
-  // var userSettings = new UserSettings(user);
   // var userSettings = UserSetting.userSettingsFactory(user)
 
   // UserSettings.getUserSetting(user)
 
 
-  userSettings.getSettings().then(function (reply) {
+  userSettings.retrieveSettings().then(function (reply) {
     logger.debug('/services/settings.get reply is ', reply);
     deferred.resolve(reply);
   }, function (err, reply) {

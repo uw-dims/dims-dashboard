@@ -85,11 +85,11 @@ config.sessionSecret = '3xueis763$%STID47373deC!!QUsT8J4$';
 
 config.cookieSecret = 'Xu9J35bq!5#kNY*n3v04aSPxoURx98wQZW';
 
-config.passSecret = '84jd$#lk903jcy2AUEI2j4nsKLJ!lIY'
+config.passSecret = '84jd$#lk903jcy2AUEI2j4nsKLJ!lIY';
 
 config.bin = '/opt/dims/bin/';
 
-config.rpcPath = '/opt/dims/src/prisem/rpc'
+config.rpcPath = '/opt/dims/src/prisem/rpc';
 
 config.rpcServer = 'rabbitmq.prisem.washington.edu';
 
@@ -106,7 +106,7 @@ config.mapfile = '/etc/ipgrep_networks.txt';
 // not used
 //config.outputdir = '/opt/dims/srv/output';
 
-config.data = '/opt/dims/data/sample-data/'
+config.data = '/opt/dims/data/sample-data/';
 
 config.serverPath = __dirname;
 
@@ -142,6 +142,13 @@ config.defaultUserSettings = {
   'rpcDebug': true,
   'rpcVerbose': true,
   'cifbulkQueue': 'cifbulk_v1'
+};
+
+config.defaultRedisTypes = {
+  'hash': 'hash',
+  'string': 'string',
+  'set': 'set',
+  'sortedSet': 'sortedSet'
 };
 
 // config.keyPrefixes = {

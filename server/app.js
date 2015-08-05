@@ -35,19 +35,31 @@ var routes = require('./routes')
   , cifbulk = require('./routes/cifbulk')
   , crosscor = require('./routes/crosscor')
   , anon = require('./routes/anon')
-  , data = require('./routes/data')
+  , data = require('./routes/data');
   // , logmon = require('./routes/logmon')
   // , chat = require('./routes/chat')
-  , settings = require('./routes/settings');
+  // , settings = require('./routes/settings');
 
 // Dependency injection container
-var diContainer = require('./services/diContainer');
-// diContainer.factory('redisClient', require('./utils/redisDB'));
-// diContainer.factory('redisUtils', require('./utils/redisUtils'));
-// diContainer.factory('db', require('./utils/redisUtils')(require('./utils/redisDB')));
-// diContainer.factory('ticket', require('./routes/ticket'));
-// diContainer.factory('ticketService', require('./services/ticketService'));
-// diContainer.factory('settingsService', require('./services/settingsService'));
+var diContainer = require('./services/diContainer')();
+diContainer.register('client', require('./utils/redisDB'));
+diContainer.factory('db', require('./utils/redisProxy'));
+diContainer.factory('UserSettings', require('./models/userSettings'));
+diContainer.factory('Ticket', require('./models/ticket'));
+diContainer.factory('FileData', require('./models/fileData'));
+diContainer.factory('Notification', require('./models/notification'));
+diContainer.factory('settingsRoute', require('./routes/settings'));
+diContainer.factory('sessionRoute', require('./routes/session'));
+diContainer.factory('ticketRoute', require('./routes/ticket'));
+diContainer.factory('fileDataRoute', require('./routes/fileData'));
+diContainer.factory('notificationRoute', require('./routes/notification'));
+
+// diContainer.factory('ticketService', require('./services/ticket'));
+
+var sessionRoute = diContainer.get('sessionRoute');
+var settingsRoute = diContainer.get('settingsRoute');
+var ticketRoute = diContainer.get('ticketRoute');
+var fileDataRoute = diContainer.get('fileDataRoute');
 
 var app = module.exports = express();
 
@@ -159,33 +171,46 @@ router.get('/data', ensureAuthenticated, data.list);
 // router.get('/status-chat', ensureAuthenticated, chat.status);
 
 // User Settings api
-router.get('/settings', ensureAuthenticated, settings.get);
-router.post('/settings', ensureAuthenticated, settings.update);
+router.get('/settings', ensureAuthenticated, settingsRoute.get);
+router.post('/settings', ensureAuthenticated, settingsRoute.update);
 
 // Tickets
 // Get all tickets (ticket objects)
-router.get('/api/ticket', require('./routes/ticket').list);
+router.get('/api/ticket', ticketRoute.list);
 // Create a ticket
-router.post('/api/ticket', require('./routes/ticket').create);
+router.post('/api/ticket', ticketRoute.create);
 // Get one ticket (ticket object, ticket key, array of topic keys)
-router.get('/api/ticket/:id', require('./routes/ticket').show);
+router.get('/api/ticket/:id', ticketRoute.show);
 // Update one ticket
-router.put('/api/ticket/:id', require('./routes/ticket').update);
+router.put('/api/ticket/:id', ticketRoute.update);
 // Delete one ticket
-router.delete('/api/ticket/:id', require('./routes/ticket').delete);
+router.delete('/api/ticket/:id', ticketRoute.delete);
 // Add a new topic to a ticket
-router.post('/api/ticket/:id/topic', require('./routes/ticket').addTopic);
+router.post('/api/ticket/:id/topic', ticketRoute.addTopic);
 // Get one topic (ticket object, topic object, contents)
-router.get('/api/ticket/topic/:id', require('./routes/ticket').showTopic);
+router.get('/api/ticket/topic/:id', ticketRoute.showTopic);
 // Update one topic
-router.put('/api/ticket/topic/:id', require('./routes/ticket').updateTopic);
+router.put('/api/ticket/topic/:id', ticketRoute.updateTopic);
 // Delete a topic
-router.delete('/api/ticket/topic/:id', require('./routes/ticket').deleteTopic);
+router.delete('/api/ticket/topic/:id', ticketRoute.deleteTopic);
+
+// Get list of all files (global)
+router.get('/api/fileData', fileDataRoute.list);
+// Get list of all files for a user
+router.get('/api/fileData/user/:id', fileDataRoute.list);
+// Get contents of a file
+router.get('/api/fileData/:path', fileDataRoute.show);
+// Create new file (global)
+router.post('/api/fileData', fileDataRoute.create);
+// Update an existing file
+router.put('/api/fileData/:path', fileDataRoute.update);
+// Delete a file
+router.delete('/api/fileData/:path', fileDataRoute.delete);
 
 // authorization
-router.get('/auth/session', ensureAuthenticated, require('./routes/session').session);
-router.post('/auth/session', require('./routes/session').login);
-router.delete('/auth/session', require('./routes/session').logout);
+router.get('/auth/session', ensureAuthenticated, sessionRoute.session);
+router.post('/auth/session', sessionRoute.login);
+router.delete('/auth/session', sessionRoute.logout);
 
 // user session - will delete
 // router.get('/session', ensureAuthenticated, require('./routes/usersession').session);

@@ -12,10 +12,9 @@ var extract = require('../../../models/keyExtract');
 // Enable service discovery for this test
 var diContainer = require('../../../services/diContainer')();
 var redis = require('redis');
-var redisJS = require('redis-js');
+// var redisJS = require('redis-js');
 
-if (config.testWithRedis) {
-  // logger.debug('do the test with redis');
+// if (config.testWithRedis) {
   var client = redis.createClient();
   // Add the regular proxy to diContainer
   client.select(10, function (err, reply) {
@@ -23,16 +22,17 @@ if (config.testWithRedis) {
       logger.error('test: redis client received error when selecting database ', err);
     } else {
       logger.debug('test: redis has selected db', 10, 'reply is ', reply);
+      client.flushdb();
     }
   });
   diContainer.factory('db', require('../../../utils/redisProxy'));
-} else {
-  // We'll use the mock libraries
-  // logger.debug('use mocks');
-  var client = redisJS.createClient();
-  diContainer.factory('redisProxy', require('../../../utils/redisProxy'));
-  diContainer.factory('db', require('../../redisTestProxy'));
-}
+// } else {
+//   // We'll use the mock libraries
+//   logger.debug('TEST fileData: use redis mocks');
+//   var client = redisJS.createClient();
+//   diContainer.factory('redisProxy', require('../../../utils/redisProxy'));
+//   diContainer.factory('db', require('../../redisTestProxy'));
+// }
 diContainer.register('client', client);
 
 diContainer.factory('FileData', require('../../../models/fileData'));
@@ -66,15 +66,18 @@ var fileMeta2 = function (pathCounter) {
 };
 
 test('models/fileData.js: FileData.fileDataFactory should return file object', function (assert) {
-  var newFile = FileData.fileDataFactory(fileMeta1(pathCounter));
-  assert.equal(typeof (newFile.save), 'function', 'Object should have save function');
-  assert.equal(typeof (newFile.getConfig), 'function', 'Object should have getMetaData function');
-  assert.ok(newFile.hasOwnProperty('creator'), 'Object should have creator property');
-  assert.ok(newFile.hasOwnProperty('description'), 'Object should have description property');
-  assert.ok(newFile.hasOwnProperty('global'), 'Object should have global property');
-  assert.ok(newFile.hasOwnProperty('path'), 'Object should have path property');
-  assert.ok(newFile.hasOwnProperty('name'), 'Object should have name property');
-  assert.end();
+  setTimeout(function () {
+    var newFile = FileData.fileDataFactory(fileMeta1(pathCounter));
+    assert.equal(typeof (newFile.save), 'function', 'Object should have save function');
+    assert.equal(typeof (newFile.create), 'function', 'Object should have create function');
+    assert.equal(typeof (newFile.getConfig), 'function', 'Object should have getMetaData function');
+    assert.ok(newFile.hasOwnProperty('creator'), 'Object should have creator property');
+    assert.ok(newFile.hasOwnProperty('description'), 'Object should have description property');
+    assert.ok(newFile.hasOwnProperty('global'), 'Object should have global property');
+    assert.ok(newFile.hasOwnProperty('path'), 'Object should have path property');
+    assert.ok(newFile.hasOwnProperty('name'), 'Object should have name property');
+    assert.end();
+  }, 1000);
 });
 
 test('models/fileData.js: FileData.fileDataFactory should validate config and options should override defaults', function (assert) {
@@ -119,35 +122,36 @@ test('models/fileData.js: FileData.fileDataFactory should validate config and op
   assert.end();
 });
 
-test('models/fileData.js: FileData save should save file contents and key', function (assert) {
+test('models/fileData.js: FileData create should save file contents and key', function (assert) {
 
   var newFile = FileData.fileDataFactory(fileMeta1(pathCounter));
 
   if (newFile instanceof Error) {
     assert.fail();
   } else {
-    return newFile.save(contents1)
+    return newFile.create(contents1)
 
     .then(function (reply) {
-      return db.get(keyGen.fileKey(newFile));
+      logger.debug('TEST filedata create newFile config is ', newFile.getConfig());
+      logger.debug('TEST filedata create reply is ', reply);
+      return db.getProxy(keyGen.fileKey(newFile));
     })
     .then(function (reply) {
       assert.equal(reply, contents1, 'Saved content equals expected.');
-      return db.hgetall(keyGen.fileMetaKey(newFile));
+      return db.hgetallProxy(keyGen.fileMetaKey(newFile));
     })
     .then(function (reply) {
+      logger.debug('TEST filedata create metadata reply is ', reply);
       // Convert strings
-      reply.createdTime = _.parseInt(reply.createdTime);
-      reply.modifiedTime = _.parseInt(reply.modifiedTime);
-      if (reply.global === 'true') {
-        reply.global = true;
-      } else {
-        reply.global = false;
-      }
+      var result = reply;
+      result.createdTime = _.parseInt(reply.createdTime);
+      result.modifiedTime = _.parseInt(reply.modifiedTime);
+      result.global = reply.global === 'true' ? true : false;
       assert.deepEqual(reply, newFile.getConfig(), 'Saved metadata equals expected');
-      return db.zrank(keyGen.fileSetKey(newFile), keyGen.fileKey(newFile));
+      return db.zrankProxy(keyGen.fileSetKey(newFile), keyGen.fileKey(newFile));
     })
     .then(function (reply) {
+      logger.debug('TEST filedata: create reply from zrank', reply);
       assert.ok(reply === 0, 'Key to file saved in set of keys');
       assert.end();
     }).catch(function (err) {
@@ -161,7 +165,7 @@ test('models/fileData.js: FileData save should save file contents and key', func
 test('models/fileData.js: FileData.getContent should return content from the database', function (assert) {
   pathCounter++;
   var newFile = FileData.fileDataFactory(fileMeta2(pathCounter));
-  return newFile.save(contents2)
+  return newFile.create(contents2)
   .then(function (reply) {
     return newFile.getContent();
   })
@@ -178,7 +182,7 @@ test('models/fileData.js: FileData.getContent should return content from the dat
 test('models/fileData.js: Filedata.exists should return true if the key exists in the database', function (assert) {
   pathCounter++;
   var newFile = FileData.fileDataFactory(fileMeta2(pathCounter));
-  return newFile.save(contents2)
+  return newFile.create(contents2)
   .then(function (reply) {
     return newFile.exists();
   })
@@ -205,29 +209,49 @@ test('models/fileData.js: FileData.getConfig should return the config object', f
   var config = newFile.getConfig();
   var expected = fileMeta2(pathCounter);
   assert.deepEqual(config, expected, 'Unsaved file config returned successfully');
-  return newFile.save(contents2)
+  return newFile.create(contents2)
   .then(function (reply) {
     config = newFile.getConfig();
     expected.createdTime = newFile.createdTime;
     expected.modifiedTime = newFile.modifiedTime;
     assert.deepEqual(config, expected, 'Saved file config returned successfully');
     assert.end();
+  })
+  .catch(function (err) {
+    logger.debug(err);
+    assert.end();
   });
 });
 
 test('models/fileData.js: FileData.getMetadata should return metadata from database', function (assert) {
-  assert.end();
+  pathCounter++;
+  var newFile = FileData.fileDataFactory(fileMeta2(pathCounter));
+  return newFile.create(contents2)
+  .then(function (reply) {
+    // Get the metaData from the database
+    logger.debug('TEST getMetadata reply from create is ', reply);
+    return newFile.getMetadata();
+  })
+  .then(function (reply) {
+    logger.debug('TEST getMetadata reply from getMetadata is ', reply);
+    assert.deepEqual(reply, newFile.getConfig(), 'Saved file config returned successfully');
+    assert.end();
+  })
+  .catch(function (err) {
+    logger.debug(err);
+    assert.end();
+  });
 });
 
 test('models/fileData.js: FileData content should handle stream', function (assert) {
   pathCounter++;
   var source = stream.PassThrough();
   var newFile = FileData.fileDataFactory(fileMeta1(pathCounter));
-  var newWriter = FileData.writer(newFile);
+  var newWriter = FileData.writer(newFile, 'create');
   // writer emits 'filesave' event when the data has been saved
   // So set a listener on it
   newWriter.on('filesave', function () {
-    return db.get(keyGen.fileKey(newFile)).then(function (reply) {
+    return db.getProxy(keyGen.fileKey(newFile)).then(function (reply) {
       assert.equal(reply, 'first part, second part', 'Stream content should be saved');
       assert.end();
     })
@@ -242,7 +266,7 @@ test('models/fileData.js: FileData content should handle stream', function (asse
   source.end();
 });
 
-if (config.testWithRedis) {
+// if (config.testWithRedis) {
   test('models/fileData.js: Finished', function (assert) {
     logger.debug('Quitting redis');
     client.flushdb(function (reply) {
@@ -253,5 +277,5 @@ if (config.testWithRedis) {
       });
     });
   });
-}
+// }
 

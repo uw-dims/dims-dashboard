@@ -3,18 +3,17 @@
 var test = require('tape-catch');
 var _ = require('lodash-compat');
 
-var logger = require('../../../utils/logger');
 var config = require('../../../config/config');
+var logger = require('../../../utils/logger');
 var keyGen = require('../../../models/keyGen');
 var extract = require('../../../models/keyExtract');
 
 // Enable service discovery for this test
 var diContainer = require('../../../services/diContainer')();
 var redis = require('redis');
-var redisJS = require('redis-js');
+// var redisJS = require('redis-js');
 
-if (config.testWithRedis) {
-  // logger.debug('do the test with redis');
+// if (config.testWithRedis) {
   var client = redis.createClient();
   // Add the regular proxy to diContainer
   client.select(10, function (err, reply) {
@@ -22,21 +21,24 @@ if (config.testWithRedis) {
       logger.error('test: redis client received error when selecting database ', err);
     } else {
       logger.debug('test: redis has selected db', 10, 'reply is ', reply);
+      client.flushdb();
     }
   });
   diContainer.factory('db', require('../../../utils/redisProxy'));
-} else {
-  // We'll use the mock libraries
-  // logger.debug('use mocks');
-  var client = redisJS.createClient();
-  diContainer.factory('redisProxy', require('../../../utils/redisProxy'));
-  diContainer.factory('db', require('../../redisTestProxy'));
-}
+// } else {
+//   // We'll use the mock libraries
+//   logger.debug('TEST fileData: use redis mocks');
+//   var client = redisJS.createClient();
+//   diContainer.factory('redisProxy', require('../../../utils/redisProxy'));
+//   diContainer.factory('db', require('../../redisTestProxy'));
+// }
 diContainer.register('client', client);
 
 diContainer.factory('Ticket', require('../../../models/ticket'));
+// diContainer.register('keyGen', require('../../../models/keyGen'));
 var Ticket = diContainer.get('Ticket');
 var db = diContainer.get('db');
+// var keyGen = diContainer.get('keyGen');
 
 // Bootstrap some data
 var user = 'testUser'; // Simulates logged in user
@@ -70,20 +72,23 @@ var failOnError = function (err) {
 };
 
 test('models/ticket.js: ticketFactory should return default ticket object', function (assert) {
-  assert.plan(8);
-  var newTicket = Ticket.ticketFactory();
-  assert.equal(typeof (newTicket.create), 'function', 'Ticket has create function');
-  assert.equal(typeof (newTicket.pullTicketMetadata), 'function', 'Ticket has pullTicketMetadata function');
-  assert.equal(typeof (newTicket.getTicketMetadata), 'function', 'Ticket has getTicketMetadata function');
-  assert.equal(newTicket.num, null, 'Ticket has default counter value');
-  assert.equal(newTicket.creator, null, 'Ticket has default creator value');
-  assert.equal(newTicket.type, null, 'Ticket has default type value');
-  assert.equal(newTicket.createdTime, null, 'Ticket has default createdTime');
-  assert.equal(newTicket.open, true, 'Ticket has default of open = true');
+  setTimeout(function () {
+    assert.plan(8);
+    var newTicket = Ticket.ticketFactory();
+    assert.equal(typeof (newTicket.create), 'function', 'Ticket has create function');
+    assert.equal(typeof (newTicket.pullTicketMetadata), 'function', 'Ticket has pullTicketMetadata function');
+    assert.equal(typeof (newTicket.getTicketMetadata), 'function', 'Ticket has getTicketMetadata function');
+    assert.equal(newTicket.num, null, 'Ticket has default counter value');
+    assert.equal(newTicket.creator, null, 'Ticket has default creator value');
+    assert.equal(newTicket.type, null, 'Ticket has default type value');
+    assert.equal(newTicket.createdTime, null, 'Ticket has default createdTime');
+    assert.equal(newTicket.open, true, 'Ticket has default of open = true');
+  }, 1000);
 });
 
 test('models/ticket.js: Created ticket should have a creator and type as supplied', function (assert) {
   assert.plan(2);
+  // Wait to make sure initial flush was done
   var newTicket = Ticket.ticketFactory();
   newTicket.create(ticketType1, user)
   .then(function (ticket) {
@@ -104,7 +109,7 @@ test('models/ticket.js: Creating a ticket should generate a counter for the tick
     debugTicketCounter(ticket);
     // Now retrieve the latest counter that was generated
     var key = keyGen.ticketCounterKey();
-    return db.get(key);
+    return db.getProxy(key);
   })
   .then(function (reply) {
     assert.equal(parseInt(reply), newTicket.num, 'Latest counter generated equal ticket.num');
@@ -125,7 +130,7 @@ test('models/ticket.js: Creating a ticket should save the ticket key in the set 
     // Key to this ticket
     var ticketKey = keyGen.ticketKey(ticket);
     // Rank should be greater than or equal to 0.
-    return db.zrank(setKey, ticketKey);
+    return db.zrankProxy(setKey, ticketKey);
   })
   .then(function (reply) {
     assert.ok (reply >= 0, 'Ticket key was saved');
@@ -143,7 +148,7 @@ test('models/ticket.js: Creating a ticket should save the ticket metadata correc
     // Key to this ticket
     var ticketKey = keyGen.ticketKey(ticket);
     // Get the value pointed to by the key
-    return db.hgetall(ticketKey);
+    return db.hgetallProxy(ticketKey);
   })
   .then(function (reply) {
     assert.equal(reply.type, ticketType1, 'Type saved correctly');
@@ -249,7 +254,7 @@ test('models/ticket.js: addTopic should save the contents to the database correc
     // Topic key
     var key = keyGen.topicKey(reply);
     // Get value at key (hash)
-    return db.hgetall(key);
+    return db.hgetallProxy(key);
   })
   .then(function (reply) {
     assert.deepEqual(reply, topicContents1, 'Contents were saved correctly for hash');
@@ -271,7 +276,7 @@ test('models/ticket.js: addTopic should save the contents to the database correc
     // Topic key
     var key = keyGen.topicKey(reply);
     // Get value at key (string)
-    return db.get(key);
+    return db.getProxy(key);
   })
   .then(function (reply) {
     assert.equal(reply, topicContents2, 'Contents were saved correctly for string');
@@ -293,7 +298,7 @@ test('models/ticket.js: addTopic should save the topic key to the set of topics 
     .then(function (reply) {
     // reply is topic object
     // setKey is key to set of Topics for this ticket
-    var setKey = keyGen.topicListKey(newTicket);
+    var setKey = keyGen.topicSetKey(newTicket);
     // Key to this topic
     var topicKey = keyGen.topicKey(reply);
     // Rank should be greater than or equal to 0.
@@ -376,7 +381,7 @@ test('models/ticket.js: Topic.getContents should should return contents from dat
     return reply.getContents();
   })
   .then(function (reply) {
-    return db.hgetall(topicKey);
+    return db.hgetallProxy(topicKey);
   })
   .then(function (reply) {
     assert.deepEqual(reply, topicContents1, 'Contents retrieved from database');
@@ -500,8 +505,8 @@ test('models/ticket.js: Ticket.getTopics should return array of Topic objects', 
   });
 });
 
-if (config.testWithRedis) {
-  test('models/fileData.js: Finished', function (assert) {
+// if (config.testWithRedis) {
+  test('models/ticket.js: Finished', function (assert) {
     logger.debug('Quitting redis');
     client.flushdb(function (reply) {
       logger.debug('flushdb reply ', reply);
@@ -511,4 +516,4 @@ if (config.testWithRedis) {
       });
     });
   });
-}
+// }

@@ -1,77 +1,103 @@
 'use strict';
-// This module proxies redis commands used by the application so
-// they return promises. Combination of proxy and decorator pattern.
+// This module proxies redis commands so
+// they return promises. Returns client so app can use proxied
+// or original commands
 
 var logger = require('./logger');
 var q = require('q');
-var dimsUtils = require('./util');
+var config = require('../config/config');
+var supportedTypes = config.defaultRedisTypes;
+
 
 module.exports = function redisProxy(client) {
 
-  var hmset = q.nbind(client.hmset, client),
-      incr = q.nbind(client.incr, client),
-      sadd = q.nbind(client.sadd, client),
-      rpush = q.nbind(client.rpush, client),
-      set = q.nbind(client.set, client),
-      get = q.nbind(client.get, client),
-      lrange = q.nbind(client.lrange, client),
-      sismember = q.nbind(client.sismember, client),
-      smembers = q.nbind(client.smembers, client),
-      hgetall = q.nbind(client.hgetall, client),
-      zadd = q.nbind(client.zadd, client),
-      zrange = q.nbind(client.zrange, client),
-      zrank = q.nbind(client.zrank, client),
-      zscore = q.nbind(client.zscore, client),
-      zcount = q.nbind(client.zcount, client),
-      type = q.nbind(client.type, client);
+  client.hmsetProxy = q.nbind(client.hmset, client);
+  // client.hmsetProxy = q.nbind(client.hmset, client),
+  client.incrProxy = q.nbind(client.incr, client),
+  client.saddProxy = q.nbind(client.sadd, client),
+  client.rpushProxy = q.nbind(client.rpush, client),
+  client.setProxy = q.nbind(client.set, client),
+  client.getProxy = q.nbind(client.get, client),
+  client.lrangeProxy = q.nbind(client.lrange, client),
+  client.sismemberProxy = q.nbind(client.sismember, client),
+  client.smembersProxy = q.nbind(client.smembers, client),
+  client.hgetallProxy = q.nbind(client.hgetall, client),
+  client.zaddProxy = q.nbind(client.zadd, client),
+  client.zrangeProxy = q.nbind(client.zrange, client),
+  client.zrankProxy = q.nbind(client.zrank, client),
+  client.zscoreProxy = q.nbind(client.zscore, client),
+  client.zcountProxy = q.nbind(client.zcount, client),
+  client.typeProxy = q.nbind(client.type, client);
+  // set - 'sortedSet' or 'set'
+  // client.exists = function exists(key, set, dataType) {
+  //   var doAction = {};
+  //   doAction[supportedTypes.set] = function (key, set) {
+  //     return client.zrankProxy(set, key)
+  //     .then(function (reply) {
+  //       return reply === null ? false : true;
+  //     });
+  //   };
+  //   doAction[supportedTypes.sortedSet] = function (key, set) {
+  //     return client.sismemberProxy(set, key)
+  //     .then(function (reply) {
+  //       return reply === 1 ? true : false;
+  //     });
+  //   };
+  //   if (typeof doAction[dataType] !== 'function') {
+  //     return new Error('Invalid data type was supplied: ', dataType);
+  //   }
+  //   return doAction[dataType];
+  // };
 
-  // Only returning proxied methods plus added methods
-  return {
-    hmset: hmset,
-    incr: incr,
-    sadd: sadd,
-    rpush: rpush,
-    set: set,
-    get: get,
-    lrange: lrange,
-    hgetall: hgetall,
-    sismember: sismember,
-    smembers: smembers,
-    zadd: zadd,
-    zrange: zrange,
-    zrank: zrank,
-    zscore: zscore,
-    zcount: zcount,
-    type: type,
-
-    // Added methods
-    getAllData: function (key, dataType) {
-      if (dataType === 'hash') {
-        return hgetall(key);
-      } else if (dataType === 'set') {
-        return smembers(key);
-      } else if (dataType === 'zset') {
-        return zrange(key, 0, -1);
-      } else {
-        return get(key);
-      }
-    },
-
-    setData: function (key, dataType, content, score) {
-      if (dataType === 'hash') {
-        return hmset(key, content);
-      } else if (dataType === 'set') {
-        return sadd(key, content);
-      } else if (dataType === 'zset') {
-        // Uses current time as the score if it is not supplied
-        var itemScore = score || 0;
-        if (itemScore === 0) {
-          itemScore = dimsUtils.createTimestamp();
-        };
-        return zadd(key, score, content);
-      } else {
-        return set(key, content)
-      }
+  client.setData = function (key, dataType, content, score) {
+    logger.debug('setData detatype is ', dataType);
+    logger.debug('setData content is ', content);
+    logger.debug('setData key is ', key);
+    var doAction = {};
+    doAction[supportedTypes.hash] = function (key, content) {
+      logger.debug('redisproxy hash set', key, content);
+      return client.hmsetProxy(key, content);
+    };
+    doAction[supportedTypes.set] =  function (key, content) {
+      return client.saddProxy(key, content);
+    };
+    doAction[supportedTypes.sortedSet] =  function (key, content, score) {
+      // Uses current time as the score if it is not supplied
+      var itemScore = score || 0;
+      if (itemScore === 0) {
+        itemScore = dimsUtils.createTimestamp();
+      };
+      return client.zaddProxy(key, score, content);
+    };
+    doAction[supportedTypes.string] =  function (key, content) {
+      logger.debug('redisproxy hash set');
+      return client.setProxy(key, content);
+    };
+    if (typeof doAction[dataType] !== 'function') {
+      return new Error('Invalid data type was supplied: ', dataType);
     }
-  }
+    logger.debug('setData before return');
+    return doAction[dataType](key, content, score);
+  };
+
+  // Method to get string data at a key, entire hash at a key,
+
+  client.getData = function (key, dataType) {
+    var doAction = {};
+    doAction[supportedTypes.hash] = function (key) {
+      return client.hgetallProxy(key);
+    };
+    doAction[supportedTypes.string] =  function (key) {
+      return client.getProxy(key);
+    };
+    if (typeof doAction[dataType] !== 'function') {
+      return new Error('Invalid data type was supplied: ', dataType);
+    }
+    return doAction[dataType](key);
+  };
+
+  // client.hmsetProxy = hmsetProxy;
+
+  return client;
+
 };
