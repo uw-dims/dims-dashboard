@@ -135,9 +135,11 @@ if (config.env === 'production') {
 
 // Set app to use Passport depending on user backend
 if (config.userSource === config.POSTGRESQL) {
+  logger.info('Dashboard initialization: Using POSTGRESQL backend.');
   app.use(require('./services/passport.js').initialize());
   app.use(require('./services/passport.js').session());
 } else {
+  logger.info('Dashboard initialization: Using STATIC backend for testing');
   app.use(require('./services/passport-static.js').initialize());
   app.use(require('./services/passport-static.js').session());
 }
@@ -229,6 +231,7 @@ app.use('/', router);
   });
 */
 if (config.sslOn) {
+  logger.debug('Dashboard initialization: SSL is on');
   var sslOptions = {
     key: fs.readFileSync(config.server_key),
     cert: fs.readFileSync(config.server_crt)
@@ -239,6 +242,7 @@ if (config.sslOn) {
   var server = https.createServer(sslOptions, app);
   var port = app.get('sslport');
 } else {
+  logger.debug('Dashboard initialization: SSL is off');
   var server = http.createServer(app);
   var port = app.get('port');
 }
@@ -285,7 +289,7 @@ var logs = io
   });
 
 server.listen(port);
-logger.info('DIMS Dashboard running on port %s', server.address().port);
+logger.info('Dashboard initialization: DIMS Dashboard running on port %s', server.address().port);
 // Create subscribers
 var chatSubscriber = new RabbitSocket('chat', 'subscriber', chat);
 var logSubscriber = new RabbitSocket('logs', 'subscriber', logs);

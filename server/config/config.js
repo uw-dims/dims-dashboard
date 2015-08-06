@@ -10,9 +10,10 @@ config.env = process.env.NODE_ENV || 'development';
 
 config.log_level = process.env.LOG_LEVEL || 'debug';
 
-config.log_dir = process.env.LOG_PATH || 'logs/';
+config.log_dir = process.env.LOG_PATH || '/data/dashboard/logs/';
 
-config.cert_dir = process.env.CERT_DIRECTORY || '/opt/dims/certs/';
+// Default is Ubuntu cert location
+config.cert_dir = process.env.CERT_DIRECTORY || '/etc/ssl/certs/';
 
 config.ca_name = process.env.CA_NAME || 'dims-ca';
 
@@ -24,8 +25,8 @@ config.redisPort = process.env.REDIS_PORT || 6379;
 
 config.redisDatabase = process.env.REDIS_DATABASE || 0;
 
-config.testWithRedis = process.env.TEST_WITH_REDIS || false;
-
+// Need to set these variables if using a real ops-trust db
+// User would be...
 config.userDBHost = process.env.USER_DB_HOST || 'localhost';
 config.userDBUser = process.env.USER_DB_USER || 'dims';
 config.userDatabase = process.env.USER_DATABASE || 'ops-trust';
@@ -39,9 +40,12 @@ config.userDatabase = process.env.USER_DATABASE || 'ops-trust';
 config.POSTGRESQL = 'postgresql';
 config.STATIC = 'static';
 
-config.userSource = process.env.USER_BACKEND || config.STATIC;
+// Set environment USER_BACKEND to 'static' to use test users for testing
+// rather than a postgres instance
+// Default is Postgresqll
+config.userSource = process.env.USER_BACKEND || config.POSTGRESQL;
 
-// Put this here for now
+// Put this here for now - only for testing
 config.testUsers =
   [
     {
@@ -106,7 +110,7 @@ config.mapfile = '/etc/ipgrep_networks.txt';
 // not used
 //config.outputdir = '/opt/dims/srv/output';
 
-config.data = '/opt/dims/data/sample-data/';
+config.data = '/opt/dims/data/sample-data';
 
 config.serverPath = __dirname;
 
@@ -117,8 +121,9 @@ config.serverPath = __dirname;
 
 // /opt/dims/data in the Dashboard container will map to host
 // /data/dashboard
-config.userDataPath = '/opt/dims/data/dashboard/mydata/';
+config.userDataPath = '/opt/dims/data/dashboard/';
 config.demoDatastorePath = '/opt/dims/data/dashboard/data/';
+config.uploadPath = '/data/dashboard/upload/';
 
 config.directoryMapping = {
   'ip_lists': config.userDataPath + 'ipFiles/',
