@@ -122,8 +122,8 @@ if (config.env === 'development') {
 }
 
 if (config.env === 'production') {
-  app.set('views', path.join(__dirname, '/dist'));
-  app.use(express.static(path.join(__dirname, '/dist')));
+  app.set('views', path.join(__dirname, '../public'));
+  app.use(express.static(path.join(__dirname, '../public')));
   app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.render('error', {

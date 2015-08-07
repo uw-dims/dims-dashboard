@@ -17,7 +17,7 @@ module.exports = function (grunt) {
   // Configurable paths for the application
   var appConfig = {
     app: require('./bower.json').appPath || 'dimswebapp',
-    dist: '../server/dist'
+    dist: '../public'
   };
 
   // Get variables for deployment from command line
@@ -30,8 +30,8 @@ module.exports = function (grunt) {
   // process.env.PUBLICPORT - port
   // When container is deployed, these environment variables need to be
   // defined. Grunt is then run to write these values to the client config file
-  // These values are the protocol, host, and port that a client will use to 
-  // connect to the app which proxies to the Dashboard. 
+  // These values are the protocol, host, and port that a client will use to
+  // connect to the app which proxies to the Dashboard.
 
   // Defaults:
 
@@ -47,7 +47,7 @@ module.exports = function (grunt) {
     ngconstant: {
       options: {
         space: '  ',
-         wrap: '\'use strict\';\n\n {%= __ngModule %}\n\n',
+        wrap: '\'use strict\';\n\n {%= __ngModule %}\n\n',
         name: 'dimsDashboard.config',
         deps: false,
         dest: '<%= appConfig.app %>/scripts/config.js',
@@ -170,7 +170,7 @@ module.exports = function (grunt) {
 
     // Empties folders to start fresh
     clean: {
-      options:{
+      options: {
         force: true
       },
       dist: {
@@ -230,7 +230,7 @@ module.exports = function (grunt) {
 
         },
         files: {
-          '.tmp/styles/style.css':'<%= appConfig.app %>/styles/style.less'
+          '.tmp/styles/style.css': '<%= appConfig.app %>/styles/style.less'
         }
       },
 
@@ -309,7 +309,7 @@ module.exports = function (grunt) {
       html: ['<%= appConfig.dist %>/{,*/}*.html'],
       css: ['<%= appConfig.dist %>/styles/{,*/}*.css'],
       options: {
-        assetsDirs: ['<%= appConfig.dist %>','<%= appConfig.dist %>/images']
+        assetsDirs: ['<%= appConfig.dist %>', '<%= appConfig.dist %>/images']
       }
     },
 
@@ -386,7 +386,7 @@ module.exports = function (grunt) {
       dist: {
         files: [{
           expand: true,
-          cwd: '.tmp/concat/scripts',
+          cwd: '<%= appConfig.app %>/scripts',
           src: '*.js',
           dest: '.tmp/concat/scripts'
         }]
