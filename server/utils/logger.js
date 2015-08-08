@@ -18,10 +18,10 @@ var logger = new (winston.Logger);
 
 logger.add(winston.transports.File, {
   level: config.log_level,
- handleExceptions: true,
+  handleExceptions: true,
   json: false,
   colorize: false,
-  filename: 'dashboard.log',
+  filename: config.logfile,
   maxsize: 1000000,
   tailable: true
 });
@@ -31,7 +31,7 @@ if (config.env === 'development') {
     level: config.log_level,
     handleExceptions: true,
     json: false,
-    colorize: true,
+    colorize: true
   });
 }
 
@@ -40,7 +40,7 @@ logger.emitErrs = false;
 
 module.exports = logger;
 module.exports.stream = {
-  write: function(message, encoding) {
+  write: function (message, encoding) {
     logger.info(message);
   }
 };

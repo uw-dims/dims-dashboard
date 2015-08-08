@@ -2,7 +2,7 @@
 
  angular.module('dimsDashboard.config')
 
-.constant('ENV', {PUBLICHOST:'localhost',PUBLICPORT:'3000',PUBLICPROTOCOL:'http'})
+.constant('ENV', {PUBLICHOST:'192.168.56.10',PUBLICPORT:'80',PUBLICPROTOCOL:'http'})
 
 ;
 

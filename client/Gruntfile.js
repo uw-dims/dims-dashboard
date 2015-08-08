@@ -39,7 +39,7 @@ module.exports = function (grunt) {
   var publicPort = process.env.PUBLICPORT || '3000';
   var publicProtocol = process.env.PUBLICPROTOCOL || 'http';
 
-
+  console.log('Grunt build with publicHost=' + publicHost + ', publicPort=' + publicPort + ', publicProtocol=' + publicProtocol);
   // Define the configuration for all the tasks
   grunt.initConfig({
     appConfig: appConfig,

@@ -290,6 +290,10 @@ var logs = io
 
 server.listen(port);
 logger.info('Dashboard initialization: DIMS Dashboard running on port %s', server.address().port);
+logger.info('Dashboard initialization: REDIS host, port, database: ', config.redisHost, config.redisPort, config.redisDatabase);
+logger.info('Dashboard initialization: Node environment: ', config.env);
+logger.info('Dashboard initialization: Log level:', config.log_level);
+logger.info('Dashboard initialization: UserDB source: ', config.userSource);
 // Create subscribers
 var chatSubscriber = new RabbitSocket('chat', 'subscriber', chat);
 var logSubscriber = new RabbitSocket('logs', 'subscriber', logs);

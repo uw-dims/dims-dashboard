@@ -1,20 +1,12 @@
 # Version: 0.1
-From hub.prisem.washington.edu:5000/dims:0.2
+From hub.prisem.washington.edu:5000/dims:0.3
 MAINTAINER Linda Parsons "linda.parsons@nextcentury.com"
 
 ENV VERSION 0.1
-ENV LAST_UPDATED 2015-06-09
+ENV LAST_UPDATED 2015-08-07
 
-ENV NODE_VERSION 0.12.1
-ENV NPM_VERSION 2.7.3
-
-# Found out curl not installed on dims:0.2. Should we add curl to base:0.2? Or
-# do we use wget here?
-# We will leave this apt-get here for now as we discover any other missing/needed packages
-RUN apt-get update && \
-    apt-get install -y \
-       curl && \
-    rm -rf /var/lib/apt/lists/*
+ENV NODE_VERSION 0.12.7
+ENV NPM_VERSION 2.11.3
 
 # Node install based upon joyent/docker-node/0.12/wheezy/Dockerfile
 
@@ -30,20 +22,22 @@ RUN curl -SLO "http://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x
   && tar -xzf "node-v$NODE_VERSION-linux-x64.tar.gz" -C /usr/local --strip-components=1 \
   && rm "node-v$NODE_VERSION-linux-x64.tar.gz" SHASUMS256.txt.asc \
   && npm install -g npm@"$NPM_VERSION" \
+  && npm install -g grunt-cli bower \
   && npm cache clear
+  
 
-RUN npm install -g grunt-cli bower
+# Download package from depts to /opt/dims/srv:
 
 USER dims
 WORKDIR /opt/dims/srv/dashboard
-ADD ./server/package.json /opt/dims/srv/dashboard/server/package.json
-ADD ./client/package.json /opt/dims/srv/dashboard/client/package.json
-ADD ./client/bower.json /opt/dims/srv/dashboard/client/bower.json
 
+# Install dependencies
 RUN cd server && \
     npm install && \
     cd ../client && \
     npm install && \
     bower install
+
+# Will use script for start so can set ENV vars at runtime via docker
 
 CMD [ "bash" ]

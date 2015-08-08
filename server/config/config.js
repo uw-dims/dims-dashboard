@@ -12,6 +12,8 @@ config.log_level = process.env.LOG_LEVEL || 'debug';
 
 config.log_dir = process.env.LOG_PATH || '/data/dashboard/logs/';
 
+config.logfile = config.log_dir + 'dashboard.log';
+
 // Default is Ubuntu cert location
 config.cert_dir = process.env.CERT_DIRECTORY || '/etc/ssl/certs/';
 
@@ -110,7 +112,7 @@ config.mapfile = '/etc/ipgrep_networks.txt';
 // not used
 //config.outputdir = '/opt/dims/srv/output';
 
-config.data = '/opt/dims/data/sample-data';
+config.data = '/opt/dims/data/dims-sample-data';
 
 config.serverPath = __dirname;
 
