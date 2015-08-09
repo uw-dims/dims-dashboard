@@ -8,11 +8,7 @@ var _ = require('lodash-compat'),
     stream = require('stream'),
     util = require('util'),
     q = require('q'),
-
-    config = require('../config/config'),
-    c = require('../config/redisScheme'),
     keyGen = require('./keyGen'),
-    extract = require('./keyExtract'),
     logger = require('../utils/logger'),
     dimsUtils = require('../utils/util');
 
@@ -35,7 +31,7 @@ module.exports = function FileData(db) {
       return db.zrankProxy(keyGen.fileSetKey(self), keyGen.fileKey(self))
       .then(function (reply) {
         if (reply !== null) {
-          return new Error('Key for file already exists');
+          deferred.reject(new Error('Key for file already exists'));
         } else {
           var multi = db.multi();
           multi.set(keyGen.fileKey(self), content);
@@ -182,7 +178,7 @@ module.exports = function FileData(db) {
   // Input is reference to a fileData object
   var ContentWriter = function ContentWriter(newFile, fcnName) {
     var self = this;
-    self.string = "";
+    self.string = '';
     stream.Writable.call(self);
     // Implement the _write method
     self._write = function (chunk, encoding, callback) {
@@ -196,12 +192,14 @@ module.exports = function FileData(db) {
         newFile.create(self.string)
         // fileData.create(self.string)
         .then(function (reply) {
+          /* jshint unused: false */
           self.emit('filesave', 'done');
         });
       } else {
         newFile.save(self.string)
         // fileData.create(self.string)
         .then(function (reply) {
+          /* jshint unused: false */
           self.emit('filesave', 'done');
         });
       }

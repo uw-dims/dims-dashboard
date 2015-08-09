@@ -1,6 +1,5 @@
 'use strict';
 
-var config = require('../config/config');
 var logger = require('../utils/logger');
 var q = require('q');
 var spawn =  require('child_process').spawn;

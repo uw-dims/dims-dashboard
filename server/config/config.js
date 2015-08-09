@@ -8,18 +8,18 @@ config.sslport = process.env.SSL_PORT || 3030;
 
 config.env = process.env.NODE_ENV || 'development';
 
-config.log_level = process.env.LOG_LEVEL || 'debug';
+config.logLevel = process.env.LOG_LEVEL || 'debug';
 
-config.log_dir = process.env.LOG_PATH || '/data/dashboard/logs/';
+config.logDir = process.env.LOG_PATH || '/data/dashboard/logs/';
 
 config.logfile = config.log_dir + 'dashboard.log';
 
 // Default is Ubuntu cert location
-config.cert_dir = process.env.CERT_DIRECTORY || '/etc/ssl/certs/';
+config.certDir = process.env.CERT_DIRECTORY || '/etc/ssl/certs/';
 
-config.ca_name = process.env.CA_NAME || 'dims-ca';
+config.caName = process.env.CA_NAME || 'dims-ca';
 
-config.cert_name = process.env.CERT_NAME || process.env.PUBLICHOST || 'localhost';
+config.certName = process.env.CERT_NAME || process.env.PUBLICHOST || 'localhost';
 
 config.redisHost = process.env.REDIS_HOST || 'localhost';
 
@@ -165,8 +165,8 @@ config.defaultRedisTypes = {
 config.maxUploadFileNum = 10;
 config.maxUploadFileSize = 39273942;
 
-config.server_key = config.cert_dir + config.cert_name + '.key';
-config.server_crt = config.cert_dir + config.cert_name + '.crt';
-config.server_ca = config.cert_dir + config.ca_name + '.crt';
+config.serverKey = config.certDir + config.certName + '.key';
+config.serverCrt = config.certDir + config.certName + '.crt';
+config.serverCa = config.certDir + config.caName + '.crt';
 
 module.exports = config;

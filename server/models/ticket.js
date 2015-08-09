@@ -5,7 +5,6 @@
   */
 
 var config = require('../config/config'),
-    c = require('../config/redisScheme'),
     keyGen = require('./keyGen'),
     keyExtract = require('./keyExtract'),
     logger = require('../utils/logger'),
@@ -131,12 +130,14 @@ module.exports = function Ticket(db) {
         if (!reply) {
           logger.debug('models/Ticket.addTopic. Topic does not exist. Save it. ');
           return topic.save(content).then(function (reply) {
+            /* jshint unused: false */
             // Add the topic key to the sorted set of keys
             // The score is the created timestamp, so we don't need to save that
             // elsewhere - can get the score from the set
             return db.zaddProxy(keyGen.topicSetKey(self), dimsUtils.createTimestamp(), keyGen.topicKey(topic));
           })
           .then(function (reply) {
+            /* jshint unused: false */
             return topic;
           })
           .catch(function (err) {
@@ -167,7 +168,7 @@ module.exports = function Ticket(db) {
       .then(function (topics) {
         return topics;
       })
-      .catch(function (err, reply) {
+      .catch(function (err) {
         logger.error('Ticket.getTopics had an err returned from redis', err);
         return new Error (err.toString());
       });
@@ -314,8 +315,7 @@ module.exports = function Ticket(db) {
 
     // Get the timestamp stored at the topic timestamp key
     getTimeStamp: function getTimeStamp() {
-      var self = this,
-          deferred = q.defer();
+      var self = this;
       // Get the value stored at the timestampkey
       return db.getProxy(keyGen.topicTimestampKey(self)).then(function (reply) {
         return reply;
@@ -405,7 +405,7 @@ module.exports = function Ticket(db) {
         return new Error(err.toString());
       });
     }
-  }
+  };
 
   return ticket;
 };

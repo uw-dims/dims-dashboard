@@ -21,53 +21,6 @@ var settings = require('./settings');
   * @param {string} user  ID of logged in user
   */
 
-exports.setup = function (params, user) {
-  var deferred = q.defer();
-
-  var data = params.data;
-  var id = user;
-
-  logger.debug('services/anonymize.setup start. id is ', id);
-
-  if (!params.useFile) {
-    logger.debug('services/anonymize.setup - not using file');
-    if (typeof params.data === 'object') {
-      data = JSON.stringify(data);
-    }
-    // logger.debug('services/anonymize.setup - data is ', data);
-  }
-
-  _setInputs(params, id).then(function (inputArray) {
-    logger.debug('services/anonymize.setup setInputs returned ', inputArray);
-    return _setFileInput(inputArray, params.type, params.useFile, data);
-
-  }).then(function (reply) {
-    deferred.resolve(reply);
-  });
-  return deferred.promise;
-};
-
-/** Sets up the command input for the input file. Returns a promise with inputArray. */
-var _setFileInput = function (inputArray, type, useFile, data) {
-  var deferred = q.defer();
-  logger.debug('services/anonymize._setFileInput type ', type, 'useFile ', useFile, 'inputArray ', inputArray);
-  if (type != 'ipgrep') {
-    inputArray.push('-r');
-  }
-  if (useFile) {
-    inputArray.push(data);
-    deferred.resolve(inputArray);
-  } else {
-    _writeTempFile(data).then(function (path) {
-      inputArray.push(path);
-      logger.debug('services/anonymize._setFileInput after writeTempFile. path is ', path);
-      deferred.resolve(inputArray);
-    }, function (err, reply) {
-      deferred.reject(err);
-    });
-  }
-  return deferred.promise;
-};
 
 /** Writes a temporary file with content. Returns promise with path. */
 var _writeTempFile = function (content) {
@@ -91,6 +44,28 @@ var _writeTempFile = function (content) {
   return deferred.promise;
 };
 
+/** Sets up the command input for the input file. Returns a promise with inputArray. */
+var _setFileInput = function (inputArray, type, useFile, data) {
+  var deferred = q.defer();
+  logger.debug('services/anonymize._setFileInput type ', type, 'useFile ', useFile, 'inputArray ', inputArray);
+  if (type !== 'ipgrep') {
+    inputArray.push('-r');
+  }
+  if (useFile) {
+    inputArray.push(data);
+    deferred.resolve(inputArray);
+  } else {
+    _writeTempFile(data).then(function (path) {
+      inputArray.push(path);
+      logger.debug('services/anonymize._setFileInput after writeTempFile. path is ', path);
+      deferred.resolve(inputArray);
+    }, function (err, reply) {
+      deferred.reject(err);
+    });
+  }
+  return deferred.promise;
+};
+
 /** Sets up the inputArray. Returns promise with inputArray */
 var _setInputs = function (params, id) {
 
@@ -111,11 +86,16 @@ var _setInputs = function (params, id) {
         logger.debug('service/anonymize._setInputs settings are ', settings);
         var inputArray = [config.bin + rpcClientApp, '--server', config.rpcServer,
             '--queue-base', rpcQueuebase];
-        settings.rpcDebug === 'true' ? inputArray.push ('--debug') : '';
-        settings.rpcVerbose === 'true' ? inputArray.push ('--verbose') : '';
-
-        params.stats === 'true' ? inputArray.push('-s') : '';
-        if (params.outputType == 'json') {
+        if (settings.rpcDebug === 'true') {
+          inputArray.push ('--debug');
+        }
+        if (settings.rpcVerbose === 'true') {
+          inputArray.push ('--verbose');
+        }
+        if (params.stats === 'true') {
+          inputArray.push('-s');
+        }
+        if (params.outputType === 'json') {
           inputArray.push('-J');
         }
         if (params.mapName !== undefined) {
@@ -130,6 +110,32 @@ var _setInputs = function (params, id) {
         deferred.resolve(inputArray);
       });
   }
+  return deferred.promise;
+};
+
+module.exports.setup = function (params, user) {
+  var deferred = q.defer();
+
+  var data = params.data;
+  var id = user;
+
+  logger.debug('services/anonymize.setup start. id is ', id);
+
+  if (!params.useFile) {
+    logger.debug('services/anonymize.setup - not using file');
+    if (typeof params.data === 'object') {
+      data = JSON.stringify(data);
+    }
+    // logger.debug('services/anonymize.setup - data is ', data);
+  }
+
+  _setInputs(params, id).then(function (inputArray) {
+    logger.debug('services/anonymize.setup setInputs returned ', inputArray);
+    return _setFileInput(inputArray, params.type, params.useFile, data);
+
+  }).then(function (reply) {
+    deferred.resolve(reply);
+  });
   return deferred.promise;
 };
 

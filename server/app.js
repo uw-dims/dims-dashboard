@@ -1,16 +1,18 @@
+'use strict';
+
 var express = require('express')
   , bodyParser = require('body-parser')
-  , compress = require('compression')
-  , cookieSession = require('cookie-session')
+ // , compress = require('compression')
+ // , cookieSession = require('cookie-session')
   , json = require('express-json')
   , cookieParser = require('cookie-parser')
-  , favicon = require('serve-favicon')
-  , responseTime = require('response-time')
+ // , favicon = require('serve-favicon')
+ // , responseTime = require('response-time')
   , errorHandler = require('errorhandler')
   , methodOverride = require('method-override')
-  , timeout = require('connect-timeout')
-  , vhost = require('vhost')
-  , csrf = require('csurf')
+ // , timeout = require('connect-timeout')
+ // , vhost = require('vhost')
+ // , csrf = require('csurf')
   , http = require('http')
   , https = require('https')
   , fs = require('fs')
@@ -23,8 +25,8 @@ var express = require('express')
   , socket = require('socket.io')
   //, flash = require('connect-flash')
   //, exec = require('child_process').exec
-  , messages = require('./utils/messages')
-  , CryptoJS = require('crypto-js')
+ // , messages = require('./utils/messages')
+ // , CryptoJS = require('crypto-js')
   , logger = require('./utils/logger');
 
 // routes
@@ -36,9 +38,6 @@ var routes = require('./routes')
   , crosscor = require('./routes/crosscor')
   , anon = require('./routes/anon')
   , data = require('./routes/data');
-  // , logmon = require('./routes/logmon')
-  // , chat = require('./routes/chat')
-  // , settings = require('./routes/settings');
 
 // Dependency injection container
 var diContainer = require('./services/diContainer')();
@@ -113,6 +112,7 @@ if (config.env === 'development') {
   app.use(express.static(path.join(__dirname, '.tmp')));
   app.use(express.static(path.join(__dirname, '../client/dashboard')));
   app.use(function (err, req, res, next) {
+    /* jshint unused: false */
     res.status(err.status || 500);
     res.render('error', {
       message: err.message,
@@ -125,6 +125,7 @@ if (config.env === 'production') {
   app.set('views', path.join(__dirname, '../public'));
   app.use(express.static(path.join(__dirname, '../public')));
   app.use(function (err, req, res, next) {
+    /* jshint unused: false */
     res.status(err.status || 500);
     res.render('error', {
       message: err.message,
@@ -233,9 +234,9 @@ app.use('/', router);
 if (config.sslOn) {
   logger.debug('Dashboard initialization: SSL is on');
   var sslOptions = {
-    key: fs.readFileSync(config.server_key),
-    cert: fs.readFileSync(config.server_crt)
-    //ca: fs.readFileSync(config.server_ca)
+    key: fs.readFileSync(config.serverKey),
+    cert: fs.readFileSync(config.serverCrt)
+    //ca: fs.readFileSync(config.serverCa∆Ô)
     //requestCert: true,
     //rejectUnauthorized: false
   };
@@ -251,7 +252,7 @@ if (config.sslOn) {
 var io = socket.listen(server);
 
 // Set up sockets
-RabbitSocket = require('./services/rabbitSocket');
+var RabbitSocket = require('./services/rabbitSocket');
 // Create publishers first so their publish method can be added as event listeners
 var chatPublisher = new RabbitSocket('chat', 'publisher');
 // Set up chat socket
@@ -270,6 +271,7 @@ var chat = io
       chatPublisher.send(msg);
     });
     socket.on('disconnect', function (evt) {
+      /* jshint unused: false */
       logger.debug('Chat socket.io: Received disconnect event from client. ConnectionID: ', socket.conn.id);
     });
   });
@@ -284,6 +286,7 @@ var logs = io
     };
     logger.debug('Logs socket.io. Received client connection event: ', info);
     socket.on('disconnect', function (evt) {
+      /* jshint unused: false */
       logger.debug('Logs socket.io: Received disconnect event from client. ConnectionID: ', socket.conn.id);
     });
   });

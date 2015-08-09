@@ -11,9 +11,9 @@ module.exports = function (grunt) {
 
   // var node_env = grunt.option('node_env') || 'test';
   // var log_level = grunt.option('log_level') || 'debug';
-  // var cert_directory = grunt.option('cert_directory') || 'certs/';
-  // var cert_name = grunt.option('cert_name') || 'localhost';
-  // var ssl_port = grunt.option('ssl_port') || '3030';
+  // var certDirectory = grunt.option('certDirectory') || 'certs/';
+  // var certName = grunt.option('certName') || 'localhost';
+  // var sslPort = grunt.option('sslPort') || '3030';
 
   // process.env.PUBLICHOST - host or ip where the socket.io server resides
   // process.env.PUBLICPROTOCOL - protocol we're using - http or https
@@ -31,10 +31,10 @@ module.exports = function (grunt) {
   var publicProtocol = process.env.PUBLICPROTOCOL || 'http';
   var nodeEnv = process.env.NODE_ENV || 'test';
   var logLevel = process.env.LOG_LEVEL || 'debug';
-  var cert_directory = process.env.CERT_DIRECTORY || '/etc/ssl/certs/';
-  var cert_name = process.env.CERT_NAME || 'localhost';
-  var ssl_port = process.env.SSL_PORT || '3030';
-  var ssl_on = process.env.SSL_ON || false;
+  var certDirectory = process.env.CERT_DIRECTORY || '/etc/ssl/certs/';
+  var certName = process.env.CERT_NAME || 'localhost';
+  var sslPort = process.env.SSL_PORT || '3030';
+  var sslOn = process.env.SSL_ON || false;
 
 
   grunt.initConfig({
@@ -43,9 +43,9 @@ module.exports = function (grunt) {
       test: {
         NODE_ENV: nodeEnv,
         LOG_LEVEL: logLevel,
-        CERT_DIRECTORY: cert_directory,
-        CERT_NAME: cert_name,
-        SSL_PORT: ssl_port,
+        CERT_DIRECTORY: certDirectory,
+        CERT_NAME: certName,
+        SSL_PORT: sslPort,
         PUBLICHOST: publicHost,
         PUBLICPORT: publicPort,
         PUBLICPROTOCOL: publicProtocol
@@ -66,7 +66,7 @@ module.exports = function (grunt) {
         pretty: false,
         output: 'console'
       },
-      files: ['test/**/*.js']
+      files: ['tests/**/*.js']
     },
 
     jshint: {
@@ -77,10 +77,10 @@ module.exports = function (grunt) {
       },
       all: {
         src: [
-          'services/{,*/}*.js'
+          '{services,models,utils,routes,config}/{,*/}*.js'
         ]
       }
-    },
+    }
   });
   grunt.registerTask('default', ['env:test', 'jshint', 'tape']);
   grunt.registerTask('test', ['env:test', 'tape']);

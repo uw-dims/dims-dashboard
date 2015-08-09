@@ -2,7 +2,6 @@
 
 // Settings routes - retrieve and update settings via REST api for the logged in user
 
-var config = require('../config/config');
 var logger = require('../utils/logger');
 // var UserSettings = require('../models/userSettings')
 
@@ -27,7 +26,6 @@ module.exports = function (UserSettings) {
 
   settings.update = function (req, res) {
     var id = req.user.get('ident');
-    var newSettings = req.body.settings;
 
     var userSettings = UserSettings.userSettingsFactory(id, req.body.settings);
     userSettings.saveSettings()

@@ -18,7 +18,7 @@ var dbConfig = {
 
 // Initialize Bookshelf ORM and connect
 var knex = require('knex')(dbConfig);
-var Bookshelf = require('bookshelf')(knex, {debug:true});
+var Bookshelf = require('bookshelf')(knex, {debug: true});
 
 // Add virtuals plug-in
 Bookshelf.plugin('virtuals');

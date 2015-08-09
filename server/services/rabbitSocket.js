@@ -1,7 +1,8 @@
+'use strict';
+
 var Publisher = require('./publisher.js');
 var Subscriber = require('./subscriber.js');
 
-var config = require('../config/config');
 var logger = require('../utils/logger');
 var util = require('util');
 

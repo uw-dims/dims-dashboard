@@ -1,9 +1,15 @@
 'use strict';
 
 var _ = require('lodash-compat');
-var config = require('../config/config');
 var c = require('../config/redisScheme');
-var logger = require('../utils/logger');
+
+var scrubPath = function scrubPath(path) {
+  // Converts path to format used to create key
+  var newPath = path.replace('/', c.config.delimiter);
+  // logger.debug('models/keyGen scrubPath: path is ', newPath);
+  // Strip trailing and initial, replace spaces with underscores
+  return _.trim(newPath, ' :').replace(' ', '_');
+};
 
 // Key Generator
 // Keys are generated from objects and/or params
@@ -102,14 +108,6 @@ var keyGen = {
   userSettingsSetKey: function () {
     return c.addSuffix(c.makeRoot('userSetting'), 'all');
   }
-};
-
-var scrubPath = function scrubPath(path) {
-  // Converts path to format used to create key
-  var newPath = path.replace('/', c.config.delimiter);
-  // logger.debug('models/keyGen scrubPath: path is ', newPath);
-  // Strip trailing and initial, replace spaces with underscores
-  return _.trim(newPath, ' :').replace(' ', '_');
 };
 
 module.exports = keyGen;

@@ -1,3 +1,5 @@
+'use strict';
+
 var winston = require('winston');
 var config = require('../config/config');
 var os = require('os');
@@ -8,7 +10,7 @@ var logger = new (winston.Logger);
 // logger.setLevels(winston.config.syslog.levels);
 
 // logger.add(winston.transports.Syslog, {
-//   level: config.log_level,
+//   level: config.logLevel,
 //   handleExceptions: true,
 //   json: false,
 //   colorize: false,
@@ -17,7 +19,7 @@ var logger = new (winston.Logger);
 // });
 
 logger.add(winston.transports.File, {
-  level: config.log_level,
+  level: config.logLevel,
   handleExceptions: true,
   json: false,
   colorize: false,
@@ -28,7 +30,7 @@ logger.add(winston.transports.File, {
 
 if (config.env === 'development') {
   logger.add(winston.transports.Console, {
-    level: config.log_level,
+    level: config.logLevel,
     handleExceptions: true,
     json: false,
     colorize: true

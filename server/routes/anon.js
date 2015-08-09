@@ -1,11 +1,9 @@
 'use strict';
 
 var logger = require('../utils/logger');
-var config = require('../config/config');
 var _ = require('lodash-compat');
 var ChildProcess = require('../services/childProcess');
 var anonymize = require('../services/anonymize');
-var settings = require('../services/settings');
 
 /**
   *
@@ -20,7 +18,6 @@ exports.anonymize = function (req, res) {
     return res.status(500).send('Error: user is not defined in request');
   }
   var id = req.user.get('ident');
-  var userSettings = settings.get(id); // Promise with user settings - this or id passed?
 
 
   logger.debug('routes/anon.anonymize - Request: ', req.query);
@@ -35,7 +32,7 @@ exports.anonymize = function (req, res) {
     }
   } else {
     params.useFile = true;
-    if (_.isEmpty(params.fileName) ) {
+    if (_.isEmpty(params.fileName)) {
       res.status(400).send('Request did not contain data or file to anonymize');
     } else {
       params.data = params.fileName;

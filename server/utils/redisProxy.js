@@ -7,26 +7,27 @@ var logger = require('./logger');
 var q = require('q');
 var config = require('../config/config');
 var supportedTypes = config.defaultRedisTypes;
+var dimsUtils = require('./util.js');
 
 
 module.exports = function redisProxy(client) {
 
   client.hmsetProxy = q.nbind(client.hmset, client);
   // client.hmsetProxy = q.nbind(client.hmset, client),
-  client.incrProxy = q.nbind(client.incr, client),
-  client.saddProxy = q.nbind(client.sadd, client),
-  client.rpushProxy = q.nbind(client.rpush, client),
-  client.setProxy = q.nbind(client.set, client),
-  client.getProxy = q.nbind(client.get, client),
-  client.lrangeProxy = q.nbind(client.lrange, client),
-  client.sismemberProxy = q.nbind(client.sismember, client),
-  client.smembersProxy = q.nbind(client.smembers, client),
-  client.hgetallProxy = q.nbind(client.hgetall, client),
-  client.zaddProxy = q.nbind(client.zadd, client),
-  client.zrangeProxy = q.nbind(client.zrange, client),
-  client.zrankProxy = q.nbind(client.zrank, client),
-  client.zscoreProxy = q.nbind(client.zscore, client),
-  client.zcountProxy = q.nbind(client.zcount, client),
+  client.incrProxy = q.nbind(client.incr, client);
+  client.saddProxy = q.nbind(client.sadd, client);
+  client.rpushProxy = q.nbind(client.rpush, client);
+  client.setProxy = q.nbind(client.set, client);
+  client.getProxy = q.nbind(client.get, client);
+  client.lrangeProxy = q.nbind(client.lrange, client);
+  client.sismemberProxy = q.nbind(client.sismember, client);
+  client.smembersProxy = q.nbind(client.smembers, client);
+  client.hgetallProxy = q.nbind(client.hgetall, client);
+  client.zaddProxy = q.nbind(client.zadd, client);
+  client.zrangeProxy = q.nbind(client.zrange, client);
+  client.zrankProxy = q.nbind(client.zrank, client);
+  client.zscoreProxy = q.nbind(client.zscore, client);
+  client.zcountProxy = q.nbind(client.zcount, client);
   client.typeProxy = q.nbind(client.type, client);
   // set - 'sortedSet' or 'set'
   // client.exists = function exists(key, set, dataType) {
@@ -66,7 +67,7 @@ module.exports = function redisProxy(client) {
       var itemScore = score || 0;
       if (itemScore === 0) {
         itemScore = dimsUtils.createTimestamp();
-      };
+      }
       return client.zaddProxy(key, score, content);
     };
     doAction[supportedTypes.string] =  function (key, content) {

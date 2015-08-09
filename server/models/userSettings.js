@@ -31,8 +31,6 @@ module.exports = function UserSettings(db) {
 
   // In progress: refactoring
   var userSettingsFactory = function userSettingsFactory(user, userSettings) {
-    var self = this;
-    var settingsConfig = {};
     // Merge with default settings
     var settingsConfig = _.extend({}, config.defaultUserSettings, userSettings);
     // Return new object from prototype and config

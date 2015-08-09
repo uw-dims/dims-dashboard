@@ -1,9 +1,9 @@
+'use strict';
 /*
  * GET home page.
  */
 
-exports.index = function(req, res){
-	// console.log(req.session);
+exports.index = function (req, res) {
   var session = req.session;
 
   res.render('index', { title: 'DIMS Dashboard' });

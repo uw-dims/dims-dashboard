@@ -5,14 +5,8 @@
 'use strict';
 
 // Includes
-var config = require('../config/config');
 var logger = require('../utils/logger');
 var KeyGen = require('../models/keyGen');
-
-// var redisDB = require('../utils/redisDB');
-// var db = require('../utils/redisUtils')(redisDB);
-// var Ticket = require('../models/ticket')(db);
-// var ticketService = require('../services/ticket');
 
 module.exports = function (Ticket) {
 
@@ -21,26 +15,43 @@ module.exports = function (Ticket) {
   /**
     * Determines the creator based upon creator supplied in post request
     * and logged in user
-    * @function _getCreator
+    * @function getCreator
     * @private
     * @return creator string or -1 if creator invalid
     */
-  var _getCreator = function (req) {
+  var getCreator = function (req) {
     if (!req.user) {
-      if (!req.body.creator) return -1;
+      if (!req.body.creator) {
+        return -1;
+      }
       var creator = req.body.creator.trim();
-      if (creator === '') return -1;
+      if (creator === '') {
+        return -1;
+      }
       return creator;
     } else {
       return req.user.get('ident');
     }
   };
 
-  var _getType = function (req) {
-    if (!req.body.type) return -1;
+  var getType = function (req) {
+    if (!req.body.type) {
+      return -1;
+    }
     var type = req.body.type.trim();
-    if (type === '') return -1;
+    if (type === '') {
+      return -1;
+    }
     return type;
+  };
+
+  var packageTicket = function (ticket, topics) {
+    var data = {};
+    data.ticket = ticket.getTicketMetadata();
+    data.key = KeyGen.ticketKey(ticket);
+    data.topics = topics;
+    logger.debug('services/ticket._packageBaseTicket data is now ', data);
+    return data;
   };
 
   /**
@@ -111,18 +122,13 @@ module.exports = function (Ticket) {
       // Get array of associated topic keys
       return ticket.getTopicKeys();
     }).then(function (reply) {
-        // Figure out what to send back to the caller - todo
-        // ticketService.getTicketData(ticket, reply).then(function (reply))
-        var data = {};
-        data.ticket = ticket;
-        data.key = KeyGen.ticketKey(ticket);
-        data.topics = reply;
-        res.status(200).send({data: data});
+        // Send back ticket key, metadata, array of associated topic keys
+        res.status(200).send({data: packageTicket(ticket, reply)});
       }, function (err, reply) {
+        /* jshint unused: false */
         res.status(400).send(err.toString());
       });
   };
-
 
   /**
     * Creates a new ticket
@@ -157,32 +163,30 @@ module.exports = function (Ticket) {
   ticketRoute.create = function (req, res) {
     logger.debug('routes/ticket CREATE');
     // Check for missing inputs
-    var creator = _getCreator(req);
+    var creator = getCreator(req);
     if (creator === -1) {
       res.status(400).send('Error: Creator not supplied.');
+    }
+    var type = getType(req);
+    if (type === -1) {
+      res.status(400).send('Error: Type not supplied.');
     } else {
-      var type = _getType(req);
-      if (type === -1) {
-        res.status(400).send('Error: Type not supplied.');
-      } else {
-        logger.debug('routes/ticket content param ', req.body.content);
-        var content = (req.body.content !== null && typeof req.body.content === undefined) ? req.body.content : null;
-        // Create the ticket and get the data to return
-        ticketService.createTicket(type, creator, content).then(function (reply) {
-          logger.debug('routes/ticket reply from ticketService.createTicket ', reply);
-          res.status(201).send({data: reply});
-        }, function (err, reply) {
-            res.status(400).send(err.toString());
-          });
-        logger.debug('routes/ticket Got to here 1');
-      }
+      logger.debug('routes/ticket content param ', req.body.content);
+      var content = (req.body.content !== null && typeof req.body.content === undefined) ? req.body.content : null;
+      // Create the ticket and get the data to return
+      ticketService.createTicket(type, creator, content).then(function (reply) {
+        logger.debug('routes/ticket reply from ticketService.createTicket ', reply);
+        res.status(201).send({data: reply});
+      }, function (err, reply) {
+          res.status(400).send(err.toString());
+        });
+      logger.debug('routes/ticket Got to here 1');
     }
   };
 
   // Not implemented
   ticketRoute.update = function (req, res) {
     logger.debug('routes/ticket UPDATE, not implemented ');
-    var data = {};
     res.status(405).send('Ticket update not yet implemented.');
     // }, function (err,reply) {
     //     res.status(400).send(err.toString());
@@ -192,7 +196,6 @@ module.exports = function (Ticket) {
   // Not implemented
   ticketRoute.delete = function (req, res) {
     logger.debug('routes/ticket DELETE, not implemented');
-    var data = {};
     res.status(405).send('Ticket delete not yet implemented.');
     // }, function (err,reply) {
     //     res.status(400).send(err.toString());
@@ -265,7 +268,8 @@ module.exports = function (Ticket) {
     */
   ticketRoute.addTopic = function (req, res) {
     logger.debug('routes/ticket addTopic, id: ', req.params.id);
-    var data = {};
+    var data = {},
+        ticket;
     var ticketKey = req.params.id;
     var name = req.body.name;
     var dataType = req.body.dataType;
@@ -275,16 +279,12 @@ module.exports = function (Ticket) {
       content = JSON.parse(content);
     }
     logger.debug('routes/ticket.addTopic. Content after possible parse is ', content);
-    // var ticket = new Ticket();
-    var ticket,
-        topic;
     Ticket.getTicket(ticketKey).then(function (reply) {
       // This populates the ticket object with metadata stored at the key
       // Add topic will return an error if the topic already exists
       ticket = reply;
       return ticket.addTopic(name, dataType, content);
     }).then(function (reply) {
-      var data = {};
       data.topic = reply;
       data.content = content;
       data.key = KeyGen.topicKey(reply);

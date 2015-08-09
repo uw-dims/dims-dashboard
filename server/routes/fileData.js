@@ -44,11 +44,12 @@ module.exports = function (FileData) {
     * @return HTTP Status code and string reply.
     */
   fileDataRoute.list = function (req, res) {
+    var id;
     logger.debug('routes/fileData GET');
     if (req.params.hasOwnProperty('id')) {
-      var id = req.params.id;
+      id = req.params.id;
     } else {
-      var id = c.config.globalRoot;
+      id = c.config.globalRoot;
     }
     FileData.list(id).then(function (reply) {
       res.status(200).send({data: reply});

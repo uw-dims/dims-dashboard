@@ -1,3 +1,5 @@
+'use strict';
+
 var amqp = require('amqplib');
 var logger = require('../utils/logger');
 var config = require('../config/config');
@@ -143,7 +145,9 @@ RabbitConnection.prototype.initPublish = function () {
           self.emit('channelError', err);
         });
 
-        return self.pubExchange = ch.assertExchange(self.name, self.type, {durable: self.durable});
+        self.pubExchange = ch.assertExchange(self.name, self.type, {durable: self.durable});
+        // Check this
+        return self.pubExchange;
       });
     }, function (err) {
       logger.error('services/RabbitConnection.initPublish: Connect failed: ', err);

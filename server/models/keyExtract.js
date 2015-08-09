@@ -1,7 +1,6 @@
 'use strict';
 
 var _ = require('lodash-compat');
-var config = require('../config/config');
 var c = require('../config/redisScheme');
 var logger = require('../utils/logger');
 
@@ -47,6 +46,26 @@ var ticketNum = function ticketNum(ticketKey) {
   return _.parseInt(keyArray[keyArray.length - 1]);
 };
 
+// Return true if key is global, false if a user key
+var isFileGlobal = function isFileGlobal(pathKey) {
+  return (pathKey.split(c.config.delimiter)[2] === c.config.file.globalRoot);
+};
+
+// Get user from key if it is not global. Return null if it is global.
+var fileUser = function fileUser(pathKey) {
+  if (!isFileGlobal(pathKey)) {
+    return pathKey.split(c.config.delimiter)[2];
+  } else {
+    return null;
+  }
+};
+
+// Return file name from a file key
+var fileName = function fileName(pathKey) {
+  var pathArray = pathKey.split(':');
+  return pathArray[pathArray.length - 1];
+};
+
 // Return complete path from a file key
 // We strip off starting slash
 var filePath = function filePath(pathKey) {
@@ -70,26 +89,6 @@ var fileSubPath = function fileSubPath(pathKey) {
   }
 };
 
-// Return true if key is global, false if a user key
-var isFileGlobal = function isFileGlobal(pathKey) {
-  return (pathKey.split(c.config.delimiter)[2] === c.config.file.globalRoot);
-};
-
-// Get user from key if it is not global. Return null if it is global.
-var fileUser = function fileUser(pathKey) {
-  if (!isFileGlobal(pathKey)) {
-    return pathKey.split(c.config.delimiter)[2];
-  } else {
-    return null;
-  }
-};
-
-// Return file name from a file key
-var fileName = function fileName(pathKey) {
-  var pathArray = pathKey.split(':');
-  return pathArray[pathArray.length - 1];
-};
-
 // May be able to delete this
 var parseTopicKey = function parseTopicKey(topicKey) {
   logger.debug('KeyGen.parseTopicKey: key is ', topicKey);
@@ -99,7 +98,7 @@ var parseTopicKey = function parseTopicKey(topicKey) {
   var topicSubKey = '';
   for (var i = 2; i < keyArray.length; i++) {
     topicSubKey += keyArray[i];
-    if (i = keyArray.length - 1) {
+    if (i === (keyArray.length - 1)) {
       topicSubKey += c.config.delimiter;
     }
   }

@@ -1,22 +1,22 @@
-var spawn =  require('child_process').spawn;
+'use strict';
+
 var tmp = require('tmp');
 var async = require('async');
 var fs = require('fs');
-var dimsutil = require('../utils/util');
 var logger = require('../utils/logger');
 var config = require('../config/config');
-var settings = require('../services/settings');
 var tools = require('../services/tools');
 
-exports.list = function(req,res) {
+exports.list = function (req, res) {
 
   logger.debug('routes/rwfind.list - Request query is: ', req.query);
 
-  if (!req.user) return res.status(500).send('Error: user is not defined in request');
+  if (!req.user) {
+    return res.status(500).send('Error: user is not defined in request');
+  }
   var id = req.user.get('ident');
-  var userSettings = settings.get(id); // Promise with user settings
 
-  var rpcQueuebase = config.rpcQueueNames['rwfind'],
+  var rpcQueuebase = config.rpcQueueNames.rwfind,
       rpcClientApp = 'rwfind_client',
       // debug = process.env.NODE_ENV === 'development' ? '--debug' : (req.query.debug === 'true' ? '--debug' : ''),
       // verbose = process.env.NODE_ENV === 'development' ? '--verbose' : (req.query.verbose === 'true' ? '--verbose' : '');
@@ -24,20 +24,26 @@ exports.list = function(req,res) {
       inputArray = [config.bin + rpcClientApp, '--server', config.rpcServer,
         '--queue-base', rpcQueuebase];
 
-  req.query.debug === 'true' ? inputArray.push ('--debug') : '';
-  req.query.verbose === 'true' ? inputArray.push ('--verbose') : '';
-
-  req.query.header === 'true' ? inputArray.push('-H') : '';
-
+  if (req.query.debug === 'true') {
+    inputArray.push ('--debug');
+  }
+  if (req.query.verbose === 'true') {
+    inputArray.push ('--verbose');
+  }
+  if (req.query.header === 'true') {
+    inputArray.push('-H');
+  }
   if (req.query.hitLimit !== undefined) {
-    inputArray.push('-T')
+    inputArray.push('-T');
     inputArray.push(req.query.hitLimit);
   }
   if (req.query.numDays !== undefined) {
-    inputArray.push('-D')
+    inputArray.push('-D');
     inputArray.push(req.query.numDays);
   }
-  if (req.query.outputType === 'json') inputArray.push('-J');
+  if (req.query.outputType === 'json') {
+    inputArray.push('-J');
+  }
   if (req.query.startTime !== undefined) {
     inputArray.push('--stime');
     inputArray.push(req.query.startTime);
@@ -51,59 +57,55 @@ exports.list = function(req,res) {
     inputArray.push(req.query.fileName);
   }
 
-    async.waterfall([
-        function(callback) {
-          if (req.query.ips !== undefined) {
-            tmp.file(function _tempFileCreated(err, path, fd) {
-              logger.debug('rwfind temp file created error: ', err);
-              logger.debug('rwfind temp file created path: ' + path);
-              logger.debug('rwfind temp file created fd: ' + fd);
-              callback(err,path,fd);
-            });
-          } else {
-            callback(null, null, null);
+  async.waterfall([
+    function (callback) {
+      if (req.query.ips !== undefined) {
+        tmp.file(function _tempFileCreated(err, path, fd) {
+          logger.debug('rwfind temp file created error: ', err);
+          logger.debug('rwfind temp file created path: ' + path);
+          logger.debug('rwfind temp file created fd: ' + fd);
+          callback(err, path, fd);
+        });
+      } else {
+        callback(null, null, null);
+      }
+
+    }, function (path, fd, callback) {
+      logger.debug('rwfind writefile path: ' + path);
+      logger.debug('rwfind req.query.ips: ', req.query.ips);
+      if (req.query.ips !== undefined) {
+        fs.writeFile(path, req.query.ips, function (err) {
+          logger.debug('rwfind writefile error: ' + err);
+          if (err === undefined || err === null) {
+            logger.debug('rwfind writefile error is null or undefined');
+            inputArray.push('-r');
+            inputArray.push(path);
           }
+          callback(err);
+        });
+      } else {
+        callback(null);
+      }
 
-        },function(path, fd, callback) {
-            logger.debug('rwfind writefile path: ' + path);
-            logger.debug('rwfind req.query.ips: ', req.query.ips);
-            if (req.query.ips !== undefined ) {
-              fs.writeFile(path, req.query.ips, function(err) {
-                  logger.debug('rwfind writefile error: ' + err);
-                  if (err === undefined || err === null) {
-                     logger.debug('rwfind writefile error is null or undefined');
-                     inputArray.push('-r');
-                     inputArray.push(path);
-                  }
-               callback(err);
-              });
-            } else {
-              callback(null);
-            }
+    }, function (callback) {
 
-       }, function(callback) {
+      logger.debug('routes/rwfind.list - Input to python child process: ', inputArray);
 
-          logger.debug('routes/rwfind.list - Input to python child process: ', inputArray);
+      tools.getData('python', inputArray, id)
 
-          tools.getData('python', inputArray, id)
+        .then(function (reply) {
+          console.log(reply);
+          logger.debug('routes/rwfind.list - Send 200 reply');
+          return res.status(200).send(reply);
+        }, function (err, reply) {
+          logger.debug('routes/rwfind.list - Send 500 reply');
+          return res.status(500).send(reply);
+        });
 
-            .then(function(reply) {
-              console.log(reply);
-              logger.debug('routes/rwfind.list - Send 200 reply');
-              return res.status(200).send(reply);
-            }, function(err, reply) {
-              logger.debug('routes/rwfind.list - Send 500 reply');
-              return res.status(500).send(reply);
-            });
-
-          // var python = spawn(
-          //   'python',
-          //   inputArray
-          //   );
-          // dimsutil.processPython(python, req, res);
-          callback(null, 'done');
-        }, function(err,result) {
-        }
-      ]);
-  };
+      callback(null, 'done');
+    }, function (err, result) {
+      logger.error('routes/rwfind.js Error: ', err, result);
+    }
+  ]);
+};
 

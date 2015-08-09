@@ -1,7 +1,6 @@
 'use strict';
 
 var _ = require('lodash-compat');
-var logger = require('../utils/logger');
 
 module.exports = function (userConfig) {
 

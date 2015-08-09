@@ -1,7 +1,5 @@
 'use strict';
 
-var logger = require('../utils/logger');
-
 // module.exports = function redisScheme() {
 
 /**
@@ -97,6 +95,7 @@ var makeRoot = function makeRoot(type) {
 
 // options = type plus variable number of content items
 var makeBase = function (options) {
+  /* jshint unused: false */
   // logger.debug('base options are ', options);
   // Get an array of args
   var args = [].slice.call(arguments, 0);
@@ -115,6 +114,7 @@ var makeBase = function (options) {
 // Add content to a base key - useful when constructing keys from other keys
 // Options are key plus a variable number of content items
 var addContent = function (options) {
+  /* jshint unused: false */
   var args = [].slice.call(arguments, 0);
   var key = args[0];
   args.shift();
