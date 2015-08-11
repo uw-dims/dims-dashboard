@@ -5,10 +5,8 @@ var async = require('async');
 var fs = require('fs');
 var logger = require('../utils/logger');
 var config = require('../config/config');
-// var settings = require('../services/settings');
-var ChildProcess = require('../services/childProcess');
-// var anonymize = require('../services/anonymize');
-
+// var ChildProcess = require('../services/childProcess');
+var tools = require('../services/tools');
 
 module.exports = function (UserSettings, anonService) {
 
@@ -31,7 +29,7 @@ module.exports = function (UserSettings, anonService) {
         // debug = req.query.debug !== undefined ? (req.query.debug === 'true' ? '--debug' : '') : '';
         // verbose = req.query.verbose !== undefined ? (req.query.verbose === 'true' ? '--verbose' : '') : '';
 
-        inputArray = [config.bin + rpcClientApp, '--server', config.rpcServer,
+        inputArray = [config.rpcbin + rpcClientApp, '--server', config.rpcServer,
           '--queue-base', rpcQueuebase];
 
     if (req.query.debug === 'true') {
@@ -91,44 +89,56 @@ module.exports = function (UserSettings, anonService) {
         }, function (callback) {
 
           logger.debug('cifbulk:list - Input to python child process:', inputArray);
-          var child = new ChildProcess();
-          child.startProcess('python', inputArray).then(function (reply) {
-            // reply is the data
-            rawData = reply;
-            logger.debug('routes/cifbulk.list Returned from cifbulk request. data is ');
-            console.log(rawData);
-            UserSettings.getUserSettings(id).then(function (reply) {
-              logger.debug('routes/cifbulk.list User settings are ', reply);
-              if (reply.anonymize === 'false') {
-                // Send back the raw data
-                return res.status(200).send(rawData);
-              } else {
-                logger.debug('routes/cifbulk.list Now will call anonService.setup. id is ', id);
-                // Need to anonymize before sending back
-                anonService.setup({data: rawData, useFile: false, type: 'anon'}, id).then(function (reply) {
-                  logger.debug('routes/cifbulk.list Back from anonymize.setup');
-                  inputArray = reply;
-                  var anonChild = new ChildProcess();
-                  anonChild.startProcess('python', inputArray).then(function (reply) {
-                    logger.debug('routes/cifbulk.list anon reply is ');
-                    console.log(reply);
-                    return res.status(200).send(reply);
-                  }, function (err, reply) {
-                    return res.status(500).send(reply);
-                  });
-                }, function (err, reply) {
-                  logger.debug('routes/cifbulk.list error is ', err, reply);
-                });
-              }
-            });
+          return tools.getData('python', inputArray, id)
+
+          .then(function (reply) {
+            console.log(reply);
+            logger.debug('routes/cifbulk.list - Send 200 reply');
+            return res.status(200).send(reply);
           })
+          // var child = new ChildProcess();
+          // child.startProcess('python', inputArray).then(function (reply) {
+          //   // reply is the data
+          //   rawData = reply;
+          //   logger.debug('routes/cifbulk.list Returned from cifbulk request. data is ');
+          //   console.log(rawData);
+          //   UserSettings.getUserSettings(id).then(function (reply) {
+          //     logger.debug('routes/cifbulk.list User settings are ', reply);
+          //     if (reply.anonymize === 'false') {
+          //       // Send back the raw data
+          //       return res.status(200).send(rawData);
+          //     } else {
+          //       logger.debug('routes/cifbulk.list Now will call anonService.setup. id is ', id);
+          //       // Need to anonymize before sending back
+          //       anonService.setup({data: rawData, useFile: false, type: 'anon'}, id).then(function (reply) {
+          //         logger.debug('routes/cifbulk.list Back from anonymize.setup');
+          //         inputArray = reply;
+          //         var anonChild = new ChildProcess();
+          //         anonChild.startProcess('python', inputArray).then(function (reply) {
+          //           logger.debug('routes/cifbulk.list anon reply is ');
+          //           console.log(reply);
+          //           return res.status(200).send(reply);
+          //         }, function (err, reply) {
+          //           return res.status(500).send(reply);
+          //         });
+          //       }, function (err, reply) {
+          //         logger.debug('routes/cifbulk.list error is ', err, reply);
+          //       });
+          //     }
+          //   });
+          // })
           .catch(function (err) {
             logger.error('routes/cifbulk.js catch block caught error: ', err);
             return res.status(500).send(err);
           });
           callback(null, 'done');
         }, function (err, result) {
-          logger.error('routes/cifbulk.js Error: ', err, result);
+          if (err) {
+            logger.error('routes/cifbulk.js error:', err);
+            return res.status(500).send(err);
+          } else {
+            logger.debug('routes/cifbulk.js no err. Result: ', err);
+          }
         }
       ]);
   };

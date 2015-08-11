@@ -95,6 +95,10 @@ config.passSecret = '84jd$#lk903jcy2AUEI2j4nsKLJ!lIY';
 
 config.bin = '/opt/dims/bin/';
 
+config.dimsenvbin = '/opt/dims/envs/dimsenv/bin';
+
+config.rpcbin = config.dimsenvbin;
+
 config.rpcPath = '/opt/dims/src/prisem/rpc';
 
 config.rpcServer = process.env.RABBIT_SERVER || 'rabbitmq.prisem.washington.edu';

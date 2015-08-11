@@ -30,14 +30,7 @@ var express = require('express')
   , logger = require('./utils/logger');
 
 // routes
-var routes = require('./routes')
-  // , users = require('./routes/users')
-  , files = require('./routes/files')
-  , rwfind = require('./routes/rwfind')
-  // , cifbulk = require('./routes/cifbulk')
-  , crosscor = require('./routes/crosscor')
-  // , anon = require('./routes/anon')
-  , data = require('./routes/data');
+var routes = require('./routes');
 
 // Dependency injection container
 var diContainer = require('./services/diContainer')();
@@ -55,6 +48,10 @@ diContainer.factory('notificationRoute', require('./routes/notification'));
 diContainer.factory('cifbulkRoute', require('./routes/cifbulk'));
 diContainer.factory('anonRoute', require('./routes/anon'));
 diContainer.factory('anonService', require('./services/anonymize'));
+diContainer.factory('filesRoute', require('./routes/files'));
+diContainer.factory('rwfindRoute', require('./routes/rwfind'));
+diContainer.factory('crosscorRoute', require('./routes/crosscor'));
+diContainer.factory('dataRoute', require('./routes/data'));
 
 // diContainer.factory('ticketService', require('./services/ticket'));
 
@@ -64,6 +61,10 @@ var ticketRoute = diContainer.get('ticketRoute');
 var fileDataRoute = diContainer.get('fileDataRoute');
 var cifbulkRoute = diContainer.get('cifbulkRoute');
 var anonRoute = diContainer.get('anonRoute');
+var filesRoute = diContainer.get('filesRoute');
+var rwfindRoute = diContainer.get('rwfindRoute');
+var crosscorRoute = diContainer.get('crosscorRoute');
+var dataRoute = diContainer.get('dataRoute');
 
 var app = module.exports = express();
 
@@ -160,13 +161,13 @@ var ensureAuthenticated = function (req, res, next) {
 };
 
 var router = express.Router();
-router.post('/upload', ensureAuthenticated, files.upload);
-router.get('/files', ensureAuthenticated, files.files);
+router.post('/upload', ensureAuthenticated, filesRoute.upload);
+router.get('/files', ensureAuthenticated, filesRoute.files);
 router.get('/cifbulk', ensureAuthenticated, cifbulkRoute.list);
-router.get('/crosscor', ensureAuthenticated, crosscor.list);
+router.get('/crosscor', ensureAuthenticated, crosscorRoute.list);
 router.post('/anon', ensureAuthenticated, anonRoute.anonymize);
-router.get('/rwfind', ensureAuthenticated, rwfind.list);
-router.get('/data', ensureAuthenticated, data.list);
+router.get('/rwfind', ensureAuthenticated, rwfindRoute.list);
+router.get('/data', ensureAuthenticated, dataRoute.list);
 
 // Set up routes for rabbitmq connection for logging and chat
 // Not used - deprecated
