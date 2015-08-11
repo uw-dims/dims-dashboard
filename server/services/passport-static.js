@@ -15,7 +15,7 @@ var userdata = require('../models/userStatic')(config.testUsers);
 // Specify how to serialize user info
 // Specify how to serialize user info
 passport.serializeUser(function (user, done) {
-  logger.debug('services/passport-static.serializeUser. user ident is ', user.get('ident'));
+  // logger.debug('services/passport-static.serializeUser. user ident is ', user.get('ident'));
   done(null, user.get('ident'));
 });
 
@@ -27,8 +27,8 @@ passport.deserializeUser(function (id, done) {
     return done('User was not found');
   } else {
 
-    logger.debug('services/passport-static.deserializeUser: deserializeduser is ', user);
-    logger.debug('services/passport-static.deserializeUser: deserializeduser ident and name are ', user.get('ident'), user.get('desc'));
+    // logger.debug('services/passport-static.deserializeUser: deserializeduser is ', user);
+    // logger.debug('services/passport-static.deserializeUser: deserializeduser ident and name are ', user.get('ident'), user.get('desc'));
     return done(null, user);
   }
 });

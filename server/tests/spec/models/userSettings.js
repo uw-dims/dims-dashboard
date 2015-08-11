@@ -13,18 +13,18 @@ var redis = require('redis');
 // var redisJS = require('redis-js');
 
 // if (config.testWithRedis) {
-  logger.debug('TEST filedata: do the test with redis');
-  var client = redis.createClient();
-  // Add the regular proxy to diContainer
-  client.select(10, function (err, reply) {
-    if (err) {
-      logger.error('test: redis client received error when selecting database ', err);
-    } else {
-      logger.debug('test: redis has selected db', 10, 'reply is ', reply);
-      // client.flushdb();
-    }
-  });
-  diContainer.factory('db', require('../../../utils/redisProxy'));
+logger.debug('TEST filedata: do the test with redis');
+var client = redis.createClient();
+// Add the regular proxy to diContainer
+client.select(10, function (err, reply) {
+  if (err) {
+    logger.error('test: redis client received error when selecting database ', err);
+  } else {
+    logger.debug('test: redis has selected db', 10, 'reply is ', reply);
+    // client.flushdb();
+  }
+});
+diContainer.factory('db', require('../../../utils/redisProxy'));
 // } else {
 //   // We'll use the mock libraries
 //   // logger.debug('use mocks');
@@ -134,6 +134,8 @@ test('models/userSettings: userSettingsFactory should return User Settings objec
 //   });
 // });
 
+
+
 test('models/userSettings: UserSettings object saveSettings method should save settings', function (assert) {
   var userSettings = UserSettings.userSettingsFactory('user5', settings1);
   logger.debug('TEST saveSettings settings are ', userSettings.settings);
@@ -154,10 +156,31 @@ test('models/userSettings: UserSettings object saveSettings method should save s
   });
 });
 
-test('model/userSettings: UserSettings object saveSettings method should save key', function (assert) {
+test('models/userSettings: UserSettings object createSettings method should save settings', function (assert) {
   var userSettings = UserSettings.userSettingsFactory('user6', settings1);
   logger.debug('TEST saveSettings settings are ', userSettings.settings);
-  userSettings.saveSettings()
+  userSettings.createSettings()
+  .then(function (reply) {
+    logger.debug('TEST debug createsettings reply is ', reply);
+    return db.hgetallProxy(keyGen.userSettingsKey(userSettings));
+  })
+  .then(function (reply) {
+    logger.debug('TEST debug hmgetall reply is ', reply);
+    var result = convertBoolean(reply);
+    logger.debug('TEST debug hmgetall result is ', result);
+    assert.deepEqual(result, userSettings.settings, 'Settings were saved');
+    assert.end();
+  })
+  .catch(function (err) {
+    return new Error(err.toString());
+  });
+});
+
+
+test('model/userSettings: UserSettings object createSettings method should save key', function (assert) {
+  var userSettings = UserSettings.userSettingsFactory('user7', settings1);
+  logger.debug('TEST saveSettings settings are ', userSettings.settings);
+  userSettings.createSettings()
   .then(function (reply) {
     logger.debug('TEST debug savesettings reply is ', reply);
     return db.sismemberProxy(keyGen.userSettingsSetKey(), keyGen.userSettingsKey(userSettings));
@@ -205,9 +228,9 @@ test('models/userSettings: UserSettings object getUser method gets the object us
 });
 
 test('models/userSettings: UserSettings object retrieveSettings method gets the settings from db', function (assert) {
-  var userSettings = UserSettings.userSettingsFactory('user7', settings1);
+  var userSettings = UserSettings.userSettingsFactory('user8', settings1);
   // Save the settings
-  userSettings.saveSettings()
+  userSettings.createSettings()
   .then(function (reply) {
     return userSettings.retrieveSettings();
   })
@@ -222,12 +245,12 @@ test('models/userSettings: UserSettings object retrieveSettings method gets the 
   });
 });
 
-test('models/userSettings: getUserSettings static method returns UserSettings object', function(assert) {
-  var userSettings = UserSettings.userSettingsFactory('user8', settings1);
+test('models/userSettings: getUserSettings static method returns UserSettings object if user has been saved', function(assert) {
+  var userSettings = UserSettings.userSettingsFactory('user9', settings1);
   // Save the settings
-  userSettings.saveSettings()
+  userSettings.createSettings()
   .then(function (reply) {
-    return UserSettings.getUserSettings('user8');
+    return UserSettings.getUserSettings('user9');
   })
   .then(function (reply) {
     logger.debug('TEST getUserSettings reply', reply);
@@ -235,7 +258,7 @@ test('models/userSettings: getUserSettings static method returns UserSettings ob
     assert.equal(typeof (reply.saveSettings), 'function', 'Object should have saveSettings function');
     assert.ok(reply.hasOwnProperty('settings'), 'Object should have settings property');
     assert.ok(reply.hasOwnProperty('user'), 'Object should have user property');
-    assert.equal(reply.user, 'user8');
+    assert.equal(reply.user, 'user9');
     assert.deepEqual(reply.settings, userSettings.settings);
     assert.end();
   })

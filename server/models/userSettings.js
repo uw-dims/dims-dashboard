@@ -6,6 +6,7 @@
 // Queries redis to read/update/create user settings
 
 var _ = require('lodash-compat'),
+    q = require('q'),
     config = require('../config/config'),
     logger = require('../utils/logger'),
     keyGen = require('./keyGen');
@@ -29,7 +30,6 @@ module.exports = function UserSettings(db) {
     }
   };
 
-  // In progress: refactoring
   var userSettingsFactory = function userSettingsFactory(user, userSettings) {
     // Merge with default settings
     var settingsConfig = _.extend({}, config.defaultUserSettings, userSettings);
@@ -41,32 +41,57 @@ module.exports = function UserSettings(db) {
     return _.create(userSettingsPrototype, finalSettings);
   };
 
-  // // Wrap the redis function for update, return promise
-  // var save = function save(key, settings) {
-  //   return db.hmset(key, settings);
-  // };
+  // create and save a userSetting object for a user
+  var create = function create(user, settings) {
+    var deferred = q.defer();
+    var multi = db.multi();
+    multi.hmset(keyGen.userSettingsKey(user), settings);
+    multi.sadd(keyGen.userSettingsSetKey(), keyGen.userSettingsKey(user));
+    multi.exec(function (err, replies) {
+      if (err) {
+        deferred.reject(new Error(err));
+      } else {
+        logger.debug('models/userSettings.js create: replies from create', replies);
+        deferred.resolve('ok');
+      }
+    });
+    return deferred.promise;
+  };
 
-  // // Wrap the redis function for get, return promise
-  // var get = function get(key) {
-  //   return db.hgetall(key);
-  // };
+  var save = function save(user, settings) {
+    return db.hmsetProxy(keyGen.userSettingsKey(user), settings);
+  };
 
-  // Saves key in key set. Returns promise
-  // var saveKey = function saveKey(keySetKey, key) {
-  //   return db.sadd(keySetKey, key);
-  // };
+  // Wrap the redis function for get, return promise
+  var get = function get(user) {
+    return db.hgetallProxy(keyGen.userSettingsKey(user));
+  };
+
+  var exists = function (user) {
+    return db.sismemberProxy(keyGen.userSettingsSetKey(), keyGen.userSettingsKey(user));
+  };
 
   // Static function to get settings object for a user. Returns userSettings object.
   var getUserSettings = function getUserSettings(user) {
     // Save for later in the chain
     var thisUser = user;
+    var newUserSettings;
+    logger.debug('model/userSettings.js getUserSettings static function. user = ', user);
     // Retrieve the settings for this user via user settings key. Return null if no settings exist.
-    return db.hgetallProxy(keyGen.userSettingsKey(thisUser))
+    return exists(thisUser)
     .then(function (reply) {
-      // Create settings object and return
-      var newSettings = convertBoolean(reply);
-      logger.debug('model/userSettings getUserSettings for user ', user, 'reply', newSettings);
-      return userSettingsFactory(thisUser, newSettings);
+      if (reply === 0) {
+        newUserSettings = userSettingsFactory(thisUser);
+        logger.debug('model/userSettings.js getUserSettings new settings ', newUserSettings.settings);
+        return create(thisUser, newUserSettings.settings).then(function (reply) {
+          return newUserSettings;
+        });
+      } else {
+        return get(thisUser).then(function (reply) {
+          // var newSettings = convertBoolean(reply);
+          return userSettingsFactory(thisUser, reply);
+        });
+      }
     })
     .catch(function (err) {
       return new Error(err.toString());
@@ -95,16 +120,27 @@ module.exports = function UserSettings(db) {
       self.user = user;
     },
 
+    createSettings: function createSettings() {
+      var self = this;
+      return create(self.user, self.settings);
+    },
+
     // Get the settings from db for this user. Returns settings object.
     retrieveSettings: function retrieveSettings() {
       var self = this;
-      return db.hgetallProxy(keyGen.userSettingsKey(self))
+      return exists(self.user)
       .then(function (reply) {
-        // update the object
-        logger.debug('model/userSettings.js retrieveSettings: key ', keyGen.userSettingsKey(self));
-        logger.debug('model/userSettings.js retrieveSettings: reply ', reply);
-        // Return the object so it can be used
-        return convertBoolean(reply);
+        if (reply === 0) {
+          return create(self.user, self.settings).then(function (reply) {
+            return self.settings;
+          });
+        } else {
+          return get(self.user).then(function (reply) {
+            // self.settings = convertBoolean(reply);
+            self.settings = reply;
+            return self.settings;
+          });
+        }
       })
       .catch(function (err) {
         return new Error(err.toString());
@@ -115,17 +151,7 @@ module.exports = function UserSettings(db) {
     saveSettings: function saveSettings() {
       var self = this;
       logger.debug('model/userSettings.js saveSettings initial settings are', self.settings);
-      return db.hmsetProxy(keyGen.userSettingsKey(self), self.settings)
-      .then(function (reply) {
-        logger.debug('model/userSettings.js saveSettings: reply from hmset', reply);
-        // Save the key for this user's settings
-        logger.debug('model/userSettings.js saveSettings: key is ', keyGen.userSettingsKey(self));
-        logger.debug('model/userSettings.js saveSettings: set key is ', keyGen.userSettingsSetKey());
-        return db.saddProxy(keyGen.userSettingsSetKey(), keyGen.userSettingsKey(self));
-      })
-      .catch(function (err) {
-        return new Error(err.toString());
-      });
+      return save(self.user, self.settings);
     }
   };
 

@@ -35,6 +35,7 @@ module.exports = function (UserSettings) {
       // Get associated settings
       var userSettings = UserSettings.userSettingsFactory(username);
       userSettings.retrieveSettings().then(function (data) {
+        logger.debug('routes/session.js session reply from retrieve settings is ', data);
           var object = sessionObject(username, name, data);
           res.status(200).send({data: object});
         }).then(function (err) {
@@ -93,11 +94,12 @@ module.exports = function (UserSettings) {
         logger.debug('routes/session.login. Get user settings for user ', username);
 
         // Create new UserSettings object
-        var userSettings = UserSettings.userSettingsFactory(username);
-        // Retrieve settings from database
-        userSettings.retrieveSettings().then(function (data) {
-            logger.debug('routes/session.login. callback from userSettings.getSettings. username and name are now ', username, name);
-            var object = sessionObject(username, name, data);
+        // If settings have never been saved, object will save
+        // default settings
+        UserSettings.getUserSettings(username).then(function (data) {
+            logger.debug('routes/session.login. callback from userSettings.getUserSettings. username and name are now ', username, name);
+            logger.debug('routes/session.login. callback from userSettings.getUserSettings. settings are ', data.settings);
+            var object = sessionObject(username, name, data.settings);
             logger.debug('routes/session.login. object is ', object);
             res.status(200).send({data: object});
           }).then(function (err) {

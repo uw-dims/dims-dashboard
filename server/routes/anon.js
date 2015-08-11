@@ -3,61 +3,68 @@
 var logger = require('../utils/logger');
 var _ = require('lodash-compat');
 var ChildProcess = require('../services/childProcess');
-var anonymize = require('../services/anonymize');
 
 /**
   *
   */
 
-exports.anonymize = function (req, res) {
-  var commandProgram,
-      inputArray,
-      params = req.query;
+module.exports = function (UserSettings, anonService) {
 
-  if (!req.user) {
-    return res.status(500).send('Error: user is not defined in request');
-  }
-  var id = req.user.get('ident');
+  var anon = {};
 
+  anon.anonymize = function (req, res) {
+    var commandProgram,
+        inputArray,
+        params = req.query;
 
-  logger.debug('routes/anon.anonymize - Request: ', req.query);
-
-  if (!_.isEmpty(req.body)) {
-    logger.debug('routes/anon.anonymize - req.body is not empty');
-    params.useFile = false;
-    if (_.isEmpty(params.fileName)) {
-      params.data = req.body;
-    } else {
-      return res.status(400).send('Request specified both file and data at the same time');
+    if (!req.user) {
+      return res.status(500).send('Error: user is not defined in request');
     }
-  } else {
-    params.useFile = true;
-    if (_.isEmpty(params.fileName)) {
-      res.status(400).send('Request did not contain data or file to anonymize');
-    } else {
-      params.data = params.fileName;
-    }
-  }
+    var id = req.user.get('ident');
 
-  if (_.isEmpty(params.type)) {
-    params.type = 'anon';
-  }
-  anonymize.setup(params, id).then(function (reply) {
-    inputArray = reply;
-    logger.debug('routes/anon.anonymize. Response from anonymize.setup: inputArray = ', inputArray);
-    if (req.query.type === 'ipgrep') {
-      commandProgram = 'perl';
+
+    logger.debug('routes/anon.anonymize - Request: ', req.query);
+
+    if (!_.isEmpty(req.body)) {
+      logger.debug('routes/anon.anonymize - req.body is not empty');
+      params.useFile = false;
+      if (_.isEmpty(params.fileName)) {
+        params.data = req.body;
+      } else {
+        return res.status(400).send('Request specified both file and data at the same time');
+      }
     } else {
-      commandProgram = 'python';
+      params.useFile = true;
+      if (_.isEmpty(params.fileName)) {
+        res.status(400).send('Request did not contain data or file to anonymize');
+      } else {
+        params.data = params.fileName;
+      }
     }
-    var child = new ChildProcess();
-    child.startProcess(commandProgram, inputArray).then(function (reply) {
-      logger.debug('routes/anon.anonymize.setup. ChildProcess returned ', reply);
-      return res.status(200).send(reply);
-    }, function (err, reply) {
-      return res.status(500).send(reply);
+
+    if (_.isEmpty(params.type)) {
+      params.type = 'anon';
+    }
+    anonService.setup(params, id).then(function (reply) {
+      inputArray = reply;
+      logger.debug('routes/anon.anonymize. Response from anonService.setup: inputArray = ', inputArray);
+      if (req.query.type === 'ipgrep') {
+        commandProgram = 'perl';
+      } else {
+        commandProgram = 'python';
+      }
+      var child = new ChildProcess();
+      child.startProcess(commandProgram, inputArray).then(function (reply) {
+        logger.debug('routes/anon.anonymize.setup. ChildProcess returned ', reply);
+        return res.status(200).send(reply);
+      }, function (err, reply) {
+        return res.status(500).send(reply);
+      });
     });
-  });
+
+  };
+
+  return anon;
 
 };
 

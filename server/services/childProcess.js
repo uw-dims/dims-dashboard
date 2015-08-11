@@ -25,6 +25,7 @@ ChildProcess.prototype.startProcess = function (commandProgram, inputArray) {
     );
 
   self.output = '';
+  self.error = '';
   logger.debug('services/childProcess spawned childProcess. Program: ', commandProgram, ', PID: ', self.childProcess.pid);
 
   // Listener on process stdout - add stdout to output
@@ -35,7 +36,8 @@ ChildProcess.prototype.startProcess = function (commandProgram, inputArray) {
   // Listener on process stderr - Log it
   self.childProcess.stderr.on('data', function (data) {
     var decoder = new (require('string_decoder').StringDecoder)('utf-8');
-    logger.info('services/childProcess stderr %s', decoder.write(data));
+    // self.stderr += decoder.write(data);
+    logger.debug('services/childProcess %s', decoder.write(data));
   });
 
   // Listener on process close - send back the resuls in the promise
@@ -43,8 +45,13 @@ ChildProcess.prototype.startProcess = function (commandProgram, inputArray) {
     logger.debug('services/childProcess closed. PID: ' + self.childProcess.pid + ', code: ' + code);
     if (code !== 0) {
       logger.error('services/childProcess closed with error. PID: %d, code: %s', self.childProcess.pid, code);
+      var err = new Error('Child process exited with error code');
+      err.code = code;
+      err.pid = self.childProcess.pid;
+      err.stderr = self.stderr;
+      logger.error('services/childProcess err is ', err, err.stack, err.code, err.pid, err.stderr);
       // return res.status(500).json({code: code, pid: childProcess.pid, data: output});
-      return deferred.reject({code: code, pid: self.childProcess.pid, data: self.output});
+      return deferred.reject(err);
     }
     // try {
     //   // Some of our tools return data with extra line returns

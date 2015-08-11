@@ -34,9 +34,9 @@ var routes = require('./routes')
   // , users = require('./routes/users')
   , files = require('./routes/files')
   , rwfind = require('./routes/rwfind')
-  , cifbulk = require('./routes/cifbulk')
+  // , cifbulk = require('./routes/cifbulk')
   , crosscor = require('./routes/crosscor')
-  , anon = require('./routes/anon')
+  // , anon = require('./routes/anon')
   , data = require('./routes/data');
 
 // Dependency injection container
@@ -52,6 +52,9 @@ diContainer.factory('sessionRoute', require('./routes/session'));
 diContainer.factory('ticketRoute', require('./routes/ticket'));
 diContainer.factory('fileDataRoute', require('./routes/fileData'));
 diContainer.factory('notificationRoute', require('./routes/notification'));
+diContainer.factory('cifbulkRoute', require('./routes/cifbulk'));
+diContainer.factory('anonRoute', require('./routes/anon'));
+diContainer.factory('anonService', require('./services/anonymize'));
 
 // diContainer.factory('ticketService', require('./services/ticket'));
 
@@ -59,6 +62,8 @@ var sessionRoute = diContainer.get('sessionRoute');
 var settingsRoute = diContainer.get('settingsRoute');
 var ticketRoute = diContainer.get('ticketRoute');
 var fileDataRoute = diContainer.get('fileDataRoute');
+var cifbulkRoute = diContainer.get('cifbulkRoute');
+var anonRoute = diContainer.get('anonRoute');
 
 var app = module.exports = express();
 
@@ -157,9 +162,9 @@ var ensureAuthenticated = function (req, res, next) {
 var router = express.Router();
 router.post('/upload', ensureAuthenticated, files.upload);
 router.get('/files', ensureAuthenticated, files.files);
-router.get('/cifbulk', ensureAuthenticated, cifbulk.list);
+router.get('/cifbulk', ensureAuthenticated, cifbulkRoute.list);
 router.get('/crosscor', ensureAuthenticated, crosscor.list);
-router.post('/anon', ensureAuthenticated, anon.anonymize);
+router.post('/anon', ensureAuthenticated, anonRoute.anonymize);
 router.get('/rwfind', ensureAuthenticated, rwfind.list);
 router.get('/data', ensureAuthenticated, data.list);
 
@@ -295,7 +300,7 @@ server.listen(port);
 logger.info('Dashboard initialization: DIMS Dashboard running on port %s', server.address().port);
 logger.info('Dashboard initialization: REDIS host, port, database: ', config.redisHost, config.redisPort, config.redisDatabase);
 logger.info('Dashboard initialization: Node environment: ', config.env);
-logger.info('Dashboard initialization: Log level:', config.log_level);
+logger.info('Dashboard initialization: Log level:', config.logLevel);
 logger.info('Dashboard initialization: UserDB source: ', config.userSource);
 // Create subscribers
 var chatSubscriber = new RabbitSocket('chat', 'subscriber', chat);

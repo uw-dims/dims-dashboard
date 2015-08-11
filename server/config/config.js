@@ -97,13 +97,13 @@ config.bin = '/opt/dims/bin/';
 
 config.rpcPath = '/opt/dims/src/prisem/rpc';
 
-config.rpcServer = 'rabbitmq.prisem.washington.edu';
+config.rpcServer = process.env.RABBIT_SERVER || 'rabbitmq.prisem.washington.edu';
 
-config.rpcUser = 'rpc_user';
+config.rpcUser = process.env.RABBIT_USER || 'rpc_user';
 
-config.rpcPass = 'rpcm3pwd';
+config.rpcPass = process.env.RABBIT_PASS || 'rpcm3pwd';
 
-config.rpcPort = '5672';
+config.rpcPort = process.env.RABBIT_PORT  || '5672';
 
 config.mapfile = '/etc/ipgrep_networks.txt';
 

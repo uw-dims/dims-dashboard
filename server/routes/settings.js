@@ -11,9 +11,10 @@ module.exports = function (UserSettings) {
   settings.get = function (req, res) {
     // id is from logged in user
     var id = req.user.get('ident');
-
+    logger.debug('routes/settings get: id = ', id);
     // Create new UserSettings object
     var userSettings = UserSettings.userSettingsFactory(id);
+    logger.debug('routes/settings get: new object = ', userSettings);
     // Get saved settings for this user
     return userSettings.retrieveSettings()
     .then(function (data) {

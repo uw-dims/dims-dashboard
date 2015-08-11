@@ -7,6 +7,12 @@ var logger = require('../utils/logger');
 var UserSettings = require('../models/userSettings')(require('../utils/redisDB'));
 var q = require('q');
 
+module.exports = function settings(UserSettings) {
+
+
+
+}
+
 module.exports.get = function (user) {
   var deferred = q.defer();
   logger.debug('/services/settings.get user is ', user);
