@@ -30,19 +30,22 @@ module.exports = function (callingModule) {
   //   app_name: 'dimswebapp'
   // });
 
-  logger.addFilter(function(msg, meta, level) {
+  logger.addFilter(function (msg, meta, level) {
     return moment().toISOString() + ' [' + getLabel() + '] ' + msg;
   });
 
-  logger.add(winston.transports.File, {
-    level: config.logLevel,
-    handleExceptions: false,
-    json: false,
-    colorize: false,
-    filename: config.logfile,
-    maxsize: 1000000,
-    tailable: true
-  });
+  // Will replace once we figure out where to send the logs
+  if (config.env === 'production') {
+    logger.add(winston.transports.File, {
+      level: config.logLevel,
+      handleExceptions: false,
+      json: false,
+      colorize: false,
+      filename: config.logfile,
+      maxsize: 1000000,
+      tailable: true
+    });
+  }
 
   if (config.env === 'development') {
     logger.add(winston.transports.Console, {

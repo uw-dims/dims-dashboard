@@ -12,7 +12,7 @@ var connectionString = 'amqp://' + config.rpcUser + ':' + config.rpcPass + '@' +
 var connection;
 var q = 'test_queue';
 
-test('Test amqpClient', function (assert) {
+test.skip('Test amqpClient', function (assert) {
   // Stub the server
   var corrId;
   assert.plan(1);
