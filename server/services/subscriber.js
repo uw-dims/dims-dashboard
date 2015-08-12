@@ -1,6 +1,7 @@
+'use strict';
+
 var RabbitConnection = require('../services/rabbitConnection');
-var config = require('../config');
-var logger = require('../utils/logger');
+var logger = require('../utils/logger')(module);
 var util = require('util');
 
 var EventEmitter = require('events').EventEmitter;
@@ -24,11 +25,11 @@ function Subscriber(name) {
   EventEmitter.call(self);
 };
 
-Subscriber.prototype.getName = function() {
+Subscriber.prototype.getName = function () {
   return self.name;
 };
 
-Subscriber.prototype.start = function() {
+Subscriber.prototype.start = function () {
   var self = this;
   logger.debug('services/Subscriber.start:' + self.name + ': starting...');
   if (self.running) {
@@ -44,19 +45,19 @@ Subscriber.prototype.start = function() {
     self.rabbit.on('channelError', self.onChannelError.bind(self));
     // Received subscribe receive event from rabbit
     // Propogate it up
-    self.rabbit.on(self.name+':receive', function(msg) {
+    self.rabbit.on(self.name + ':receive', function (msg) {
       // logger.debug('Subscriber: ' + self.name + ': message received', msg);
-      self.emit(self.name+':receive', msg);
+      self.emit(self.name + ':receive', msg);
     });
     // Subscribe
     self.rabbit.subscribe();
   }
-  
+
 };
 
-Subscriber.prototype.stop = function() {
+Subscriber.prototype.stop = function () {
   var self = this;
-  logger.debug('services/Subscriber.stop:' + self.name + ': stopping... ch =', self.ch, 
+  logger.debug('services/Subscriber.stop:' + self.name + ': stopping... ch =', self.ch,
     'exchange =', self.exchange, 'queue =', self.queue, 'consumerTag =', self.consumerTag);
   if (self.running) {
     self.running = false;
@@ -73,20 +74,20 @@ Subscriber.prototype.stop = function() {
   }
 };
 
-Subscriber.prototype.status = function() {
+Subscriber.prototype.status = function () {
   var self = this;
   return (self.running) ? 'started' : 'stopped';
 };
 
-// Subscriber.prototype.onMessage = function(msg) {
+// Subscriber.prototype.onMessage = function (msg) {
 //   // Pass on event
 //   logger.debug('Subscriber: ' + self.name + ': message received');
 //   //self.emit('msg', msg);
 // };
 
 // Listener for the ready event emitted by a RabbitConnection object
-Subscriber.prototype.onReady = function(ev) {
-  logger.debug('services/Subscriber received ready event from RabbitConnection. Event is ', ev);
+Subscriber.prototype.onReady = function (ev) {
+  logger.info('services/Subscriber received ready event from RabbitConnection object. Event is ', ev);
   var self = this;
   self.ch = ev.ch;
   self.exchange = ev.exchange;
@@ -99,10 +100,10 @@ Subscriber.prototype.onReady = function(ev) {
 };
 
 // Listener for the close event emitted when a RabbitConnection closes
-Subscriber.prototype.onClosed = function() {
+Subscriber.prototype.onClosed = function (ev) {
   var self = this;
-  logger.debug('services/Subscriber.onClosed:' + self.name + ': received connection close event. ch =', self.ch, 
-    'exchange =', self.exchange, 'queue =', self.queue, 'consumerTag =', self.consumerTag);
+  logger.debug('services/Subscriber.onClosed:' + self.name + ': received connection close event. ch =', self.ch,
+    'exchange =', self.exchange, 'queue =', self.queue, 'consumerTag =', self.consumerTag + ' Event: ' + ev);
   self.running = false;
   // Notify others that the fanout has stopped
   self.emit(self.stopEvent);
@@ -110,9 +111,9 @@ Subscriber.prototype.onClosed = function() {
 };
 
 // Listener for the close event emitted when a RabbitConnection channel closes
-Subscriber.prototype.onChannelClosed = function() {
+Subscriber.prototype.onChannelClosed = function (ev) {
   var self = this;
-  logger.debug('services/Subscriber.onChannelClosed:' + self.name + ': received channel close event. ch =', self.ch, 
+  logger.debug('services/Subscriber.onChannelClosed:' + self.name + ': received channel close event. ch =', self.ch,
     'exchange =', self.exchange, 'queue =', self.queue, 'consumerTag =', self.consumerTag);
   if (self.running) {
     self.rabbit.subscribe();
@@ -120,16 +121,16 @@ Subscriber.prototype.onChannelClosed = function() {
 };
 
 // Listener for the error event emitted by a RabbitConnection connection
-Subscriber.prototype.onError = function(err) {
+Subscriber.prototype.onError = function (err) {
   var self = this;
-  logger.debug('services/Subscriber.onError: ' + self.name + ': received connection error event', err, 'ch =', self.ch, 
+  logger.debug('services/Subscriber.onError: ' + self.name + ': received connection error event', err, 'ch =', self.ch,
     'exchange =', self.exchange, 'queue =', self.queue, 'consumerTag =', self.consumerTag);
 };
 
 // Listener for the error event emitted by a RabbitConnection channel
-Subscriber.prototype.onChannelError = function(err) {
+Subscriber.prototype.onChannelError = function (err) {
   var self = this;
-  logger.debug('services/Subscriber.onChannelError: ' + self.name + ': received channel error event', err, 'ch =', self.ch, 
+  logger.debug('services/Subscriber.onChannelError: ' + self.name + ': received channel error event', err, 'ch =', self.ch,
     'exchange =', self.exchange, 'queue =', self.queue, 'consumerTag =', self.consumerTag);
 };
 

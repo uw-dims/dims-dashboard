@@ -27,13 +27,13 @@
     return directive;
 
     function linkFunc(scope, el, attr, ctrl) {
-      $log.debug('LINK: scope.fileSource = ', scope.fileSource);
-      $log.debug('LINK: scope.pickerModel = ', scope.pickerModel);
-      $log.debug('LINK: scope.fileType = ', scope.fileType);
-      $log.debug('LINK: scope.vm.fileType = ', scope.vm.fileType);
+      // $log.debug('LINK: scope.fileSource = ', scope.fileSource);
+      // $log.debug('LINK: scope.pickerModel = ', scope.pickerModel);
+      // $log.debug('LINK: scope.fileType = ', scope.fileType);
+      // $log.debug('LINK: scope.vm.fileType = ', scope.vm.fileType);
 
       scope.$watch('pickerModel', function(newValue, oldValue) {
-        $log.debug('LINK: scope.pickerModel = ', scope.pickerModel);
+        // $log.debug('LINK: scope.pickerModel = ', scope.pickerModel);
       });
     }
 

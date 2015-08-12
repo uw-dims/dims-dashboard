@@ -2,33 +2,41 @@
 
 // Settings routes - retrieve and update settings via REST api for the logged in user
 
-var config = require('../config');
-var logger = require('../utils/logger');
-var UserSettings = require('../models/userSettings')
+var logger = require('../utils/logger')(module);
+// var UserSettings = require('../models/userSettings')
 
-exports.get = function(req, res) {
-	// id is from logged in user
-	var id = req.user.get('ident');
+module.exports = function (UserSettings) {
+  var settings = {};
 
-	var userSettings = new UserSettings(id);
-	userSettings.getSettings().then(function(data) {
-    logger.debug('routes/settings.get  settings: ', data);
+  settings.get = function (req, res) {
+    // id is from logged in user
+    var id = req.user.get('ident');
+    logger.debug('routes/settings get: id = ', id);
+    // Create new UserSettings object
+    var userSettings = UserSettings.userSettingsFactory(id);
+    logger.debug('routes/settings get: new object = ', userSettings);
+    // Get saved settings for this user
+    return userSettings.retrieveSettings()
+    .then(function (data) {
+      logger.debug('routes/settings.get  settings: ', data);
       res.status(200).send({data: data});
-    }).then(function(err) {
+    }).then(function (err) {
       return res.status(400).send(err);
     });
-};
+  };
 
-exports.update = function(req, res) {
-	var id = req.user.get('ident');
-	var newSettings = req.body.settings;
-	
-	var userSettings = new UserSettings(id, req.body.settings);
-	userSettings.updateSettings().then(function(data) {
-    logger.debug('routes/settings.set settings: ', data);
+  settings.update = function (req, res) {
+    var id = req.user.get('ident');
+
+    var userSettings = UserSettings.userSettingsFactory(id, req.body.settings);
+    userSettings.saveSettings()
+    .then(function (data) {
+      logger.debug('routes/settings.set settings: ', data);
       res.status(200).send({data: data});
-    }).then(function(err) {
+    }).then(function (err) {
       return res.status(400).send(err);
     });
+  };
+  return settings;
 };
 

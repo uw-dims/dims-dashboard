@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function(Bookshelf) {
+module.exports = function (Bookshelf) {
 
   var model = {};
 

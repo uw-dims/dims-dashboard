@@ -20,9 +20,9 @@
     vm.fileSource = $scope.fileSource;
     vm.fileType = $scope.fileType;
 
-    $log.debug('Controller: fileSource is ', vm.fileSource);
-    $log.debug('Controller: pickerModel is ', $scope.pickerModel);
-    $log.debug('Controller: fileType is ', vm.fileType);
+    // $log.debug('Controller: fileSource is ', vm.fileSource);
+    // $log.debug('Controller: pickerModel is ', $scope.pickerModel);
+    // $log.debug('Controller: fileType is ', vm.fileType);
 
     activate();
 
@@ -36,7 +36,7 @@
           vm.pickerValues.push({value: vm.fileList.path+value.name, text: value.name})
         });
       });
-    }   
+    }
   }
 
 }());

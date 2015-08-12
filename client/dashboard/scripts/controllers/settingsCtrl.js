@@ -4,7 +4,7 @@
 
 (function () {
 
-  var SettingsCtrl = function($scope, $modalInstance, $location, $log, SettingsService) {
+  var SettingsCtrl = function ($scope, $modalInstance, $location, $log, SettingsService) {
 
     // Get the current settings - save in scope and in formData
     $scope.settings = SettingsService.get();
@@ -14,38 +14,38 @@
     $scope.cifbulkQueueValues = [{
         value: 'cifbulk_v1',
         label: 'cifbulk_v1 - default'
-      },{
+      }, {
         value: 'cifbulk_v1_test',
         label: 'cifbulk_v1 - default with debug and verbose'
-      },{
+      }, {
         value: 'cifbulk_v1_demo',
         label: 'cifbulk_v1_demo - alternate queue'
-      },{
+      }, {
         value: 'cifbulk_v1_demo_test',
         label: 'cifbulk_v1_demo_test - alternate queue with debug and verbose'
       }];
 
-    $scope.anonymizeValues =[{
-      value: 'true',
+    $scope.anonymizeValues = [{
+      value: true,
       label: 'Anonymization On'
-    },{
-      value: 'false',
+    }, {
+      value: false,
       label: 'Anonymization Off'
     }];
 
     $scope.rpcDebugValues = [{
-      value: 'true',
+      value: true,
       label: 'RPC Client Debug On'
-    },{
-      value: 'false',
+    }, {
+      value: false,
       label: 'RPC Client Debug Off'
     }];
 
     $scope.rpcVerboseValues = [{
-      value: 'true',
+      value: true,
       label: 'RPC Client Verbose On'
-    },{
-      value: 'false',
+    }, {
+      value: false,
       label: 'RPC Client Verbose Off'
     }];
 
@@ -58,8 +58,8 @@
 
     $scope.message = 'Each setting can be changed by choosing a new value from the pop-up menu.';
 
-    // Save user settings currently selected by User 
-    $scope.setUserSettings = function(kind) {
+    // Save user settings currently selected by User
+    $scope.setUserSettings = function (kind) {
       // Construct the config
       var settings = {};
       settings.anonymize = $scope.settingsFormData.anonymize;
@@ -68,21 +68,21 @@
       settings.rpcVerbose = $scope.settingsFormData.rpcVerbose;
 
       // Call the service to save the settings
-      SettingsService.update(settings).then(function(resource) {
+      SettingsService.update(settings).then(function (resource) {
         $log.debug('success setting, data is ', resource.data);
         $scope.message = $scope.messageKind[kind];
-      }), (function(err) {
+      }), (function (err) {
         $log.debug('setUserSettings error', err);
       });
     };
 
     // OK button handler
-    $scope.ok = function() {
+    $scope.ok = function () {
       $modalInstance.close('close');
     };
 
     // Cancel button handler
-    $scope.cancel = function() {
+    $scope.cancel = function () {
       $modalInstance.dismiss('cancel');
     };
 
@@ -90,9 +90,9 @@
 
   // Plug controller function into AngularJS
   angular.module('dimsDashboard.controllers').
-  controller('SettingsCtrl', 
-      ['$scope', '$modalInstance','$location', '$log', 'SettingsService',
-      SettingsCtrl ]);
+  controller('SettingsCtrl',
+      ['$scope', '$modalInstance', '$location', '$log', 'SettingsService',
+      SettingsCtrl]);
 
 }());
 

@@ -9,3 +9,5 @@ bower_components/*
 */dist/*
 .DS_Store
 logs/
+style.css
+public/

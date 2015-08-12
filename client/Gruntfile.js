@@ -17,13 +17,29 @@ module.exports = function (grunt) {
   // Configurable paths for the application
   var appConfig = {
     app: require('./bower.json').appPath || 'dimswebapp',
-    dist: '../server/dist'
+    dist: '../public'
   };
 
-  // Get URL for deployment from command line
-  var deployedURL = grunt.option('url') || 'localhost';
-  var deployedPort = grunt.option('port') || '3030';
+  // Get variables for deployment from command line
+  // var deployedURL = grunt.option('url') || 'localhost';
+  // var deployedPort = grunt.option('port') || '3000';
+  // Refactoring
+  // We will use the environment vars:
+  // process.env.PUBLICHOST - host or ip where the socket.io server resides
+  // process.env.PUBLICPROTOCOL - protocol we're using - http or https
+  // process.env.PUBLICPORT - port
+  // When container is deployed, these environment variables need to be
+  // defined. Grunt is then run to write these values to the client config file
+  // These values are the protocol, host, and port that a client will use to
+  // connect to the app which proxies to the Dashboard.
 
+  // Defaults:
+
+  var publicHost = process.env.PUBLICHOST || 'localhost';
+  var publicPort = process.env.PUBLICPORT || '3000';
+  var publicProtocol = process.env.PUBLICPROTOCOL || 'http';
+
+  console.log('Grunt build with publicHost=' + publicHost + ', publicPort=' + publicPort + ', publicProtocol=' + publicProtocol);
   // Define the configuration for all the tasks
   grunt.initConfig({
     appConfig: appConfig,
@@ -31,13 +47,17 @@ module.exports = function (grunt) {
     ngconstant: {
       options: {
         space: '  ',
-         wrap: '\'use strict\';\n\n {%= __ngModule %}\n\n',
+        wrap: '\'use strict\';\n\n {%= __ngModule %}\n\n',
         name: 'dimsDashboard.config',
         deps: false,
         dest: '<%= appConfig.app %>/scripts/config.js',
+
+        // Set up environment vars to be available to the client
         constants: {
           ENV: {
-            SOCKETIO_URL: 'https://' + deployedURL + ':' + deployedPort
+            PUBLICHOST: publicHost,
+            PUBLICPORT: publicPort,
+            PUBLICPROTOCOL: publicProtocol
           }
         }
       },
@@ -150,7 +170,7 @@ module.exports = function (grunt) {
 
     // Empties folders to start fresh
     clean: {
-      options:{
+      options: {
         force: true
       },
       dist: {
@@ -210,7 +230,7 @@ module.exports = function (grunt) {
 
         },
         files: {
-          '.tmp/styles/style.css':'<%= appConfig.app %>/styles/style.less'
+          '.tmp/styles/style.css': '<%= appConfig.app %>/styles/style.less'
         }
       },
 
@@ -289,7 +309,7 @@ module.exports = function (grunt) {
       html: ['<%= appConfig.dist %>/{,*/}*.html'],
       css: ['<%= appConfig.dist %>/styles/{,*/}*.css'],
       options: {
-        assetsDirs: ['<%= appConfig.dist %>','<%= appConfig.dist %>/images']
+        assetsDirs: ['<%= appConfig.dist %>', '<%= appConfig.dist %>/images']
       }
     },
 
@@ -366,7 +386,7 @@ module.exports = function (grunt) {
       dist: {
         files: [{
           expand: true,
-          cwd: '.tmp/concat/scripts',
+          cwd: '<%= appConfig.app %>/scripts',
           src: '*.js',
           dest: '.tmp/concat/scripts'
         }]
@@ -438,6 +458,12 @@ module.exports = function (grunt) {
         singleRun: true
       }
     }
+  });
+
+  grunt.registerTask('configure', 'Create the configuration file', function (target) {
+    grunt.task.run([
+      'ngconstant'
+      ]);
   });
 
 

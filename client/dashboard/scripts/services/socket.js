@@ -3,7 +3,7 @@
 angular.module('dimsDashboard.services')
 
   .factory('ChatSocket', function($q, $rootScope, SocketFactory, $timeout, $log, ENV) {
-    
+
     var socket = $q.defer();
     var hasRun = 0;
     // Set up the socket and return the promise when we receive an authenticated event
@@ -17,7 +17,8 @@ angular.module('dimsDashboard.services')
           socket.forward('chat:data');
         });
       } else {
-        var myIoSocket = io.connect(ENV.SOCKETIO_URL+'/chat', {forceNew: true});
+        $log.debug('services/ChatSocket: url is ' + ENV.PUBLICPROTOCOL + '://' + ENV.PUBLICHOST + ':' + ENV.PUBLICPORT + '/chat');
+        var myIoSocket = io.connect(ENV.PUBLICPROTOCOL + '://' + ENV.PUBLICHOST + ':' + ENV.PUBLICPORT + '/chat', {forceNew: true});
         var mySocket = SocketFactory({
           ioSocket: myIoSocket
         });
@@ -30,7 +31,7 @@ angular.module('dimsDashboard.services')
   })
 
   .factory('LogSocket', function($q, $rootScope, SocketFactory, $timeout, $log, ENV) {
-    
+
     var socket = $q.defer();
     var hasRun = 0;
     // Set up the socket and return the promise when we receive an authenticated event
@@ -44,7 +45,7 @@ angular.module('dimsDashboard.services')
           socket.forward('logs:data');
         });
       } else {
-        var myIoSocket = io.connect(ENV.SOCKETIO_URL+'/logs', {forceNew: true});
+        var myIoSocket = io.connect(ENV.PUBLICPROTOCOL+'://'+ENV.PUBLICHOST+':'+ENV.PUBLICPORT+'/logs', {forceNew: true});
         var mySocket = SocketFactory({
           ioSocket: myIoSocket
         });

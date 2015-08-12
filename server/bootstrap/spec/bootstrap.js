@@ -8,12 +8,12 @@ var Ticket = require('../../models/ticket');
 var db = require('../../utils/redisUtils');
 var redisDB = require('../../utils/redisDB');
 var redis = require('redis');
-var logger = require('../../utils/logger');
+var logger = require('../../utils/logger')(module);
 var KeyGen = require('../../models/keyGen');
 var c = require('../../config/redisScheme');
 var q = require('q');
 var fs = require('fs');
-var config = require('../../config');
+var config = require('../../config/config');
 var anonymize = require('../../services/anonymize');
 var ChildProcess = require('../../services/childProcess');
 
@@ -90,7 +90,7 @@ var createCounter;
 
 var debugTicketCounter = function(ticket) {
   createCounter++;
-  logger.debug('TEST:Ticket '+ createCounter +' created: ', ticket.paramString());  
+  logger.debug('TEST:Ticket '+ createCounter +' created: ', ticket.paramString());
 };
 
 var failOnError = function(err) {
@@ -136,7 +136,7 @@ describe('models/Ticket', function() {
       ticket.addTopic(topic1.topic, topic1.dataType, data1)
         .then(function(reply) {
           expect(reply.parent.creator).to.equal(ticketConfig[0].user);
-          
+
           ticket.addTopic(topic2.topic, topic2.dataType, data2).then(function(reply) {
             done();
           });
@@ -176,14 +176,14 @@ describe('models/Ticket', function() {
       ticket.addTopic(topic1.topic, topic1.dataType, data1)
         .then(function(reply) {
           logger.debug('Added topic 1 to ticket 2, reply is ', reply);
-          
+
           ticket.addTopic(topic2.topic, topic2.dataType, data2).then(function(reply) {
             logger.debug('Added topic 2 to ticket 2, reply is ', reply);
             ticket.addTopic(topic3.topic, topic3.dataType, data3).then(function(reply) {
               logger.debug('Added topic 3 to ticket 2, reply is ', reply);
               done();
             })
-            
+
           });
         });
     });
@@ -224,13 +224,13 @@ describe('models/Ticket', function() {
             console.log('stuartIps');
             console.log(stuartIps);
             var eliotIps = JSON.stringify(userIps.matching.eliot);
-            
+
             ticket.addTopic('user:dittrich', 'hash', {
                 data: dittrichIps,
                 shortDesc: 'IPs assigned to dittrich',
                 description: '',
                 displayType: 'mitigation'
-            
+
             }).then(function(reply){
 
               ticket.addTopic('user:stuart', 'hash', {
@@ -254,8 +254,8 @@ describe('models/Ticket', function() {
                     }).then(function(reply){
                       done();
                     })
-                    
-                  
+
+
                 });
               });
             });

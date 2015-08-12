@@ -1,8 +1,9 @@
+'use strict';
+
 var Publisher = require('./publisher.js');
 var Subscriber = require('./subscriber.js');
 
-var config = require('../config');
-var logger = require('../utils/logger');
+var logger = require('../utils/logger')(module);
 var util = require('util');
 
 var EventEmitter = require('events').EventEmitter;
@@ -16,10 +17,10 @@ function RabbitSocket(name, type, io) {
   // Received a packet from a client - needs to be published (client)
   // Received a packet from rabbit - needs to be emitted (receive)
 
-  self.clientEvent = name+':client';
-  self.receiveEvent = name+':receive';
+  self.clientEvent = name + ':client';
+  self.receiveEvent = name + ':receive';
 
-  self.IO_MSG_TYPE = name+':data';
+  self.IO_MSG_TYPE = name + ':data';
 
   self.buffer = [];
 
@@ -31,21 +32,21 @@ function RabbitSocket(name, type, io) {
     self.connection = new Publisher(name);
     // Publishes a message to the exchange. This will be the handler called when
     // messages are recevied from a client via a socket
-    self.send = function(msg) {
-      logger.debug('services/RabbitSocket publisher: Received client event from client '+name+', msg is ', msg.message);
+    self.send = function (msg) {
+      logger.debug('services/RabbitSocket publisher: Received client event from client ' + name + ', msg is ', msg.message);
       self.connection.publish(msg.message);
     };
 
   } else {
     self.connection = new Subscriber(name);
-    self.connection.on(self.receiveEvent, function(msg) {
+    self.connection.on(self.receiveEvent, function (msg) {
       // logger.debug('Socket: Subscriber received message. Need to emit to client. Msg: ', msg);
       io.emit(self.IO_MSG_TYPE, msg);
     });
-    self.send = function(msg) {
+    self.send = function (msg) {
       logger.debug('services/RabbitSocket: Subscriber noop.');
     };
-    self.connection.on('fanout:' + name + ':started', function(ev) {
+    self.connection.on('fanout:' + name + ':started', function (ev) {
       logger.debug('services/RabbitSocket subscriber received started event for ', name, 'ev=', ev);
     });
   }
