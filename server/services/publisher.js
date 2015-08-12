@@ -1,7 +1,7 @@
 'use strict';
 
 var RabbitConnection = require('../services/rabbitConnection');
-var logger = require('../utils/logger');
+var logger = require('../utils/logger')(module);
 var util = require('util');
 
 var EventEmitter = require('events').EventEmitter;

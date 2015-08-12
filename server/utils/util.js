@@ -1,7 +1,7 @@
 'use strict';
 
 var stream = require('stream');
-var logger = require('./logger');
+var logger = require('./logger')(module);
 
 var createParser = function () {
 

@@ -95,7 +95,7 @@ config.passSecret = '84jd$#lk903jcy2AUEI2j4nsKLJ!lIY';
 
 config.bin = '/opt/dims/bin/';
 
-config.dimsenvbin = '/opt/dims/envs/dimsenv/bin';
+config.dimsenvbin = '/opt/dims/envs/dimsenv/bin/';
 
 config.rpcbin = config.dimsenvbin;
 

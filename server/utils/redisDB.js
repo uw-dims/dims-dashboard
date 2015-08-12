@@ -5,7 +5,7 @@
 
 var config = require('../config/config');
 var redis = require('redis');
-var logger = require('./logger');
+var logger = require('./logger')(module);
 
 logger.info('utils.redisDB: Attempting to connect to Redis server ' + config.redisHost + ':' + config.redisPort);
 

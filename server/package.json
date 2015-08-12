@@ -64,7 +64,8 @@
     "vhost": "^2.0.0",
     "when": "^3.7.3",
     "winston": "^1.0.1",
-    "xml2js": "^0.4.4"
+    "xml2js": "^0.4.4",
+    "moment": "^2.10.6"
   },
   "devDependencies": {
     "difflet": "^0.2.6",

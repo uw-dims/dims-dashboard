@@ -1,7 +1,7 @@
 'use strict';
 
 var config = require('../config/config');
-var logger = require('../utils/logger');
+var logger = require('../utils/logger')(module);
 var q = require('q');
 var _ = require('lodash-compat');
 var tmp = require('tmp');
@@ -88,7 +88,7 @@ module.exports = function (UserSettings) {
       UserSettings.getUserSettings(id).then(function (reply) {
           var settings = reply.settings;
           logger.debug('service/anonymize._setInputs settings are ', settings);
-          var inputArray = [config.bin + rpcClientApp, '--server', config.rpcServer,
+          var inputArray = [config.rpcbin + rpcClientApp, '--server', config.rpcServer,
               '--queue-base', rpcQueuebase];
           if (settings.rpcDebug === 'true') {
             inputArray.push ('--debug');

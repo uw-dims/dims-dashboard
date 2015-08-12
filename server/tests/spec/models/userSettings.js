@@ -2,7 +2,7 @@
 
 var test = require('tape-catch');
 var _ = require('lodash-compat');
-var logger = require('../../../utils/logger');
+var logger = require('../../../utils/logger')(module);
 var config = require('../../../config/config');
 var keyGen = require('../../../models/keyGen');
 var extract = require('../../../models/keyExtract');
@@ -147,7 +147,7 @@ test('models/userSettings: UserSettings object saveSettings method should save s
   .then(function (reply) {
     logger.debug('TEST debug hmgetall reply is ', reply);
     var result = convertBoolean(reply);
-    logger.debug('TEST debug hmgetall result is ', result);
+    // logger.debug('TEST debug hmgetall result is ', result);
     assert.deepEqual(result, userSettings.settings, 'Settings were saved');
     assert.end();
   })
@@ -167,7 +167,7 @@ test('models/userSettings: UserSettings object createSettings method should save
   .then(function (reply) {
     logger.debug('TEST debug hmgetall reply is ', reply);
     var result = convertBoolean(reply);
-    logger.debug('TEST debug hmgetall result is ', result);
+    // logger.debug('TEST debug hmgetall result is ', result);
     assert.deepEqual(result, userSettings.settings, 'Settings were saved');
     assert.end();
   })

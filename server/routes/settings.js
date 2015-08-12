@@ -2,7 +2,7 @@
 
 // Settings routes - retrieve and update settings via REST api for the logged in user
 
-var logger = require('../utils/logger');
+var logger = require('../utils/logger')(module);
 // var UserSettings = require('../models/userSettings')
 
 module.exports = function (UserSettings) {

@@ -8,7 +8,7 @@
 var _ = require('lodash-compat'),
     q = require('q'),
     config = require('../config/config'),
-    logger = require('../utils/logger'),
+    logger = require('../utils/logger')(module),
     keyGen = require('./keyGen');
 
 module.exports = function UserSettings(db) {
@@ -88,8 +88,8 @@ module.exports = function UserSettings(db) {
         });
       } else {
         return get(thisUser).then(function (reply) {
-          // var newSettings = convertBoolean(reply);
-          return userSettingsFactory(thisUser, reply);
+          var newSettings = convertBoolean(reply);
+          return userSettingsFactory(thisUser, newSettings);
         });
       }
     })
@@ -136,8 +136,8 @@ module.exports = function UserSettings(db) {
           });
         } else {
           return get(self.user).then(function (reply) {
-            // self.settings = convertBoolean(reply);
-            self.settings = reply;
+            self.settings = convertBoolean(reply);
+            // self.settings = reply;
             return self.settings;
           });
         }

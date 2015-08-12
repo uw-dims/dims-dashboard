@@ -2,7 +2,7 @@
 
 // Get the app configuration
 var config = require('../config/config');
-var logger = require('../utils/logger');
+var logger = require('../utils/logger')(module);
 var  CryptoJS = require('crypto-js');
 
 var passport = require('passport')

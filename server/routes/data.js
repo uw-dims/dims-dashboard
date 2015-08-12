@@ -4,7 +4,7 @@ var fs = require('fs');
 var dimsutil = require('../utils/util');
 // var yaml = require('js-yaml');
 var JSONStream = require('JSONStream');
-var logger = require('../utils/logger');
+var logger = require('../utils/logger')(module);
 
 module.exports = function () {
   var data = {};

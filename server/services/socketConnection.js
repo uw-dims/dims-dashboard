@@ -1,6 +1,6 @@
 // No longer used
 
-// var logger = require('../utils/logger');
+// var logger = require('../utils/logger')(module);
 // var config = require('../config/config');
 // var EventEmitter = require('events').EventEmitter;
 // var util = require('util');

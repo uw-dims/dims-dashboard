@@ -4,7 +4,7 @@
 // the Redis mock used for testing (redis-js) since a few of the interfaces
 // are different.
 
-var logger = require('../utils/logger');
+var logger = require('../utils/logger')(module);
 var q = require('q');
 var _ = require('lodash-compat');
 var dimsUtils = require('../utils/util');

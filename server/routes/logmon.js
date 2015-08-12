@@ -2,7 +2,7 @@
   * currently not used - deprecated
 
 var config = require('../config/config');
-var logger = require('../utils/logger');
+var logger = require('../utils/logger')(module);
 var Fanout = require('../services/fanout.js');
 
 var logmon = null;

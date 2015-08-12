@@ -9,7 +9,7 @@ var _ = require('lodash-compat'),
     c = require('../config/redisScheme'),
     keyGen = require('./keyGen'),
     extract = require('./keyExtract'),
-    logger = require('../utils/logger'),
+    logger = require('../utils/logger')(module),
     dimsUtils = require('../utils/util');
 
 module.exports = function Notification(db) {

@@ -2,7 +2,7 @@
 
 // var spawn =  require('child_process').spawn;
 var dimsutil = require('../utils/util');
-var logger = require('../utils/logger');
+var logger = require('../utils/logger')(module);
 var config = require('../config/config');
 var tools = require('../services/tools');
 

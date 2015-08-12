@@ -7,7 +7,7 @@
 // Includes
 var diContainer = require('./diContainer');
 var config = require('../config/config');
-var logger = require('../utils/logger');
+var logger = require('../utils/logger')(module);
 var KeyGen = require('../models/keyGen');
 // var redisDB = require('../utils/redisDB');
 // var db = require('../utils/redisUtils')(redisDB);
@@ -22,7 +22,7 @@ exports.createTicket = function (type, creator, content) {
   var ticket = Ticket.ticketFactory();
   var data;
   logger.debug('services/ticket.createTicket creating ticket');
-  ticket.create(type, creator).then(function (reply) {
+  return ticket.create(type, creator).then(function (reply) {
     // reply is the ticket object
     logger.debug('services/ticket.createTicket Reply from ticket create is ', reply);
     if (type === 'mitigation') {

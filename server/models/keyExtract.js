@@ -2,7 +2,7 @@
 
 var _ = require('lodash-compat');
 var c = require('../config/redisScheme');
-var logger = require('../utils/logger');
+var logger = require('../utils/logger')(module);
 
 // Key Parser - Extract data from keys
 
@@ -91,9 +91,7 @@ var fileSubPath = function fileSubPath(pathKey) {
 
 // May be able to delete this
 var parseTopicKey = function parseTopicKey(topicKey) {
-  logger.debug('KeyGen.parseTopicKey: key is ', topicKey);
   var keyArray = topicKey.split(c.config.delimiter);
-  logger.debug('KenGen.parseTopicKey: keyArray is ', keyArray);
   var ticketKey = keyArray[0] + c.config.delimiter + keyArray[1];
   var topicSubKey = '';
   for (var i = 2; i < keyArray.length; i++) {

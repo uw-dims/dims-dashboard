@@ -2,7 +2,7 @@
 
 // Currently not used
 
-var logger = require('../utils/logger');
+var logger = require('../utils/logger')(module);
 
 // Get the session data for the logged in user
 // If data doesn't exist, create it

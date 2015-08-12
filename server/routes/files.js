@@ -5,7 +5,7 @@ var util = require('util');
 var config = require('../config/config');
 var yaml = require('js-yaml');
 var multiparty = require('multiparty');
-var logger = require('../utils/logger');
+var logger = require('../utils/logger')(module);
 
 module.exports = function () {
   var files = {};

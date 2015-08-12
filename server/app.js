@@ -27,7 +27,7 @@ var express = require('express')
   //, exec = require('child_process').exec
  // , messages = require('./utils/messages')
  // , CryptoJS = require('crypto-js')
-  , logger = require('./utils/logger');
+  , logger = require('./utils/logger')(module);
 
 // routes
 var routes = require('./routes');

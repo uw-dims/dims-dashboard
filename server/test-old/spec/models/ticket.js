@@ -3,7 +3,7 @@
 //var redisDB = require('../../../utils/redisDB');
 // var redisDB = require('../config');
 //var redis = require('redis');
-var logger = require('../../../utils/logger');
+var logger = require('../../../utils/logger')(module);
 var KeyGen = require('../../../models/keyGen');
 var c = require('../../../config/redisScheme');
 var q = require('q');
@@ -45,7 +45,7 @@ before(function(done) {
 // Perform after all tests done
 after(function(done) {
   logger.debug('Quitting redis');
-  
+
   client.flushdb(function(reply) {
     logger.debug('flushdb reply ',reply);
     client.quit(function(err, reply) {
@@ -57,7 +57,7 @@ after(function(done) {
 
 var debugTicketCounter = function(ticket) {
   createCounter++;
-  //logger.debug('TEST:Ticket '+ createCounter +' created: ', ticket.paramString());  
+  //logger.debug('TEST:Ticket '+ createCounter +' created: ', ticket.paramString());
   console.log('TEST:Ticket '+ createCounter +' created: ' + ticket.paramString())
 };
 
@@ -285,10 +285,10 @@ describe('models/Ticket', function() {
   //     });
   //   });
   // });
-    
- 
-  // describe('#getTopicKeys', function(done) {   
-   
+
+
+  // describe('#getTopicKeys', function(done) {
+
   //   it('should retrieve all topic keys from a ticket', function(done) {
   //     //var ticket = new Ticket();
   //     Ticket.create(ticketType1, user).then(function(ticket) {
@@ -308,7 +308,7 @@ describe('models/Ticket', function() {
   //               done();
   //             });
   //           });
-  //         });         
+  //         });
   //       });
   //     });
   //   });
@@ -351,7 +351,7 @@ describe('models/Ticket', function() {
   //               expect(topics[1]).to.eql(topic2);
   //               done();
   //             });
-  //           });       
+  //           });
   //       });
   //     });
   //   });

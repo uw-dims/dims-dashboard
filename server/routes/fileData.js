@@ -5,7 +5,7 @@
 'use strict';
 
 var config = require('../config/config');
-var logger = require('../utils/logger');
+var logger = require('../utils/logger')(module);
 var keyGen = require('../models/keyGen');
 var keyExtract = require('../models/keyExtract');
 var c = require('../config/redisScheme');

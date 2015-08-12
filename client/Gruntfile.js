@@ -460,6 +460,12 @@ module.exports = function (grunt) {
     }
   });
 
+  grunt.registerTask('configure', 'Create the configuration file', function (target) {
+    grunt.task.run([
+      'ngconstant'
+      ]);
+  });
+
 
   grunt.registerTask('serve', 'Compile then start a connect web server', function (target) {
     if (target === 'dist') {

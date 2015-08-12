@@ -3,7 +3,7 @@
 var Publisher = require('./publisher.js');
 var Subscriber = require('./subscriber.js');
 
-var logger = require('../utils/logger');
+var logger = require('../utils/logger')(module);
 var util = require('util');
 
 var EventEmitter = require('events').EventEmitter;

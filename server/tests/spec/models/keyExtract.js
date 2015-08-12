@@ -2,7 +2,7 @@
 
 var test = require('tape-catch');
 var _ = require('lodash-compat');
-var logger = require('../../../utils/logger');
+var logger = require('../../../utils/logger')(module);
 var keyExtract = require('../../../models/keyExtract');
 var c = require('../../../config/redisScheme');
 

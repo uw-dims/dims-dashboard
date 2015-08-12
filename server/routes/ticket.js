@@ -5,7 +5,7 @@
 'use strict';
 
 // Includes
-var logger = require('../utils/logger');
+var logger = require('../utils/logger')(module);
 var KeyGen = require('../models/keyGen');
 
 module.exports = function (Ticket) {

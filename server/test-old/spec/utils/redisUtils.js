@@ -3,7 +3,7 @@
 //var redisDB = require('../../../utils/redisDB');
 //var redis = require('redis');
 var q = require('q');
-var logger = require('../../../utils/logger');
+var logger = require('../../../utils/logger')(module);
 
 // Redis mock
 var redis = require('redis-js');

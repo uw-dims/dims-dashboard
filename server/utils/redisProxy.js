@@ -3,7 +3,7 @@
 // they return promises. Returns client so app can use proxied
 // or original commands
 
-var logger = require('./logger');
+var logger = require('./logger')(module);
 var q = require('q');
 var config = require('../config/config');
 var supportedTypes = config.defaultRedisTypes;

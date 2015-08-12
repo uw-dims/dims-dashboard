@@ -1,7 +1,7 @@
 'use strict';
 
 var config = require('../config/config');
-var logger = require('../utils/logger');
+var logger = require('../utils/logger')(module);
 var Ticket = require('../models/ticket');
 var KeyGen = require('../models/keyGen');
 var db = require('../utils/redisProxy');

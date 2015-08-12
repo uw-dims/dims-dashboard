@@ -1,6 +1,6 @@
 'use strict';
 
-var logger = require('../utils/logger');
+var logger = require('../utils/logger')(module);
 var _ = require('lodash-compat');
 var ChildProcess = require('../services/childProcess');
 

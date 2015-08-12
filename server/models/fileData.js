@@ -9,7 +9,7 @@ var _ = require('lodash-compat'),
     util = require('util'),
     q = require('q'),
     keyGen = require('./keyGen'),
-    logger = require('../utils/logger'),
+    logger = require('../utils/logger')(module),
     dimsUtils = require('../utils/util');
 
 // module.exports = function FileData(serviceLocator) {
@@ -25,10 +25,7 @@ module.exports = function FileData(db) {
       self.createdTime = dimsUtils.createTimestamp();
       self.modifiedTime = self.createdTime;
       // Make sure the file does not already exist
-      logger.debug('models/fileData.js create fileSetKey: ', keyGen.fileSetKey(self));
-      logger.debug('models/fileData.js create fileKey: ', keyGen.fileKey(self));
-      logger.debug('models/fileData.js create fileMetaKey: ', keyGen.fileMetaKey(self));
-      return db.zrankProxy(keyGen.fileSetKey(self), keyGen.fileKey(self))
+      db.zrankProxy(keyGen.fileSetKey(self), keyGen.fileKey(self))
       .then(function (reply) {
         if (reply !== null) {
           deferred.reject(new Error('Key for file already exists'));
@@ -41,7 +38,7 @@ module.exports = function FileData(db) {
             if (err) {
               deferred.reject(err);
             } else {
-              logger.debug('models/fileData.js create: replies from create', replies);
+              logger.debug('create: replies from multi.exec', replies);
               deferred.resolve(self);
             }
           });
@@ -62,7 +59,7 @@ module.exports = function FileData(db) {
         if (err) {
           deferred.reject(err);
         } else {
-          logger.debug('replies from save', replies);
+          logger.debug('save: replies from multi.exec', replies);
           deferred.resolve(self);
         }
       });
@@ -83,7 +80,7 @@ module.exports = function FileData(db) {
         return reply === null ? false : true;
       })
       .catch(function (err) {
-        logger.error('models/fileData.js: exists had an err returned from redis', err);
+        logger.error('exists: Error returned from redis', err);
         return new Error(err.toString());
       });
     },
@@ -100,7 +97,7 @@ module.exports = function FileData(db) {
         return reply;
       })
       .catch(function (err) {
-        logger.error('models/fileData.js: getMetadata had an err returned from redis', err);
+        logger.error('getMetadata: Error returned from redis', err);
         return new Error(err.toString());
       });
     },
@@ -152,8 +149,8 @@ module.exports = function FileData(db) {
   };
 
   var scrubMetaData = function scrubMetaData(config) {
-    config.createdTime = _.parseInt(reply.createdTime);
-    config.modifiedTime = _.parseInt(reply.modifiedTime);
+    config.createdTime = _.parseInt(config.createdTime);
+    config.modifiedTime = _.parseInt(config.modifiedTime);
     config.global = (config.global === 'true') ? true : false;
     return config;
   };
@@ -161,10 +158,10 @@ module.exports = function FileData(db) {
   // Validate a config
   var validateConfig = function validateConfig(config) {
     if (!config.hasOwnProperty('creator') || !config.hasOwnProperty('description') || !config.hasOwnProperty('name')) {
-      return new Error('Options must include name, description, creator');
+      return new Error('validateConfig: Options must include name, description, creator');
     }
     if (typeof config.global !== 'boolean') {
-      return new Error('global must either be true or false');
+      return new Error('validateConfig: global must either be true or false');
     }
     return config;
   };
@@ -219,7 +216,5 @@ module.exports = function FileData(db) {
     fileDataFactory: fileDataFactory,
     writer: contentWriterFactory
   };
-
   return fileData;
-
 };

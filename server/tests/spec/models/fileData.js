@@ -5,7 +5,7 @@ var stream = require('stream');
 var _ = require('lodash-compat');
 
 var config = require('../../../config/config');
-var logger = require('../../../utils/logger');
+var logger = require('../../../utils/logger')(module);
 var keyGen = require('../../../models/keyGen');
 var extract = require('../../../models/keyExtract');
 

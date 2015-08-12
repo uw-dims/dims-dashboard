@@ -6,7 +6,7 @@ var express = require('express'),
   bodyParser = require('body-parser'),
   methodOverride = require('method-override'),
   session = require('express-session'),
-  logger = require(ROOT_DIR + '/utils/logger');
+  logger = require(ROOT_DIR + '/utils/logger')(module);
 
 var app = express();
 

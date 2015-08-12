@@ -1,6 +1,8 @@
 'use strict';
 
 var _ = require('lodash-compat');
+var moment = require('moment');
+var logger = require('../utils/logger')(module);
 
 module.exports = function (userConfig) {
 
@@ -9,6 +11,7 @@ module.exports = function (userConfig) {
   var user = {
     data: {},
     get: function (token) {
+      logger.debug('models/userStatic get: result is ', this.data[token]);
       return this.data[token];
     }
   };
@@ -17,9 +20,9 @@ module.exports = function (userConfig) {
     var result = _.find(userConfig, {'ident': id});
     // logger.debug('models/userStatic result is ', result);
     user.data = result;
-    // logger.debug('models/userStatic user is now', user);
-    // logger.debug('models/userStatic test');
-    // logger.debug('models/userStatic name is user.get(desc) ', user.get('desc'));
+    logger.debug('models/userStatic findById: user.data is now', user.data);
+    console.log(user);
+    logger.debug('models/userStatic findById: name is user.get(desc) ', user.get('desc'));
     return user;
   };
 

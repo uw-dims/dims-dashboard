@@ -1,7 +1,8 @@
 'use strict';
 
 var passport = require('passport');
-var logger = require('../utils/logger');
+var moment = require('moment');
+var logger = require('../utils/logger')(module);
 // var UserSettings = require('../models/userSettings');
 
 module.exports = function (UserSettings) {
@@ -21,26 +22,31 @@ module.exports = function (UserSettings) {
 
   // Return login session data - user plus settings
   session.session = function (req, res) {
-    logger.debug('routes/session.session Starting session.');
+    logger.debug(moment().toISOString(), 'routes/session.session Starting session.');
     if (req.user) {
       // we are not using ops-trust column names any more
-      logger.debug('routes/session.session returned req.user', req.user);
+      logger.debug(moment().toISOString(), 'routes/session.session returned req.user', req.user);
+      console.log(req.user);
       var username = req.user.get('ident');
-      var name = req.user.get('descr');
+      var name = req.user.get('desc');
       // var username = req.user.get('id');
       // var name = req.user.get('name');
       // var client = req.app.get('client');
-      logger.debug('routes/session.session. username, name ', username, name);
+      logger.debug(moment().toISOString(), 'routes/session.session. req.user.get(ident) ', req.user.get('ident'));
+      logger.debug(moment().toISOString(), 'routes/session.session. req.user.get(desc) ', req.user.get('desc'));
+      logger.debug(moment().toISOString(), 'routes/session.session. req.user.data ', req.user.data);
+      logger.debug(moment().toISOString(), 'routes/session.session. username, name ', username, name);
 
       // Get associated settings
       var userSettings = UserSettings.userSettingsFactory(username);
       userSettings.retrieveSettings().then(function (data) {
-        logger.debug('routes/session.js session reply from retrieve settings is ', data);
-          var object = sessionObject(username, name, data);
-          res.status(200).send({data: object});
-        }).then(function (err) {
-          return res.status(400).send(err);
-        });
+        logger.debug(moment().toISOString(), 'routes/session.js session reply from retrieve settings is ', data);
+        var object = sessionObject(username, name, data);
+        logger.debug(moment().toISOString(), 'routes/session.js sessionObject is ', object);
+        res.status(200).send({data: object});
+      }).then(function (err) {
+        return res.status(400).send(err);
+      });
     } else {
       return res.status(401).send('User not logged in');
     }

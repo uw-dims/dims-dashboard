@@ -1,6 +1,6 @@
 'use strict';
 
-var logger = require('../utils/logger');
+var logger = require('../utils/logger')(module);
 var q = require('q');
 var spawn =  require('child_process').spawn;
 

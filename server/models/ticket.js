@@ -7,12 +7,10 @@
 var config = require('../config/config'),
     keyGen = require('./keyGen'),
     keyExtract = require('./keyExtract'),
-    logger = require('../utils/logger'),
+    logger = require('../utils/logger')(module),
     q = require('q'),
     _ = require('lodash-compat'),
     dimsUtils = require('../utils/util');
-
-// exports = module.exports = Ticket;
 
 module.exports = function Ticket(db) {
 
@@ -62,7 +60,7 @@ module.exports = function Ticket(db) {
           if (err) {
             deferred.reject(err);
           } else {
-            logger.debug('models/ticket.js create: replies from create', replies);
+            logger.debug('create: replies from multi.exec', replies);
             deferred.resolve(self);
           }
         });

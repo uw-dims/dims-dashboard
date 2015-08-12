@@ -11,7 +11,7 @@
 //   bodyParser = require('body-parser'),
 //   methodOverride = require('method-override'),
 //   session = require('express-session'),
-//   logger = require(ROOT_DIR + '/utils/logger'),
+//   logger = require(ROOT_DIR + '/utils/logger')(module),
 //   errorHandler = require('errorhandler'),
 //   routes = require(ROOT_DIR + '/routes');
 
@@ -53,7 +53,7 @@
 // // end mock server
 
 // var Ticket = require('../../../models/ticket');
-// var logger = require('../../../utils/logger');
+// var logger = require('../../../utils/logger')(module);
 // var KeyGen = require('../../../models/keyGen');
 
 // // var app = require('../../../app');

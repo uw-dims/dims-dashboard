@@ -11,7 +11,7 @@ var q = require('q');
 var fs = require('fs');
 
 
-var logger = require('../../utils/logger');
+var logger = require('../../utils/logger')(module);
 var KeyGen = require('../../models/keyGen');
 var c = require('../../config/redisScheme');
 var q = require('q');

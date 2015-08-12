@@ -4,7 +4,7 @@ var Ticket = require('../../../models/ticket');
 var db = require('../../../utils/redisUtils');
 var redisDB = require('../../../utils/redisDB');
 var redis = require('redis');
-var logger = require('../../../utils/logger');
+var logger = require('../../../utils/logger')(module);
 var KeyGen = require('../../../models/keyGen');
 var c = require('../../../config/redisScheme');
 var q = require('q');
@@ -26,7 +26,7 @@ var createCounter = 0;
 
 var debugTicketCounter = function(ticket) {
   createCounter++;
-  logger.debug('TEST:Ticket '+ createCounter +' created: ', ticket.paramString());  
+  logger.debug('TEST:Ticket '+ createCounter +' created: ', ticket.paramString());
 };
 
 var failOnError = function(err) {
@@ -70,7 +70,7 @@ var failOnError = function(err) {
 //           topic.getDataType().then(function(reply) {
 //             expect(reply).to.equal(expectedDataType);
 //             done();
-//           });         
+//           });
 //         });
 //       });
 //     });

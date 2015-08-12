@@ -3,7 +3,7 @@
 var tmp = require('tmp');
 var async = require('async');
 var fs = require('fs');
-var logger = require('../utils/logger');
+var logger = require('../utils/logger')(module);
 var config = require('../config/config');
 // var ChildProcess = require('../services/childProcess');
 var tools = require('../services/tools');
