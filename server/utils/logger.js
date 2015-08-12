@@ -11,7 +11,7 @@ module.exports = function (callingModule) {
 
   // var winstonlogger = {};
 
-  // Labeling inspired by
+  // function from
   // http://stackoverflow.com/questions/13410754/i-want-to-display-the-file-name-in-the-log-statement
   var getLabel = function () {
     var parts = callingModule.filename.split('/');
