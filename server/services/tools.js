@@ -1,7 +1,6 @@
 'use strict';
 
 var logger = require('../utils/logger')(module);
-var settings = require('../services/settings');
 var q = require('q');
 
 /** Gets data from command line tool and anonymizes it if requested */
@@ -18,16 +17,13 @@ module.exports = function (UserSettings, anonService) {
       logger.debug('services/tools.getData Returned from first request. data is ');
       console.log(rawData);
 
-      settings.get(id).then(function (reply) {
-        logger.debug('services/tools.getData User settings are ', reply);
-        console.log(reply);
-        if (reply.anonymize === 'false') {
-          console.log(reply.anonymize);
+      UserSettings.getUserSettings(id).then(function (reply) {
+        logger.debug('services/tools.getData User settings are ', reply.settings);
+        if (!reply.settings.anonymize) {
           logger.debug('services/tools.getData  Do not anonymize - send back data');
           // Send back the raw data
           deferred.resolve(rawData);
         } else {
-          console.log(reply.anonymize);
           logger.debug('services/tools.getData Now will call anonymize.setup. id is ', id);
           // Need to anonymize before sending back
           anonService.setup({data: rawData, useFile: false, type: 'anon'}, id).then(function (reply) {
