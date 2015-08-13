@@ -2,7 +2,6 @@
 
 var logger = require('../utils/logger')(module);
 var settings = require('../services/settings');
-var ChildProcess = require('../services/childProcess');
 var q = require('q');
 
 /** Gets data from command line tool and anonymizes it if requested */

@@ -9,6 +9,7 @@
     "run-development": "USER_BACKEND=static node app",
     "run-testclient": "NODE_ENV=production USER_BACKEND=static LOG_LEVEL=debug node app",
     "run-integration": "SSL_ON=true node app",
+    "run-demo": "node app",
     "test": "tape tests/spec/**/*.js",
     "test-ci": "tape tests/spec/**/*.js | tap-xunit",
     "test-tap": "tape tests/spec/**/*.js",

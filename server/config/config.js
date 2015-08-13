@@ -12,7 +12,7 @@ config.logLevel = process.env.LOG_LEVEL || 'debug';
 
 config.logDir = process.env.LOG_PATH || '/data/dashboard/logs/';
 
-config.logfile = config.log_dir + 'dashboard.log';
+config.logFile = config.logDir + 'dashboard.log';
 
 // Default is Ubuntu cert location
 config.certDir = process.env.CERT_DIRECTORY || '/etc/ssl/certs/';
@@ -63,9 +63,9 @@ config.testUsers =
       'desc': 'Eliot Lim',
       'password': 'eliot'
     }, {
-      'ident': 'stuart',
-      'desc': 'Stuart Maclean',
-      'password': 'stuart'
+      'ident': 'jhanna',
+      'desc': 'Jordan Hanna',
+      'password': 'jhanna'
     }, {
       'ident': 'parksj',
       'desc': 'Jeremy Parks',

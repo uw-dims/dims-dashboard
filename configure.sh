@@ -1,5 +1,6 @@
 #! /bin/bash
 
+# Used during development
 # Set up common functions and variables.
 source $DIMS/bin/test_functions.sh
 
