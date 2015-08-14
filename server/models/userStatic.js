@@ -22,7 +22,7 @@ module.exports = function (userConfig) {
     user.data = result;
     logger.debug('models/userStatic findById: user.data is now', user.data);
     console.log(user);
-    logger.debug('models/userStatic findById: name is user.get(desc) ', user.get('desc'));
+    logger.debug('models/userStatic findById: name is user.get(descr) ', user.get('descr'));
     return user;
   };
 

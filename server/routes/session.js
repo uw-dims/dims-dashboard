@@ -28,21 +28,21 @@ module.exports = function (UserSettings) {
       logger.debug(moment().toISOString(), 'routes/session.session returned req.user', req.user);
       console.log(req.user);
       var username = req.user.get('ident');
-      var name = req.user.get('desc');
+      var name = req.user.get('descr');
       // var username = req.user.get('id');
       // var name = req.user.get('name');
       // var client = req.app.get('client');
-      logger.debug(moment().toISOString(), 'routes/session.session. req.user.get(ident) ', req.user.get('ident'));
-      logger.debug(moment().toISOString(), 'routes/session.session. req.user.get(desc) ', req.user.get('desc'));
-      logger.debug(moment().toISOString(), 'routes/session.session. req.user.data ', req.user.data);
-      logger.debug(moment().toISOString(), 'routes/session.session. username, name ', username, name);
+      logger.debug('routes/session.session. req.user.get(ident) ', req.user.get('ident'));
+      logger.debug('routes/session.session. req.user.get(descr) ', req.user.get('descr'));
+      logger.debug('routes/session.session. req.user.data ', req.user.data);
+      logger.debug('routes/session.session. username, name ', username, name);
 
       // Get associated settings
       var userSettings = UserSettings.userSettingsFactory(username);
       userSettings.retrieveSettings().then(function (data) {
-        logger.debug(moment().toISOString(), 'routes/session.js session reply from retrieve settings is ', data);
+        logger.debug('routes/session.js session reply from retrieve settings is ', data);
         var object = sessionObject(username, name, data);
-        logger.debug(moment().toISOString(), 'routes/session.js sessionObject is ', object);
+        logger.debug('routes/session.js sessionObject is ', object);
         res.status(200).send({data: object});
       }).then(function (err) {
         return res.status(400).send(err);
@@ -82,7 +82,7 @@ module.exports = function (UserSettings) {
         return res.status(400).send(message);
       }
       // logger.debug('routes/session.login. Successful response from passport.authenticate. err, user, info: ', err, user.get('id'), info);
-      logger.debug('routes/session.login. Successful response from passport.authenticate. err, user, info: ', err, user.get('ident'), user.get('desc'), info);
+      logger.debug('routes/session.login. Successful response from passport.authenticate. err, user, info: ', err, user.get('ident'), user.get('descr'), info);
       // Puts the logged in user in the session and then return user and settings
       req.logIn(user, function (err) {
         logger.debug('routes/session.login. Callback from req.logIn');
@@ -93,7 +93,7 @@ module.exports = function (UserSettings) {
         // var username = req.user.get('id');
         // var name = req.user.get('name');
         var username = req.user.get('ident');
-        var name = req.user.get('desc');
+        var name = req.user.get('descr');
         //var client = req.app.get('client');
         logger.debug('routes/session.login. req.user is ', req.user);
         logger.debug('routes/session.login. info from req.user is ', username, name);

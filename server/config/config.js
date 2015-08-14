@@ -47,41 +47,21 @@ config.STATIC = 'static';
 // Default is Postgresqll
 config.userSource = process.env.USER_BACKEND || config.POSTGRESQL;
 
-// Put this here for now - only for testing
+// Put this here for now - only for testing without database
 config.testUsers =
   [
     {
-      'ident': 'dittrich',
-      'desc': 'David Dittrich',
-      'password': 'dittrich'
+      'ident': 'testuser1',
+      'descr': 'Test User 1',
+      'password': 'testuser1'
     }, {
-      'ident': 'lparsons',
-      'desc': 'Linda Parsons',
-      'password': 'lparsons'
+      'ident': 'testuser2',
+      'descr': 'Test User 2',
+      'password': 'testuser2'
     }, {
-      'ident': 'eliot',
-      'desc': 'Eliot Lim',
-      'password': 'eliot'
-    }, {
-      'ident': 'jhanna',
-      'desc': 'Jordan Hanna',
-      'password': 'jhanna'
-    }, {
-      'ident': 'parksj',
-      'desc': 'Jeremy Parks',
-      'password': 'parksj'
-    }, {
-      'ident': 'mboggess',
-      'desc': 'Megan Boggess',
-      'password': 'mboggess'
-    }, {
-      'ident': 'andclay',
-      'desc': 'Anderson Nascimento',
-      'password': 'andclay'
-    }, {
-      'ident': 'testuser',
-      'desc': 'Test User',
-      'password': 'testuser'
+      'ident': 'testuser3',
+      'descr': 'Test User 3',
+      'password': 'testuser3'
     }
   ];
 

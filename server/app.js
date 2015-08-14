@@ -143,8 +143,8 @@ if (config.env === 'production') {
 // Set app to use Passport depending on user backend
 if (config.userSource === config.POSTGRESQL) {
   logger.info('Dashboard initialization: Using POSTGRESQL backend.');
-  app.use(require('./services/passport.js').initialize());
-  app.use(require('./services/passport.js').session());
+  app.use(require('./services/passport-postgres.js').initialize());
+  app.use(require('./services/passport-postgres.js').session());
 } else {
   logger.info('Dashboard initialization: Using STATIC backend for testing');
   app.use(require('./services/passport-static.js').initialize());
