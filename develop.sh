@@ -25,6 +25,6 @@ sudo rsync -ah --exclude '.git' --exclude 'node_modules' --exclude 'public' --ex
 sudo chown -R $USER:$USER ${DEST}/dims-dashboard
 cd ${DEST}/dims-dashboard/client
 # This is just for developing, so don't need to do a production build
-grunt configure
+grunt dev-compile
 # Reset to owner
 sudo chown -R $OWNER:$OWNER ${DEST}/dims-dashboard

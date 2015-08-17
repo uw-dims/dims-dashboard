@@ -466,6 +466,13 @@ module.exports = function (grunt) {
       ]);
   });
 
+  grunt.registerTask('dev-compile', 'Create the config file and compile LESS', function (target) {
+    grunt.task.run([
+      'ngconstant',
+      'less:development'
+      ]);
+  });
+
 
   grunt.registerTask('serve', 'Compile then start a connect web server', function (target) {
     if (target === 'dist') {
