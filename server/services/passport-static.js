@@ -41,7 +41,7 @@ passport.use(new LocalStrategy({
   logger.debug('services/passport-static.use: username, password are ', username, password);
   // Decrypt password received via http post
   var decrypted = CryptoJS.AES.decrypt(password, config.passSecret).toString(CryptoJS.enc.Utf8);
-  logger.debug('decrypted is ', decrypted);
+  // logger.debug('decrypted is ', decrypted);
   // Look up the user corresponding to the supplied username
   var user = userdata.findById(username);
   logger.debug('services/passport-static.use: user is ', user);
@@ -54,7 +54,7 @@ passport.use(new LocalStrategy({
       logger.debug('services/passport-static.use: password is equal');
 
       logger.debug('services/passport-static.use: validated user is ', user.get('ident'));
-      logger.debug('services/passport-static.use: validated user name is ', user.get('desc'));
+      logger.debug('services/passport-static.use: validated user name is ', user.get('descr'));
       return done(null, user);
 
     } else {

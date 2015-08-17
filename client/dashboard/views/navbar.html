@@ -8,11 +8,14 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="/" ng-if="currentUser">DIMS</a>
+
+      <a class="navbar-brand-dims navbar-brand" href="/" ng-if="currentUser"> DIMS</a>
       <p class="navbar-text" ng-hide="currentUser">DIMS</p>
     </div>
     <div class="navbar-collapse collapse">
       <ul class="nav navbar-nav" ng-show="currentUser">
+        <li><a href="/"><i class="fa fa-bar-chart" style="padding-right:3px;"></i>Home</a></li>
+        <!--
         <li class="dropdown" >
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tracking <span class="caret"></span></a>
           <ul class="dropdown-menu" role="menu">
@@ -22,7 +25,20 @@
             <li class="divider"></li>
             <li><a href="#">Notifications</a></li>
           </ul>
-        </li>
+        </li> -->
+        <li><a href="/">Tracking</a></li>
+        <li><a href="/">Data</a></li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Users<span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="/users/">Find DIMS users</a></li>
+            <li><a href="http://portal.uw.ops-trust.net" target="_blank">Open Ops-Trust portal</a></li>
+          </ul>
+        </li> 
+        <li><a ng-click="vm.logMonitor()">Log Monitor</a></li>
+        <li><a href="/">Admin</a></li>
+        <li><a ng-click="vm.settings()"><i class="fa fa-cog fa-lg"></i></a>
+        <!--
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tools <span class="caret"></span></a>
           <ul class="dropdown-menu" role="menu">
@@ -31,7 +47,7 @@
             <li><a href="/crosscor_client/">Correlate</a></li>
             <li><a href="/anon_client/">Anonymize</a></li>
           </ul>
-        </li>
+        </li> 
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Files <span class="caret"></span></a>
           <ul class="dropdown-menu" role="menu">
@@ -44,17 +60,32 @@
           <ul class="dropdown-menu" role="menu">
             <li><a href="/graph">Graph Demo</a></li>
           </ul>
-        </li>
-      </ul>
+        </li> -->
+      </ul> 
 
       <ul class="nav navbar-nav navbar-right">
-        <li ng-show="currentUser"><a ng-click="vm.messaging()">Messaging</a></li>
-        <li ng-show="currentUser"><a ng-click="vm.settings()">Settings</a></li>
-        <li ng-show="currentUser"><a ng-click="vm.logout()"> Logout</a></li>
+        <li ng-show="currentUser"><a ng-click="vm.chat()"><i class="fa fa-comments fa-lg"></i></a></li>
+        <li ng-show="currentUser" class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-bell fa-lg"></i> <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="/">New notifications</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="/">Notification 1</a></li>
+            <li><a href="/">Notification 2</a></li>
+          </ul>
+        </li>
+        <!--<li ng-show="currentUser"><a ng-click="vm.logout()"> Logout</a></li> -->
+        <li ng-show="currentUser" class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{currentUser.username}} <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="/profile">Profile</a></li>
+            <li><a ng-click="vm.logout()">Logout</a></li>
+          </ul>
+        </li>
       </ul>
-      <p class="navbar-right navbar-text" ng-show="currentUser">&nbsp;</p>
-      <p class="navbar-right navbar-text" ng-show="currentUser">Welcome, {{currentUser.name}}</p>
-      <!-- <ul class="nav navbar-nav navbar-right">
+      <!-- <p class="navbar-right navbar-text" ng-show="currentUser">&nbsp;</p>
+      <p class="navbar-right navbar-text" ng-show="currentUser">Welcome, {{currentUser.id}}</p>
+      <ul class="nav navbar-nav navbar-right">
         <li><a href="../navbar/">Default</a></li>
         <li><a href="../navbar-static-top/">Static top</a></li>
         <li class="active"><a href="./">Fixed top</a></li>

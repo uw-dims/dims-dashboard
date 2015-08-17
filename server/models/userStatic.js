@@ -18,11 +18,13 @@ module.exports = function (userConfig) {
 
   model.findById = function (id) {
     var result = _.find(userConfig, {'ident': id});
-    // logger.debug('models/userStatic result is ', result);
+    if (result === undefined) {
+      return result;
+    }
     user.data = result;
-    logger.debug('models/userStatic findById: user.data is now', user.data);
-    console.log(user);
-    logger.debug('models/userStatic findById: name is user.get(descr) ', user.get('descr'));
+    // logger.debug('models/userStatic findById: user.data is now', user.data);
+    // console.log(user);
+    // logger.debug('models/userStatic findById: name is user.get(descr) ', user.get('descr'));
     return user;
   };
 

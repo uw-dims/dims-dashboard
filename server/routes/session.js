@@ -22,27 +22,24 @@ module.exports = function (UserSettings) {
 
   // Return login session data - user plus settings
   session.session = function (req, res) {
-    logger.debug(moment().toISOString(), 'routes/session.session Starting session.');
+    logger.debug('session:  Starting session.');
     if (req.user) {
       // we are not using ops-trust column names any more
-      logger.debug(moment().toISOString(), 'routes/session.session returned req.user', req.user);
-      console.log(req.user);
+      // logger.debug('routes/session.session returned req.user', req.user);
+      // console.log(req.user);
       var username = req.user.get('ident');
       var name = req.user.get('descr');
-      // var username = req.user.get('id');
-      // var name = req.user.get('name');
-      // var client = req.app.get('client');
-      logger.debug('routes/session.session. req.user.get(ident) ', req.user.get('ident'));
-      logger.debug('routes/session.session. req.user.get(descr) ', req.user.get('descr'));
-      logger.debug('routes/session.session. req.user.data ', req.user.data);
-      logger.debug('routes/session.session. username, name ', username, name);
+      logger.debug('session: req.user.get(ident) ', req.user.get('ident'));
+      logger.debug('session:  req.user.get(descr) ', req.user.get('descr'));
+      logger.debug('session:  req.user.data ', req.user.data);
+      logger.debug('session:  username, name ', username, name);
 
       // Get associated settings
       var userSettings = UserSettings.userSettingsFactory(username);
       userSettings.retrieveSettings().then(function (data) {
-        logger.debug('routes/session.js session reply from retrieve settings is ', data);
+        logger.debug('session:  reply from retrieve settings is ', data);
         var object = sessionObject(username, name, data);
-        logger.debug('routes/session.js sessionObject is ', object);
+        logger.debug('session:  sessionObject is ', object);
         res.status(200).send({data: object});
       }).then(function (err) {
         return res.status(400).send(err);
@@ -56,7 +53,7 @@ module.exports = function (UserSettings) {
   session.logout = function (req, res) {
     if (req.user) {
       // logger.debug('routes/session.logout', req.user.get('id'));
-      logger.debug('routes/session.logout', req.user.get('ident'));
+      logger.debug('logout:', req.user.get('ident'));
       req.logout();
       // req.flash('info','You are now logged out.');
       res.status(200).send('Successfully logged out');
@@ -71,9 +68,9 @@ module.exports = function (UserSettings) {
     passport.authenticate('local', function (err, user, info) {
       // Info contains messages regarding why login was unsuccessful
       //console.trace();
-      logger.debug('routes/session.login. Back from authenticate', err, user, info);
+      logger.debug('login: Back from authenticate', err, user, info);
       if (err || !user) {
-        logger.debug('routes/session.login. Unsuccessful Response from passport.authenticate. err, info: ', err, info);
+        logger.debug('login: Unsuccessful Response from passport.authenticate. err, info: ', err, info);
         var message = (info !== null && info !== undefined) ? info : '';
         message = message + ((err !== null && err !== undefined) ? err : '');
         // req.flash('username', req.body.username);
@@ -82,10 +79,10 @@ module.exports = function (UserSettings) {
         return res.status(400).send(message);
       }
       // logger.debug('routes/session.login. Successful response from passport.authenticate. err, user, info: ', err, user.get('id'), info);
-      logger.debug('routes/session.login. Successful response from passport.authenticate. err, user, info: ', err, user.get('ident'), user.get('descr'), info);
+      logger.debug('login: Successful response from passport.authenticate. err, user, info: ', err, user.get('ident'), user.get('descr'), info);
       // Puts the logged in user in the session and then return user and settings
       req.logIn(user, function (err) {
-        logger.debug('routes/session.login. Callback from req.logIn');
+        logger.debug('login: Callback from req.logIn');
         if (err !== null && err !== undefined) {
           // req.flash('error', err);
           return res.status(400).send(err);
@@ -95,18 +92,18 @@ module.exports = function (UserSettings) {
         var username = req.user.get('ident');
         var name = req.user.get('descr');
         //var client = req.app.get('client');
-        logger.debug('routes/session.login. req.user is ', req.user);
-        logger.debug('routes/session.login. info from req.user is ', username, name);
-        logger.debug('routes/session.login. Get user settings for user ', username);
+        logger.debug('login: req.user is ', req.user);
+        logger.debug('login: info from req.user is ', username, name);
+        logger.debug('login: Get user settings for user ', username);
 
         // Create new UserSettings object
         // If settings have never been saved, object will save
         // default settings
         UserSettings.getUserSettings(username).then(function (data) {
-            logger.debug('routes/session.login. callback from userSettings.getUserSettings. username and name are now ', username, name);
-            logger.debug('routes/session.login. callback from userSettings.getUserSettings. settings are ', data.settings);
+            logger.debug('login:  callback from userSettings.getUserSettings. username and name are now ', username, name);
+            logger.debug('login:  callback from userSettings.getUserSettings. settings are ', data.settings);
             var object = sessionObject(username, name, data.settings);
-            logger.debug('routes/session.login. object is ', object);
+            logger.debug('login:  object is ', object);
             res.status(200).send({data: object});
           }).then(function (err) {
             return res.status(400).send(err);

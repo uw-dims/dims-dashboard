@@ -1,7 +1,7 @@
 /*global angular */
 'use strict';
 
-var dimsDashboardConfig = function($provide, $routeProvider, $locationProvider, datepickerConfig, datepickerPopupConfig) {
+var dimsDashboardConfig = function ($provide, $routeProvider, $locationProvider, datepickerConfig, datepickerPopupConfig) {
   $routeProvider.when('/', {
     controller: 'MainCtrl',
     templateUrl: 'views/partials/main.html'
@@ -15,7 +15,7 @@ var dimsDashboardConfig = function($provide, $routeProvider, $locationProvider, 
     templateUrl: 'views/partials/data_files.html'
   }).
   when('/ipgrep_client', {
-    controller:'IpgrepCtrl',
+    controller: 'IpgrepCtrl',
     templateUrl: '/views/partials/ipgrep.html'
   }).
   when('/anon_client', {
@@ -37,6 +37,14 @@ var dimsDashboardConfig = function($provide, $routeProvider, $locationProvider, 
   when('/graph', {
     controller: 'GraphCtrl',
     templateUrl: 'views/partials/graph.html'
+  }).
+  when('/profile', {
+    controller: 'ProfileCtrl',
+    templateUrl: 'views/partials/profile.html'
+  }).
+  when('/users', {
+    controller: 'UserCtrl',
+    templateUrl: '/views/partials/users.html'
   }).
   when('/login', {
     controller: 'LoginCtrl',

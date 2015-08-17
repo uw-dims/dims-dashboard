@@ -34,6 +34,14 @@ label {
   text-decoration: none;
 }
 
+/* Override navbar-default navbar-brand */
+
+a.navbar-brand-dims {
+  background-color: @navbar-inverse-bg;
+}   
+
+
+
 /* override list groups for dims */
 .list-group-item {
   padding: @list-group-item-top-padding @list-group-item-side-padding;
@@ -443,7 +451,7 @@ html>body tbody.scrollContent {
 
 .popup-box .popup-head
 {
-    background-color: lighten(@navbar-inverse-bg, 20%);//#51524c; //#474843;
+    background-color: lighten(@brand-primary, 3%);//#51524c; //#474843;
     padding: 4px 4px 4px 5px;
     color: white;
     font-weight: normal;

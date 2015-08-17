@@ -12,6 +12,8 @@ var connectionString = 'amqp://' + config.rpcUser + ':' + config.rpcPass + '@' +
 var connection;
 var q = 'test_queue';
 
+// Set to skip unless we have rabbitmq docker container running
+// to test
 test.skip('Test amqpClient', function (assert) {
   // Stub the server
   var corrId;

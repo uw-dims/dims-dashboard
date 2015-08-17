@@ -1,9 +1,9 @@
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller('MainCtrl', ['$scope', 'DataService', 'TicketService', 'LogService','ChatService','$cookies','$location', '$routeParams', '$log', '$filter', '$http', 'SettingsService','$rootScope',
+  controller('MainCtrl', ['$scope', 'DataService', 'TicketService', 'LogService', 'ChatService',  '$cookies', '$location', '$routeParams', '$log', '$filter', '$http', 'SettingsService', '$rootScope',
       function ($scope, DataService, TicketService, LogService, ChatService, $cookies, $location, $routeParams, $log, $filter, $http, SettingsService, $rootScope) {
 
-    $scope.title = 'DIMS Main';
+    $scope.title = 'Data View';
 
     $scope.mapTestData = {};
     $scope.fileTestData = {};
