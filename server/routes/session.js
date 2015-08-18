@@ -68,7 +68,7 @@ module.exports = function (UserSettings) {
     passport.authenticate('local', function (err, user, info) {
       // Info contains messages regarding why login was unsuccessful
       //console.trace();
-      logger.debug('login: Back from authenticate', err, user, info);
+      // logger.debug('login: Back from authenticate', err, user, info);
       if (err || !user) {
         logger.debug('login: Unsuccessful Response from passport.authenticate. err, info: ', err, info);
         var message = (info !== null && info !== undefined) ? info : '';
@@ -92,7 +92,7 @@ module.exports = function (UserSettings) {
         var username = req.user.get('ident');
         var name = req.user.get('descr');
         //var client = req.app.get('client');
-        logger.debug('login: req.user is ', req.user);
+        // logger.debug('login: req.user is ', req.user);
         logger.debug('login: info from req.user is ', username, name);
         logger.debug('login: Get user settings for user ', username);
 
