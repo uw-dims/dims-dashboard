@@ -96,7 +96,7 @@ config.mapfile = '/etc/ipgrep_networks.txt';
 // not used
 //config.outputdir = '/opt/dims/srv/output';
 
-config.data = '/opt/dims/data/dims-sample-data';
+config.data = '/opt/dims/data/dims-sample-data/';
 
 config.serverPath = __dirname;
 

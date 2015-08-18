@@ -206,7 +206,7 @@ module.exports = function () {
           }
 
         } else {
-          logger.warn(directory + ' does not exist');
+          logger.warn('files: ' + directory + ' does not exist');
           //return res.send(400, 'File does not exist');
           return res.status(400).send('File does not exist');
         }

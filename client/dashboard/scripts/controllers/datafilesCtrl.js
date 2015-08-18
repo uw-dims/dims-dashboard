@@ -2,7 +2,7 @@
 angular.module('dimsDashboard.controllers').
   controller('DataFilesCtrl', ['fileSourceMap', 'Utils', '$scope', '$http', '$log', '$location', '$routeParams', 'SettingsService',
       function (fileSourceMap, Utils, $scope, $http, $log, $location, $routeParams, SettingsService) {
-    console.log('In DataFiles controller');
+    $log.debug('In DataFiles controller');
     // Setup form data
     $scope.formData = {};
     $scope.showData = false;
@@ -15,43 +15,43 @@ angular.module('dimsDashboard.controllers').
     // Set up ng-grid
     $scope.gridData = {};
     var columnDefs = [
-      {field: 'name', displayName: 'Name', enableCellEdit: false,  
+      {field: 'name', displayName: 'Name', enableCellEdit: false,
           cellTemplate: '<div class="ngCellText" ng-click="tableClicked(row.getProperty(col.field))">{{row.getProperty(col.field)}}</div>'},
       {field: 'type', displayName: 'Type', enableCellEdit: true},
       {field: 'desc', displayName: 'Description', enableCellEdit: true}
     ];
     $scope.fileSelections = [];
-    $scope.gridOptions = {data: 'gridData', 
+    $scope.gridOptions = {data: 'gridData',
         columnDefs: columnDefs,
         selectedItems: $scope.fileSelections,
-        multiSelect: false, 
+        multiSelect: false,
         enableCellEdit: true
       };
 
-    $scope.singleFile='';
+    $scope.singleFile = '';
 
-    $scope.getFiles = function() {
+    $scope.getFiles = function () {
       return $http({
         method: 'GET',
-        url: '/files', 
+        url: '/files',
         params: {
           source: $scope.formData.source,
           action: 'list'
-        }       
+        }
       }).
-        success(function(data, status, headers, config) {
+        success(function (data, status, headers, config) {
           $scope.gridData = data.files;
           $scope.filePath = data.path;
           $scope.fileSource = config.params.source;
           $scope.showFiles = true;
         }).
-        error(function(data, status, headers, config) {
+        error(function (data, status, headers, config) {
           $log.error('Error getting file list', data, status, config);
         });
     };
 
     // Display file contents when clicked
-    $scope.tableClicked = function(file) {
+    $scope.tableClicked = function (file) {
       $scope.showData = false;
       $scope.singleFile = '';
       $scope.rawFile = '';
@@ -62,7 +62,7 @@ angular.module('dimsDashboard.controllers').
       return $http({
         method: 'GET',
         // Modify transformResponse since we don't want automatic Json parsing
-        transformResponse: [function(data, headersGetter) {
+        transformResponse: [function (data, headersGetter) {
           if (angular.isString(data)) {
             data = data.replace(angular.PROTECTION_PREFIX, '');
           }
@@ -78,20 +78,20 @@ angular.module('dimsDashboard.controllers').
           source: $scope.fileSource
         }
       }).
-        success(function(data, status, headers, config){
+        success(function (data, status, headers, config){
           $scope.showData = true;
           $scope.loading = false;
           $scope.isRaw = true;
           $scope.singleFile = data;
           $scope.isJson = isJson(data);
         }).
-        error(function(data, status, headers, config) {
+        error(function (data, status, headers, config) {
           $scope.loading = false;
           $log.error('Error getting file contents', data, status, config);
         });
     };
 
-    var isJson = function(data) {
+    var isJson = function (data) {
       $scope.jsonData = '';
       try {
         $scope.jsonData = JSON.parse($scope.singleFile);
@@ -101,7 +101,7 @@ angular.module('dimsDashboard.controllers').
       }
     };
 
-    $scope.showPrettyResults= function() {
+    $scope.showPrettyResults= function () {
       $scope.prettyMsg = '';
       try {
         var jsonPretty = JSON.stringify($scope.jsonData,null,2);
@@ -111,13 +111,13 @@ angular.module('dimsDashboard.controllers').
       }
     };
 
-    $scope.fileContentsLoaded = function(jsonPretty) {
+    $scope.fileContentsLoaded = function (jsonPretty) {
       $scope.rawFile = $scope.singleFile;
       $scope.singleFile = jsonPretty;
       $scope.isRaw = false;
     };
 
-    $scope.showRawData = function() {
+    $scope.showRawData = function () {
         $scope.singleFile = $scope.rawFile;
         $scope.rawFile = '';
         $scope.isRaw = true;
