@@ -27,7 +27,9 @@ var express = require('express')
   //, exec = require('child_process').exec
  // , messages = require('./utils/messages')
  // , CryptoJS = require('crypto-js')
-  , logger = require('./utils/logger')(module);
+  , logger = require('./utils/logger')(module)
+  , passport = require('passport')
+  , LocalStrategy = require('passport-local').Strategy;
 
 // routes
 var routes = require('./routes');
@@ -36,8 +38,12 @@ var routes = require('./routes');
 var diContainer = require('./services/diContainer')();
 diContainer.register('client', require('./utils/redisDB'));
 diContainer.factory('db', require('./utils/redisProxy'));
+diContainer.register('Bookshelf', require('./utils/bookshelf'));
 diContainer.factory('UserSettings', require('./models/userSettings'));
 diContainer.factory('Ticket', require('./models/ticket'));
+diContainer.factory('UserModel', require('./models/user'));
+diContainer.factory('passportPostgres', require('./services/passportPostgres'));
+diContainer.factory('passportStatic', require('./services/passportStatic'));
 diContainer.factory('FileData', require('./models/fileData'));
 diContainer.factory('Notification', require('./models/notification'));
 diContainer.factory('settingsRoute', require('./routes/settings'));
@@ -52,6 +58,8 @@ diContainer.factory('filesRoute', require('./routes/files'));
 diContainer.factory('rwfindRoute', require('./routes/rwfind'));
 diContainer.factory('crosscorRoute', require('./routes/crosscor'));
 diContainer.factory('dataRoute', require('./routes/data'));
+diContainer.factory('userRoute', require('./routes/user'));
+diContainer.factory('attributeRoute', require('./routes/attributes'));
 
 // diContainer.factory('ticketService', require('./services/ticket'));
 
@@ -65,6 +73,10 @@ var filesRoute = diContainer.get('filesRoute');
 var rwfindRoute = diContainer.get('rwfindRoute');
 var crosscorRoute = diContainer.get('crosscorRoute');
 var dataRoute = diContainer.get('dataRoute');
+var passportPostgres = diContainer.get('passportPostgres');
+var passportStatic = diContainer.get('passportStatic');
+var userRoute = diContainer.get('userRoute');
+var attributeRoute = diContainer.get('attributeRoute');
 
 var app = module.exports = express();
 
@@ -140,16 +152,29 @@ if (config.env === 'production') {
   });
 }
 
+// Specify how to serialize user info
+passport.serializeUser(function (user, done) {
+  done(null, user.get('ident'));
+});
+
 // Set app to use Passport depending on user backend
 if (config.userSource === config.POSTGRESQL) {
-  logger.info('Dashboard initialization: Using POSTGRESQL backend.');
-  app.use(require('./services/passport-postgres.js').initialize());
-  app.use(require('./services/passport-postgres.js').session());
+  passport.serializeUser(passportPostgres.serialize);
+  passport.deserializeUser(passportPostgres.deserialize);
+  passport.use(new LocalStrategy({
+    usernameField: 'username',
+    passwordField: 'password'
+  }, passportPostgres.strategy));
 } else {
-  logger.info('Dashboard initialization: Using STATIC backend for testing');
-  app.use(require('./services/passport-static.js').initialize());
-  app.use(require('./services/passport-static.js').session());
+  passport.serializeUser(passportStatic.serialize);
+  passport.deserializeUser(passportStatic.deserialize);
+  passport.use(new LocalStrategy({
+    usernameField: 'username',
+    passwordField: 'password'
+  }, passportStatic.strategy));
 }
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Middleware to be used for every secured route
 var ensureAuthenticated = function (req, res, next) {
@@ -182,6 +207,14 @@ router.get('/data', ensureAuthenticated, dataRoute.list);
 // User Settings api
 router.get('/settings', ensureAuthenticated, settingsRoute.get);
 router.post('/settings', ensureAuthenticated, settingsRoute.update);
+
+// Get all attributes
+router.get('/api/attributes', attributeRoute.list);
+
+// Get all users
+router.get('/api/user', userRoute.list);
+// Get one user
+router.get('/api/user/:id', userRoute.show);
 
 // Tickets
 // Get all tickets (ticket objects)

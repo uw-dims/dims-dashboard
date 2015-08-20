@@ -24,7 +24,7 @@
       'cifbulk': ['ips', 'fileName', 'upload'],
       'crosscor': ['fileName', 'mapName', 'stats', 'iff'],
       'anon': ['fileName', 'mapName', 'outputType', 'stats']
-    }; 
+    };
 
     // Populates outputType picker
     vm.outputTypes = [{
@@ -34,7 +34,7 @@
         value: 'text',
         label: 'TEXT'
       }];
-      
+
     // Populates iff picker
     vm.iffs = [{
         value: 'friend',

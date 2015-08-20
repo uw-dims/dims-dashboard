@@ -3,6 +3,7 @@
 // Get the app configuration
 var config = require('../config/config');
 var logger = require('../utils/logger')(module);
+var diContainer = require('./diContainer');
 var  CryptoJS = require('crypto-js');
 var exec = require('child_process').exec;
 
@@ -10,10 +11,13 @@ var passport = require('passport')
   , LocalStrategy = require('passport-local').Strategy;
 
 // Initialize Bookshelf
-var Bookshelf = require('../utils/bookshelf');
+//var Bookshelf = require('../utils/bookshelf');
 
 // Get the user model so Passport can use it
-var userdata = require('../models/user')(Bookshelf);
+//var userdata = require('../models/user')(Bookshelf);
+console.log(diContainer);
+var User = diContainer.get('Bookshelf');
+
 
 // Specify how to serialize user info
 passport.serializeUser(function (user, done) {
@@ -23,7 +27,7 @@ passport.serializeUser(function (user, done) {
 
 // Specify how to deserialize the user info
 passport.deserializeUser(function (ident, done) {
-  new userdata.User({ident: ident}).fetch().then(function (user) {
+  new User({ident: ident}).fetch().then(function (user) {
     // logger.debug('services/passport.deserializeUser: retrieved user ident ', user.get('ident'));
     return done(null, user);
   }, function (error) {
@@ -40,7 +44,7 @@ passport.use(new LocalStrategy({
 }, function (username, password, done) {
   logger.debug('services/passport.use Starting function for ', username);
   // Look up the user corresponding to the supplied username
-  new userdata.User({ident: username}).fetch({require: true}).then(function (user) {
+  new User({ident: username}).fetch({require: true}).then(function (user) {
       logger.debug('services/passport.use Retrieved user ', user.get('ident'));
       // Decrypt password received via http post
       var decrypted = CryptoJS.AES.decrypt(password, config.passSecret).toString(CryptoJS.enc.Utf8);

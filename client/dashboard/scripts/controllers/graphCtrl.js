@@ -10,7 +10,7 @@ angular.module('dimsDashboard.controllers').
     $scope.showFiles = false;
     $scope.showResults = true;
     var chart = null;
-  
+
     FileService.getDemoList('timeseries').then(function(result) {
       $scope.fileNames = result.fileNames;
       $scope.filePath = result.filePath;
@@ -39,17 +39,17 @@ angular.module('dimsDashboard.controllers').
           });
 
           $scope.showResults = true;
-          
+
           nv.addGraph(function() {
             console.log('in nv.addGraph');
             chart = nv.models.lineWithFocusChart()
                 // .useInteractiveGuideline(true)
-                .margin({top: 30, right: 30, bottom: 60, left: 100})
+                .margin({top: 30, right: 30, bottom: 60, left: 80})
                 // .margin2({top: 0, right: 30, bottom: 60, left: 60})
                 // x: function(d,i) { return i},
                 // showXAxis: true,
                 // showYAxis: true,
-                .transitionDuration(250)
+                //.transitionDuration(250)
                 // .interpolate("basis")
                 .color(d3.scale.category10().range());
 
@@ -91,7 +91,7 @@ angular.module('dimsDashboard.controllers').
             return chart;
           });
 
-          
+
       });
     };
 
@@ -104,9 +104,9 @@ angular.module('dimsDashboard.controllers').
 
     $scope.yAxisTickFormatFunction = function() {
       return function(d) {
-        return d3.format(',.3f')(d/1000000);
+        return d3.format(',.1f')(d/1000000);
       };
-      
+
     };
 
 

@@ -1,6 +1,6 @@
 'use strict';
 angular.module('dimsDashboard.directives').
-  
+
   /**
    *  pid - process id returned by server
    *  showResults - controller-specified - should we specify it here?
@@ -8,7 +8,7 @@ angular.module('dimsDashboard.directives').
    */
 
   directive('dimsRawResults', [ '$timeout', '$log', function($timeout, $log) {
-    
+
     var link = function(scope, el, attr) {
 
       scope.$watch('rawData', function(newValue, oldValue) {
@@ -35,7 +35,7 @@ angular.module('dimsDashboard.directives').
             scope.prettyMsg = 'Pretty print does not work on this data.';
           }
         }
-        scope.isRaw = false; 
+        scope.isRaw = false;
       };
 
       scope.showRawData = function() {
@@ -48,5 +48,5 @@ angular.module('dimsDashboard.directives').
       templateUrl: 'views/partials/rawResults.html',
       link: link
     };
-    
+
 }]);

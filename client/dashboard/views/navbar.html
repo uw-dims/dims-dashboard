@@ -9,7 +9,7 @@
         <span class="icon-bar"></span>
       </button>
 
-      <a class="navbar-brand-dims navbar-brand" href="/" ng-if="currentUser"> DIMS</a>
+      <a class="navbar-brand-dims navbar-brand" href="/mainnew" ng-if="currentUser"> DIMS</a>
       <p class="navbar-text" ng-hide="currentUser">DIMS</p>
     </div>
     <div class="navbar-collapse collapse">
@@ -31,8 +31,15 @@
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Users<span class="caret"></span></a>
           <ul class="dropdown-menu" role="menu">
-            <li><a href="/users/">Find DIMS users</a></li>
+            <li><a href="/users">Find DIMS users</a></li>
             <li><a href="http://portal.uw.ops-trust.net" target="_blank">Open Ops-Trust portal</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="/datafiles">View files</a></li>
+            <li><a href="/uploadfile">Upload files</a></li>
           </ul>
         </li>
         <li><a ng-click="vm.logMonitor()">Log Monitor</a></li>
@@ -48,19 +55,12 @@
           </ul>
         </li>
         <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Files <span class="caret"></span></a>
-          <ul class="dropdown-menu" role="menu">
-            <li><a href="/datafiles">View</a></li>
-            <li><a href="/uploadfile">Upload</a></li>
-          </ul>
-        </li>
-        <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Demos <span class="caret"></span></a>
           <ul class="dropdown-menu" role="menu">
             <li><a href="/graph">Graph Demo</a></li>
           </ul>
         </li>
-        <li><a ng-click="vm.settings()"><i class="fa fa-cog fa-lg"></i></a>
+        <li><a href="/userinfo/settings"><i class="fa fa-cog fa-lg"></i></a>
       </ul>
 
       <ul class="nav navbar-nav navbar-right">
@@ -78,7 +78,7 @@
         <li ng-show="currentUser" class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{currentUser.username}} <span class="caret"></span></a>
           <ul class="dropdown-menu" role="menu">
-            <li><a href="/profile">Profile</a></li>
+            <li><a href="/userinfo">Profile</a></li>
             <li><a ng-click="vm.logout()">Logout</a></li>
           </ul>
         </li>

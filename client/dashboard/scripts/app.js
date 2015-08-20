@@ -1,7 +1,7 @@
 /*global angular */
 'use strict';
 
-var dimsDashboardConfig = function ($provide, $routeProvider, $locationProvider, datepickerConfig, datepickerPopupConfig) {
+var dimsDashboardConfig = function ($routeProvider, $locationProvider, datepickerConfig, datepickerPopupConfig) {
   $routeProvider.when('/', {
     controller: 'MainCtrl',
     templateUrl: 'views/partials/main.html'
@@ -38,9 +38,13 @@ var dimsDashboardConfig = function ($provide, $routeProvider, $locationProvider,
     controller: 'GraphCtrl',
     templateUrl: 'views/partials/graph.html'
   }).
-  when('/profile', {
-    controller: 'ProfileCtrl',
-    templateUrl: 'views/partials/profile.html'
+  when('/userinfo', {
+    controller: 'UserInfoCtrl',
+    templateUrl: 'views/partials/userinfo.html'
+  }).
+  when('/userinfo/:type', {
+    controller: 'UserInfoCtrl',
+    templateUrl: 'views/partials/userinfo.html'
   }).
   when('/users', {
     controller: 'UserCtrl',
@@ -49,6 +53,10 @@ var dimsDashboardConfig = function ($provide, $routeProvider, $locationProvider,
   when('/login', {
     controller: 'LoginCtrl',
     templateUrl: 'views/partials/login.html'
+  }).
+  when('/mainnew', {
+    controller: 'MainnewCtrl',
+    templateUrl: 'views/partials/mainnew.html'
   }).
   otherwise({
     redirectTo: '/'
@@ -136,7 +144,7 @@ var rpcClientOptions = {
   }
 };
 
-var dimsDashboard = angular.module('dimsDashboard', 
+var dimsDashboard = angular.module('dimsDashboard',
   ['ngRoute','angularFileUpload','ui.bootstrap','ui.bootstrap.showErrors','ngGrid', 'ngAnimate', 'ngResource','http-auth-interceptor',
     'ngCookies','anguFixedHeaderTable', 'truncate', 'dimsDashboard.controllers', 'dimsDashboard.directives', 'dimsDashboard.services','dimsDashboard.config'])
   .config(dimsDashboardConfig);

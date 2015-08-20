@@ -1,0 +1,38 @@
+<div class="spacer10">
+<div class="panel panel-default">
+<div class="panel-body">
+<h2>User Settings</h2>
+<p style="padding-bottom: 10px">{{vm.message}}</p>
+
+<form role="form">
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" ng-model="vm.settingsFormData.anonymize"> Anonymize query results
+    </label>
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" ng-model="vm.settingsFormData.rpcDebug"> Set debug flag for queries
+    </label>
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" ng-model="vm.settingsFormData.rpcVerbose"> Set verbose flag for queries
+    </label>
+  </div>
+
+  <div class="form-group">
+    <label>Select cifbulk queue</label>
+    </div><div class="form-group">
+    <div class="col-sm-6">
+      <select class="form-control" ng-model="vm.settingsFormData.cifbulkQueue" ng-options="f.value as f.label for f in vm.cifbulkQueueValues" >
+      </select>
+    </div><div class="col-sm-6">
+  </div>
+  <button type="button" class="btn btn-primary btn-sm" ng-click="vm.setUserSettings()">Submit</button>
+</form>
+
+</div>
+</div>
+</div>
+

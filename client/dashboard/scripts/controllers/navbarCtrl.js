@@ -16,10 +16,11 @@
 
     // Bindable members
     vm.logout = logout;
-    vm.settings = settings;
-    vm.messaging = messaging;
+    // vm.settings = settings;
+    // vm.messaging = messaging;
     vm.chat = chat;
     vm.logMonitor = logMonitor;
+    //vm.userSettings = userSettings;
 
     // Logout link handler
     function logout() {
@@ -31,20 +32,20 @@
     };
 
     // Settings link handler - creates the modal window
-    function settings(size) {
-      var modalInstance = $modal.open({
-        templateUrl: '../views/partials/settings.html',
-        controller: 'SettingsCtrl'
-      });
-    };
+    // function settings(size) {
+    //   var modalInstance = $modal.open({
+    //     templateUrl: '../views/partials/settings.html',
+    //     controller: 'SettingsCtrl'
+    //   });
+    // };
 
-    // Messaging link handler - creates the modal window
-    function messaging(size) {
-      var modalInstance = $modal.open({
-        templateUrl: '../views/partials/messaging.html',
-        controller: 'MessagingCtrl'
-      });
-    };
+    // // Messaging link handler - creates the modal window
+    // function messaging(size) {
+    //   var modalInstance = $modal.open({
+    //     templateUrl: '../views/partials/messaging.html',
+    //     controller: 'MessagingCtrl'
+    //   });
+    // };
 
     function chat() {
       $rootScope.chatOn = ChatService.isRunning();

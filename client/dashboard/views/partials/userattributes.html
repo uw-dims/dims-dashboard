@@ -1,0 +1,30 @@
+<div class="spacer10">
+<div class="panel panel-default">
+<div class="panel-body">
+
+  <tabset type="pills">
+    <tab heading="CIDR Blocks">
+    <div class="spacer20">
+      <div class="row" ng-repeat="cidrRow in vm.cidrRows track by $index">
+        <div class="col-md-3" ng-repeat="cell in cidrRow track by $index"> {{ cell }}</div>
+        <!-- <div class="col-md-4">{{ row[0] }}</div>
+        <div class="col-md-4">{{ row[1] }}</div>
+        <div class="col-md-4">{{ row[2] }}</div> -->
+      </div>
+      </div>
+    </tab>
+
+    <tab heading="Domains">
+      <div class="spacer20">
+      </div>
+    </tab>
+    <tab heading="TLP">
+      <div class="spacer20">
+      </div>
+    </tab>
+
+ </tabset>
+
+</div>
+</div>
+</div>

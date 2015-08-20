@@ -1,6 +1,6 @@
 'use strict';
 
-var pg = require('pg');
+//var pg = require('pg');
 
 // Get the app configuration
 var config = require('../config/config');

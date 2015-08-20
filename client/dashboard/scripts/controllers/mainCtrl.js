@@ -44,7 +44,7 @@ angular.module('dimsDashboard.controllers').
     $scope.currentSelectedQuery = {};
     $scope.currentSelectedTool = {};
     // $scope.settings = {};
-    // $scope.settingsUrl = '/settings/' 
+    // $scope.settingsUrl = '/settings/'
     $scope.demoActivitiesNum = 10;
     $scope.savedDemoQueries = [];
     $scope.savedQueries = [] || $scope.savedQueries;
@@ -69,7 +69,7 @@ angular.module('dimsDashboard.controllers').
     ];
 
 
-    
+
 
     var initializeTools = function() {
       angular.forEach($scope.initialTools, function(value, index) {
@@ -115,7 +115,7 @@ angular.module('dimsDashboard.controllers').
         'desc': 'Search for CIF 65% confidence IPs',
         'selected': ''
       });
-     
+
     };
 
     var initializeQueryList = function() {
@@ -127,7 +127,7 @@ angular.module('dimsDashboard.controllers').
     initializeTools();
     initializeDemoQueries();
     initializeQueryList();
-    
+
     $log.debug('Saved queries: ', $scope.savedQueries);
 
     // Toggles the panel open and closed
@@ -199,8 +199,8 @@ angular.module('dimsDashboard.controllers').
           $log.debug('mainCtrl. tickets are ', $scope.tickets);
         });
       }
-      
-      
+
+
     };
 
     // Set the tool selected in the Tools panel
@@ -325,7 +325,7 @@ angular.module('dimsDashboard.controllers').
       // Empty any existing chart
       $('#chart svg').empty();
 
-      
+
           $scope.graphDataPoints = [
             {
               'key': 'MB',
@@ -338,7 +338,7 @@ angular.module('dimsDashboard.controllers').
           });
 
           $scope.showResults = true;
-          
+
           nv.addGraph(function() {
             console.log('in nv.addGraph');
             chart = nv.models.lineWithFocusChart()
@@ -402,7 +402,7 @@ angular.module('dimsDashboard.controllers').
       return function(d) {
         return d3.format(',.3f')(d/1000000);
       };
-      
+
     };
 
     $scope.callClient = function(tool, formData){
