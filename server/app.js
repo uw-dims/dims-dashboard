@@ -61,6 +61,7 @@ diContainer.factory('crosscorRoute', require('./routes/crosscor'));
 diContainer.factory('dataRoute', require('./routes/data'));
 diContainer.factory('userRoute', require('./routes/user'));
 diContainer.factory('attributeRoute', require('./routes/attributes'));
+diContainer.factory('lmsearchRoute', require('./routes/lmsearch'));
 
 // diContainer.factory('ticketService', require('./services/ticket'));
 
@@ -78,6 +79,7 @@ var passportPostgres = diContainer.get('passportPostgres');
 var passportStatic = diContainer.get('passportStatic');
 var userRoute = diContainer.get('userRoute');
 var attributeRoute = diContainer.get('attributeRoute');
+var lmsearchRoute = diContainer.get('lmsearchRoute');
 
 var app = module.exports = express();
 
@@ -195,6 +197,7 @@ router.post('/anon', ensureAuthenticated, anonRoute.anonymize);
 router.get('/rwfind', ensureAuthenticated, rwfindRoute.list);
 router.get('/data', ensureAuthenticated, dataRoute.list);
 
+router.get('/api/lmsearch', lmsearchRoute.list);
 // Set up routes for rabbitmq connection for logging and chat
 // Not used - deprecated
 // router.get('/start-logmonitor', ensureAuthenticated, logmon.start);
