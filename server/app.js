@@ -45,6 +45,7 @@ diContainer.factory('UserModel', require('./models/user'));
 diContainer.factory('passportPostgres', require('./services/passportPostgres'));
 diContainer.factory('passportStatic', require('./services/passportStatic'));
 diContainer.factory('FileData', require('./models/fileData'));
+diContainer.factory('tools', require('./services/tools'));
 diContainer.factory('Notification', require('./models/notification'));
 diContainer.factory('settingsRoute', require('./routes/settings'));
 diContainer.factory('sessionRoute', require('./routes/session'));

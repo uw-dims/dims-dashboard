@@ -9,17 +9,17 @@ module.exports = function () {
   var diContainer = {};
 
   diContainer.factory = function (name, factory) {
-    logger.debug('factory: name is ', name);
+    //logger.debug('factory: name is ', name);
     factories[name] = factory;
   };
 
   diContainer.register = function (name, dep) {
-    logger.debug('register: name is ', name);
+    //logger.debug('register: name is ', name);
     dependencies[name] = dep;
   };
 
   diContainer.get = function (name) {
-    logger.debug('get: name = ', name);
+    //logger.debug('get: name = ', name);
     if (!dependencies[name]) {
       var factory = factories[name];
       //logger.debug('get. no dependencies. factory', factory);

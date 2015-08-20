@@ -5,9 +5,8 @@ var async = require('async');
 var fs = require('fs');
 var logger = require('../utils/logger')(module);
 var config = require('../config/config');
-var tools = require('../services/tools');
 
-module.exports = function () {
+module.exports = function (tools) {
   var rwfind = {};
   rwfind.list = function (req, res) {
 

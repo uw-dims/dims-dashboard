@@ -2,6 +2,7 @@
 
 var logger = require('../utils/logger')(module);
 var q = require('q');
+var ChildProcess = require('../services/childProcess');
 
 /** Gets data from command line tool and anonymizes it if requested */
 module.exports = function (UserSettings, anonService) {

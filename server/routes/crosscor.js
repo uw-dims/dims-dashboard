@@ -4,9 +4,8 @@
 var dimsutil = require('../utils/util');
 var logger = require('../utils/logger')(module);
 var config = require('../config/config');
-var tools = require('../services/tools');
 
-module.exports = function () {
+module.exports = function (tools) {
   var crosscor = {};
 
   crosscor.list = function (req, res) {

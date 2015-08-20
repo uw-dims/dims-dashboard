@@ -49,7 +49,7 @@ module.exports = function (UserModel) {
         var reply = processUsers(collection.toJSON());
         res.status(200).send({data: reply});
       }).catch(function (err) {
-        logger.debug('list error:', err);
+        logger.error('list error:', err);
         res.status(400).send(err.toString());
       });
   };
@@ -75,7 +75,7 @@ module.exports = function (UserModel) {
             res.status(200).send({data: reply});
           });
       }).catch(function (err) {
-        logger.debug('show error:', err);
+        logger.error('show error:', err);
         res.status(400).send(err.toString());
       });
   };

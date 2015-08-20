@@ -7,7 +7,6 @@ var yaml = require('js-yaml');
 var fs = require('fs');
 var path = require('path');
 var logger = require('../utils/logger')(module);
-// var UserSettings = require('../models/userSettings')
 
 module.exports = function () {
   var attributes = {};
@@ -17,7 +16,6 @@ module.exports = function () {
   attributes.list = function (req, res) {
     try {
       var doc = yaml.safeLoad(fs.readFileSync(yamlPath, 'utf8'));
-      console.log(doc);
       res.status(200).send({data: doc});
     } catch (err) {
       logger.error('Cannot read file at ' + yamlPath + '. Error: ', err);
