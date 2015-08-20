@@ -47,6 +47,7 @@
     "lodash": "^2.4.2",
     "lodash-compat": "^3.10.0",
     "method-override": "^2.3.4",
+    "moment": "^2.10.6",
     "morgan": "^1.6.1",
     "multiparty": "^4.1.2",
     "node-uuid": "^1.4.3",
@@ -65,8 +66,7 @@
     "vhost": "^2.0.0",
     "when": "^3.7.3",
     "winston": "^1.0.1",
-    "xml2js": "^0.4.4",
-    "moment": "^2.10.6"
+    "xml2js": "^0.4.4"
   },
   "devDependencies": {
     "difflet": "^0.2.6",
