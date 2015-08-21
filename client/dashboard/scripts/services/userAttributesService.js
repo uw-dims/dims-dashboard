@@ -13,12 +13,12 @@ angular.module('dimsDashboard.services')
       return {
         cidr: 'cidr',
         domain: 'domain'
-      }
+      };
     };
 
     // Algorithm from http://stackoverflow.com/questions/19178782/how-to-reshape-an-array-with-lodash
     UserAttributesService.formatAttribute = function formatAttribute(attribute, cols) {
-      return _.compact(attribute.map(function(el, i){
+      return _.compact(attribute.map(function (el, i) {
         if (i % cols === 0) {
           return attribute.slice(i, i + cols);
         }
@@ -43,7 +43,7 @@ angular.module('dimsDashboard.services')
           $log.debug('UserAttributesService.getAttributes success callback data: ', resource.data);
           deferred.resolve(resource.data);
         }, function (err) {
-          $log.debug('UserAttributesService.getAttributes failure callback err: ', err);
+          $log.error('UserAttributesService.getAttributes failure callback err: ', err);
           deferred.reject(err);
         });
       return deferred.promise;

@@ -47,7 +47,7 @@ var dimsDashboardConfig = function ($routeProvider, $locationProvider, datepicke
     templateUrl: 'views/partials/userinfo.html'
   }).
   when('/users', {
-    controller: 'UserCtrl',
+    controller: 'UserCtrl as vm',
     templateUrl: '/views/partials/users.html'
   }).
   when('/login', {

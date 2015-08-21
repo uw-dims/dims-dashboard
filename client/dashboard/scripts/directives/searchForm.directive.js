@@ -36,17 +36,17 @@
 angular.module('dimsDashboard.directives')
 
 //   directive('dimsSearchForm', [ '$timeout', '$log', 'FileService', function($timeout, $log, FileService) {
-    
+
 //     var link = function(scope, el, attr) {
-      
+
 //       var queryItems = {
 //         'rwfind': ['startDateTime', 'endDateTime', 'numDays', 'hitLimit', 'header', 'ips', 'fileName', 'outputType'],
 //         'cifbulk': ['ips', 'fileName', 'upload'],
 //         'crosscor': ['fileName', 'mapName', 'stats', 'iff'],
 //         'anon': ['fileName', 'mapName', 'outputType', 'stats']
-//       }; 
+//       };
 
-//       // Initialize elements 
+//       // Initialize elements
 //       var initializeElements = function() {
 //         scope.formData = {};
 //         scope.outputTypes = [{
@@ -56,7 +56,7 @@ angular.module('dimsDashboard.directives')
 //           value: 'text',
 //           label: 'TEXT'
 //         }];
-        
+
 //         scope.iffs = [{
 //           value: 'friend',
 //           label: 'Friend'
@@ -64,8 +64,8 @@ angular.module('dimsDashboard.directives')
 //           value: 'foe',
 //           label: 'Foe'
 //         }];
-        
-        
+
+
 //         scope.show = {};
 
 //         scope.tooltips = {
@@ -124,7 +124,7 @@ angular.module('dimsDashboard.directives')
 //         callback: '&'
 //       }
 //     };
-    
+
 // }])
 
 .directive('dimsTestForm', [ '$timeout', '$log', 'FileService', function($timeout, $log, FileService) {
@@ -133,7 +133,7 @@ angular.module('dimsDashboard.directives')
     var queryItems = {
       'rwfind': ['ips', 'header', 'iff'],
       'cifbulk': ['ips', 'stats']
-    }; 
+    };
     var initializeShowElements = function() {
         scope.show.header = false;
         scope.show.ips = false;
@@ -191,5 +191,5 @@ angular.module('dimsDashboard.directives')
 
 }])
 ;
-    
+
 

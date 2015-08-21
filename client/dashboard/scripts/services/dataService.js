@@ -1,15 +1,7 @@
 'use strict';
 
-angular.module('dimsDashboard.services').factory('DataService', function($http, $q, $log) {
-
-  // var root={};
-
-  // root.getNextData = function(startRec, endRec, output, data) {
-  //   for (var i=startRec; i<end; i++) {
-  //     output.push(data[i]);
-  //   }
-  //   startRec = endRec;
-  // };
+angular.module('dimsDashboard.services')
+  .factory('DataService', function ($http, $q, $log) {
 
   var getData = function(source) {
     console.log('in DataService.getData');

@@ -13,21 +13,46 @@ angular.module('dimsDashboard.services')
 
     var fieldMapping = {
       username: 'Username',
-      email: 'Email Address',
       name: 'Full Name',
+      email: 'Email Address',
+      pgpkeyId: 'PGP Key ID',
       affiliation: 'Affiliation',
       sms: 'SMS Info',
       im: 'IM Info',
-      tel: 'Phone Info',
+      phone: 'Phone Info',
       post: 'Postal Info',
       airport: 'Home Airport',
-      bio: 'Biography'
+      bio: 'Biography',
+      entered: 'Start Time',
+      activity: 'Last Activity'
+    };
+
+    var emailMapping = {
+      email: 'Email',
+      pgpkeyId: 'PGP Key ID',
+      pgpkeyExpires: 'PGP Key Expiration'
     };
 
     UserService.convertToDisplay = function convertToDisplay(data) {
       var newData = {};
+      var emailArray =[];
       _.each(fieldMapping, function (value, key, list) {
-        newData[value] = data[key];
+        if (data[key] instanceof Array) {
+          $log.debug('is array ', data[key]);
+          _.each(data[key], function (value, index, array) {
+            var emailData = {};
+            $log.debug('in each email value, index now', value, index);
+            var originalData = value;
+            _.each(emailMapping, function (value, key, list) {
+              $log.debug('inner loop', value, key);
+              emailData[value] = originalData[key];
+            });
+            emailArray.push(emailData);
+          });
+          newData[value] = emailArray;
+        } else {
+          newData[value] = data[key];
+        }
       });
       return newData;
     };
