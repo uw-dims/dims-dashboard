@@ -299,10 +299,10 @@ var io = socket.listen(server);
 // Set up sockets
 var RabbitSocket = require('./services/rabbitSocket');
 // Create publishers first so their publish method can be added as event listeners
-var chatPublisher = new RabbitSocket('chat', 'publisher');
+var chatPublisher = new RabbitSocket(config.chatExchange, 'publisher');
 // Set up chat socket
 var chat = io
-  .of('/chat')
+  .of(config.io.chat)
   .on('connection', function (socket) {
 
     var info = {
@@ -322,7 +322,7 @@ var chat = io
   });
 // Set up logs socket
 var logs = io
-  .of('/logs')
+  .of(config.io.log)
   .on('connection', function (socket) {
 
     var info = {
@@ -343,8 +343,8 @@ logger.info('Dashboard initialization: Node environment: ', config.env);
 logger.info('Dashboard initialization: Log level:', config.logLevel);
 logger.info('Dashboard initialization: UserDB source: ', config.userSource);
 // Create subscribers
-var chatSubscriber = new RabbitSocket('chat', 'subscriber', chat);
-var logSubscriber = new RabbitSocket('logs', 'subscriber', logs);
+var chatSubscriber = new RabbitSocket(config.chatExchange, 'subscriber', chat);
+var logSubscriber = new RabbitSocket(config.logExchange, 'subscriber', logs);
 
 
 
