@@ -62,6 +62,7 @@ diContainer.factory('dataRoute', require('./routes/data'));
 diContainer.factory('userRoute', require('./routes/user'));
 diContainer.factory('attributeRoute', require('./routes/attributes'));
 diContainer.factory('lmsearchRoute', require('./routes/lmsearch'));
+diContainer.factory('mitigationService', require('./services/mitigation'));
 
 // diContainer.factory('ticketService', require('./services/ticket'));
 
