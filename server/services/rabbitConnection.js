@@ -30,8 +30,8 @@ function RabbitConnection(name, type) {
 
   EventEmitter.call(self);
   self.open = amqp.connect('amqp://' + self.user + ':' + self.pwd + '@' + self.server);
-  logger.debug('New RabbitConnection called. Name: ', self.name, 'Type: ', self.type);
-};
+  logger.debug('New RabbitConnection called. Name=', self.name, 'Type=', self.type);
+}
 
 RabbitConnection.prototype.subscribe = function () {
 
@@ -48,7 +48,7 @@ RabbitConnection.prototype.subscribe = function () {
     });
 
     self.conn.on('error', function (err) {
-      logger.debug('Subscribe for ', self.name, ' received connection error event', err);
+      logger.debug('Subscribe received connection error event for', self.name, err);
       self.emit('connectionError', err);
     });
 
@@ -58,32 +58,32 @@ RabbitConnection.prototype.subscribe = function () {
         self.ch = ch;
         // save the channel number
         self.channel = ch.ch;
-        logger.debug('Subscribe:', self.name, ' Channel created, number: ', ch.ch);
+        logger.debug('Subscribe', self.name, 'Channel created, number: ', ch.ch);
 
         // Add listeners
         self.ch.on('close', function () {
-          logger.debug('Subscribe:', self.name, ' received channel close event');
+          logger.debug('Subscribe', self.name, 'Received channel close event');
           self.ch = null;
           self.emit('channelClose');
         });
 
         self.ch.on('error', function (err) {
-          logger.debug('Subscribe:', self.name, ' received channel error event', err);
+          logger.debug('Subscribe', self.name, 'received channel error event', err);
           self.emit('channelError', err);
         });
 
         // Assert the exchange
-        logger.debug('Subscribe: Now asser the exchange ', self.name, self.type, self.durable);
+        logger.debug('Subscribe: Assert the exchange ', self.name, self.type, self.durable);
         return ch.assertExchange(self.name, self.type, {durable: self.durable});
 
       }).then(function (reply) {
-        logger.debug('Subscribe: ', self.name, ' Exchange Asserted ', reply.exchange);
+        logger.debug('Subscribe', self.name, 'Exchange Asserted ', reply.exchange);
         self.exchange = reply.exchange; // should be the same as self.name
         // Assert the queue
         return self.ch.assertQueue('', {exclusive: true});
 
       }).then(function (qok) {
-          logger.debug('Subscribe: ',self.name,'Queue asserted. queue=', qok.queue, ' exchange=', self.exchange);
+          logger.debug('Subscribe', self.name, 'Queue asserted. queue=', qok.queue, ' exchange=', self.exchange);
           // qok contains queue (aka name), messageCount, consumerCount
           self.queue = qok.queue;
           // Bind the queue
@@ -91,14 +91,14 @@ RabbitConnection.prototype.subscribe = function () {
 
         }).then(function (reply) {
           // reply is empty object here
-          logger.debug('Subscribe:', self.name, ' Queue bound. queue=', self.queue, ' exchange=', self.exchange);
+          logger.debug('Subscribe', self.name, 'Queue bound. queue=', self.queue, ' exchange=', self.exchange);
           return self.ch.consume(self.queue, logMessage, {noAck: true});
 
         }).then(function (reply) {
           // Waiting for logs
           // Emit the ready event to notify listeners
           self.consumerTag = reply.consumerTag;
-          logger.debug('Subscribe:', self.name, 'Ready. queue=', self.queue, ' exchange=', self.exchange, ' consumerTag=', self.consumerTag);
+          logger.debug('Subscribe', self.name, 'Ready. queue=', self.queue, ' exchange=', self.exchange, ' consumerTag=', self.consumerTag);
           // Send event indicated we are ready
           self.emit('ready', {'queue': self.queue, 'ch': self.ch.ch, 'exchange': self.exchange, 'consumerTag': self.consumerTag });
         });
