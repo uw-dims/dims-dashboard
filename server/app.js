@@ -183,7 +183,8 @@ app.use(passport.session());
 // Middleware to be used for every secured route
 var ensureAuthenticated = function (req, res, next) {
   if (!req.isAuthenticated()) {
-    res.status(401).send();
+    res.set('Content-Type', 'text/html');
+    res.status(401).send('<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=/"></head></html>');
   } else {
     return next();
   }
