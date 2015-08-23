@@ -153,4 +153,12 @@ config.serverKey = config.certDir + config.certName + '.key';
 config.serverCrt = config.certDir + config.certName + '.crt';
 config.serverCa = config.certDir + config.caName + '.crt';
 
+// Later will allow multiple logs to select
+config.logExchange = 'devops';
+config.chatExchange = 'chat';
+config.io = {
+  log: '/' + config.logExchange,
+  chat: '/' + config.chatExchange
+};
+
 module.exports = config;

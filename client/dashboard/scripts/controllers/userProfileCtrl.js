@@ -3,14 +3,20 @@
 (function () {
   'use strict';
 
-  function UserProfileCtrl($scope, $rootScope, $log, $location, UserService) {
+  function UserProfileCtrl($scope, $log, $location, UserService) {
     var vm = this;
     vm.profile = {};
-
     vm.keys = UserService.keys;
 
+    function init() {
+      $scope.id = angular.copy($scope.username);
+    }
+
+    init();
+
     function activate() {
-      UserService.getUser($rootScope.currentUser.username)
+      $log.debug('userProfileCtrl username is ', $scope.id);
+      UserService.getUser($scope.id)
       .then(function (reply) {
         vm.profile = UserService.convertToDisplay(reply);
         $log.debug('userProfileCtrl.js reply is ', vm.profile);
@@ -26,7 +32,7 @@
     .module('dimsDashboard.controllers')
     .controller('UserProfileCtrl', UserProfileCtrl);
 
-  UserProfileCtrl.$inject = ['$scope', '$rootScope', '$log', '$location', 'UserService'];
+  UserProfileCtrl.$inject = ['$scope', '$log', '$location', 'UserService'];
 
 }());
 

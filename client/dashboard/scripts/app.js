@@ -47,7 +47,7 @@ var dimsDashboardConfig = function ($routeProvider, $locationProvider, datepicke
     templateUrl: 'views/partials/userinfo.html'
   }).
   when('/users', {
-    controller: 'UserCtrl',
+    controller: 'UserCtrl as vm',
     templateUrl: '/views/partials/users.html'
   }).
   when('/login', {
@@ -88,7 +88,11 @@ var constants = {
   'CIF' : 'cifbulk',
   'CORRELATE' : 'crosscor',
   'ANONYMIZE' : 'anon',
-  'PASS_SECRET' : '84jd$#lk903jcy2AUEI2j4nsKLJ!lIY'
+  'PASS_SECRET' : '84jd$#lk903jcy2AUEI2j4nsKLJ!lIY',
+  'logExchange': 'devops',
+  'chatExchange': 'chat',
+  'logEvent': 'devops:data',
+  'chatEvent': 'chat:data'
 };
 
 var rpcClientOptions = {

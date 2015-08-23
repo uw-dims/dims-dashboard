@@ -20,7 +20,7 @@ function Publisher(name) {
   self.startEvent = 'fanout:' + self.name + ':started';
   self.stopEvent = 'fanout:' + self.name + ':stopped';
 
-  logger.debug('services/Publisher: ' + self.name + ': constructor');
+  logger.debug('Constructor. Name: ', self.name, 'Type: ', self.type);
 
   EventEmitter.call(self);
 };
@@ -31,9 +31,9 @@ Publisher.prototype.getName = function () {
 
 Publisher.prototype.start = function () {
   var self = this;
-  logger.debug('services/Publisher.start: ' + self.name + ': starting...');
+  logger.debug('Start: ' + self.name + ': starting...');
   if (self.running) {
-    logger.debug('services/Publisher.start: ' + self.name + ': already running');
+    logger.debug('Start: ' + self.name + ': already running');
   } else {
     // create the RabbitConnection
     self.rabbit = new RabbitConnection(self.name, self.type);
@@ -51,25 +51,25 @@ Publisher.prototype.start = function () {
 
 Publisher.prototype.stop = function () {
   var self = this;
-  logger.debug('services/Publisher.stop: ' + self.name + ': stopping...');
+  logger.debug('Stop: ' + self.name + ': stopping...');
   if (self.running) {
     self.running = false;
     try {
       self.rabbit.conn.close();
     } catch (alreadyClosed) {
-      logger.debug('services/Publisher.stop: ' + self.name + ': was already closed');
+      logger.debug('Stop: ' + self.name + ': was already closed');
       self.running = false;
       self.emit(self.stopEvent);
     }
   } else {
-    logger.debug('services/Publisher.stop: ' + self.name + ': was not running');
+    logger.debug('Stop: ' + self.name + ': was not running');
     self.emit(self.stopEvent);
   }
 };
 
 Publisher.prototype.publish = function (message) {
   var self = this;
-  logger.debug('services/Publisher.publish: ' + self.name + ': Publish');
+  logger.debug('Publish: ' + self.name + ': Publish');
   self.rabbit.publish(message);
 };
 
@@ -80,7 +80,7 @@ Publisher.prototype.status = function () {
 
 // Listener for the ready event emitted by a RabbitConnection object
 Publisher.prototype.onReady = function (ev) {
-  logger.info('services/Publisher received ready event from RabbitConnection object. Event is ', ev);
+  logger.info('onReady: received ready event from RabbitConnection object. Event is ', ev);
   var self = this;
   // Set running property to indicate that this fanout is running
   self.running = true;
@@ -91,7 +91,7 @@ Publisher.prototype.onReady = function (ev) {
 // Listener for the close event emitted when a RabbitConnection closes
 Publisher.prototype.onClosed = function (ev) {
   var self = this;
-  logger.debug('services/Publisher.onClosed: ' + self.name + ': received connection close event. ' + ev);
+  logger.debug('onClosed: ' + self.name + ': received connection close event. ' + ev);
   self.running = false;
   // Notify others that the fanout has stopped
   self.emit(self.stopEvent);
@@ -101,7 +101,7 @@ Publisher.prototype.onClosed = function (ev) {
 // Listener for the close event emitted when a RabbitConnection channel closes
 Publisher.prototype.onChannelClosed = function (ev) {
   var self = this;
-  logger.debug('services/Publisher.onChannelClosed: ' + self.name + ': received channel close event. ' + ev);
+  logger.debug('onChannelClosed: ' + self.name + ': received channel close event. ' + ev);
   console.log(self);
   if (self.running) {
     self.initPublish();
@@ -111,13 +111,13 @@ Publisher.prototype.onChannelClosed = function (ev) {
 // Listener for the error event emitted by a RabbitConnection connection
 Publisher.prototype.onError = function (err) {
   var self = this;
-  logger.debug('services/Publisher.onError: ' + self.name + ': received connection error event', err);
+  logger.debug('onError: ' + self.name + ': received connection error event', err);
 };
 
 // Listener for the error event emitted by a RabbitConnection channel
 Publisher.prototype.onChannelError = function (err) {
   var self = this;
-  logger.debug('services/Publisher.onChannelError: ' + self.name + ': received channel error event', err);
+  logger.debug('onChannelError: ' + self.name + ': received channel error event', err);
   console.log(self);
 };
 
