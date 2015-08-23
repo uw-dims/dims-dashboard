@@ -34,7 +34,7 @@ function RabbitSocket(name, type, io) {
     // Publishes a message to the exchange. This will be the handler called when
     // messages are recevied from a client via a socket
     self.send = function (msg) {
-      logger.debug('Publisher Send function ' + name + ', msg is ', msg.message);
+      //logger.debug('Publisher Send function ' + name + ', msg is ', msg.message);
       self.connection.publish(msg.message);
     };
 

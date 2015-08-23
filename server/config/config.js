@@ -143,7 +143,7 @@ config.defaultRedisTypes = {
   'hash': 'hash',
   'string': 'string',
   'set': 'set',
-  'sortedSet': 'sortedSet'
+  'sortedSet': 'zset'
 };
 
 // config.keyPrefixes = {

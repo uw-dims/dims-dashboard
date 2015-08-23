@@ -112,7 +112,7 @@ module.exports = function Ticket(db) {
 
     // Add a topic to this ticket. Creates topic object, saves to database.
     // Returns topic object
-    addTopic: function addTopic(topicName, dataType, content, numbered) {
+    addTopic: function addTopic(topicName, dataType, content, score) {
       var self = this,
       // Create the topic object
           topic = topicFactory({
@@ -122,12 +122,13 @@ module.exports = function Ticket(db) {
             dataType: dataType
           });
       logger.debug('models/Ticket.addTopic. Content is ', content);
+      logger.debug('models/Ticket.addTopic. topicName is ', topicName);
       // Check to see if it already exists
       return topic.exists()
       .then(function (reply) {
         if (!reply) {
-          logger.debug('models/Ticket.addTopic. Topic does not exist. Save it. ');
-          return topic.save(content).then(function (reply) {
+          logger.debug('models/Ticket.addTopic. Topic does not exist. Save it. content, score', content, score);
+          return topic.save(content, score).then(function (reply) {
             /* jshint unused: false */
             // Add the topic key to the sorted set of keys
             // The score is the created timestamp, so we don't need to save that
@@ -191,6 +192,9 @@ module.exports = function Ticket(db) {
     topicFromKey: function topicFromKey(key) {
       var self = this;
       // Create a new topic object
+      logger.debug('Got to top of topicFromKey');
+      logger.debug('key is ', key);
+      logger.debug('ticket key is ', keyGen.ticketKey(self));
       var topic = topicFactory({
         parent: self,
         type: self.type,
@@ -280,11 +284,14 @@ module.exports = function Ticket(db) {
       return self.getDataType()
       .then(function (reply) {
         self.dataType = reply; // side effect - do we need this
+        logger.debug('getContents datatype = ', reply);
+        logger.debug('topic key is ', keyGen.topicKey(self));
         // Get the data as per the topic key and datatype
         return db.getData(keyGen.topicKey(self), self.dataType);
       })
       .then(function (reply) {
         logger.debug('models/ticket.topic.getContents reply from getAllContents is ', reply);
+        console.log(reply);
         return reply;
       })
       .catch(function (err) {

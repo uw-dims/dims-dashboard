@@ -7,6 +7,7 @@
 // Includes
 var logger = require('../utils/logger')(module);
 var KeyGen = require('../models/keyGen');
+var KeyExtract = require('../models/keyExtract');
 
 module.exports = function (Ticket) {
 
@@ -118,6 +119,7 @@ module.exports = function (Ticket) {
     var ticket;
     // Get the ticket object and stored metadata. returns ticket object.
     Ticket.getTicket(req.params.id).then(function (reply) {
+      // logger.debug('SHOW getTicket reply', reply);
       ticket = reply; // update the ticket
       // Get array of associated topic keys
       return ticket.getTopicKeys();
@@ -336,15 +338,17 @@ module.exports = function (Ticket) {
     var ticket,
         topic;
     var topicKey = req.params.id;
-
-    var parsedKey = KeyGen.parseTopicKey(req.params.id);
-    var ticketKey = parsedKey.ticketKey;
+    var ticketKey = KeyExtract.ticketKey(topicKey);
+    logger.debug('showTopic. ticketKey, topickey', ticketKey, topicKey);
     Ticket.getTicket(ticketKey).then(function (reply) {
+      logger.debug('showTopic, got ticket');
       ticket = reply;
       return ticket.topicFromKey(topicKey);
     }).then(function (reply) {
       // Reply is a topic object
+      // logger.debug('showtopic topic object is ', reply);
       topic = reply;
+      logger.debug('topic key is now ', KeyGen.topicKey(topic));
       // Get the content
       return topic.getContents();
     }).then(function (reply) {

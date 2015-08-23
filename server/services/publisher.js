@@ -69,7 +69,7 @@ Publisher.prototype.stop = function () {
 
 Publisher.prototype.publish = function (message) {
   var self = this;
-  logger.debug('Publish: ' + self.name + ': Publish');
+  //logger.debug('Publish: ' + self.name + ': Publish');
   self.rabbit.publish(message);
 };
 
@@ -102,7 +102,7 @@ Publisher.prototype.onClosed = function (ev) {
 Publisher.prototype.onChannelClosed = function (ev) {
   var self = this;
   logger.debug('onChannelClosed: ' + self.name + ': received channel close event. ' + ev);
-  console.log(self);
+  //console.log(self);
   if (self.running) {
     self.initPublish();
   }
@@ -118,6 +118,6 @@ Publisher.prototype.onError = function (err) {
 Publisher.prototype.onChannelError = function (err) {
   var self = this;
   logger.debug('onChannelError: ' + self.name + ': received channel error event', err);
-  console.log(self);
+  //console.log(self);
 };
 

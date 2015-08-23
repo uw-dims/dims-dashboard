@@ -26,7 +26,12 @@ var topicData = function topicData(topicKey) {
 
 var topicName = function topicName(topicKey) {
   // Split the topic portion of key into type and name and return name
-  return (topicData(topicKey).split(c.config.delimiter))[1];
+  var topicString = topicData(topicKey);
+  console.log(topicString);
+  var topicArray = topicString.split(c.config.delimiter);
+  console.log(topicArray);
+  topicArray = _.slice(topicArray, 1, topicArray.length).join(':');
+  return topicArray;
 };
 
 var ticketType = function ticketType(topicKey) {

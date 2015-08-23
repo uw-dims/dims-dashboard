@@ -51,7 +51,7 @@ module.exports = function (callingModule) {
   logger.addFilter(function (msg, meta, level) {
     return moment().toISOString() + ' ' + os.hostname() + ' ' +
       config.uuid + ' [' + getLabel() + '] ' + level.toUpperCase() + ' ' + process.pid + ' ' +
-      msg + meta;
+      msg;
   });
 
   // Will replace once we figure out where to send the logs

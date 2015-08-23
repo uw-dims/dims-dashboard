@@ -16,6 +16,7 @@ module.exports = function redisProxy(client) {
   // client.hmsetProxy = q.nbind(client.hmset, client),
   client.incrProxy = q.nbind(client.incr, client);
   client.saddProxy = q.nbind(client.sadd, client);
+  client.sremProxy = q.nbind(client.srem, client);
   client.rpushProxy = q.nbind(client.rpush, client);
   client.setProxy = q.nbind(client.set, client);
   client.getProxy = q.nbind(client.get, client);
@@ -29,6 +30,7 @@ module.exports = function redisProxy(client) {
   client.zscoreProxy = q.nbind(client.zscore, client);
   client.zcountProxy = q.nbind(client.zcount, client);
   client.typeProxy = q.nbind(client.type, client);
+  client.scardProxy = q.nbind(client.scard, client);
   // set - 'sortedSet' or 'set'
   // client.exists = function exists(key, set, dataType) {
   //   var doAction = {};
@@ -51,12 +53,12 @@ module.exports = function redisProxy(client) {
   // };
 
   client.setData = function (key, dataType, content, score) {
-    logger.debug('setData detatype is ', dataType);
-    logger.debug('setData content is ', content);
-    logger.debug('setData key is ', key);
+    //logger.debug('setData detatype is ', dataType);
+    //logger.debug('setData content is ', content);
+    //logger.debug('setData key is ', key);
     var doAction = {};
     doAction[supportedTypes.hash] = function (key, content) {
-      logger.debug('redisproxy hash set', key, content);
+      //logger.debug('redisproxy hash set', key, content);
       return client.hmsetProxy(key, content);
     };
     doAction[supportedTypes.set] =  function (key, content) {
@@ -71,13 +73,13 @@ module.exports = function redisProxy(client) {
       return client.zaddProxy(key, score, content);
     };
     doAction[supportedTypes.string] =  function (key, content) {
-      logger.debug('redisproxy hash set');
+      //logger.debug('redisproxy hash set');
       return client.setProxy(key, content);
     };
     if (typeof doAction[dataType] !== 'function') {
       return new Error('Invalid data type was supplied: ', dataType);
     }
-    logger.debug('setData before return');
+    //logger.debug('setData before return');
     return doAction[dataType](key, content, score);
   };
 
@@ -90,6 +92,12 @@ module.exports = function redisProxy(client) {
     };
     doAction[supportedTypes.string] =  function (key) {
       return client.getProxy(key);
+    };
+    doAction[supportedTypes.set] =  function (key) {
+      return client.smembersProxy(key);
+    };
+    doAction[supportedTypes.sortedSet] =  function (key) {
+      return client.zrangeProxy(key, 0, -1, 'WITHSCORES');
     };
     if (typeof doAction[dataType] !== 'function') {
       return new Error('Invalid data type was supplied: ', dataType);
