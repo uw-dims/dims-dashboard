@@ -1,4 +1,8 @@
+var uuid = require('node-uuid');
+
 var config = {};
+
+config.uuid = uuid.v4();
 
 config.sslOn = process.env.SSL_ON || false;
 

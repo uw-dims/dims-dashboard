@@ -16,7 +16,6 @@ module.exports = function (UserModel) {
     users.forEach(function (user, index, array) {
       result.push(reduceUser(user));
     });
-    console.log(result);
     return result;
   };
 
