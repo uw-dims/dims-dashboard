@@ -46,7 +46,7 @@ Subscriber.prototype.start = function () {
     // Received subscribe receive event from rabbit
     // Propogate it up
     self.rabbit.on(self.name + ':receive', function (msg) {
-      // logger.debug('Subscriber: ' + self.name + ': message received', msg);
+      logger.debug('Subscriber:' + self.name + 'message received', msg);
       self.emit(self.name + ':receive', msg);
     });
     // Subscribe

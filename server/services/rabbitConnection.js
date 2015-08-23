@@ -106,6 +106,7 @@ RabbitConnection.prototype.subscribe = function () {
     // This function handles incoming messages
     // Emits as event
     function logMessage(msg) {
+      logger.debug('Subscribe', self.name, 'Received msg, now will send ', msg.content.toString());
       self.emit(self.name + ':receive', msg.content.toString());
     }
   });

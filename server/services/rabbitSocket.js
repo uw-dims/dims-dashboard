@@ -19,6 +19,7 @@ function RabbitSocket(name, type, io) {
 
   self.clientEvent = name + ':client';
   self.receiveEvent = name + ':receive';
+  logger.debug('Constructor. Receive event is ', self.receiveEvent);
 
   self.IO_MSG_TYPE = name + ':data';
 
@@ -40,7 +41,7 @@ function RabbitSocket(name, type, io) {
   } else {
     self.connection = new Subscriber(name);
     self.connection.on(self.receiveEvent, function (msg) {
-      // logger.debug('Socket: Subscriber received message. Need to emit to client. Msg: ', msg);
+      logger.debug('Socket: Subscriber received message. Need to emit to client. Msg: ', self.IO_MSG_TYPE, msg);
       io.emit(self.IO_MSG_TYPE, msg);
     });
     self.send = function (msg) {
