@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('dimsDashboard.services')
-  
+
   .factory('TicketApi', function($resource) {
     return $resource('/api/ticket/:id');
   })
@@ -59,7 +59,7 @@ angular.module('dimsDashboard.services')
 
         function(resource) {
           $log.debug('TicketService.getTickets success callback data is ', resource.data);
-          
+
           var list = TicketUtils.parseTicketList(resource.data);
           $log.debug('TicketService.getTickets parsed list is ', list);
           TicketService.tickets = list; // not sure if we'll need this or not
@@ -102,7 +102,17 @@ angular.module('dimsDashboard.services')
         function(resource) {
           $log.debug('TicketService.getTopic success callback data is ', resource.data);
           var jsonData;
+          resource.data.content.mitigationData = false;
+          resource.data.content.mitigationType = 'set';
           resource.data.content.responseType = 'txt';
+
+            if (topicKey.indexOf("mitigation") > -1) {
+              resource.data.mitigationData = true;
+              resource.data.responseType = 'mitigation';
+              if (topicKey.indexOf("mitigation:data")) {
+                resource.data.mitigationType = 'zset';
+              }
+            }
 
           try {
             jsonData = JSON.parse(resource.data.content.data);
@@ -112,11 +122,11 @@ angular.module('dimsDashboard.services')
             $log.debug('TicketService.getTopic data is not json');
           }
           $log.debug('TicketService.getTopic data response type is ', resource.data.content.responseType);
-          
+
           deferred.resolve(resource.data);
-          
-          
-        }, 
+
+
+        },
 
         function(err) {
           $log.debug('TicketService.getTopic failure callback err is ', err);

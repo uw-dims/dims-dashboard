@@ -262,6 +262,7 @@ angular.module('dimsDashboard.controllers').
       });
       $scope.rawData = '';
       $scope.showGraph = false;
+      $scope.showMitigation = false;
       $scope.currentSelectedTicket.topics[row].selected = 'active';
       TicketService.getTopic(topic.topicKey).then(function(reply) {
         $log.debug('reply is ', reply);
@@ -303,6 +304,18 @@ angular.module('dimsDashboard.controllers').
           }
         } else {
           $scope.showCif = false;
+          $log.debug('not cif');
+          $scope.currentSelectedTopic.mitigationData = reply.mitigationData;
+          $scope.currentSelectedTopic.mitigationType = reply.mitigationType;
+          $log.debug('mitigationType', $scope.currentSelectedTopic.mitigationType);
+          $log.debug('mitigationData', $scope.currentSelectedTopic.mitigationData);
+        }
+
+        if ($scope.currentSelectedTopic.mitigationData) {
+          $scope.showMitigation = true;
+          $scope.mitigationType = $scope.currentSelectedTopic.mitigationData;
+          $scope.rawData = reply.content;
+          //$scope.displayData = $scope.currentSelectedTopic.data;
         }
 
         if ($scope.currentSelectedTopic.displayType === 'double-time-series' &&
