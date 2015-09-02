@@ -1,0 +1,19 @@
+#! /bin/bash
+
+# Types:
+# production: production environment, SSL on
+# development: development environment, SSL off, static user db
+# testclient: For testing minified client. Production environment, log_level=debug
+#    static user db
+# integration: For testing with postgresql user db, development environment, SSL on.
+# demo: SSL off, postgresql db, development environment
+
+echo "[+++] Start up docker container"
+echo "[+++] PUBLICHOST=$PUBLICHOST"
+echo "[+++] PUBLICPORT=$PUBLICPORT"
+echo "[+++] RUNTYPE=$RUNTYPE"
+
+# dev-compile will set the env values needed by socket.io in the client and will compile LESS
+cd /opt/dims/srv/dims-dashboard/client && grunt dev-compile
+cd /opt/dims/srv/dims-dashboard/server
+npm run run-$RUNTYPE

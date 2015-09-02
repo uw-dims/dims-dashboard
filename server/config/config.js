@@ -113,7 +113,7 @@ config.serverPath = __dirname;
 // /data/dashboard
 config.userDataPath = '/opt/dims/data/dashboard/';
 config.demoDatastorePath = '/opt/dims/data/dashboard/data/';
-config.uploadPath = '/data/dashboard/upload/';
+config.uploadPath = '/opt/dims/data/dashboard/upload/';
 
 config.directoryMapping = {
   'ip_lists': config.userDataPath + 'ipFiles/',
