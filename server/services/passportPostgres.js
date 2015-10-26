@@ -35,12 +35,12 @@ module.exports = function (UserModel) {
         // Get the user's hashed password from the datastore
         var pw = user.get('password');
         // Call perl crypt to check password since we are using passwords generated using crypt
-        var program = 'perl ' + __dirname + '/../utils/getPass.pl ' + decrypted + ' ' + '\'' + pw + '\'';
+        var program = 'perl ' + __dirname + '/../utils/getPass.pl \'' + decrypted + '\' ' + '\'' + pw + '\'';
         var child = exec(program, function (error, stdout, stderr) {
-          logger.debug('strategy: getPass results. error, stdout, stderr', error, stdout, stderr);
+          logger.debug('strategy: getPass results. stdout', stdout);
           if (error !== null) {
-            logger.error('strategy: exec error. user, error ', username, error);
-            return done(null, false, error);
+            logger.error('strategy: exec error. user, error ', username);
+            return done(null, false, 'Could not get MD5 hash of password - notify Admin');
           }
           if (pw === stdout) {
             logger.debug('strategy: Passwords match. Return user');

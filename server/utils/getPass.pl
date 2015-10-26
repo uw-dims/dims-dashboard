@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 my $pass = $ARGV[0];
 my $encPw = $ARGV[1];
