@@ -25,30 +25,29 @@ module.exports = function (UserModel) {
   };
 
   passportPostgres.strategy = function strategy(username, password, done) {
-    logger.debug('services/passport.use Starting function for ', username);
+    logger.debug('strategy: Starting function for ', username);
     // Look up the user corresponding to the supplied username
     new UserModel.User({ident: username}).fetch({require: true}).then(function (user) {
-        logger.debug('services/passport.use Retrieved user ', user.get('ident'));
-        // Decrypt password received via http post
+        logger.debug('strategy: Retrieved user ', user.get('ident'));
+        logger.debug('strategy: Base64', password);
+        // Decrypt Base64 encoded encrypted password received via http post
         var decrypted = CryptoJS.AES.decrypt(password, config.passSecret).toString(CryptoJS.enc.Utf8);
         // Get the user's hashed password from the datastore
         var pw = user.get('password');
-        // logger.debug('use: pw from datastore is ', pw);
-        // logger.debug('use: pw from client is ', decrypted);
         // Call perl crypt to check password since we are using passwords generated using crypt
         var program = 'perl ' + __dirname + '/../utils/getPass.pl ' + decrypted + ' ' + '\'' + pw + '\'';
         var child = exec(program, function (error, stdout, stderr) {
-          logger.debug('app/passport.use. getPass results. error, stdout, stderr', error, stdout, stderr);
+          logger.debug('strategy: getPass results. error, stdout, stderr', error, stdout, stderr);
           if (error !== null) {
-            logger.error('app/passport.use: exec error. user, error ', username, error);
+            logger.error('strategy: exec error. user, error ', username, error);
             return done(null, false, error);
           }
           if (pw === stdout) {
-            logger.debug('app/passport.use: Passwords match. Return user');
+            logger.debug('strategy: Passwords match. Return user');
             // We are passing back new user record
             return done(null, user);
           }
-          logger.debug('app/passport.use: Passwords did not match. ', pw);
+          logger.debug('strategy: Passwords did not match. ', pw);
           return done(null, false, 'Invalid password');
         });
 
@@ -57,7 +56,7 @@ module.exports = function (UserModel) {
 
       }).catch(function (err) {
         var errmsg = '';
-        logger.error('app/passport.use. Unknown user ', username, err);
+        logger.error('strategy: Unknown user ', username, err);
         // check for connection refused errors
         if (err.hasOwnProperty('code')) {
           if (err.code === 'ECONNREFUSED') {
