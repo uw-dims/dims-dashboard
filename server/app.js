@@ -101,8 +101,6 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 //app.use(flash());
 
-//var redisClient = require('./utils/redisDB');
-
 // Cookies and session
 app.use(cookieParser(config.cookieSecret));
 app.use(session({
@@ -118,13 +116,11 @@ app.use(session({
   resave: false // don't save session if unmodified
 }));
 
-
 // Disabled for now - Do we need to log http requests? This will generate a lot of output
 // Override Express logging - stream logs to logger
 // app.use(require('morgan') ('common',{
 //   'stream': logger.stream
 // }));
-
 
 // development only
 if (config.env === 'development') {
@@ -143,6 +139,7 @@ if (config.env === 'development') {
   });
 }
 
+// production environment
 if (config.env === 'production') {
   app.set('views', path.join(__dirname, '../public'));
   app.use(express.static(path.join(__dirname, '../public')));
@@ -157,9 +154,9 @@ if (config.env === 'production') {
 }
 
 // Specify how to serialize user info
-passport.serializeUser(function (user, done) {
-  done(null, user.get('ident'));
-});
+// passport.serializeUser(function (user, done) {
+//   done(null, user.get('ident'));
+// });
 
 // Set app to use Passport depending on user backend
 if (config.userSource === config.POSTGRESQL) {
@@ -200,15 +197,6 @@ router.get('/rwfind', ensureAuthenticated, rwfindRoute.list);
 router.get('/data', ensureAuthenticated, dataRoute.list);
 
 router.get('/api/lmsearch', lmsearchRoute.list);
-// Set up routes for rabbitmq connection for logging and chat
-// Not used - deprecated
-// router.get('/start-logmonitor', ensureAuthenticated, logmon.start);
-// router.get('/stop-logmonitor', ensureAuthenticated, logmon.stop);
-// router.get('/status-logmonitor', ensureAuthenticated, logmon.status);
-
-// router.get('/start-chat', ensureAuthenticated, chat.start);
-// router.get('/stop-chat', ensureAuthenticated, chat.stop);
-// router.get('/status-chat', ensureAuthenticated, chat.status);
 
 // User Settings api
 router.get('/settings', ensureAuthenticated, settingsRoute.get);
@@ -277,64 +265,27 @@ app.use('/', router);
   });
 */
 if (config.sslOn) {
-  logger.debug('Dashboard initialization: SSL is on');
+  logger.info('Dashboard initialization: SSL is on');
   var sslOptions = {
     key: fs.readFileSync(config.serverKey),
     cert: fs.readFileSync(config.serverCrt)
-    //ca: fs.readFileSync(config.serverCa∆Ô)
+    //ca: fs.readFileSync(config.serverCa)
     //requestCert: true,
     //rejectUnauthorized: false
   };
   var server = https.createServer(sslOptions, app);
   var port = app.get('sslport');
 } else {
-  logger.debug('Dashboard initialization: SSL is off');
+  logger.info('Dashboard initialization: SSL is off');
   var server = http.createServer(app);
   var port = app.get('port');
 }
 
 // Set up socket.io to listen on same port as https
 var io = socket.listen(server);
-
-// Set up sockets
-var RabbitSocket = require('./services/rabbitSocket');
-// Create publishers first so their publish method can be added as event listeners
-var chatPublisher = new RabbitSocket(config.chatExchange, 'publisher');
-// Set up chat socket
-var chat = io
-  .of(config.io.chat)
-  .on('connection', function (socket) {
-
-    var info = {
-      connectionID: socket.conn.id,
-      serverAddr: socket.conn.remoteAddress
-    };
-    logger.debug('Chat socket.io. Received client connection event: ', info);
-    // Send message to fanout when received from client on socket
-    socket.on('chat:client', function (msg) {
-      logger.debug('Chat socket.io: Received client event from client. ConnectionID: ', socket.conn.id, ' msg: ', msg);
-      chatPublisher.send(msg);
-    });
-    socket.on('disconnect', function (evt) {
-      /* jshint unused: false */
-      logger.debug('Chat socket.io: Received disconnect event from client. ConnectionID: ', socket.conn.id);
-    });
-  });
-// Set up logs socket
-var logs = io
-  .of(config.io.log)
-  .on('connection', function (socket) {
-
-    var info = {
-      connectionID: socket.conn.id,
-      serverAddr: socket.conn.remoteAddress
-    };
-    logger.debug('Logs socket.io. Received client connection event: ', info);
-    socket.on('disconnect', function (evt) {
-      /* jshint unused: false */
-      logger.debug('Logs socket.io: Received disconnect event from client. ConnectionID: ', socket.conn.id);
-    });
-  });
+// Initialize messaging - fanout publish, subscribe, sockets
+// Saving handle for now
+var dashboardMessaging = require('./services/messaging')(io);
 
 server.listen(port);
 logger.info('Dashboard initialization: DIMS Dashboard running on port %s', server.address().port);
@@ -342,9 +293,3 @@ logger.info('Dashboard initialization: REDIS host, port, database: ', config.red
 logger.info('Dashboard initialization: Node environment: ', config.env);
 logger.info('Dashboard initialization: Log level:', config.logLevel);
 logger.info('Dashboard initialization: UserDB source: ', config.userSource);
-// Create subscribers
-var chatSubscriber = new RabbitSocket(config.chatExchange, 'subscriber', chat);
-var logSubscriber = new RabbitSocket(config.logExchange, 'subscriber', logs);
-
-
-

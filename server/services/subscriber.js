@@ -9,6 +9,8 @@ util.inherits(Subscriber, EventEmitter);
 
 exports = module.exports = Subscriber;
 
+// io is optional. Include if you want the subscriber to emit the message
+// over a socket.io socket
 function Subscriber(name) {
   var self = this;
   self.type = 'fanout';
@@ -20,16 +22,18 @@ function Subscriber(name) {
   self.startEvent = 'fanout:' + self.name + ':started';
   self.stopEvent = 'fanout:' + self.name + ':stopped';
 
-  logger.debug('Constructor: Name:', self.name, 'type: ', self.type);
+  // Types of events
+  // Received a packet from a client - needs to be published (client)
+  // Received a packet from rabbit - needs to be emitted (receive)
 
+  self.clientEvent = name + ':client';
+  self.receiveEvent = name + ':receive';
+  self.IO_MSG_TYPE = name + ':data';
+  logger.debug('Constructor: Name:', self.name, 'type: ', self.type);
   EventEmitter.call(self);
 };
 
-Subscriber.prototype.getName = function () {
-  return self.name;
-};
-
-Subscriber.prototype.start = function () {
+Subscriber.prototype.start = function (io) {
   var self = this;
   logger.debug('Start:' + self.name + ': starting...');
   if (self.running) {
@@ -43,12 +47,14 @@ Subscriber.prototype.start = function () {
     self.rabbit.on('connectionError', self.onError.bind(self));
     self.rabbit.on('channelClose', self.onChannelClosed.bind(self));
     self.rabbit.on('channelError', self.onChannelError.bind(self));
-    // Received subscribe receive event from rabbit
-    // Propogate it up
-    self.rabbit.on(self.name + ':receive', function (msg) {
-      //logger.debug('Subscriber:' + self.name + 'message received', msg);
-      self.emit(self.name + ':receive', msg);
-    });
+    // If io setup for this subscriber, set a listener on
+    // rabbit for received message events
+    if (io !== undefined) {
+      self.rabbit.on(self.receiveEvent, function (msg) {
+        //logger.debug('Subscriber:' + self.name + 'message received', msg);
+        io.emit(self.IO_MSG_TYPE, msg);
+      });
+    }
     // Subscribe
     self.rabbit.subscribe();
   }

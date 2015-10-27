@@ -5,7 +5,7 @@
 // Get the app configuration
 var config = require('../config/config');
 var logger = require('./logger')(module);
-logger.info('utils.bookshelf: Setting up Bookshelf');
+logger.info('Setting up Bookshelf');
 // Set up postgresql connection data to user database
 var dbConfig = {
   client: 'postgresql',

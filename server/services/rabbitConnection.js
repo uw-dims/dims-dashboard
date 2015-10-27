@@ -16,17 +16,16 @@ function RabbitConnection(name, type) {
   self.port = config.rpcPort;
   self.server = config.rpcServer;
 
+  // Todo: add check for missing params
+
   // name: exchange
-  self.name = name || 'logs';
+  self.name = name;
   // type: type of exchange
-  self.type = type || 'fanout';
-  if (self.type === 'fanout' && self.name !== 'devops') {
-    self.durable = false;
-  } else if (self.type === 'fanout' && self.name === 'devops') {
-    self.durable = true;
-  } else {
-    self.durable = true;
+  self.type = type;
+  if (self.type === 'fanout') {
+    self.durable = config.fanoutExchanges[name].durable;
   }
+
 
   EventEmitter.call(self);
   self.open = amqp.connect('amqp://' + self.user + ':' + self.pwd + '@' + self.server);
@@ -162,6 +161,7 @@ RabbitConnection.prototype.initPublish = function () {
 };
 
 RabbitConnection.prototype.publish = function (message) {
+  logger.debug('publish: message=', message);
   var self = this;
   return self.pubExchange.then(function (reply) {
           self.exchange = reply.exchange;

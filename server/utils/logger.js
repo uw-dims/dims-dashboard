@@ -22,7 +22,7 @@ module.exports = function (callingModule) {
   // var CustomLogger = winston.transports.CustomLogger = function (options) {
   //   this.name = 'amqpLogger';
   //   this.level = options.level || config.logLevel;
-  //   this.logExchange = config.logExchange;
+  //   this.logExchange = config.logExchange.logs;
   // };
 
   // util.inherits(CustomLogger, winston.Transport);
@@ -79,7 +79,7 @@ module.exports = function (callingModule) {
   //   level: config.logLevel
   // });
 
-  
+
   // }
   // Prepend with time
 

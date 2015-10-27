@@ -9,6 +9,8 @@ util.inherits(Publisher, EventEmitter);
 
 exports = module.exports = Publisher;
 
+// Publisher sends messages to a fanout exchange only
+
 function Publisher(name) {
   var self = this;
   self.type = 'fanout';
@@ -23,10 +25,6 @@ function Publisher(name) {
   logger.debug('Constructor. Name: ', self.name, 'Type: ', self.type);
 
   EventEmitter.call(self);
-};
-
-Publisher.prototype.getName = function () {
-  return self.name;
 };
 
 Publisher.prototype.start = function () {
@@ -69,7 +67,6 @@ Publisher.prototype.stop = function () {
 
 Publisher.prototype.publish = function (message) {
   var self = this;
-  //logger.debug('Publish: ' + self.name + ': Publish');
   self.rabbit.publish(message);
 };
 

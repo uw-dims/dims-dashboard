@@ -89,10 +89,28 @@ var constants = {
   'CORRELATE' : 'crosscor',
   'ANONYMIZE' : 'anon',
   'PASS_SECRET' : '84jd$#lk903jcy2AUEI2j4nsKLJ!lIY',
-  'logExchange': 'devops',
-  'chatExchange': 'chat',
-  'logEvent': 'devops:data',
-  'chatEvent': 'chat:data'
+  'fanoutExchanges': {
+    'chat': {
+      'name': 'chat',
+      'event': 'chat:data'
+    },
+    'logs': {
+      'name': 'logs',
+      'event': 'logs:data'
+    },
+    'devops': {
+      'name': 'devops',
+      'event': 'devops:data'
+    },
+    'test': {
+      'name': 'test',
+      'event': 'test:data'
+    }
+  }
+  //'logExchange': 'devops',
+  //'chatExchange': 'chat',
+  //'logEvent': 'devops:data',
+  //'chatEvent': 'chat:data'
 };
 
 var rpcClientOptions = {

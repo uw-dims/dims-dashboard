@@ -157,12 +157,56 @@ config.serverKey = config.certDir + config.certName + '.key';
 config.serverCrt = config.certDir + config.certName + '.crt';
 config.serverCa = config.certDir + config.caName + '.crt';
 
-// Later will allow multiple logs to select
-config.logExchange = 'devops';
-config.chatExchange = 'chat';
-config.io = {
-  log: '/' + config.logExchange,
-  chat: '/' + config.chatExchange
+config.fanoutExchanges = {
+  'chat': {
+    'name': 'chat',
+    'durable': false,
+    'subscribe': true,
+    'publish': true,
+    'io': true,
+    'ioRcv': true,
+    'ioEvent': 'chat:client',
+    'ioPath': '/chat'
+  },
+  'logs': {
+    'name': 'logs',
+    'durable': false,
+    'subscribe': true,
+    'publish': true,
+    'io': true,
+    'ioRcv': false,
+    'ioPath': '/logs'
+  },
+  'devops': {
+    'name': 'devops',
+    'durable': true,
+    'subscribe': true,
+    'publish': false,
+    'io': true,
+    'ioRcv': false,
+    'ioPath': '/devops'
+  },
+  'test': {
+    'name': 'test',
+    'durable': true,
+    'subscribe': true,
+    'publish': false,
+    'io': true,
+    'ioRcv': false,
+    'ioPath': '/test'
+  }
 };
+config.socketEvents = {
+  'chat': 'chat:client'
+};
+
+// Later will allow multiple logs to select
+//config.logExchange = 'devops';
+//config.chatExchange = 'chat';
+// config.io = {
+//   'logs': '/' + config.logExchange.logs,
+
+//   'chat': '/' + config.chatExchange.chat
+// };
 
 module.exports = config;
