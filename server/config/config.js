@@ -185,6 +185,12 @@ config.sockets = {
     'receive': false,
     'send': true,
     'publish': false
+  },
+  'health': {
+    'ioPath': '/health',
+    'receive': false,
+    'send': true,
+    'publish': false
   }
 };
 
@@ -193,42 +199,31 @@ config.fanoutExchanges = {
     'name': 'chat',
     'durable': false,
     'subscribe': true,
-    'publish': true,
-    'io': true,
-    'ioRcv': true,
-    'ioRcvEvent': 'chat:client',
-    'ioSendEvent': 'chat:data',
-    'ioPath': '/chat'
+    'publish': true
   },
   'logs': {
     'name': 'logs',
     'durable': false,
     'subscribe': true,
-    'publish': true,
-    'io': true,
-    'ioRcv': false,
-    'ioSendEvent': 'logs:data',
-    'ioPath': '/logs'
-  // },
-  // 'devops': {
-  //   'name': 'devops',
-  //   'durable': true,
-  //   'subscribe': true,
-  //   'publish': false,
-  //   'io': true,
-  //   'ioRcv': false,
-  //   'ioSendEvent': 'devops:data',
-  //   'ioPath': '/devops'
-  // },
-  // 'test': {
-  //   'name': 'test',
-  //   'durable': true,
-  //   'subscribe': true,
-  //   'publish': false,
-  //   'io': true,
-  //   'ioRcv': false,
-  //   'ioSendEvent': 'test:data',
-  //   'ioPath': '/test'
+    'publish': true
+  },
+  'devops': {
+    'name': 'devops',
+    'durable': true,
+    'subscribe': true,
+    'publish': false
+  },
+  'test': {
+    'name': 'test',
+    'durable': true,
+    'subscribe': true,
+    'publish': false
+  },
+  'health': {
+    'name': 'health',
+    'durable': true,
+    'subscribe': true,
+    'publish': false
   }
 };
 config.socketEvents = {
