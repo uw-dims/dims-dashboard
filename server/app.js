@@ -1,6 +1,7 @@
 'use strict';
 
 var express = require('express')
+  , amqpLogger = require('./services/amqpLogger')
   , bodyParser = require('body-parser')
  // , compress = require('compression')
  // , cookieSession = require('cookie-session')
@@ -27,9 +28,9 @@ var express = require('express')
   //, exec = require('child_process').exec
  // , messages = require('./utils/messages')
  // , CryptoJS = require('crypto-js')
-  , logger = require('./utils/logger')(module)
   , passport = require('passport')
-  , LocalStrategy = require('passport-local').Strategy;
+  , LocalStrategy = require('passport-local').Strategy
+  , logger = require('./utils/logger')(module);
 
 // routes
 var routes = require('./routes');
@@ -66,6 +67,7 @@ diContainer.factory('mitigationService', require('./services/mitigation'));
 
 // diContainer.factory('ticketService', require('./services/ticket'));
 
+// These are used here
 var sessionRoute = diContainer.get('sessionRoute');
 var settingsRoute = diContainer.get('settingsRoute');
 var ticketRoute = diContainer.get('ticketRoute');
@@ -122,7 +124,7 @@ app.use(session({
 //   'stream': logger.stream
 // }));
 
-// development only
+// development environment
 if (config.env === 'development') {
   app.set('views', path.join(__dirname, '../client/dashboard'));
   app.use(errorHandler());
@@ -152,11 +154,6 @@ if (config.env === 'production') {
     });
   });
 }
-
-// Specify how to serialize user info
-// passport.serializeUser(function (user, done) {
-//   done(null, user.get('ident'));
-// });
 
 // Set app to use Passport depending on user backend
 if (config.userSource === config.POSTGRESQL) {
@@ -264,32 +261,50 @@ app.use('/', router);
   }, 200);
   });
 */
-if (config.sslOn) {
-  logger.info('Dashboard initialization: SSL is on');
-  var sslOptions = {
-    key: fs.readFileSync(config.serverKey),
-    cert: fs.readFileSync(config.serverCrt)
-    //ca: fs.readFileSync(config.serverCa)
-    //requestCert: true,
-    //rejectUnauthorized: false
-  };
-  var server = https.createServer(sslOptions, app);
-  var port = app.get('sslport');
-} else {
-  logger.info('Dashboard initialization: SSL is off');
-  var server = http.createServer(app);
-  var port = app.get('port');
-}
+var io,
+    server,
+    port,
+    sslOptions,
+    dashboardMessaging;
 
-// Set up socket.io to listen on same port as https
-var io = socket.listen(server);
-// Initialize messaging - fanout publish, subscribe, sockets
-// Saving handle for now
-var dashboardMessaging = require('./services/messaging')(io);
+// Wait for logger to be ready to finish up
+amqpLogger.on('logger-ready', function () {
+  if (config.sslOn) {
+    logger.info('Dashboard initialization: SSL is on');
+    sslOptions = {
+      key: fs.readFileSync(config.serverKey),
+      cert: fs.readFileSync(config.serverCrt)
+      //ca: fs.readFileSync(config.serverCa)
+      //requestCert: true,
+      //rejectUnauthorized: false
+    };
+    server = https.createServer(sslOptions, app);
+    port = app.get('sslport');
+  } else {
+    logger.info('Dashboard initialization: SSL is off');
+    server = http.createServer(app);
+    port = app.get('port');
+  }
 
-server.listen(port);
-logger.info('Dashboard initialization: DIMS Dashboard running on port %s', server.address().port);
-logger.info('Dashboard initialization: REDIS host, port, database: ', config.redisHost, config.redisPort, config.redisDatabase);
-logger.info('Dashboard initialization: Node environment: ', config.env);
-logger.info('Dashboard initialization: Log level:', config.logLevel);
-logger.info('Dashboard initialization: UserDB source: ', config.userSource);
+  // Set up socket.io to listen on same port as https
+  io = socket.listen(server);
+  // Initialize messaging - fanout publish, subscribe, sockets
+  // Saving handle for now
+  dashboardMessaging = require('./services/messaging')(io);
+
+  server.listen(port);
+  logger.info('Dashboard initialization: DIMS Dashboard running on port %s', server.address().port);
+  logger.info('Dashboard initialization: REDIS host, port, database: ', config.redisHost, config.redisPort, config.redisDatabase);
+  logger.info('Dashboard initialization: Node environment: ', config.env);
+  logger.info('Dashboard initialization: Log level:', config.logLevel);
+  logger.info('Dashboard initialization: UserDB source: ', config.userSource);
+});
+
+
+process.on('SIGTERM', function () {
+  logger.debug('SIGTERM received');
+  server.close(function () {
+    logger.debug('Server close');
+    process.exit(0);
+  });
+});

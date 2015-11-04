@@ -20,13 +20,11 @@ client.on('error', function (err) {
 });
 
 client.on('ready', function () {
-  logger.info('utils.redisDB: redis client has connected to ' + config.redisHost + ':' + config.redisPort);
-  logger.info('utils.redisDB: selecting database ' + config.redisDatabase);
+  logger.info('utils.redisDB: redis client is connected to %s:%s, database %s',config.redisHost, config.redisPort,
+        config.redisDatabase);
   client.select(config.redisDatabase, function (err, reply) {
     if (err) {
       logger.error('utils.redisDB: redis client received error when selecting database ', err);
-    } else {
-      logger.info('utils.redisDB: redis has selected db, reply is ', reply);
     }
   });
 });

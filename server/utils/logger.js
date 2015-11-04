@@ -4,8 +4,9 @@ var winston = require('winston');
 var config = require('../config/config');
 var moment = require('moment');
 var os = require('os');
-var spawn =  require('child_process').spawn;
 var util = require('util');
+var _ = require('lodash-compat');
+var amqpLogger = require('../services/amqpLogger');
 
 module.exports = function (callingModule) {
 
@@ -18,24 +19,29 @@ module.exports = function (callingModule) {
     return parts[parts.length - 2] + '/' + parts.pop();
   };
 
-  // Future - custom amqp logger. Will add node.js publisher
-  // var CustomLogger = winston.transports.CustomLogger = function (options) {
-  //   this.name = 'amqpLogger';
-  //   this.level = options.level || config.logLevel;
-  //   this.logExchange = config.logExchange.logs;
-  // };
-
-  // util.inherits(CustomLogger, winston.Transport);
-
-  // CustomLogger.prototype.log = function (level, msg, meta, callback) {
-  //   var childProcess = spawn(
-  //     '/opt/dims/envs/dimsenv/bin/logmon',
-  //     ['-l', this.logExchange, '-m', msg]
-  //   );
-  //   callback(null, true);
-  // };
+  var CustomLogger = winston.transports.CustomLogger = function (options) {
+    var self = this;
+    self.name = 'amqpLogger';
+    self.level = options.level || config.logLevel;
+    self.queue = [];
+  };
+  util.inherits(CustomLogger, winston.Transport);
+  CustomLogger.prototype.log = function (level, msg, meta, callback) {
+    try {
+      amqpLogger.channel.publish(config.fanoutExchanges.logs.name, '', new Buffer(msg));
+    } catch (err) {
+      // no-op - will get error here until the channel is ready
+    } finally {
+      callback(null, true);
+    }
+  };
 
   var logger = new (winston.Logger);
+
+  logger.add(CustomLogger, {
+    level: config.logLevel
+  });
+
 
   //logger.setLevels(winston.config.syslog.levels);
 
@@ -48,9 +54,10 @@ module.exports = function (callingModule) {
   //   app_name: 'DIMS-DASHBOARD'
   // });
 
+  // Add to log output
   logger.addFilter(function (msg, meta, level) {
     return moment().toISOString() + ' ' + os.hostname() + ' ' +
-      config.uuid + ' [' + getLabel() + '] ' + level.toUpperCase() + ' ' + process.pid + ' ' +
+      config.uuid + ' DIMS-DASHBOARD [' + getLabel() + '] ' + level.toUpperCase() + ' ' + process.pid + ' ' +
       msg;
   });
 
@@ -75,12 +82,6 @@ module.exports = function (callingModule) {
     colorize: true
   });
 
-  // logger.add(CustomLogger, {
-  //   level: config.logLevel
-  // });
-
-
-  // }
   // Prepend with time
 
   logger.exitOnError = false;

@@ -2,7 +2,7 @@
 
 angular.module('dimsDashboard.services')
 
-    .factory('AuthService', function ($location, $rootScope, SessionService, $cookieStore, $log, SettingsService, ChatService, LogService, ChatSocket, LogSocket) {
+    .factory('AuthService', function ($location, $rootScope, SessionService, $cookieStore, $log, SettingsService, ChatService) {
 
       $rootScope.currentUser = $cookieStore.get('user') || null;
       $log.debug('AuthService: rootScope.currentUser from cookieStore is ', $rootScope.currentUser);
@@ -34,16 +34,17 @@ angular.module('dimsDashboard.services')
         logout: function (callback) {
           $log.debug('AuthService:logout');
           var cb = callback || angular.noop;
+          $rootScope.$emit('logout');
           ChatService.stop();
-          LogService.stop();
-          ChatSocket.then(function (socket) {
-            socket.removeAllListeners(constants.chatEvent);
-            socket.disconnect();
-          });
-          LogSocket.then(function (socket) {
-            socket.removeAllListeners(constants.logEvent);
-            socket.disconnect();
-          })
+          //LogService.stop();
+          // ChatSocket.then(function (socket) {
+          //   socket.removeAllListeners(constants.chatEvent);
+          //   socket.disconnect();
+          // });
+          // LogSocket.then(function (socket) {
+          //   socket.removeAllListeners(constants.logEvent);
+          //   socket.disconnect();
+          // });
           SessionService.delete(function (res) {
               $rootScope.currentUser = null;
               return cb();

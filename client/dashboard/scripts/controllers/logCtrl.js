@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('dimsDashboard.controllers').
-  controller('LogCtrl', function ($scope, $location, $log, LogService, $rootScope) {
+  controller('LogCtrl', function ($scope, $location, $log, $rootScope) {
 
     $log.debug('logCtrl. scope.currentUser is ', $scope.currentUser);
 
@@ -23,13 +23,13 @@ angular.module('dimsDashboard.controllers').
     };
 
     // Register as a listener for LogService
-    LogService.registerObserverCallback($scope.listener);
+    //LogService.registerObserverCallback($scope.listener);
 
     // Close the log monitor
     $scope.close = function () {
       $log.debug('controllers/LogCtrl.close');
       $rootScope.logmonOn = false;
-      LogService.setRunning(false);
+      //LogService.setRunning(false);
       $scope.offListen();
     };
 
@@ -49,7 +49,7 @@ angular.module('dimsDashboard.controllers').
 
     // Start the log monitor
     $scope.start = function () {
-      LogService.setRunning(true);
+      //LogService.setRunning(true);
       $scope.messages = ''; // Re-initialize messages
       $log.debug('controllers/LogCtrl event is ', constants.logEvent);
       // Add listener for socket:constants.logEvent broadcast
@@ -69,7 +69,7 @@ angular.module('dimsDashboard.controllers').
       // Remove listener for socket:constants.logEvent broadcast
       $scope.offListen();
       $rootScope.logmonOn = false;
-      LogService.setRunning(false);
+      //LogService.setRunning(false);
     };
 
     var formatter = function (date, message) {

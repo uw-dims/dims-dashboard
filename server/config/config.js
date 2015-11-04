@@ -157,6 +157,37 @@ config.serverKey = config.certDir + config.certName + '.key';
 config.serverCrt = config.certDir + config.certName + '.crt';
 config.serverCa = config.certDir + config.caName + '.crt';
 
+// Sockets configuration
+// receive: true if socket listening for client events
+// send: true if socket sends to client
+// publish: true if sockets emits publish event when receiving
+config.sockets = {
+  'chat': {
+    'ioPath': '/chat',
+    'receive': true,
+    'send': true,
+    'publish': true
+  },
+  'logs': {
+    'ioPath': '/logs',
+    'receive': false,
+    'send': true,
+    'publish': false
+  },
+  'devops': {
+    'ioPath': '/devops',
+    'receive': false,
+    'send': true,
+    'publish': false
+  },
+  'test': {
+    'ioPath': '/test',
+    'receive': false,
+    'send': true,
+    'publish': false
+  }
+};
+
 config.fanoutExchanges = {
   'chat': {
     'name': 'chat',
@@ -165,7 +196,8 @@ config.fanoutExchanges = {
     'publish': true,
     'io': true,
     'ioRcv': true,
-    'ioEvent': 'chat:client',
+    'ioRcvEvent': 'chat:client',
+    'ioSendEvent': 'chat:data',
     'ioPath': '/chat'
   },
   'logs': {
@@ -175,25 +207,28 @@ config.fanoutExchanges = {
     'publish': true,
     'io': true,
     'ioRcv': false,
+    'ioSendEvent': 'logs:data',
     'ioPath': '/logs'
-  },
-  'devops': {
-    'name': 'devops',
-    'durable': true,
-    'subscribe': true,
-    'publish': false,
-    'io': true,
-    'ioRcv': false,
-    'ioPath': '/devops'
-  },
-  'test': {
-    'name': 'test',
-    'durable': true,
-    'subscribe': true,
-    'publish': false,
-    'io': true,
-    'ioRcv': false,
-    'ioPath': '/test'
+  // },
+  // 'devops': {
+  //   'name': 'devops',
+  //   'durable': true,
+  //   'subscribe': true,
+  //   'publish': false,
+  //   'io': true,
+  //   'ioRcv': false,
+  //   'ioSendEvent': 'devops:data',
+  //   'ioPath': '/devops'
+  // },
+  // 'test': {
+  //   'name': 'test',
+  //   'durable': true,
+  //   'subscribe': true,
+  //   'publish': false,
+  //   'io': true,
+  //   'ioRcv': false,
+  //   'ioSendEvent': 'test:data',
+  //   'ioPath': '/test'
   }
 };
 config.socketEvents = {

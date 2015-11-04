@@ -14,10 +14,6 @@
 <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
 <!-- build:css styles/vendor.css -->
 <!-- bower:css -->
-<link rel="stylesheet" href="../bower_components/angular-motion/dist/angular-motion.css" />
-<link rel="stylesheet" href="../bower_components/ng-grid/ng-grid.css" />
-<link rel="stylesheet" href="../bower_components/nvd3/build/nv.d3.css" />
-<link rel="stylesheet" href="../bower_components/font-awesome/css/font-awesome.css" />
 <!-- endbower -->
 <!-- endbuild -->
 <!-- build:css styles/style.css -->
@@ -32,7 +28,7 @@
 
     </div>
 
-    <div ng-include src="'views/partials/logmonitor.html'"></div>
+    <!-- <div ng-include src="'views/partials/logmonitor.html'"></div> -->
     <div ng-include src="'views/partials/chat.html'"></div>
 
     <!-- build:js scripts/oldieshim.js -->
@@ -55,32 +51,7 @@
     <script src="../bower_components/socket.io-client/socket.io.js"></script>
     <script src="../bower_components/cryptojslib/rollups/aes.js"></script>
     <!-- bower:js -->
-    <script src="../bower_components/modernizr/modernizr.js"></script>
-    <script src="../bower_components/jquery/dist/jquery.js"></script>
-    <script src="../bower_components/ng-file-upload-shim/angular-file-upload-shim.js"></script>
-    <script src="../bower_components/angular/angular.js"></script>
-    <script src="../bower_components/angular-route/angular-route.js"></script>
-    <script src="../bower_components/ng-file-upload/angular-file-upload.js"></script>
-    <script src="../bower_components/angular-animate/angular-animate.js"></script>
-    <script src="../bower_components/angular-resource/angular-resource.js"></script>
-    <script src="../bower_components/angular-loader/angular-loader.js"></script>
-    <script src="../bower_components/angular-cookies/angular-cookies.js"></script>
-    <script src="../bower_components/angular-sanitize/angular-sanitize.js"></script>
-    <script src="../bower_components/angular-touch/angular-touch.js"></script>
-    <script src="../bower_components/angular-strap/dist/angular-strap.min.js"></script>
-    <script src="../bower_components/angular-strap/dist/angular-strap.tpl.min.js"></script>
-    <script src="../bower_components/html5shiv/dist/html5shiv.js"></script>
-    <script src="../bower_components/d3/d3.js"></script>
-    <script src="../bower_components/json3/lib/json3.js"></script>
-    <script src="../bower_components/ng-grid/build/ng-grid.js"></script>
-    <script src="../bower_components/nvd3/build/nv.d3.js"></script>
-    <script src="../bower_components/lodash/dist/lodash.compat.js"></script>
-    <script src="../bower_components/underscore.string/lib/underscore.string.js"></script>
-    <script src="../bower_components/respond/dest/respond.src.js"></script>
-    <script src="../bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
-    <script src="../bower_components/angular-bootstrap-show-errors/src/showErrors.js"></script>
-    <script src="../bower_components/angular-http-auth/src/http-auth-interceptor.js"></script>
-    <script src="../bower_components/angu-fixed-header-table/angu-fixed-header-table.js"></script>
+
     <!-- endbower -->
 
     <!-- endbuild -->
@@ -100,7 +71,6 @@
     <script src="scripts/controllers/graphCtrl.js"></script>
     <script src="scripts/controllers/loginCtrl.js"></script>
     <script src="scripts/controllers/navbarCtrl.js"></script>
-    <script src="scripts/controllers/logCtrl.js"></script>
     <script src="scripts/controllers/chatCtrl.js"></script>
     <script src="scripts/controllers/userSettingsCtrl.js"></script>
     <script src="scripts/controllers/messagingCtrl.js"></script>
@@ -111,6 +81,7 @@
     <script src="scripts/controllers/userAttributesCtrl.js"></script>
     <script src="scripts/controllers/userInfoCtrl.js"></script>
     <script src="scripts/controllers/userCtrl.js"></script>
+    <script src="scripts/controllers/logMonitorCtrl.js"></script>
     <script src="scripts/directives/directives.js"></script>
     <script src="scripts/directives/dimsResults.js"></script>
     <script src="scripts/directives/searchForm.directive.js"></script>
@@ -118,6 +89,7 @@
     <script src="scripts/directives/userProfile.directive.js"></script>
     <script src="scripts/directives/userSettings.directive.js"></script>
     <script src="scripts/directives/userAttributes.directive.js"></script>
+    <script src="scripts/directives/logMonitor.directive.js"></script>
     <script src="scripts/filters/filters.js"></script>
     <script src="scripts/services/services.js"></script>
     <script src="scripts/services/dataService.js"></script>
@@ -128,11 +100,9 @@
     <script src="scripts/services/sessionService.js"></script>
     <script src="scripts/services/settingsService.js"></script>
     <script src="scripts/services/cryptoService.js"></script>
-    <script src="scripts/services/socketFactory.js"></script>
     <script src="scripts/services/ticketService.js"></script>
     <script src="scripts/services/userService.js"></script>
     <script src="scripts/services/userAttributesService.js"></script>
-    <script src="scripts/lib/owf/owf-widget-debug.js"></script>
     <!-- endbuild -->
 
     <script>

@@ -1,14 +1,14 @@
 'use strict';
 
 angular.module('dimsDashboard.controllers').
-  controller('MessagingCtrl', ['$scope', '$rootScope','$modalInstance','$location', '$routeParams', '$log', 
+  controller('MessagingCtrl', ['$scope', '$rootScope','$modalInstance','$location', '$routeParams', '$log',
     'ChatService', 'LogService',
     function ($scope, $rootScope, $modalInstance, $location, $routeParams, $log, ChatService, LogService) {
 
   // $log.debug('messagingCtrl. settings are ', $scope.settings);
   // $log.debug('settingsCtrl. formData ', $scope.settingsFormData);
 
-  
+
 
     $scope.messageKind = {
       rpcDebug: 'You successfully changed the value of the RPC Debug flag',
@@ -22,25 +22,25 @@ angular.module('dimsDashboard.controllers').
   $scope.logs = [];
 
   // Set current value of socket states
-  $rootScope.logmonOn = LogService.isRunning();
+  //$rootScope.logmonOn = LogService.isRunning();
   $rootScope.chatOn = ChatService.isRunning();
 
   $log.debug('Log and Chat are ', $scope.logmonOn, $scope.chatOn);
 
-  $scope.toggleLogMonitor = function() {
-      if ($scope.logmonOn) {
-        // Turn it off
-        $rootScope.logmonOn = false;
-        $
-        $log.debug('Turning log monitor off');
-        LogService.stop();
-      } else {
-        // Turn it on
-        $rootScope.logmonOn = true;
-        $log.debug('Turning log monitor on');
-        LogService.start();
-      }
-    };
+  // $scope.toggleLogMonitor = function() {
+  //     if ($scope.logmonOn) {
+  //       // Turn it off
+  //       $rootScope.logmonOn = false;
+  //       $
+  //       $log.debug('Turning log monitor off');
+  //       LogService.stop();
+  //     } else {
+  //       // Turn it on
+  //       $rootScope.logmonOn = true;
+  //       $log.debug('Turning log monitor on');
+  //       LogService.start();
+  //     }
+  //   };
 
     $scope.toggleChat = function() {
       if ($scope.chatOn) {

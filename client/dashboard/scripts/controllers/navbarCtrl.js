@@ -8,10 +8,10 @@
     .module('dimsDashboard.controllers')
     .controller('NavbarCtrl', NavbarCtrl);
 
-  NavbarCtrl.$inject = ['$scope', '$modal', 'AuthService', '$log', '$location', '$rootScope', 'ChatService', 'LogService', '$window'];
+  NavbarCtrl.$inject = ['$scope', '$modal', 'AuthService', '$log', '$location', '$rootScope', 'ChatService', '$window'];
 
   // The controller function for the Navbar
-  function NavbarCtrl($scope, $modal, AuthService, $log, $location, $rootScope, ChatService, LogService, $window) {
+  function NavbarCtrl($scope, $modal, AuthService, $log, $location, $rootScope, ChatService,  $window) {
     var vm = this;
 
     // Bindable members
@@ -19,7 +19,7 @@
     // vm.settings = settings;
     // vm.messaging = messaging;
     vm.chat = chat;
-    vm.logMonitor = logMonitor;
+    //vm.logMonitor = logMonitor;
     vm.openSite = openSite;
     //vm.userSettings = userSettings;
     var associatedSites = {
@@ -56,34 +56,34 @@
     // };
 
     function chat() {
-      $rootScope.chatOn = ChatService.isRunning();
-      if ($scope.chatOn) {
+      //$rootScope.chatOn = ChatService.isRunning();
+      if (ChatService.isRunning()) {
         // Turn it off
-        $rootScope.chatOn = false;
-        $log.debug('Turning chat off');
+        //$rootScope.chatOn = false;
+        $log.debug('navbarCtrl: Turning chat off');
         ChatService.stop();
       } else {
         // Turn it on
-        $rootScope.chatOn = true;
-        $log.debug('Turning chat on');
+        //$rootScope.chatOn = true;
+        $log.debug('navbarCtrl: Turning chat on');
         ChatService.start();
       }
     }
 
-    function logMonitor() {
-      $rootScope.logmonOn = LogService.isRunning();
-      if ($scope.logmonOn) {
-        // Turn it off
-        $rootScope.logmonOn = false;
-        $log.debug('Turning log monitor off');
-        LogService.stop();
-      } else {
-        // Turn it on
-        $rootScope.logmonOn = true;
-        $log.debug('Turning log monitor on');
-        LogService.start();
-      }
-    }
+    // function logMonitor() {
+    //   $rootScope.logmonOn = LogService.isRunning();
+    //   if ($scope.logmonOn) {
+    //     // Turn it off
+    //     $rootScope.logmonOn = false;
+    //     $log.debug('Turning log monitor off');
+    //     LogService.stop();
+    //   } else {
+    //     // Turn it on
+    //     $rootScope.logmonOn = true;
+    //     $log.debug('Turning log monitor on');
+    //     LogService.start();
+    //   }
+    // }
   }
 
 }());

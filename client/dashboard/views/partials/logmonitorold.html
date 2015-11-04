@@ -1,0 +1,16 @@
+<div ng-controller="LogCtrl">
+<div class="{{ logClass }}">
+<div class="popup-box chat-popup" ng-show="logmonOn">
+    <div class="popup-head">
+        <div class="popup-head-left">Log Monitor</div>
+        <div class="popup-head-right">
+	        <span class="glyphicon glyphicon-chevron-down popup-btn" ng-click="hide()" ng-show="logMaximized"></span>
+	        <span class="glyphicon glyphicon-chevron-up popup-btn" ng-click="show()" ng-hide="logMaximized"></span>
+	        <span class="glyphicon glyphicon-remove popup-btn" ng-click="close()"></span>
+        </div>
+        <div style="clear: both"></div>
+    </div>
+    <div class="popup-messages" style="white-space: pre; font-family: Monaco, monospace; font-size: 10px;" ng-show="logMaximized">{{ messages }} </div>
+</div>
+</div>
+</div>

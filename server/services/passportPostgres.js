@@ -29,15 +29,16 @@ module.exports = function (UserModel) {
     // Look up the user corresponding to the supplied username
     new UserModel.User({ident: username}).fetch({require: true}).then(function (user) {
         logger.debug('strategy: Retrieved user ', user.get('ident'));
-        logger.debug('strategy: Base64', password);
         // Decrypt Base64 encoded encrypted password received via http post
         var decrypted = CryptoJS.AES.decrypt(password, config.passSecret).toString(CryptoJS.enc.Utf8);
         // Get the user's hashed password from the datastore
         var pw = user.get('password');
         // Call perl crypt to check password since we are using passwords generated using crypt
+        // Need to do more work on this to make sure input is sanitized - maybe use perl module instead
+        // of child process exec
         var program = 'perl ' + __dirname + '/../utils/getPass.pl \'' + decrypted + '\' ' + '\'' + pw + '\'';
         var child = exec(program, function (error, stdout, stderr) {
-          logger.debug('strategy: getPass results. stdout', stdout);
+          // logger.debug('strategy: getPass results. stdout', stdout);
           if (error !== null) {
             logger.error('strategy: exec error. user, error ', username);
             return done(null, false, 'Could not get MD5 hash of password - notify Admin');
@@ -48,12 +49,8 @@ module.exports = function (UserModel) {
             return done(null, user);
           }
           logger.debug('strategy: Passwords did not match. ', pw);
-          return done(null, false, 'Invalid password');
+          return done(null, false, 'Password does not match');
         });
-
-     // }, function (error) {
-     // See https://github.com/petkaantonov/bluebird/wiki/Promise-anti-patterns#the-thensuccess-fail-anti-pattern
-
       }).catch(function (err) {
         var errmsg = '';
         logger.error('strategy: Unknown user ', username, err);

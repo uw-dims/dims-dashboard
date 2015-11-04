@@ -50,6 +50,10 @@ var dimsDashboardConfig = function ($routeProvider, $locationProvider, datepicke
     controller: 'UserCtrl as vm',
     templateUrl: '/views/partials/users.html'
   }).
+  when('/logmonitor', {
+    controller: 'LogMonitorCtrl as vm',
+    templateUrl: 'views/partials/logmonitormain.html'
+  }).
   when('/login', {
     controller: 'LoginCtrl',
     templateUrl: 'views/partials/login.html'
@@ -82,18 +86,21 @@ var constants = {
       { value: 'ip_lists', label: 'List of IPs, CIDR, or Domains' },
       { value: 'map_files', label: 'Mapping Files' },
       { value: 'data_files', label: 'Any Data Files' }
-    ] ,
+    ],
   'maxFileUpload': 10,
   'SILK' : 'rwfind',
   'CIF' : 'cifbulk',
   'CORRELATE' : 'crosscor',
   'ANONYMIZE' : 'anon',
   'PASS_SECRET' : '84jd$#lk903jcy2AUEI2j4nsKLJ!lIY',
-  'fanoutExchanges': {
+  'chatExchanges': {
     'chat': {
       'name': 'chat',
-      'event': 'chat:data'
-    },
+      'event': 'chat:data',
+      'sendEvent': 'chat:client'
+    }
+  },
+  'fanoutExchanges': {
     'logs': {
       'name': 'logs',
       'event': 'logs:data'
@@ -167,7 +174,7 @@ var rpcClientOptions = {
 };
 
 var dimsDashboard = angular.module('dimsDashboard',
-  ['ngRoute','angularFileUpload','ui.bootstrap','ui.bootstrap.showErrors','ngGrid', 'ngAnimate', 'ngResource','http-auth-interceptor',
+  ['ngRoute','angularFileUpload','ui.bootstrap','ui.bootstrap.showErrors','ngGrid', 'ngAnimate', 'ngResource','http-auth-interceptor', 'btford.socket-io',
     'ngCookies','anguFixedHeaderTable', 'truncate', 'dimsDashboard.controllers', 'dimsDashboard.directives', 'dimsDashboard.services','dimsDashboard.config'])
   .config(dimsDashboardConfig);
 
