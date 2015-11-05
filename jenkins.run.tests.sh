@@ -1,4 +1,5 @@
 #! /bin/bash
+VERSION=1.0.5
 
 # Run the server tests on Jenkins
 

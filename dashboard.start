@@ -1,4 +1,5 @@
 #! /bin/bash
+VERSION=1.0.5
 
 # When running manually, run with sudo -u dims
 
