@@ -2,6 +2,8 @@ var uuid = require('node-uuid');
 
 var config = {};
 
+config.appName = 'DASHBOARD';
+
 config.uuid = uuid.v4();
 
 config.sslOn = process.env.SSL_ON || false;
@@ -226,17 +228,7 @@ config.fanoutExchanges = {
     'publish': false
   }
 };
-config.socketEvents = {
-  'chat': 'chat:client'
-};
 
-// Later will allow multiple logs to select
-//config.logExchange = 'devops';
-//config.chatExchange = 'chat';
-// config.io = {
-//   'logs': '/' + config.logExchange.logs,
-
-//   'chat': '/' + config.chatExchange.chat
-// };
+config.appLogExchange = 'logs';
 
 module.exports = config;

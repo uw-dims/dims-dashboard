@@ -1,6 +1,7 @@
 'use strict';
 
 var express = require('express')
+  , config = require('./config/config')
   , amqpLogger = require('./services/amqpLogger')
   , bodyParser = require('body-parser')
  // , compress = require('compression')
@@ -18,7 +19,6 @@ var express = require('express')
   , https = require('https')
   , fs = require('fs')
   , path = require('path')
-  , config = require('./config/config')
   , session = require('express-session')
   , RedisStore = require('connect-redis')(session)
   // , pg = require('pg')

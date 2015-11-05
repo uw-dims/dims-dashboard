@@ -6,75 +6,71 @@ var moment = require('moment');
 var os = require('os');
 var util = require('util');
 var _ = require('lodash-compat');
-var amqpLogger = require('../services/amqpLogger');
 
 module.exports = function (callingModule) {
 
-  // var winstonlogger = {};
+  var amqpLogger;
 
   // function from
   // http://stackoverflow.com/questions/13410754/i-want-to-display-the-file-name-in-the-log-statement
-  var getLabel = function () {
+  var getLabel = function getLabel() {
     var parts = callingModule.filename.split('/');
     return parts[parts.length - 2] + '/' + parts.pop();
   };
 
-  var CustomLogger = winston.transports.CustomLogger = function (options) {
-    var self = this;
-    self.name = 'amqpLogger';
-    self.level = options.level || config.logLevel;
-    self.queue = [];
+  // Adds to log output for development or production
+  var dimsFormat = function dimsFormat(msg, meta, level) {
+    return moment().toISOString() + ' ' + os.hostname() + ' ' +
+      config.uuid + ' ' + config.appName + ' [' + getLabel() + '] ' + level.toUpperCase() + ' ' + process.pid + ' ' +
+      msg;
   };
-  util.inherits(CustomLogger, winston.Transport);
-  CustomLogger.prototype.log = function (level, msg, meta, callback) {
-    try {
-      amqpLogger.channel.publish(config.fanoutExchanges.logs.name, '', new Buffer(msg));
-    } catch (err) {
-      // no-op - will get error here until the channel is ready
-    } finally {
-      callback(null, true);
-    }
+
+  // Update the log level for a transport
+  var updateLogLevel = function updateLogLevel(transport, level) {
+    logger.transports[transport].level = level;
   };
+
+  // Define our custom logger for logging to AMQP if we are not doing testing
+  if (config.env !== 'test') {
+    amqpLogger = require('../services/amqpLogger');
+    var CustomLogger = winston.transports.CustomLogger = function (options) {
+      var self = this;
+      self.name = options.name || 'amqpLogger';
+      self.exchange = options.exchange || config.appLogName;
+      self.level = options.level || config.logLevel;
+    };
+    util.inherits(CustomLogger, winston.Transport);
+    CustomLogger.prototype.log = function (level, msg, meta, callback) {
+      var self = this;
+      try {
+        amqpLogger.channel.publish(this.exchange, '', new Buffer(msg));
+      } catch (err) {
+        // no-op - will get error here until the channel is ready
+      } finally {
+        callback(null, true);
+      }
+    };
+  }
+
+  // var updateExchange = function updateExchange(exchange) {
+  //   logger.transport.CustomLogger
+  // }
+
+  var evChangeLevel = 'change-log-level';
+  var evChangeExchange  = 'change-exchange';
 
   var logger = new (winston.Logger);
 
-  logger.add(CustomLogger, {
-    level: config.logLevel
-  });
+  // Add the custom logger if not test
+  if (config.env !== 'test') {
+    logger.add(CustomLogger, {
+      level: config.logLevel,
+      exchange: config.appLogExchange
+    });
+  }
 
+  logger.addFilter(dimsFormat);
 
-  //logger.setLevels(winston.config.syslog.levels);
-
-  // logger.add(winston.transports.Syslog, {
-  //   level: config.logLevel,
-  //   handleExceptions: true,
-  //   json: false,
-  //   colorize: false,
-  //   localhost: os.hostname(),
-  //   app_name: 'DIMS-DASHBOARD'
-  // });
-
-  // Add to log output
-  logger.addFilter(function (msg, meta, level) {
-    return moment().toISOString() + ' ' + os.hostname() + ' ' +
-      config.uuid + ' DIMS-DASHBOARD [' + getLabel() + '] ' + level.toUpperCase() + ' ' + process.pid + ' ' +
-      msg;
-  });
-
-  // Will replace once we figure out where to send the logs
-  // if (config.env === 'production') {
-  //   logger.add(winston.transports.File, {
-  //     level: config.logLevel,
-  //     handleExceptions: false,
-  //     json: false,
-  //     colorize: false,
-  //     filename: config.logfile,
-  //     maxsize: 1000000,
-  //     tailable: true
-  //   });
-  // }
-
-  // if (config.env === 'development') {
   logger.add(winston.transports.Console, {
     level: config.logLevel,
     handleExceptions: false,
@@ -82,7 +78,8 @@ module.exports = function (callingModule) {
     colorize: true
   });
 
-  // Prepend with time
+  logger.on(evChangeLevel, updateLogLevel.bind(this));
+  // logger.on(evChangeExchange, updateExchange.bind(this));
 
   logger.exitOnError = false;
   logger.emitErrs = false;

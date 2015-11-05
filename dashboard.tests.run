@@ -1,0 +1,53 @@
+#! /bin/bash
+VERSION=1.0.5
+
+# Run the server tests during the development cycle
+# Must be run as dims user if you are running against
+# dashboard at /opt/dims/srv/dims-dashboard
+
+# Set up common functions and variables.
+source $DIMS/bin/test_functions.sh
+
+echo DEBUG=$DEBUG
+echo VERBOSE=$VERBOSE
+
+if [ $VERBOSE -eq 1 ]; then
+  echo "Verbose is on"
+fi
+
+if [ $DEBUG -eq 1 ]; then
+  echo "Debug is on"
+fi
+
+BASE=$(basename "$0")
+
+DATE=$(iso8601dateshort)
+LOGFILE=$BASE-$DATE.log
+
+# Cleanup on exit
+trap "rm -f $TFILE" EXIT
+
+TFILE=$(mktemp --tmpdir $$.dashboardtest.$RANDOM.XXXXXX)
+echo "DIMS-DASHBOARD Test Run on ${DATE} by ${USER}" > $TFILE
+
+RUNDIR=${RUNDIR:="/opt/dims/srv/dims-dashboard/"}
+
+export LOG_LEVEL=${LOG_LEVEL:="info"}
+export NODE_ENV=${NODE_ENV:="test"}
+
+# RABBIT_SERVER=${RABBIT_SERVER:="172.17.0.2"}
+# RABBIT_SERVER=$(sudo docker inspect --format '{{ .NetworkSettings.IPAddress }}' rabbit)
+# RABBIT_SERVER=rabbitmq.prisem.washington.edu
+TEST=${TEST:="tap"}
+
+cd $RUNDIR
+npm --version >> $TFILE
+cd server
+
+# export RABBIT_SERVER=$RABBIT_SERVER
+
+npm run test-$TEST >> $TFILE
+
+logmon -l test -s $TFILE
+
+exit 0
