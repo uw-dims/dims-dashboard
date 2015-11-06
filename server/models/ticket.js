@@ -291,7 +291,6 @@ module.exports = function Ticket(db) {
       })
       .then(function (reply) {
         logger.debug('models/ticket.topic.getContents reply from getAllContents is ', reply);
-        console.log(reply);
         return reply;
       })
       .catch(function (err) {
