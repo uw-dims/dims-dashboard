@@ -9,7 +9,7 @@ var _ = require('lodash-compat');
 
 module.exports = function (callingModule) {
 
-  var amqpLogger;
+  var appLogger;
 
   // function from
   // http://stackoverflow.com/questions/13410754/i-want-to-display-the-file-name-in-the-log-statement
@@ -32,7 +32,7 @@ module.exports = function (callingModule) {
 
   // Define our custom logger for logging to AMQP if we are not doing testing
   if (config.env !== 'test') {
-    amqpLogger = require('../services/amqpLogger');
+    appLogger = require('./appLogger');
     var CustomLogger = winston.transports.CustomLogger = function (options) {
       var self = this;
       self.name = options.name || 'amqpLogger';
@@ -43,7 +43,8 @@ module.exports = function (callingModule) {
     CustomLogger.prototype.log = function (level, msg, meta, callback) {
       var self = this;
       try {
-        amqpLogger.channel.publish(this.exchange, '', new Buffer(msg));
+        // appLogger.channel.publish(this.exchange, '', new Buffer(msg));
+        appLogger.publish(msg);
       } catch (err) {
         // no-op - will get error here until the channel is ready
       } finally {

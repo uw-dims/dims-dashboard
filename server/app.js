@@ -2,7 +2,9 @@
 
 var express = require('express')
   , config = require('./config/config')
-  , amqpLogger = require('./services/amqpLogger')
+  , appLogger = require('./utils/appLogger')
+  , healthLogger = require('./utils/healthLogger')
+  // , healthService = require('./services/healthService')()
   , bodyParser = require('body-parser')
  // , compress = require('compression')
  // , cookieSession = require('cookie-session')
@@ -64,6 +66,7 @@ diContainer.factory('userRoute', require('./routes/user'));
 diContainer.factory('attributeRoute', require('./routes/attributes'));
 diContainer.factory('lmsearchRoute', require('./routes/lmsearch'));
 diContainer.factory('mitigationService', require('./services/mitigation'));
+diContainer.factory('healthService', require('./services/healthService'));
 
 // diContainer.factory('ticketService', require('./services/ticket'));
 
@@ -83,6 +86,9 @@ var passportStatic = diContainer.get('passportStatic');
 var userRoute = diContainer.get('userRoute');
 var attributeRoute = diContainer.get('attributeRoute');
 var lmsearchRoute = diContainer.get('lmsearchRoute');
+// Run the healthService
+var healthService = diContainer.get('healthService');
+healthService.run();
 
 var app = module.exports = express();
 
@@ -268,7 +274,7 @@ var io,
     dashboardMessaging;
 
 // Wait for logger to be ready to finish up
-amqpLogger.on('logger-ready', function () {
+appLogger.on('logger-ready', function () {
   if (config.sslOn) {
     logger.info('Dashboard initialization: SSL is on');
     sslOptions = {
@@ -298,11 +304,16 @@ amqpLogger.on('logger-ready', function () {
   logger.info('Dashboard initialization: Node environment: ', config.env);
   logger.info('Dashboard initialization: Log level:', config.logLevel);
   logger.info('Dashboard initialization: UserDB source: ', config.userSource);
+  healthLogger.publish('Initialization: DIMS Dashboard running on port ' + server.address().port);
+  healthLogger.publish('Initialization: REDIS host ' + config.redisHost +
+    ', port ' + config.redisPort + ', database: ' + config.redisDatabase);
+  healthLogger.publish('Initialization: Node environment: ' + config.env);
+  healthLogger.publish('Initialization: Log level: ' + config.logLevel);
 });
-
 
 process.on('SIGTERM', function () {
   logger.debug('SIGTERM received');
+  healthLogger.publish('Received SIGTERM, exiting...');
   server.close(function () {
     logger.debug('Server close');
     process.exit(0);

@@ -2,7 +2,7 @@ var uuid = require('node-uuid');
 
 var config = {};
 
-config.appName = 'DASHBOARD';
+config.appName = 'dims-dashboard';
 
 config.uuid = uuid.v4();
 
@@ -19,6 +19,8 @@ config.logLevel = process.env.LOG_LEVEL || 'debug';
 config.logDir = process.env.LOG_PATH || '/data/dashboard/logs/';
 
 config.logFile = config.logDir + 'dashboard.log';
+
+config.healthInterval = 5;
 
 // Default is Ubuntu cert location
 config.certDir = process.env.CERT_DIRECTORY || '/etc/ssl/certs/';
@@ -230,5 +232,6 @@ config.fanoutExchanges = {
 };
 
 config.appLogExchange = 'logs';
+config.healthExchange = 'health';
 
 module.exports = config;

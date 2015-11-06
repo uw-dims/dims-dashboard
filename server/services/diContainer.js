@@ -1,7 +1,7 @@
 'use strict';
 
 var argsList = require('args-list');
-var logger = require('../utils/logger')(module);
+// var logger = require('../utils/logger')(module);
 
 module.exports = function () {
   var dependencies = {};
