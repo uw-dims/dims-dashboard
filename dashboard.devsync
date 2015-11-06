@@ -1,5 +1,5 @@
 #! /bin/bash
-VERSION=1.0.5
+VERSION=1.0.6
 
 # During development of the dashboard on a VM, this script syncs the
 # contents of the working git directory to the target location on
