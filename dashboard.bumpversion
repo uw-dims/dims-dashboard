@@ -1,0 +1,25 @@
+#! /bin/bash
+VERSION=1.0.5
+
+# Bumps versions using bumpversion and npm. npm is needed to bump versions
+# for node.js package files.
+
+# Set up common functions and variables.
+source $DIMS/bin/test_functions.sh
+
+if [ $VERBOSE -eq 1 ]; then
+  echo "Verbose is on"
+fi
+
+if [ $DEBUG -eq 1 ]; then
+  echo "Debug is on"
+fi
+
+
+DATE=$(iso8601dateshort)
+
+header
+printresults
+
+echo "$DATE"
+exit 0
