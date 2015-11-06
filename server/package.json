@@ -1,7 +1,7 @@
 {
   "name": "dims-dashboard-server",
   "main": "app.js",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Server module for the DIMS Dashboard",
   "private": true,
   "scripts": {
