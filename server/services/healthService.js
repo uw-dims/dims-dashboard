@@ -5,7 +5,7 @@ var healthLogger = require('../utils/healthLogger');
 
 module.exports = function healthService(UserModel) {
   var checkHealth = function checkHealth() {
-    healthLogger.publish('Dashboard server is running');
+    healthLogger.publish('healthy');
     checkPostgres();
   };
 
@@ -13,10 +13,10 @@ module.exports = function healthService(UserModel) {
     UserModel.Users.forge()
     .fetch({ withRelated: ['email']})
     .then(function (reply) {
-      healthLogger.publish('PostgreSQL service is available.');
+      healthLogger.publish('healthy postgresql postgresql://' + config.userDBHost + '/' + config.userDatabase);
     })
     .catch(function (err) {
-      healthLogger.publish('PostgreSQL service is not available. Error: ', err.toString());
+      healthLogger.publish('unhealthy postgresql not available. Error: ', err.toString());
     })
     .done();
   };

@@ -8,7 +8,7 @@ var redis = require('redis');
 var logger = require('./logger')(module);
 var healthLogger = require('./healthLogger');
 
-logger.debug('utils.redisDB: Connecting to Redis server ' + config.redisHost + ':' + config.redisPort);
+logger.debug('Connecting to Redis server ' + config.redisHost + ':' + config.redisPort);
 
 var client = redis.createClient(
   config.redisPort,
@@ -21,20 +21,20 @@ client.on('error', function (err) {
 });
 
 client.on('ready', function () {
-  healthLogger.publish('Redis client connected to ' + config.redisHost + ':' + config.redisPort + ', database ' + config.redisDatabase);
-  logger.debug('utils.redisDB: redis client is connected to %s:%s, database %s', config.redisHost, config.redisPort,
+  healthLogger.publish('healthy redis ' + config.redisHost + ':' + config.redisPort + ', database ' + config.redisDatabase);
+  logger.debug('redis client is connected to %s:%s, database %s', config.redisHost, config.redisPort,
         config.redisDatabase);
   client.select(config.redisDatabase, function (err, reply) {
     if (err) {
-      healthLogger.publish('Redis client received error when selecting database. Err: ' + err.toString());
-      logger.error('utils.redisDB: redis client received error when selecting database ', err);
+      healthLogger.publish('redis received error when selecting database. Err: ' + err.toString());
+      logger.error('unhealthy redis client received error when selecting database ', err);
     }
   });
 });
 
 client.on('close', function () {
   healthLogger.publish('Redis client closing connection');
-})
+});
 
 module.exports = client;
 

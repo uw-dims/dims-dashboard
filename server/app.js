@@ -304,11 +304,9 @@ appLogger.on('logger-ready', function () {
   logger.info('Dashboard initialization: Node environment: ', config.env);
   logger.info('Dashboard initialization: Log level:', config.logLevel);
   logger.info('Dashboard initialization: UserDB source: ', config.userSource);
-  healthLogger.publish('Initialization: DIMS Dashboard running on port ' + server.address().port);
-  healthLogger.publish('Initialization: REDIS host ' + config.redisHost +
-    ', port ' + config.redisPort + ', database: ' + config.redisDatabase);
-  healthLogger.publish('Initialization: Node environment: ' + config.env);
-  healthLogger.publish('Initialization: Log level: ' + config.logLevel);
+  healthLogger.publish('initialized DIMS Dashboard running on port ' + server.address().port);
+  healthLogger.publish('initialized Node environment: ' + config.env);
+  healthLogger.publish('initialized Log level: ' + config.logLevel);
 });
 
 process.on('SIGTERM', function () {

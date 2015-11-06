@@ -6,6 +6,7 @@ var moment = require('moment');
 var os = require('os');
 
 var healthLogger = amqpLogger(config.healthExchange);
+console.log('in healthlogger');
 
 // Create publish function
 
@@ -20,7 +21,7 @@ var publish = function (msg) {
     try {
       healthLogger.pub(format(msg));
     } catch (err) {
-      // no-op
+      console.log(err);
     }
   }
 };

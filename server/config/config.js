@@ -20,7 +20,7 @@ config.logDir = process.env.LOG_PATH || '/data/dashboard/logs/';
 
 config.logFile = config.logDir + 'dashboard.log';
 
-config.healthInterval = 5;
+config.healthInterval = 1;
 
 // Default is Ubuntu cert location
 config.certDir = process.env.CERT_DIRECTORY || '/etc/ssl/certs/';
@@ -225,6 +225,12 @@ config.fanoutExchanges = {
   },
   'health': {
     'name': 'health',
+    'durable': true,
+    'subscribe': true,
+    'publish': false
+  },
+  'dimstr': {
+    'name': 'dimstr',
     'durable': true,
     'subscribe': true,
     'publish': false

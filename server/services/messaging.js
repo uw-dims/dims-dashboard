@@ -7,6 +7,7 @@ var _ = require('lodash-compat');
 
 var SocketFactory = require('./socketFactory');
 var AmqpConnection = require('./amqpConnection');
+var healthLogger = require('../utils/healthLogger');
 
 module.exports = function (io) {
 
@@ -32,6 +33,7 @@ module.exports = function (io) {
   });
   messaging.amqp.on('connection-created', function () {
     logger.debug('Connection established');
+    healthLogger.publish('healthy messaging amqp connection established');
     fanoutSetup();
   });
   messaging.amqp.on('connection-close', onConnectionClose.bind(this));
@@ -44,6 +46,7 @@ module.exports = function (io) {
       // Listen for successful fanout creation
       messaging.amqp.on(getEventName(value.name, 'ready'), function (reply) {
         logger.debug('Received ready event for fanout %s', value.name);
+        healthLogger.publish('healthy ' + value.name + ' fanout ready');
         // Save fanout connection items
         messaging.fanouts[value.name].fanout = _.assign({}, reply);
       });
@@ -68,6 +71,7 @@ module.exports = function (io) {
 
   function onConnectionClose() {
     // Received a close event from amqp - need to re-establish
+    // healthLogger.publish('messaging amqp connection closed');
     removeFanoutListeners();
     messaging.fanoutEvents = [];
     messaging.fanouts = {};
