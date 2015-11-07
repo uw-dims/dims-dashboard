@@ -4,6 +4,8 @@
 var config = require('../config/config');
 var logger = require('../utils/logger')(module);
 var _ = require('lodash-compat');
+var StringReader = require('../utils/stringReader');
+var logStream = require('logrotate-stream');
 
 var SocketFactory = require('./socketFactory');
 var AmqpConnection = require('./amqpConnection');
@@ -40,25 +42,55 @@ module.exports = function (io) {
 
   socketSetup();
 
+  function getLogConfig(name) {
+    return {
+      file: config.logmonPath + name + '.log',
+      size: '1000k',
+      keep: 20
+    };
+  }
+
+  function getLogSave(name) {
+    return config.fanoutExchanges[name].save;
+  }
+
+  function saveMsg(msg, name) {
+    if (getLogSave(name)) {
+      getReader(msg).pipe(logStream(getLogConfig(name)));
+    }
+  }
+
+  function getReader(msg) {
+    var stringReader = new StringReader(msg);
+    stringReader.on('error', function (err) {
+      logger.error(err);
+    });
+    return stringReader;
+  }
+
   function fanoutSetup() {
     _.forEach(config.fanoutExchanges, function (value, key) {
-      messaging.fanouts[value.name] = {};
+      var name = value.name;
+      messaging.fanouts[name] = {};
       // Listen for successful fanout creation
-      messaging.amqp.on(getEventName(value.name, 'ready'), function (reply) {
+      messaging.amqp.on(getEventName(name, 'ready'), function (reply) {
         logger.debug('Received ready event for fanout %s', value.name);
-        healthLogger.publish('healthy ' + value.name + ' fanout ready');
+        healthLogger.publish('healthy ' + name + ' fanout ready');
         // Save fanout connection items
-        messaging.fanouts[value.name].fanout = _.assign({}, reply);
+        messaging.fanouts[name].fanout = _.assign({}, reply);
       });
       // Listen for message received event
-      messaging.amqp.on(getEventName(value.name, 'received'), function (msg) {
+      messaging.amqp.on(getEventName(name, 'received'), function (msg) {
         // Socket emits message with data event (will go to client)
-        messaging.sockets[value.name].socket.emit(getEventName(value.name, 'data'), msg);
+        messaging.sockets[name].socket.emit(getEventName(name, 'data'), msg);
+        // Stream to log file
+        saveMsg(msg, name);
       });
-      messaging.fanoutEvents.push(getEventName(value.name, 'received'));
-      messaging.fanoutEvents.push(getEventName(value.name, 'ready'));
+      // Save events that are being listened to so we can remove them later
+      messaging.fanoutEvents.push(getEventName(name, 'received'));
+      messaging.fanoutEvents.push(getEventName(name, 'ready'));
       // Start the fanout
-      messaging.amqp.startFanout(value.name, value.durable);
+      messaging.amqp.startFanout(name, value.durable);
     });
   }
 
@@ -92,6 +124,9 @@ module.exports = function (io) {
         } catch (err) {
           logger.error('Cannot publish message on %s received by socket at this time. Error: ', key, err.toString());
         }
+      });
+      messaging.sockets[key].on('error', function (err) {
+        console.log(err);
       });
     });
   }

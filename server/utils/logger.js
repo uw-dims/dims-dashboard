@@ -72,12 +72,14 @@ module.exports = function (callingModule) {
 
   logger.addFilter(dimsFormat);
 
-  logger.add(winston.transports.Console, {
-    level: config.logLevel,
-    handleExceptions: false,
-    json: false,
-    colorize: true
-  });
+  if (config.env === 'development') {
+    logger.add(winston.transports.Console, {
+      level: config.logLevel,
+      handleExceptions: false,
+      json: false,
+      colorize: true
+    });
+  }
 
   logger.on(evChangeLevel, updateLogLevel.bind(this));
   // logger.on(evChangeExchange, updateExchange.bind(this));

@@ -118,6 +118,7 @@ config.serverPath = __dirname;
 config.userDataPath = '/opt/dims/data/dashboard/';
 config.demoDatastorePath = '/opt/dims/data/dashboard/data/';
 config.uploadPath = '/opt/dims/data/dashboard/upload/';
+config.logmonPath = '/opt/dims/data/logmon/';
 
 config.directoryMapping = {
   'ip_lists': config.userDataPath + 'ipFiles/',
@@ -203,37 +204,43 @@ config.fanoutExchanges = {
     'name': 'chat',
     'durable': false,
     'subscribe': true,
-    'publish': true
+    'publish': true,
+    'save': false
   },
   'logs': {
     'name': 'logs',
     'durable': false,
     'subscribe': true,
-    'publish': true
+    'publish': true,
+    'save': true
   },
   'devops': {
     'name': 'devops',
     'durable': true,
     'subscribe': true,
-    'publish': false
+    'publish': false,
+    'save': true
   },
   'test': {
     'name': 'test',
     'durable': true,
     'subscribe': true,
-    'publish': false
+    'publish': false,
+    'save': true
   },
   'health': {
     'name': 'health',
     'durable': true,
     'subscribe': true,
-    'publish': false
+    'publish': false,
+    'save': true
   },
   'dimstr': {
     'name': 'dimstr',
     'durable': true,
     'subscribe': true,
-    'publish': false
+    'publish': false,
+    'save': true
   }
 };
 
