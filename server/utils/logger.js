@@ -21,7 +21,7 @@ module.exports = function (callingModule) {
   // Adds to log output for development or production
   var dimsFormat = function dimsFormat(msg, meta, level) {
     return moment().toISOString() + ' ' + os.hostname() + ' ' +
-      config.uuid + ' ' + config.appName + ' [' + getLabel() + '] ' + level.toUpperCase() + ' ' + process.pid + ' ' +
+      config.uuid + ' ' + config.appName + '/server/' + getLabel() + ' ' + level.toUpperCase() + ' ' + process.pid + ' ' +
       msg;
   };
 
@@ -72,7 +72,7 @@ module.exports = function (callingModule) {
 
   logger.addFilter(dimsFormat);
 
-  if (config.env === 'development') {
+  if (config.env === 'development' || config.env === 'test') {
     logger.add(winston.transports.Console, {
       level: config.logLevel,
       handleExceptions: false,
