@@ -61,12 +61,12 @@ AmqpLogPublisher.prototype.createConnection = function () {
 };
 
 // Need to pass self (this) so it is propagated through multiple calls
-// AmqpLogPublisher.prototype.onFail = function (self) {
-//   console.log('Connection failure. Trying again in 5 seconds...');
-//   setTimeout(function (self) {
-//     self.createConnection();
-//   }, 5000, self);
-// };
+AmqpLogPublisher.prototype.onFail = function (self) {
+  console.log('Connection failure. Trying again in 5 seconds...');
+  setTimeout(function (self) {
+    self.createConnection();
+  }, 5000, self);
+};
 
 AmqpLogPublisher.prototype.setConnection = function (conn) {
   var self = this;
