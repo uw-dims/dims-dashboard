@@ -31,6 +31,7 @@ module.exports = function redisProxy(client) {
   client.zcountProxy = q.nbind(client.zcount, client);
   client.typeProxy = q.nbind(client.type, client);
   client.scardProxy = q.nbind(client.scard, client);
+  client.existsProxy = q.nbind(client.exists, client);
   // set - 'sortedSet' or 'set'
   // client.exists = function exists(key, set, dataType) {
   //   var doAction = {};

@@ -144,6 +144,9 @@ config.defaultUserSettings = {
   'cifbulkQueue': 'cifbulk_v1'
 };
 
+// The attributes we are tracking
+config.defaultAttributes = ['cidr', 'domain'];
+
 config.defaultRedisTypes = {
   'hash': 'hash',
   'string': 'string',

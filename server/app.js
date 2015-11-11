@@ -45,6 +45,7 @@ diContainer.register('Bookshelf', require('./utils/bookshelf'));
 diContainer.factory('UserSettings', require('./models/userSettings'));
 diContainer.factory('Ticket', require('./models/ticket'));
 diContainer.factory('UserModel', require('./models/user'));
+diContainer.factory('Attributes', require('./models/attributes'));
 diContainer.factory('passportPostgres', require('./services/passportPostgres'));
 diContainer.factory('passportStatic', require('./services/passportStatic'));
 diContainer.factory('FileData', require('./models/fileData'));
@@ -205,8 +206,11 @@ router.get('/api/lmsearch', lmsearchRoute.list);
 router.get('/settings', ensureAuthenticated, settingsRoute.get);
 router.post('/settings', ensureAuthenticated, settingsRoute.update);
 
-// Get all attributes
+// Get all attributes of all users - not implemented - do we need this?
+// router.get('/api/attributes', attributeRoute.list);
 router.get('/api/attributes', attributeRoute.list);
+router.get('/api/attributes/:id', attributeRoute.show);
+router.post('/api/attributes/:id', attributeRoute.update);
 
 // Get all users
 router.get('/api/user', userRoute.list);

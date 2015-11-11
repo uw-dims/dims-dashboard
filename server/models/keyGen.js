@@ -107,6 +107,14 @@ var keyGen = {
   },
   userSettingsSetKey: function () {
     return c.addSuffix(c.makeRoot('userSetting'), 'all');
+  },
+
+  // Keys to attributes
+  attributeKey: function (user, type) {
+    return c.makeBase('attribute', user, type);
+  },
+  attributeSetKey: function () {
+    return c.addSuffix(c.makeRoot('attribute'), 'all');
   }
 };
 

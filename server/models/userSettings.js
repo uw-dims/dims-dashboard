@@ -51,7 +51,7 @@ module.exports = function UserSettings(db) {
       if (err) {
         deferred.reject(new Error(err));
       } else {
-        logger.debug('models/userSettings.js create: replies from create', replies);
+        logger.debug('Create: replies from create', replies);
         deferred.resolve('ok');
       }
     });

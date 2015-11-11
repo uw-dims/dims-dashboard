@@ -76,6 +76,9 @@ var makeRoot = function makeRoot(type) {
     'userSetting': function () {
       return config.namespace + config.delimiter + config.userSetting.prefix;
     },
+    'attribute': function () {
+      return config.namespace + config.delimiter + config.attribute.prefix;
+    },
     'notification': function () {
       return config.namespace + config.delimiter + config.notification.prefix;
     },
@@ -146,6 +149,9 @@ var config =
     },
     'userSetting': {
       'prefix': 'userSetting'
+    },
+    'attribute': {
+      'prefix': 'attribute'
     },
     'notification': {
       'prefix': 'notification'

@@ -27,9 +27,7 @@ var topicData = function topicData(topicKey) {
 var topicName = function topicName(topicKey) {
   // Split the topic portion of key into type and name and return name
   var topicString = topicData(topicKey);
-  console.log(topicString);
   var topicArray = topicString.split(c.config.delimiter);
-  console.log(topicArray);
   topicArray = _.slice(topicArray, 1, topicArray.length).join(':');
   return topicArray;
 };
@@ -94,6 +92,14 @@ var fileSubPath = function fileSubPath(pathKey) {
   }
 };
 
+var userFromAttribute = function userFromAttribute(key) {
+  return key.split(c.config.delimiter)[2];
+};
+
+var typeFromAttribute = function typeFromAttribute(key) {
+  return key.split(c.config.delimiter)[3];
+};
+
 // May be able to delete this
 var parseTopicKey = function parseTopicKey(topicKey) {
   var keyArray = topicKey.split(c.config.delimiter);
@@ -121,5 +127,7 @@ module.exports = {
   fileSubPath: fileSubPath,
   fileName: fileName,
   isFileGlobal: isFileGlobal,
-  fileUser: fileUser
+  fileUser: fileUser,
+  userFromAttribute: userFromAttribute,
+  typeFromAttribute: typeFromAttribute
 };
