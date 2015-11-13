@@ -12,6 +12,7 @@
     "run-test": "LOG_LEVEL=info node app",
     "run-demo": "node app",
     "test": "tape tests/spec/**/*.js",
+    "test-tap": "tape tests/spec/**/*.js",
     "test-ci": "tape tests/spec/**/*.js | tap-xunit",
     "test-diff": "tape tests/spec/**/*.js | tap-difflet",
     "test-json": "tape tests/spec/**/*.js | tap-json",
