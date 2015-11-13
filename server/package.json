@@ -9,15 +9,14 @@
     "run-development": "USER_BACKEND=static node app",
     "run-testclient": "NODE_ENV=production USER_BACKEND=static LOG_LEVEL=debug node app",
     "run-integration": "SSL_ON=true node app",
+    "run-test": "LOG_LEVEL=info node app",
     "run-demo": "node app",
     "test": "tape tests/spec/**/*.js",
     "test-ci": "tape tests/spec/**/*.js | tap-xunit",
-    "test-tap": "tape tests/spec/**/*.js",
     "test-diff": "tape tests/spec/**/*.js | tap-difflet",
     "test-json": "tape tests/spec/**/*.js | tap-json",
     "test-spec": "tape tests/spec/**/*.js | tap-spec",
-    "tap": "tap tests/spec/**/*.js",
-    "test-one": "tape tests/spec/**/userSettings.js"
+    "tap": "tap tests/spec/**/*.js"
   },
   "dependencies": {
     "JSONStream": "^0.8.4",

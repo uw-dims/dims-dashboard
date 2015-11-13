@@ -33,18 +33,19 @@ SocketFactory.prototype.createSocket = function (io) {
     .on('connection', function (socket) {
       self.connectionID = socket.conn.id;
       self.serverAddr = socket.conn.remoteAddress;
-      logger.debug('Received client connection event. connection ID: %s, serverAddr: %s', self.connectionID, self.serverAddr);
+      self.clientIP = socket.conn.request.headers['x-real-ip'];
+      logger.debug('Socket client connection: ID %s, path %s, IP %s', self.connectionID, self.path, self.clientIP);
       // Listener for receive event - needed if msg is supposed to be published
       if (self.pubEvent !== null) {
-        logger.debug('Set listener for io event %s', self.rcvEvent);
+        // logger.debug('Set listener for io event %s', self.rcvEvent);
         socket.on(self.rcvEvent, self.onMessage.bind(self));
       }
       socket.on('disconnect', function (evt) {
         /* jshint unused: false */
-        logger.debug('Socket disconnect from client: ConnectionID %s, path %s', socket.conn.id, self.path);
+        logger.debug('Socket disconnect from client: ID %s, path %s', socket.conn.id, self.path);
       });
       socket.on('error', function (err) {
-        logger.error('Socket error: ConnectionID: %s, path %s', socket.conn.id, self.path, err);
+        logger.error('Socket error: ConnectionID %s, path %s', socket.conn.id, self.path, err);
       });
     });
   return newSocket;

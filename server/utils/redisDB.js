@@ -21,13 +21,13 @@ client.on('error', function (err) {
 });
 
 client.on('ready', function () {
-  healthLogger.publish('healthy redis ' + config.redisHost + ':' + config.redisPort + ', database ' + config.redisDatabase);
-  logger.debug('redis client is connected to %s:%s, database %s', config.redisHost, config.redisPort,
-        config.redisDatabase);
+  healthLogger.publish('redis healthy ' + config.redisHost + ':' + config.redisPort + ', database ' + config.redisDatabase);
+  // logger.debug('redis client is connected to %s:%s, database %s', config.redisHost, config.redisPort,
+  //       config.redisDatabase);
   client.select(config.redisDatabase, function (err, reply) {
     if (err) {
-      healthLogger.publish('redis received error when selecting database. Err: ' + err.toString());
-      logger.error('unhealthy redis client received error when selecting database ', err);
+      healthLogger.publish('redis unhealthy received error when selecting database. Err: ' + err.toString());
+      logger.error('redis unhealthy received error when selecting database ', err);
     }
   });
 });

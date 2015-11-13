@@ -10,7 +10,7 @@ var publish = function (msg) {
   try {
     appLogger.pub(msg);
   } catch (err) {
-    console.log(err);
+    console.log('[!!!] appLogger publish error: ' + err);
   }
 };
 

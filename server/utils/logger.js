@@ -21,7 +21,7 @@ module.exports = function (callingModule) {
   // Adds to log output for development or production
   var dimsFormat = function dimsFormat(msg, meta, level) {
     return moment().toISOString() + ' ' + os.hostname() + ' ' +
-      config.uuid + ' ' + config.appName + '/server/' + getLabel() + ' ' + level.toUpperCase() + ' ' + process.pid + ' ' +
+      config.uuid + ' ' + config.appName + ' [' + getLabel()  + '] [' + process.pid + '] ' + level.toUpperCase() + ' ' +
       msg;
   };
 
@@ -46,7 +46,7 @@ module.exports = function (callingModule) {
         // appLogger.channel.publish(this.exchange, '', new Buffer(msg));
         appLogger.publish(msg);
       } catch (err) {
-        // no-op - will get error here until the channel is ready
+        console.log('[!!!] logger applogger error, cannot publish. error: ' + err);
       } finally {
         callback(null, true);
       }

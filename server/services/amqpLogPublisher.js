@@ -62,7 +62,7 @@ AmqpLogPublisher.prototype.createConnection = function () {
 
 // Need to pass self (this) so it is propagated through multiple calls
 AmqpLogPublisher.prototype.onFail = function (self) {
-  console.log('Connection failure. Trying again in 5 seconds...');
+  console.log('[!!!] AmqpLogPublisher Connection failure. Trying again in 5 seconds...');
   setTimeout(function (self) {
     self.createConnection();
   }, 5000, self);
@@ -72,12 +72,12 @@ AmqpLogPublisher.prototype.setConnection = function (conn) {
   var self = this;
   self.connection = conn;
   self.connection.on('close', function () {
-    console.log('Connection received close event');
+    console.log('[!!!] AmqpPublisher Connection received close event');
     // self.connection =  null;
     self.emit(self.connectionClose);
   });
   self.connection.on('error', function (err) {
-    console.log('Connection received error event.' + err.toString());
+    console.log('[!!!] AmqpPublisher Connection received error event.' + err.toString());
     self.emit(self.connectionError, err.toString());
   });
 };

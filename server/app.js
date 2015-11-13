@@ -4,32 +4,22 @@ var express = require('express')
   , config = require('./config/config')
   , appLogger = require('./utils/appLogger')
   , healthLogger = require('./utils/healthLogger')
-  // , healthService = require('./services/healthService')()
   , bodyParser = require('body-parser')
  // , compress = require('compression')
  // , cookieSession = require('cookie-session')
   , json = require('express-json')
   , cookieParser = require('cookie-parser')
  // , favicon = require('serve-favicon')
- // , responseTime = require('response-time')
   , errorHandler = require('errorhandler')
   , methodOverride = require('method-override')
- // , timeout = require('connect-timeout')
- // , vhost = require('vhost')
- // , csrf = require('csurf')
   , http = require('http')
   , https = require('https')
   , fs = require('fs')
   , path = require('path')
   , session = require('express-session')
   , RedisStore = require('connect-redis')(session)
-  // , pg = require('pg')
-  // , sql = require('sql')
   , socket = require('socket.io')
   //, flash = require('connect-flash')
-  //, exec = require('child_process').exec
- // , messages = require('./utils/messages')
- // , CryptoJS = require('crypto-js')
   , passport = require('passport')
   , LocalStrategy = require('passport-local').Strategy
   , logger = require('./utils/logger')(module);
@@ -132,7 +122,7 @@ app.use(session({
 // }));
 
 // development environment
-if (config.env === 'development') {
+if (config.env === 'development' || config.env === 'test') {
   app.set('views', path.join(__dirname, '../client/dashboard'));
   app.use(errorHandler());
   app.use(express.static(path.join(__dirname, '../client')));
@@ -308,14 +298,14 @@ appLogger.on('logger-ready', function () {
   logger.info('Dashboard initialization: Node environment: ', config.env);
   logger.info('Dashboard initialization: Log level:', config.logLevel);
   logger.info('Dashboard initialization: UserDB source: ', config.userSource);
-  healthLogger.publish('initialized DIMS Dashboard running on port ' + server.address().port);
-  healthLogger.publish('initialized Node environment: ' + config.env);
-  healthLogger.publish('initialized Log level: ' + config.logLevel);
+  healthLogger.publish('dashboard initialized DIMS Dashboard running on port ' + server.address().port);
+  healthLogger.publish('dashboard initialized Node environment: ' + config.env);
+  healthLogger.publish('dashboard initialized Log level: ' + config.logLevel);
 });
 
 process.on('SIGTERM', function () {
   logger.debug('SIGTERM received');
-  healthLogger.publish('Received SIGTERM, exiting...');
+  healthLogger.publish('dashboard eceived SIGTERM, exiting...');
   server.close(function () {
     logger.debug('Server close');
     process.exit(0);

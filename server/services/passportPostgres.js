@@ -28,7 +28,7 @@ module.exports = function (UserModel) {
     logger.debug('strategy: Starting function for ', username);
     // Look up the user corresponding to the supplied username
     new UserModel.User({ident: username}).fetch({require: true}).then(function (user) {
-        logger.debug('strategy: Retrieved user ', user.get('ident'));
+        // logger.debug('strategy: Retrieved user ', user.get('ident'));
         // Decrypt Base64 encoded encrypted password received via http post
         var decrypted = CryptoJS.AES.decrypt(password, config.passSecret).toString(CryptoJS.enc.Utf8);
         // Get the user's hashed password from the datastore
@@ -44,11 +44,11 @@ module.exports = function (UserModel) {
             return done(null, false, 'Could not get MD5 hash of password - notify Admin');
           }
           if (pw === stdout) {
-            logger.debug('strategy: Passwords match. Return user');
+            // logger.debug('strategy: Passwords match. Return user');
             // We are passing back new user record
             return done(null, user);
           }
-          logger.debug('strategy: Passwords did not match. ', pw);
+          logger.debug('strategy: Passwords did not match for user ', user);
           return done(null, false, 'Password does not match');
         });
       }).catch(function (err) {

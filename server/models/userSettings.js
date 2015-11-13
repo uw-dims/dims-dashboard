@@ -51,7 +51,6 @@ module.exports = function UserSettings(db) {
       if (err) {
         deferred.reject(new Error(err));
       } else {
-        logger.debug('Create: replies from create', replies);
         deferred.resolve('ok');
       }
     });
@@ -76,13 +75,12 @@ module.exports = function UserSettings(db) {
     // Save for later in the chain
     var thisUser = user;
     var newUserSettings;
-    logger.debug('model/userSettings.js getUserSettings static function. user = ', user);
     // Retrieve the settings for this user via user settings key. Return null if no settings exist.
     return exists(thisUser)
     .then(function (reply) {
       if (reply === 0) {
         newUserSettings = userSettingsFactory(thisUser);
-        logger.debug('model/userSettings.js getUserSettings new settings ', newUserSettings.settings);
+        logger.debug('getUserSettings new settings ', newUserSettings.settings);
         return create(thisUser, newUserSettings.settings).then(function (reply) {
           return newUserSettings;
         });
@@ -150,7 +148,7 @@ module.exports = function UserSettings(db) {
     // Save this user's current settings
     saveSettings: function saveSettings() {
       var self = this;
-      logger.debug('model/userSettings.js saveSettings initial settings are', self.settings);
+      logger.debug('saveSettings initial settings are', self.settings);
       return save(self.user, self.settings);
     }
   };
