@@ -10,7 +10,7 @@
     var appSockets = {};
     // Connect to a socket described by an exchange (can add token later as another argument)
     function connect(exchange) {
-      var url = ENV.PUBLICPROTOCOL + '://' + ENV.PUBLICHOST + ':' + ENV.PUBLICPORT + '/' + exchange.name;
+      var url = ENV.DASHBOARD_PUBLIC_PROTOCOL + '://' + ENV.DASHBOARD_PUBLIC_HOST + ':' + ENV.DASHBOARD_PUBLIC_PORT + '/' + exchange.name;
       $log.debug('connect with ', url);
       var thisSocket = {};
       thisSocket.ioSocket = io.connect(url, {forceNew: true});
@@ -235,8 +235,8 @@
   //         socket.forward(constants.chatEvent);
   //       });
   //     } else {
-  //       $log.debug('services/ChatSocket: url is ' + ENV.PUBLICPROTOCOL + '://' + ENV.PUBLICHOST + ':' + ENV.PUBLICPORT + '/' + constants.fanoutExchanges.chat.name);
-  //       var myIoSocket = io.connect(ENV.PUBLICPROTOCOL + '://' + ENV.PUBLICHOST + ':' + ENV.PUBLICPORT + '/' + constants.fanoutExchanges.chat.name, {forceNew: true});
+  //       $log.debug('services/ChatSocket: url is ' + ENV.DASHBOARD_PUBLIC_PROTOCOL + '://' + ENV.DASHBOARD_PUBLIC_HOST + ':' + ENV.DASHBOARD_PUBLIC_PORT + '/' + constants.fanoutExchanges.chat.name);
+  //       var myIoSocket = io.connect(ENV.DASHBOARD_PUBLIC_PROTOCOL + '://' + ENV.DASHBOARD_PUBLIC_HOST + ':' + ENV.DASHBOARD_PUBLIC_PORT + '/' + constants.fanoutExchanges.chat.name, {forceNew: true});
   //       var mySocket = SocketFactory({
   //         ioSocket: myIoSocket
   //       });
@@ -264,7 +264,7 @@
   //         socket.forward(constants.logEvent);
   //       });
   //     } else {
-  //       var myIoSocket = io.connect(ENV.PUBLICPROTOCOL+'://'+ENV.PUBLICHOST+':'+ENV.PUBLICPORT+'/' + constants.logExchange, {forceNew: true});
+  //       var myIoSocket = io.connect(ENV.DASHBOARD_PUBLIC_PROTOCOL+'://'+ENV.DASHBOARD_PUBLIC_HOST+':'+ENV.DASHBOARD_PUBLIC_PORT+'/' + constants.logExchange, {forceNew: true});
   //       var mySocket = SocketFactory({
   //         ioSocket: myIoSocket
   //       });

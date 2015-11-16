@@ -104,13 +104,13 @@ RUN chown -R root:root /opt/dims/srv/dims-dashboard \
 WORKDIR /opt/dims/srv/dims-dashboard
 
 # Override these at run time as needed
-# PUBLICHOST will definitely need to be provided
-ENV PUBLICHOST localhost
-ENV PUBLICPORT 80
-ENV PUBLICPROTOCOL http
-ENV RUNTYPE demo
-ENV RABBIT_SERVER rabbitmq.prisem.washington.edu
-ENV RUNTYPE demo
+# DASHBOARD_PUBLIC_HOST will definitely need to be provided
+ENV DASHBOARD_PUBLIC_HOST localhost
+ENV DASHBOARD_PUBLIC_PORT 80
+ENV DASHBOARD_PUBLIC_PROTOCOL http
+ENV DASHBOARD_RUNTYPE demo
+ENV RABBITMQ_HOST rabbitmq.prisem.washington.edu
+ENV DASHBOARD_RUNTYPE demo
 # Access via weave dns
 ENV REDIS_HOST localhost
 ENV REDIS_PORT 6379

@@ -10,11 +10,11 @@ VERSION=1.0.6
 # demo: SSL off, postgresql db, development environment
 
 echo "[+++] Start up docker container"
-echo "[+++] PUBLICHOST=$PUBLICHOST"
-echo "[+++] PUBLICPORT=$PUBLICPORT"
-echo "[+++] RUNTYPE=$RUNTYPE"
+echo "[+++] DASHBOARD_PUBLIC_HOST=$DASHBOARD_PUBLIC_HOST"
+echo "[+++] DASHBOARD_PUBLIC_PORT=$DASHBOARD_PUBLIC_PORT"
+echo "[+++] DASHBOARD_RUNTYPE=$DASHBOARD_RUNTYPE"
 
 # dev-compile will set the env values needed by socket.io in the client and will compile LESS
 cd /opt/dims/srv/dims-dashboard/client && grunt dev-compile
 cd /opt/dims/srv/dims-dashboard/server
-npm run run-$RUNTYPE
+npm run run-$DASHBOARD_RUNTYPE

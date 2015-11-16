@@ -21,10 +21,10 @@ USAGE="`basename $0` runtype where runtype is optional"
 
 if [ "$1x" == "x" ]; then
   echo "[+++] dashboard.start: You have chosen development runtype"
-  RUNTYPE="development"
+  DASHBOARD_RUNTYPE="development"
 else
   echo "[+++] dashboard.start: You have chosen ${1} runtype"
-  RUNTYPE=$1
+  DASHBOARD_RUNTYPE=$1
 fi
 
 # virtual environment needed here since the prisem scripts
@@ -35,4 +35,4 @@ RUNDIR=/opt/dims/srv/dims-dashboard/server
 
 # Need virtualenv since that's where pika is installed
 cd $RUNDIR && . $ACTIVATE
-npm run run-$RUNTYPE
+npm run run-$DASHBOARD_RUNTYPE

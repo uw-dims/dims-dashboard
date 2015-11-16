@@ -10,9 +10,9 @@ source $DIMS/bin/test_functions.sh
 
 # Defaults for these exist in config files. Only specified
 # ones that are needed.
-export PUBLICHOST=${PUBLICHOST}
-export PUBLICPORT=${PUBLICPORT}
-export PUBLICPROTOCOL=${PUBLICPROTOCOL}
+export DASHBOARD_PUBLIC_HOST=${DASHBOARD_PUBLIC_HOST}
+export DASHBOARD_PUBLIC_PORT=${DASHBOARD_PUBLIC_PORT}
+export DASHBOARD_PUBLIC_PROTOCOL=${DASHBOARD_PUBLIC_PROTOCOL}
 
 DATE=$(iso8601dateshort)
 LOGFILE=$BASE-$DATE.log

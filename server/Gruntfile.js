@@ -15,9 +15,9 @@ module.exports = function (grunt) {
   // var certName = grunt.option('certName') || 'localhost';
   // var sslPort = grunt.option('sslPort') || '3030';
 
-  // process.env.PUBLICHOST - host or ip where the socket.io server resides
-  // process.env.PUBLICPROTOCOL - protocol we're using - http or https
-  // process.env.PUBLICPORT - port
+  // process.env.DASHBOARD_PUBLIC_HOST - host or ip where the socket.io server resides
+  // process.env.DASHBOARD_PUBLIC_PROTOCOL - protocol we're using - http or https
+  // process.env.DASHBOARD_PUBLIC_PORT - port
   // When container is deployed, these environment variables need to be
   // defined. Grunt is then run to write these values to the client config file
   // These values are the protocol, host, and port that a client will use to
@@ -26,9 +26,9 @@ module.exports = function (grunt) {
   // Defaults:
 
   var port = process.env.PORT || '3000';
-  var publicHost = process.env.PUBLICHOST || 'localhost';
-  var publicPort = process.env.PUBLICPORT || port;
-  var publicProtocol = process.env.PUBLICPROTOCOL || 'http';
+  var publicHost = process.env.DASHBOARD_PUBLIC_HOST || 'localhost';
+  var publicPort = process.env.DASHBOARD_PUBLIC_PORT || port;
+  var publicProtocol = process.env.DASHBOARD_PUBLIC_PROTOCOL || 'http';
   var nodeEnv = process.env.NODE_ENV || 'test';
   var logLevel = process.env.LOG_LEVEL || 'debug';
   var certDirectory = process.env.CERT_DIRECTORY || '/etc/ssl/certs/';
@@ -46,9 +46,9 @@ module.exports = function (grunt) {
         CERT_DIRECTORY: certDirectory,
         CERT_NAME: certName,
         SSL_PORT: sslPort,
-        PUBLICHOST: publicHost,
-        PUBLICPORT: publicPort,
-        PUBLICPROTOCOL: publicProtocol
+        DASHBOARD_PUBLIC_HOST: publicHost,
+        DASHBOARD_PUBLIC_PORT: publicPort,
+        DASHBOARD_PUBLIC_PROTOCOL: publicProtocol
       }
     },
 

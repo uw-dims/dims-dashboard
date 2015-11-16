@@ -27,7 +27,7 @@ config.certDir = process.env.CERT_DIRECTORY || '/etc/ssl/certs/';
 
 config.caName = process.env.CA_NAME || 'dims-ca';
 
-config.certName = process.env.CERT_NAME || process.env.PUBLICHOST || 'localhost';
+config.certName = process.env.CERT_NAME || process.env.DASHBOARD_PUBLIC_HOST || 'localhost';
 
 config.redisHost = process.env.REDIS_HOST || 'localhost';
 
@@ -89,13 +89,13 @@ config.rpcbin = config.dimsenvbin;
 
 config.rpcPath = '/opt/dims/src/prisem/rpc';
 
-config.rpcServer = process.env.RABBIT_SERVER || 'rabbitmq.prisem.washington.edu';
+config.rpcServer = process.env.RABBITMQ_HOST || 'rabbitmq.prisem.washington.edu';
 
-config.rpcUser = process.env.RABBIT_USER || 'rpc_user';
+config.rpcUser = process.env.RABBITMQ_DEFAULT_USER || 'rpc_user';
 
-config.rpcPass = process.env.RABBIT_PASS || 'rpcm3pwd';
+config.rpcPass = process.env.RABBITMQ_DEFAULT_PASS || 'rpcm3pwd';
 
-config.rpcPort = process.env.RABBIT_PORT  || '5672';
+config.rpcPort = process.env.RABBITMQ_PORT  || '5672';
 
 config.mapfile = '/etc/ipgrep_networks.txt';
 
