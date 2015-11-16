@@ -1,0 +1,10 @@
+{
+  "name": "dims-rest-tester",
+  "main": "rest_service_spec.js",
+  "version": "0.0.1",
+  "dependencies":
+  {
+    "frisby": "^0.8.5",
+    "jasmine-node": "^1.14.5"
+  }
+}
