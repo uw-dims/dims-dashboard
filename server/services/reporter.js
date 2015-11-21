@@ -91,7 +91,7 @@ var path = require('path');
       if (input === null) {
         return '';
       }
-      if (input === 'N/A') {
+      if (input === 'NA') {
         return input;
       }
       if (validateResult(key, input)) {
@@ -138,7 +138,7 @@ var path = require('path');
         // Find a matching test in the cycle that has been run
         var filterresult = _.filter(testResults.tests, 'ID', value.key);
         if (filterresult.length === 1) {
-          var issueStatus = _.pluck(filterresult, 'Status'); 
+          var issueStatus = _.pluck(filterresult, 'Status');
           var config = {};
           console.log('[+++] Found a test in the cycle. Summary is ', value.fields.summary);
           var status = getStatus(issueStatus[0]);
