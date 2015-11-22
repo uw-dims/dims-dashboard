@@ -51,7 +51,6 @@ module.exports = function Attributes(db) {
     return db.smembersProxy(keyGen.attributeKey(user, type))
     .then(function (reply) {
       result[type] = reply;
-      logger.debug('get, result is ', result);
       return result;
     })
     .catch(function (err) {
@@ -81,6 +80,7 @@ module.exports = function Attributes(db) {
       _.forEach(reply, function (value, index) {
         // get the user from the key
         users.push(keyExtract.userFromAttribute(value));
+        logger.debug('user in getAttributes is ', keyExtract.userFromAttribute(value));
         promises.push(get(keyExtract.userFromAttribute(value), keyExtract.typeFromAttribute(value)));
       });
       return q.all(promises)
@@ -88,8 +88,20 @@ module.exports = function Attributes(db) {
         var zipped = _.zip(users, reply);
         var merged = [];
         var result = {};
-        for (var i = 0; i < zipped.length - 1; i += 2) {
-          merged.push((_.merge(zipped[i], zipped[i + 1])));
+        var k = 0;
+        while (k < zipped.length) {
+          if (k !== zipped.length - 1) {
+            if (zipped[k][0] === zipped[k+1][0]) {
+              merged.push((_.merge(zipped[k], zipped[k + 1])));
+              k = k + 2;
+            } else {
+              merged.push((_.merge(zipped[k], zipped[k])));
+              k = k + 1;
+            }
+          } else {
+            merged.push((_.merge(zipped[k], zipped[k])));
+            k = k + 1;
+          }
         }
         for (var j = 0; j < merged.length; j++) {
           result[merged[j][0]] = merged[j][1];
