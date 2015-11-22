@@ -1,9 +1,8 @@
 'use strict';
 
-// File: server/bootstrap/spec/bootstrap.js
+// File: server/bootstrap/bootstrapFiles.js
 
-// This file will bootstrap some ticket data
-
+// Bootstrap initial files on server
 
 var fs = require('fs');
 var path = require('path');
@@ -11,8 +10,6 @@ var _ = require('lodash-compat');
 var config = require('../config/config');
 
 var ROOT_DIR = __dirname + '/../../';
-
-// logger.debug('ROOT_DIR is ', ROOT_DIR);
 
 (function () {
 
@@ -80,8 +77,6 @@ var ROOT_DIR = __dirname + '/../../';
         remove(to);
       });
     }
-    
-
   };
 
   if (!module.parent) {
@@ -89,6 +84,3 @@ var ROOT_DIR = __dirname + '/../../';
   }
 
 })();
-
-
-

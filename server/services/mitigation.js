@@ -25,7 +25,7 @@ module.exports = function (Ticket, anonService, UserSettings, db) {
   // };
 
   // For testing
-  var users = ['lparsons', 'eliot', 'dittrich', 'parksj', 'mboggess', 'andclay', 'jhanna01'];
+  var users = ['testuser1', 'testuser2', 'testuser3', 'testuser4'];
 
   // Just for demo:
   var mapPath = __dirname + '/../bootstrap/userAttributes.yml';
