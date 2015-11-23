@@ -8,9 +8,14 @@
     $log.debug('LogMonitorCtrl. param is ', $routeParams.type);
     $log.debug('LogMonitorCtrl. routeParams is ', $routeParams);
 
+    //TODO(lparsons) - generate this programatically
     $scope.tabs = [
     {
       active: true
+    }, {
+      active: false
+    }, {
+      active: false
     }, {
       active: false
     }, {
@@ -19,15 +24,50 @@
 
     $scope.active = {
       logs: false,
+      health: false,
       devops: true,
-      test: false
+      test: false,
+      dimstr: false
     };
 
+    // $scope.types = {
+    //   logs: 'logs',
+    //   devops: 'devops',
+    //   test: 'test',
+    //   health: 'health',
+    //   dimstr: 'dimstr'
+    // };
+
     $scope.types = {
-      logs: 'logs',
-      devops: 'devops',
-      test: 'test'
+      logs: {
+        name: 'logs',
+        display: 'Logs'
+      },
+      devops: {
+        name: 'devops',
+        display: 'Devops'
+      },
+      test: {
+        name: 'test',
+        display: 'CI Testing'
+      },
+      health: {
+        name: 'health',
+        display: 'Health'
+      },
+      dimstr: {
+        name: 'dimstr',
+        display: 'Test Report'
+      }
     };
+
+    // $scope.typeNames = {
+    //   logs: 'Logs',
+    //   devops: 'Devops',
+    //   test: 'CI Testing',
+    //   health: 'Health',
+    //   dimstr: 'Test Report'
+    // };
 
     // var activateTab = function activateTab(num) {
     //   if (num >= 0 && num <= 2) {

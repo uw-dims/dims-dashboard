@@ -27,12 +27,16 @@
       $log.debug('LogMonitor Directive: In controllerFunc, exchange is ', $scope.exchange);
       var vm = this;
 
+      vm.buttonText = 'Turn on';
+
       vm.clear = function () {
         vm.messages = '';
       };
 
       function init() {
-        vm.type = angular.copy($scope.exchange);
+        vm.exchange = angular.copy($scope.exchange);
+        vm.type = vm.exchange.name;
+        vm.displayName = vm.exchange.display;
         vm.clear();
         vm.logClass = 'logMax';
         vm.logMaximized = true;
@@ -51,11 +55,13 @@
           // Turn it off
           //$rootScope.logmonOn[type] = false;
           $log.debug('LogMonitor Directive Turning log monitor off for ', type);
+          vm.buttonText = 'Turn on';
           LogService.stop(type);
         } else {
           // Turn it on
           //$rootScope.logmonOn[type] = true;
           $log.debug('LogMonitor Directive Turning log monitor on');
+          vm.buttonText = 'Turn off';
           LogService.start(type);
         }
       };

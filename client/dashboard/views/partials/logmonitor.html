@@ -3,7 +3,7 @@
 <div class="spacer10">
 <div class="panel panel-default">
 <div class="panel-body">
-<button type="button" class="btn btn-default" ng-click="vm.toggle(vm.type)">Toggle {{ vm.type }}</button>
+<button type="button" class="btn btn-default" ng-click="vm.toggle(vm.type)">{{ vm.buttonText }} {{ vm.displayName }}</button>
 <button type="button" class="btn btn-default" ng-click="vm.clear()">Clear</button>
 <div class="spacer10" ng-show="vm.logmonOn()">
     <!-- <div class="popup-head">

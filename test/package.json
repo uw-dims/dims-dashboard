@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "dependencies":
   {
-    "frisby": "^0.8.5",
-    "jasmine-node": "^1.14.5"
+    "joi": "6.10.0",
+    "icedfrisby": "^0.2.4"
   }
 }
