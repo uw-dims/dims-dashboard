@@ -1,6 +1,6 @@
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller('CrosscorCtrl', ['$scope', 'Utils', 'FileService', '$http', '$log', 'DateService', 'SettingsService', 'AnonService', '$location', '$routeParams', 
+  controller('CrosscorCtrl', ['$scope', 'Utils', 'FileService', '$http', '$log', 'DateService', 'SettingsService', 'AnonService', '$location', '$routeParams',
     function ($scope, Utils, FileService, $http, $log, DateService, SettingsService, AnonService, $location, $routeParams) {
     console.log('In crosscor controller');
 
@@ -42,7 +42,7 @@ angular.module('dimsDashboard.controllers').
     //   $scope.rpcDebug = result.rpcDebug;
     //   $scope.rpcVerbose = result.rpcVerbose;
     // });
-    
+
 
     // Other setup
     $scope.showResults = false;
@@ -67,7 +67,7 @@ angular.module('dimsDashboard.controllers').
     //       {field: 'count', displayName: 'Count'},
     //       {field: 'percent', displayName:'Percent'}
     //     ]};
-    
+
     // var anonymizeData = function(data,status,headers,config) {
     //    $log.debug('Call anonymize service');
     //    AnonService.anonymize($scope.settings.anonymize, data.data, data.pid)
@@ -76,15 +76,16 @@ angular.module('dimsDashboard.controllers').
 
     var prepareData = function(data, status, headers, config) {
       $log.debug('crosscor returned data');
-      $scope.rawData = data.data;
-      $scope.pid = data.pid;
+      // $scope.rawData = data.data;
+      // $scope.pid = data.pid;
+      $scope.rawData = data;
 
-      $log.debug('crosscor pid: ' + $scope.pid);
+      // $log.debug('crosscor pid: ' + $scope.pid);
       $log.debug('crosscor data:  ');
       $log.debug(data);
-     
+
       $scope.showResults = true;
-      $scope.resultsMsg = 'Results';   
+      $scope.resultsMsg = 'Results';
     };
 
     /**
@@ -108,7 +109,7 @@ angular.module('dimsDashboard.controllers').
 
       // Setup the config to send to the server
       var clientConfig = {};
-     
+
       Utils.setConfig(clientConfig, $scope.formData.stats, 'stats');
       Utils.setConfig(clientConfig, $scope.formData.iff, 'iff');
       Utils.setConfig(clientConfig, $scope.formData.mapName, 'mapName');
@@ -121,10 +122,10 @@ angular.module('dimsDashboard.controllers').
       $log.debug('crosscor CallClient: Now sending http get request');
 
       $scope.resultsMsg = 'Results - Waiting...';
-      
+
       $http(
         { method: 'GET',
-          url: '/crosscor', 
+          url: '/crosscor',
           params: clientConfig
         } ).
         success(prepareData).
