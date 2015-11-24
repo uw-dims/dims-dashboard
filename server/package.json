@@ -11,7 +11,7 @@
     "run-integration": "SSL_ON=true node app",
     "run-test": "LOG_LEVEL=info node app",
     "run-demo": "node app",
-    "test": "tape tests/spec/**/*.js",
+    "test": "tape",
     "test-tap": "tape tests/spec/**/*.js",
     "test-ci": "tape tests/spec/**/*.js | tap-xunit",
     "test-diff": "tape tests/spec/**/*.js | tap-difflet",
