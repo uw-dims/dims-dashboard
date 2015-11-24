@@ -32,12 +32,18 @@ module.exports = function (Ticket, anonService, UserSettings, db) {
 
   var initiateMitigation = function initiateMitigation(ipPath, user) {
     var ipData = fs.readFileSync(ipPath, {encoding: 'utf-8'});
+    console.log('-----------------------------------');
+    console.log('Initial IPs coming into the system:');
+    console.log('-----------------------------------');
+    console.log(ipData);
     var ticket = Ticket.ticketFactory();
     var binnedIps;
     var initialIps = [];
     return ticket.create('mitigation', user)
     .then(function (reply) {
-      return anonService.setup({data: ipData, useFile: false, type: 'anon', mapName: mapPath, outputType: 'json'}, 'lparsons');
+      console.log('-----------------------------------');
+      console.log('Ticket created. Now assign IPs to users who are tracking them');
+      return anonService.setup({data: ipData, useFile: false, type: 'anon', mapName: mapPath, outputType: 'json'}, 'testuser2');
     })
     .then(function (reply) {
       var anonChild = new ChildProcess();
@@ -45,16 +51,19 @@ module.exports = function (Ticket, anonService, UserSettings, db) {
     })
     .then(function (reply) {
       binnedIps = JSON.parse(reply);
-      console.log(binnedIps);
       //console.log(binnedIps);
       return q.allSettled(_.map(users, function (user) {
         var name = 'user:' + user;
         logger.debug('user is ', user);
         if (binnedIps.matching.hasOwnProperty(user)) {
-          logger.debug('will add topic');
           return ticket.addTopic(name, 'set').then (function (reply) {
+            
             initialIps.push.apply(initialIps, ipListToArray(binnedIps.matching[user]));
-            console.log(initialIps);
+            console.log('-----------------------------------');
+            console.log('Added a topic for IPs belonging to user ', user, ' so they can be tracked.');
+            console.log('User ', user, ' is responsible for these IPs:');
+            console.log('-----------------------------------');
+            console.log(binnedIps.matching[user]);
             return addIpsToSet(reply, binnedIps.matching[user]);
           });
         }
