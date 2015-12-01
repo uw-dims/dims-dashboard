@@ -68,9 +68,8 @@ module.exports = function (callingModule) {
       level: config.logLevel,
       exchange: config.appLogExchange
     });
+    logger.addFilter(dimsFormat);
   }
-
-  logger.addFilter(dimsFormat);
 
   if (config.env === 'development' || config.env === 'test') {
     logger.add(winston.transports.Console, {
