@@ -50,6 +50,12 @@ fi
 
 TESTPATH=${RUNDIR}/server/tests/spec
 
+if [[ "$*" =~ "--spec" ]]; then
+  PRETTY=1
+else
+  PRETTY=0
+fi
+
 if [ "$1" == "all" ]; then
   TESTPATH="${TESTPATH}/**/*.js"
 else
@@ -102,18 +108,33 @@ if [ $VERBOSE -eq 1 ]; then
   header 2>&1 | tee -a $TFILE
   echo "DIMS-DASHBOARD Test Run for version $(cat $VERSIONFILE)" 2>&1 | tee -a $TFILE
   # npm run test-$TEST 2>&1 | tee -a $TFILE
-  npm test -- $TESTPATH 2>&1 | tee -a $TFILE
+  if [ $PRETTY -eq 1 ]; then
+    npm test -- $TESTPATH | ${RUNDIR}/server/node_modules/.bin/tap-spec 2>&1 | tee -a $TFILE
+  else
+    npm test -- $TESTPATH 2>&1 | tee -a $TFILE
+  fi
 else
   header > $TFILE
   echo "DIMS-DASHBOARD Test Run for version $(cat $VERSIONFILE)" >> $TFILE
   # npm run test-$TEST >> $TFILE
-  npm test -- $TESTPATH >> $TFILE
+  if [ $PRETTY -eq 1 ]; then
+    npm test -- $TESTPATH | ${RUNDIR}/server/node_modules/.bin/tap-spec >> $TFILE
+  else
+    npm test -- $TESTPATH >> $TFILE
+  fi
 fi
-
-PASSED=$(cat $TFILE | grep "# pass")
-PASSED=${PASSED:8}
-FAILED=$(cat $TFILE | grep "# fail")
-FAILED=${FAILED:8}
+if [ $PRETTY -eq 0 ]; then
+  PASSED=$(cat $TFILE | grep "# pass")
+  PASSED=${PASSED:8}
+  FAILED=$(cat $TFILE | grep "# fail")
+  FAILED=${FAILED:8}
+else
+  PASSED=$(cat $TFILE | grep "passing:")
+  PASSED=${PASSED:11}
+  TOTAL=$(cat $TFILE | grep "total:")
+  TOTAL=${TOTAL:11}
+  FAILED=$(($TOTAL - $PASSED))
+fi
 
 if [ $VERBOSE -eq 1 ]; then
   printresults $PASSED $FAILED 2>&1 | tee -a $TFILE
