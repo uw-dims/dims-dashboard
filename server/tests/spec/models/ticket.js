@@ -11,34 +11,20 @@ var extract = require('../../../models/keyExtract');
 // Enable service discovery for this test
 var diContainer = require('../../../services/diContainer')();
 var redis = require('redis');
-// var redisJS = require('redis-js');
-
-// if (config.testWithRedis) {
-  var client = redis.createClient();
-  // Add the regular proxy to diContainer
-  client.select(10, function (err, reply) {
-    if (err) {
-      logger.error('test: redis client received error when selecting database ', err);
-    } else {
-      logger.debug('test: redis has selected db', 10, 'reply is ', reply);
-      client.flushdb();
-    }
-  });
-  diContainer.factory('db', require('../../../utils/redisProxy'));
-// } else {
-//   // We'll use the mock libraries
-//   logger.debug('TEST fileData: use redis mocks');
-//   var client = redisJS.createClient();
-//   diContainer.factory('redisProxy', require('../../../utils/redisProxy'));
-//   diContainer.factory('db', require('../../redisTestProxy'));
-// }
+var client = redis.createClient();
+client.select(10, function (err, reply) {
+  if (err) {
+    console.error('test: redis client received error when selecting database ', err);
+    throw new Error(err);
+  }
+});
+diContainer.factory('db', require('../../../utils/redisProxy'));
 diContainer.register('client', client);
 
 diContainer.factory('Ticket', require('../../../models/ticket'));
-// diContainer.register('keyGen', require('../../../models/keyGen'));
+
 var Ticket = diContainer.get('Ticket');
 var db = diContainer.get('db');
-// var keyGen = diContainer.get('keyGen');
 
 // Bootstrap some data
 var user = 'testUser'; // Simulates logged in user
@@ -97,7 +83,7 @@ test('models/ticket.js: Created ticket should have a creator and type as supplie
     assert.equal(ticket.creator, user, 'creator equals ' + user);
   })
   .catch(function (err) {
-    logger.debug(err);
+    console.error(err);
   });
 });
 
@@ -115,7 +101,7 @@ test('models/ticket.js: Creating a ticket should generate a counter for the tick
     assert.equal(parseInt(reply), newTicket.num, 'Latest counter generated equal ticket.num');
   })
   .catch(function (err) {
-    logger.debug(err);
+    console.error(err);
   });
 });
 
@@ -136,7 +122,7 @@ test('models/ticket.js: Creating a ticket should save the ticket key in the set 
     assert.ok (reply >= 0, 'Ticket key was saved');
   })
   .catch(function (err) {
-    logger.debug(err);
+    console.error(err);
   });
 });
 
@@ -158,7 +144,7 @@ test('models/ticket.js: Creating a ticket should save the ticket metadata correc
     assert.end();
   })
   .catch(function (err) {
-    logger.debug(err);
+    console.error(err);
   });
 });
 
@@ -170,7 +156,7 @@ test('models/ticket.js: getAllTicket keys', function (assert) {
     assert.end();
   })
   .catch(function (err) {
-    logger.debug(err);
+    console.error(err);
   });
 });
 
@@ -193,7 +179,7 @@ test('models/ticket.js: getTicket should return populated ticket object', functi
     assert.end();
   })
   .catch(function (err) {
-    logger.debug(err);
+    console.error(err);
   });
 });
 
@@ -220,7 +206,7 @@ test('models/ticket.js: addTopic should return topic object with correct metadat
     assert.end();
   })
   .catch(function (err) {
-    logger.debug(err);
+    console.error(err);
   });
 });
 
@@ -239,7 +225,7 @@ test('models/ticket.js: addTopic should return error if topic already exists', f
     assert.end();
   })
   .catch(function (err) {
-    logger.debug(err);
+    console.error(err);
   });
 });
 
@@ -261,7 +247,7 @@ test('models/ticket.js: addTopic should save the contents to the database correc
     assert.end();
   })
   .catch(function (err) {
-    logger.debug(err);
+    console.error(err);
   });
 });
 
@@ -283,7 +269,7 @@ test('models/ticket.js: addTopic should save the contents to the database correc
     assert.end();
   })
   .catch(function (err) {
-    logger.debug(err);
+    console.error(err);
   });
 });
 
@@ -306,7 +292,7 @@ test('models/ticket.js: addTopic should save the topic key to the set of topics 
     assert.end();
   })
   .catch(function (err) {
-    logger.debug(err);
+    console.error(err);
   });
 });
 
@@ -324,7 +310,7 @@ test('models/ticket.js: Topic.setDatatype should set the dataType of the topic o
     assert.end();
   })
   .catch(function (err) {
-    logger.debug(err);
+    console.error(err);
   });
 });
 
@@ -343,7 +329,7 @@ test('models/ticket.js: Topic.getDataType should get the dataType from the datab
     assert.end();
   })
   .catch(function (err) {
-    logger.debug(err);
+    console.error(err);
   });
 });
 
@@ -365,7 +351,7 @@ test('models/ticket.js: Topic.getTopicMetadata should should return metadata fro
     assert.end();
   })
   .catch(function (err) {
-    logger.debug(err);
+    console.error(err);
   });
 });
 
@@ -388,7 +374,7 @@ test('models/ticket.js: Topic.getContents should should return contents from dat
     assert.end();
   })
   .catch(function (err) {
-    logger.debug(err);
+    console.error(err);
   });
 });
 
@@ -417,7 +403,7 @@ test('models/ticket.js: Topic.exists should report the existence of the topic', 
     assert.end();
   })
   .catch(function (err) {
-    logger.debug(err);
+    console.error(err);
   });
 });
 
@@ -446,7 +432,7 @@ test('models/ticket.js: Ticket.getTopicKeys should return the correct keys', fun
     assert.end();
   })
   .catch(function (err) {
-    logger.debug(err);
+    console.error(err);
   });
 });
 
@@ -470,7 +456,7 @@ test('models/ticket.js: Ticket.topicFromKey creates topic object from key', func
     assert.end();
   })
   .catch(function (err) {
-    logger.debug(err);
+    console.error(err);
   });
 });
 
@@ -501,19 +487,14 @@ test('models/ticket.js: Ticket.getTopics should return array of Topic objects', 
     assert.end();
   })
   .catch(function (err) {
-    logger.debug(err);
+    console.error(err);
   });
 });
 
-// if (config.testWithRedis) {
-  test('models/ticket.js: Finished', function (assert) {
-    logger.debug('Quitting redis');
-    client.flushdb(function (reply) {
-      logger.debug('flushdb reply ', reply);
-      client.quit(function (err, reply) {
-        logger.debug('quit reply ', reply);
-        assert.end();
-      });
+test('models/ticket.js: Finished', function (assert) {
+  client.flushdb(function (reply) {
+    client.quit(function (err, reply) {
+      assert.end();
     });
   });
-// }
+});

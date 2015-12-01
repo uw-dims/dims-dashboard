@@ -97,11 +97,14 @@ else
   export LOG_LEVEL=info
 fi
 
+# Use local WORKON_HOME if defined, otherwise use /opt/dims/envs
+WORKON_HOME=${WORKON_HOME:-/opt/dims/envs}
+
 export NODE_ENV=test
 VERSIONFILE=${RUNDIR}/VERSION
 APPVERSION=$(cat $VERSIONFILE)
 
-cd $RUNDIR && . /opt/dims/envs/dimsenv/bin/activate
+cd $RUNDIR && . ${WORKON_HOME}/dimsenv/bin/activate
 cd server
 
 if [ $VERBOSE -eq 1 ]; then
