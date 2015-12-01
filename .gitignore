@@ -13,3 +13,4 @@ style.css
 public/
 npm-debug.log
 logmon.log
+*/coverage/*

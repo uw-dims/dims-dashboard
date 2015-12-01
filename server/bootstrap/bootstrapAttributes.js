@@ -12,7 +12,7 @@ var redis = require('redis');
 var q = require('q');
 
 var ROOT_DIR = __dirname + '/../';
-var diContainer = require(path.join(ROOT_DIR,'/services/diContainer'))();
+var diContainer = require(path.join(ROOT_DIR, '/services/diContainer'))();
 var client = redis.createClient();
 
 diContainer.factory('Attributes', require(path.join(ROOT_DIR, '/models/attributes')));

@@ -2,7 +2,7 @@
 
 var test = require('tape-catch');
 var _ = require('lodash-compat');
-var logger = require('../../../utils/logger')(module);
+// var logger = require('../../../utils/logger')(module);
 var keyGen = require('../../../models/keyGen');
 
 // Mock ticket and topic objects

@@ -275,7 +275,6 @@ if (config.sslOn) {
   server = https.createServer(sslOptions, app);
   port = app.get('sslport');
 } else {
-  // logger.info('Dashboard initialization: SSL is off');
   server = http.createServer(app);
   port = app.get('port');
 }

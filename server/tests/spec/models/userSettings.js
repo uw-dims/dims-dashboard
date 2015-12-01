@@ -3,16 +3,14 @@
 var test = require('tape-catch');
 var _ = require('lodash-compat');
 var logger = require('../../../utils/logger')(module);
-var config = require('../../../config/config');
+// var config = require('../../../config/config');
 var keyGen = require('../../../models/keyGen');
-var extract = require('../../../models/keyExtract');
+// var extract = require('../../../models/keyExtract');
 
 // Enable service discovery for this test
 var diContainer = require('../../../services/diContainer')();
 var redis = require('redis');
-// var redisJS = require('redis-js');
 
-// if (config.testWithRedis) {
 logger.debug('TEST filedata: do the test with redis');
 var client = redis.createClient();
 // Add the regular proxy to diContainer
@@ -21,19 +19,10 @@ client.select(10, function (err, reply) {
     logger.error('test: redis client received error when selecting database ', err);
   } else {
     logger.debug('test: redis has selected db', 10, 'reply is ', reply);
-    // client.flushdb();
   }
 });
 diContainer.factory('db', require('../../../utils/redisProxy'));
-// } else {
-//   // We'll use the mock libraries
-//   // logger.debug('use mocks');
-//   var client = redisJS.createClient();
-//   diContainer.factory('redisProxy', require('../../../utils/redisProxy'));
-//   diContainer.factory('db', require('../../redisTestProxy'));
-// }
 diContainer.register('client', client);
-
 diContainer.factory('UserSettings', require('../../../models/userSettings'));
 var UserSettings = diContainer.get('UserSettings');
 var db = diContainer.get('db');

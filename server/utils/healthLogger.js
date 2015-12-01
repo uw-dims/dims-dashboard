@@ -7,7 +7,7 @@ var os = require('os');
 var uuid = require('node-uuid');
 
 var healthLogger = amqpLogger(config.healthExchange);
-
+console.log('[+++] HealthLogger starting...');
 var label = 'utils/healthLogger.js';
 var logLevel = 'INFO';
 

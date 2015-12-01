@@ -2,9 +2,9 @@
 
 var test = require('tape-catch');
 var _ = require('lodash-compat');
-var logger = require('../../../utils/logger')(module);
-var config = require('../../../config/config');
-var keyGen = require('../../../models/keyGen');
+// var logger = require('../../../utils/logger')(module);
+// var config = require('../../../config/config');
+// var keyGen = require('../../../models/keyGen');
 
 // Enable service discovery for this test
 var diContainer = require('../../../services/diContainer')();
@@ -12,18 +12,17 @@ var redis = require('redis');
 var client = redis.createClient();
 client.select(10, function (err, reply) {
   if (err) {
-    logger.error('test: redis client received error when selecting database ', err);
+    console.error('test: redis client received error when selecting database ', err);
   } else {
-    logger.debug('test: redis has selected db', 10, 'reply is ', reply);
+    // logger.debug('test: redis has selected db', 10, 'reply is ', reply);
     // client.flushdb();
   }
 });
 diContainer.factory('db', require('../../../utils/redisProxy'));
 diContainer.register('client', client);
-
 diContainer.factory('Attributes', require('../../../models/attributes'));
 var Attributes = diContainer.get('Attributes');
-var db = diContainer.get('db');
+// var db = diContainer.get('db');
 
 // TEST DATA
 var user1 = 'bob';
@@ -104,11 +103,11 @@ test('models/attributes: getAllAttributes should return all attributes', functio
 });
 
 test('models/attributes.js: Finished', function (assert) {
-  logger.debug('Quitting redis');
+  // logger.debug('Quitting redis');
   client.flushdb(function (reply) {
-    logger.debug('flushdb reply ', reply);
+    // logger.debug('flushdb reply ', reply);
     client.quit(function (err, reply) {
-      logger.debug('quit reply ', reply);
+      // logger.debug('quit reply ', reply);
       assert.end();
     });
   });

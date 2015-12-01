@@ -3,36 +3,36 @@
 var test = require('tape-catch');
 var stream = require('stream');
 var _ = require('lodash-compat');
+var fs = require('fs');
+var path = require('path');
 
-var config = require('../../../config/config');
-var logger = require('../../../utils/logger')(module);
+process.env.NODE_ENV = 'test';
+
+// ROOT_DIR is path to server directory
+var ROOT_DIR = __dirname + '/../../../';
+// console.log('dirname is ', __dirname);
+// console.log('ROOT_DIR is ', ROOT_DIR);
+// console.log('Current directory: ' + process.cwd());
+
 var keyGen = require('../../../models/keyGen');
-var extract = require('../../../models/keyExtract');
 
 // Enable service discovery for this test
 var diContainer = require('../../../services/diContainer')();
 var redis = require('redis');
-// var redisJS = require('redis-js');
 
-// if (config.testWithRedis) {
-  var client = redis.createClient();
-  // Add the regular proxy to diContainer
-  client.select(10, function (err, reply) {
-    if (err) {
-      logger.error('test: redis client received error when selecting database ', err);
-    } else {
-      logger.debug('test: redis has selected db', 10, 'reply is ', reply);
-      client.flushdb();
-    }
-  });
-  diContainer.factory('db', require('../../../utils/redisProxy'));
-// } else {
-//   // We'll use the mock libraries
-//   logger.debug('TEST fileData: use redis mocks');
-//   var client = redisJS.createClient();
-//   diContainer.factory('redisProxy', require('../../../utils/redisProxy'));
-//   diContainer.factory('db', require('../../redisTestProxy'));
-// }
+var client = redis.createClient();
+// Add the regular proxy to diContainer
+client.select(10, function (err, reply) {
+  if (err) {
+    console.error('test: redis client received error when selecting database ', err);
+  } else {
+    console.log('test: redis has selected db', 10, 'reply is ', reply);
+    client.flushdb();
+  }
+});
+/* istanbul ignore next */
+diContainer.factory('db', require('../../../utils/redisProxy'));
+
 diContainer.register('client', client);
 
 diContainer.factory('FileData', require('../../../models/fileData'));
@@ -49,19 +49,17 @@ var contents2 = 'Contents2';
 var fileMeta1 = function (pathCounter) {
   return {
     creator: user1,
-    description: 'description',
-    path: 'boxes' + pathCounter,
-    global: true,
-    name: 'main.txt'
+    description: 'description1',
+    path: 'boxes' + pathCounter + '/main.txt',
+    global: true
   };
 };
 var fileMeta2 = function (pathCounter) {
   return {
-    creator: 'user2',
-    description: 'description',
-    path: 'boxes/stores' + pathCounter,
-    global: false,
-    name: 'main.txt'
+    creator: user2,
+    description: 'description2',
+    path: 'boxes/stores' + pathCounter + '/main.txt',
+    global: false
   };
 };
 
@@ -75,7 +73,6 @@ test('models/fileData.js: FileData.fileDataFactory should return file object', f
     assert.ok(newFile.hasOwnProperty('description'), 'Object should have description property');
     assert.ok(newFile.hasOwnProperty('global'), 'Object should have global property');
     assert.ok(newFile.hasOwnProperty('path'), 'Object should have path property');
-    assert.ok(newFile.hasOwnProperty('name'), 'Object should have name property');
     assert.end();
   }, 1000);
 });
@@ -86,11 +83,11 @@ test('models/fileData.js: FileData.fileDataFactory should validate config and op
   newFile = FileData.fileDataFactory({
     creator: 'user'
   });
-  assert.ok(newFile instanceof Error, 'Options missing description should return error object');
+  assert.ok(newFile instanceof Error, 'Options with only creator return error object');
   newFile = FileData.fileDataFactory({
-    description: 'description'
+    description: 'path'
   });
-  assert.ok(newFile instanceof Error, 'Options missing creator should return error object');
+  assert.ok(newFile instanceof Error, 'Options with only path should return error object');
   newFile = FileData.fileDataFactory({
     creator: 'user',
     description: 'A new file'
@@ -99,23 +96,23 @@ test('models/fileData.js: FileData.fileDataFactory should validate config and op
   newFile = FileData.fileDataFactory({
     creator: 'user',
     description: 'A new file',
-    name: 'big-file.txt'
+    path: 'big-file.txt'
   });
-  assert.equal(newFile.path, '', 'Defaults should work');
+  assert.equal(newFile.path, 'big-file.txt', 'Required options should work');
   assert.equal(newFile.global, false, 'Defaults should work');
   assert.equal(newFile.creator, 'user', 'Required options should work');
-  assert.equal(newFile.description, 'A new file', 'Required options should work');
+  assert.equal(newFile.description, 'A new file', 'Options should work');
   newFile = FileData.fileDataFactory({
     creator: 'user',
     description: 'A new file',
-    name: 'big-file.txt',
+    path: 'big-file.txt',
     global: true
   });
   assert.equal(newFile.global, true, 'Options should override defaults');
   newFile = FileData.fileDataFactory({
     creator: 'user',
     description: 'A new file',
-    name: 'big-file.txt',
+    path: 'big-file.txt',
     global: 'fred'
   });
   assert.ok(newFile instanceof Error, 'global option must be boolean');
@@ -130,10 +127,9 @@ test('models/fileData.js: FileData create should save file contents and key', fu
     assert.fail();
   } else {
     return newFile.create(contents1)
-
     .then(function (reply) {
-      logger.debug('TEST filedata create newFile config is ', newFile.getConfig());
-      logger.debug('TEST filedata create reply is ', reply);
+      console.log('TEST filedata create newFile config is ', newFile.getConfig());
+      console.log('TEST filedata create reply is ', reply);
       return db.getProxy(keyGen.fileKey(newFile));
     })
     .then(function (reply) {
@@ -141,7 +137,7 @@ test('models/fileData.js: FileData create should save file contents and key', fu
       return db.hgetallProxy(keyGen.fileMetaKey(newFile));
     })
     .then(function (reply) {
-      logger.debug('TEST filedata create metadata reply is ', reply);
+      console.log('TEST filedata create metadata reply is ', reply);
       // Convert strings
       var result = reply;
       result.createdTime = _.parseInt(reply.createdTime);
@@ -151,11 +147,11 @@ test('models/fileData.js: FileData create should save file contents and key', fu
       return db.zrankProxy(keyGen.fileSetKey(newFile), keyGen.fileKey(newFile));
     })
     .then(function (reply) {
-      logger.debug('TEST filedata: create reply from zrank', reply);
+      console.log('TEST filedata: create reply from zrank', reply);
       assert.ok(reply === 0, 'Key to file saved in set of keys');
       assert.end();
     }).catch(function (err) {
-      logger.debug(err);
+      console.log(err);
       assert.end();
     });
   }
@@ -174,7 +170,7 @@ test('models/fileData.js: FileData.getContent should return content from the dat
     assert.end();
   })
   .catch(function (err) {
-    logger.debug(err);
+    console.error(err);
     assert.end();
   });
 });
@@ -193,12 +189,12 @@ test('models/fileData.js: Filedata.exists should return true if the key exists i
     return newFile2.exists();
   })
   .then(function (reply) {
-    logger.debug('TEST reply to exists = false ', reply);
+    console.log('TEST reply to exists = false ', reply);
     assert.notOk(reply, 'Unsaved key was not found in database');
     assert.end();
   })
   .catch(function (err) {
-    logger.debug(err);
+    console.error(err);
     assert.end();
   });
 });
@@ -218,7 +214,7 @@ test('models/fileData.js: FileData.getConfig should return the config object', f
     assert.end();
   })
   .catch(function (err) {
-    logger.debug(err);
+    console.error(err);
     assert.end();
   });
 });
@@ -229,16 +225,16 @@ test('models/fileData.js: FileData.getMetadata should return metadata from datab
   return newFile.create(contents2)
   .then(function (reply) {
     // Get the metaData from the database
-    logger.debug('TEST getMetadata reply from create is ', reply);
+    console.log('TEST getMetadata reply from create is ', reply);
     return newFile.getMetadata();
   })
   .then(function (reply) {
-    logger.debug('TEST getMetadata reply from getMetadata is ', reply);
+    console.log('TEST getMetadata reply from getMetadata is ', reply);
     assert.deepEqual(reply, newFile.getConfig(), 'Saved file config returned successfully');
     assert.end();
   })
   .catch(function (err) {
-    logger.debug(err);
+    console.error(err);
     assert.end();
   });
 });
@@ -256,7 +252,7 @@ test('models/fileData.js: FileData content should handle stream', function (asse
       assert.end();
     })
     .catch(function (err) {
-      logger.debug(err);
+      console.error(err);
       assert.end();
     });
   });
@@ -266,16 +262,33 @@ test('models/fileData.js: FileData content should handle stream', function (asse
   source.end();
 });
 
-// if (config.testWithRedis) {
-  test('models/fileData.js: Finished', function (assert) {
-    logger.debug('Quitting redis');
-    client.flushdb(function (reply) {
-      logger.debug('flushdb reply ', reply);
-      client.quit(function (err, reply) {
-        logger.debug('quit reply ', reply);
-        assert.end();
-      });
+test('models/fileData.js: FileData should handle content from file via stream', function (assert) {
+  pathCounter++;
+  var newFile = FileData.fileDataFactory(fileMeta1(pathCounter));
+  var testFilePath = path.join(ROOT_DIR, '/tests/testData/response.json');
+  var testFile = fs.readFileSync(testFilePath);
+  var newWriter = FileData.writer(newFile, 'create');
+  newWriter.on('filesave', function () {
+    return db.getProxy(keyGen.fileKey(newFile)).then(function (reply) {
+      assert.deepEqual(reply, testFile.toString(), 'Stream content should be saved');
+      assert.end();
+    })
+    .catch(function (err) {
+      console.error(err);
+      assert.end();
     });
   });
-// }
+  fs.createReadStream(testFilePath).pipe(newWriter);
+});
+
+test('models/fileData.js: Finished', function (assert) {
+  console.log('Quitting redis');
+  client.flushdb(function (reply) {
+    console.log('flushdb reply ', reply);
+    client.quit(function (err, reply) {
+      console.log('quit reply ', reply);
+      assert.end();
+    });
+  });
+});
 
