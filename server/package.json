@@ -11,13 +11,14 @@
     "run-integration": "SSL_ON=true node app",
     "run-test": "LOG_LEVEL=info node app",
     "run-demo": "node app",
-    "test": "./node_modules/tape/bin/tape",
-    "test-tap": "./node_modules/tape/bin/tape tests/spec/**/*.js",
-    "test-ci": "./node_modules/tape/bin/tape tests/spec/**/*.js | tap-xunit",
-    "test-diff": "./node_modules/tape/bin/tape tests/spec/**/*.js | tap-difflet",
-    "test-json": "./node_modules/tape/bin/tape tests/spec/**/*.js | tap-json",
-    "test-spec": "./node_modules/tape/bin/tape tests/spec/**/*.js | tap-spec",
-    "tap": "./node_modules/.bin/tap tests/spec/**/*.js"
+    "test": "./node_modules/.bin/tape",
+    "test-tap": "./node_modules/.bin/tape tests/spec/**/*.js",
+    "test-ci": "./node_modules/.bin/tape tests/spec/**/*.js | tap-xunit",
+    "test-diff": "./node_modules/.bin/tape tests/spec/**/*.js | tap-difflet",
+    "test-json": "./node_modules/.bin/tape tests/spec/**/*.js | tap-json",
+    "test-spec": "./node_modules/.bin/tape tests/spec/**/*.js | tap-spec",
+    "tap": "./node_modules/.bin/tap tests/spec/**/*.js",
+    "coverage":"./node_modules/.bin/istanbul cover --print both --dir ../test/coverage ./node_modules/.bin/tape ./tests/spec/**/*.js"
   },
   "dependencies": {
     "JSONStream": "^0.8.4",

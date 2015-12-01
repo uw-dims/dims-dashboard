@@ -14,7 +14,6 @@ var _ = require('lodash-compat'),
 
 // module.exports = function FileData(serviceLocator) {
 module.exports = function FileData(db) {
-  // var db = serviceLocator.get('db');
 
   // Prototype with functions for a fileData object
   var filePrototype = {
@@ -109,8 +108,7 @@ module.exports = function FileData(db) {
         creator: self.creator,
         description: self.description,
         global: self.global,
-        path: self.path,
-        name: self.name
+        path: self.path
       };
       if (self.createdTime !== undefined) {
         config.createdTime = self.createdTime;
@@ -135,7 +133,7 @@ module.exports = function FileData(db) {
   var fileDataFactory = function fileDataFactory(options) {
     var defaults = {
       global: false,
-      path: ''
+      description: ''
     };
     // Apply the options to defaults
     var config = _.extend({}, defaults, options);
@@ -157,8 +155,11 @@ module.exports = function FileData(db) {
 
   // Validate a config
   var validateConfig = function validateConfig(config) {
-    if (!config.hasOwnProperty('creator') || !config.hasOwnProperty('description') || !config.hasOwnProperty('name')) {
-      return new Error('validateConfig: Options must include name, description, creator');
+    if (!config.hasOwnProperty('creator')) {
+      return new Error('validateConfig: Options must contain creator');
+    }
+    if (!config.hasOwnProperty('path')) {
+      return new Error('validateConfig: Options must contain path');
     }
     if (typeof config.global !== 'boolean') {
       return new Error('validateConfig: global must either be true or false');
@@ -168,7 +169,7 @@ module.exports = function FileData(db) {
 
   var scrubPath = function scrubPath(path) {
     // Strip trailing and initial, replace spaces with underscores
-    return _.trim(path, ' /').replace(' ', '_');
+    return _.trim(path, ' :').replace(' ', '_');
   };
 
   // Stream writer function to receive content if it is a stream

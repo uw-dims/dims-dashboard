@@ -2,7 +2,7 @@
 
 var test = require('tape');
 var _ = require('lodash-compat');
-var logger = require('../../../utils/logger')(module);
+// var logger = require('../../../utils/logger')(module);
 var c = require('../../../config/redisScheme');
 
 test('config/redisScheme.js: Should return correct root', function (assert) {

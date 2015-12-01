@@ -64,29 +64,33 @@ var makeSuffix = function (suffixType, param) {
   return suffix[suffixType](param);
 };
 
+var getDelimiter = function () {
+  return config.delimiter;
+};
+
 var makeRoot = function makeRoot(type) {
   // logger.debug('makeRoot type is ', type);
   var base  = {
     'ticket': function () {
-      return config.namespace + config.delimiter + config.ticket.prefix;
+      return config.namespace + getDelimiter() + config.ticket.prefix;
     },
     'file': function () {
-      return config.namespace + config.delimiter + config.file.prefix;
+      return config.namespace + getDelimiter() + config.file.prefix;
     },
     'userSetting': function () {
-      return config.namespace + config.delimiter + config.userSetting.prefix;
+      return config.namespace + getDelimiter() + config.userSetting.prefix;
     },
     'attribute': function () {
-      return config.namespace + config.delimiter + config.attribute.prefix;
+      return config.namespace + getDelimiter() + config.attribute.prefix;
     },
     'notification': function () {
-      return config.namespace + config.delimiter + config.notification.prefix;
+      return config.namespace + getDelimiter() + config.notification.prefix;
     },
     'data': function () {
-      return config.namespace + config.delimiter + config.data.prefix;
+      return config.namespace + getDelimiter() + config.data.prefix;
     },
     'query': function () {
-      return config.namespace + config.delimiter + config.query.prefix;
+      return config.namespace + getDelimiter() + config.query.prefix;
     }
   };
   if (typeof base[type] !== 'function') {
@@ -109,20 +113,20 @@ var makeBase = function (options) {
   // logger.debug('args are now', args);
   args.forEach(function (item) {
     // logger.debug('item is ', item);
-    key = key + config.delimiter + item;
+    key = key + getDelimiter() + item;
   });
   return key;
 };
 
 // Add content to a base key - useful when constructing keys from other keys
-// Options are key plus a variable number of content items
+// Options are key, plus a variable number of content items
 var addContent = function (options) {
   /* jshint unused: false */
   var args = [].slice.call(arguments, 0);
   var key = args[0];
   args.shift();
   args.forEach(function (item) {
-    key = key + config.delimiter + item;
+    key = key + getDelimiter() + item;
   });
   return key;
 };

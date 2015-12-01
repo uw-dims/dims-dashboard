@@ -28,7 +28,7 @@ module.exports = function (FileData) {
                 "global" : false,
                 "createdTime": "1418060768120",
                 "modifiedTime": "1418060768120",
-                "path": "cifdata/apt4/"
+                "path": "cifdata/apt4/data.json"
               }
             }
     *     ]
@@ -39,7 +39,7 @@ module.exports = function (FileData) {
     *  Using curl:
     *
     *     curl -k https://dashboard_url/api/fileData/bobjones/
-    *     curl -k https://dashboard_url/api/fileData/_global/
+    *     curl -k https://dashboard_url/api/fileData/
     *
     * @return HTTP Status code and string reply.
     */
