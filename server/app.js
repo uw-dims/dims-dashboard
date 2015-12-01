@@ -2,8 +2,6 @@
 
 var express = require('express')
   , config = require('./config/config')
-  , appLogger = require('./utils/appLogger')
-  , healthLogger = require('./utils/healthLogger')
   , bodyParser = require('body-parser')
  // , compress = require('compression')
  // , cookieSession = require('cookie-session')
@@ -21,8 +19,7 @@ var express = require('express')
   , socket = require('socket.io')
   //, flash = require('connect-flash')
   , passport = require('passport')
-  , LocalStrategy = require('passport-local').Strategy
-  , logger = require('./utils/logger')(module);
+  , LocalStrategy = require('passport-local').Strategy;
 
 // routes
 var routes = require('./routes');
@@ -77,9 +74,6 @@ var passportStatic = diContainer.get('passportStatic');
 var userRoute = diContainer.get('userRoute');
 var attributeRoute = diContainer.get('attributeRoute');
 var lmsearchRoute = diContainer.get('lmsearchRoute');
-// Run the healthService
-var healthService = diContainer.get('healthService');
-healthService.run();
 
 var app = module.exports = express();
 
@@ -265,49 +259,66 @@ var io,
     server,
     port,
     sslOptions,
-    dashboardMessaging;
+    dashboardMessaging,
+    appLogger,
+    healthLogger;
 
-// Wait for logger to be ready to finish up
-appLogger.on('logger-ready', function () {
-  if (config.sslOn) {
-    logger.info('Dashboard initialization: SSL is on');
-    sslOptions = {
-      key: fs.readFileSync(config.serverKey),
-      cert: fs.readFileSync(config.serverCrt)
-      //ca: fs.readFileSync(config.serverCa)
-      //requestCert: true,
-      //rejectUnauthorized: false
-    };
-    server = https.createServer(sslOptions, app);
-    port = app.get('sslport');
-  } else {
-    logger.info('Dashboard initialization: SSL is off');
-    server = http.createServer(app);
-    port = app.get('port');
-  }
+if (config.sslOn) {
+  // logger.info('Dashboard initialization: SSL is on');
+  sslOptions = {
+    key: fs.readFileSync(config.serverKey),
+    cert: fs.readFileSync(config.serverCrt)
+    //ca: fs.readFileSync(config.serverCa)
+    //requestCert: true,
+    //rejectUnauthorized: false
+  };
+  server = https.createServer(sslOptions, app);
+  port = app.get('sslport');
+} else {
+  // logger.info('Dashboard initialization: SSL is off');
+  server = http.createServer(app);
+  port = app.get('port');
+}
 
-  // Set up socket.io to listen on same port as https
-  io = socket.listen(server);
-  // Initialize messaging - fanout publish, subscribe, sockets
-  // Saving handle for now
-  dashboardMessaging = require('./services/messaging')(io);
+if (require.main === module) {
+  appLogger = require('./utils/appLogger');
+  appLogger.on('logger-ready', function () {
+    console.log('[+++] appLogger received logger-ready event');
+    healthLogger = require('./utils/healthLogger');
+    healthLogger.on('logger-ready', function () {
+      console.log('[+++] healthLogger received logger-ready event');
+      // Run the healthService
+      var healthService = diContainer.get('healthService');
+      healthService.run();
+      console.log('[+++] Finished running healthService');
+      // Set up socket.io to listen on same port as https
+      io = socket.listen(server);
+      // Initialize messaging - fanout publish, subscribe, sockets
+      require('./services/messaging')(io);
+      server.listen(port, function () {
+        console.log('[+++] Server listening');
+        healthLogger.publish('dashboard initialized DIMS Dashboard running on port ' + server.address().port);
+        if (config.sslOn) {
+          healthLogger.publish('dashboard initialized SSL is on');
+        } else {
+          healthLogger.publish('dashboard initialized SSL is off');
+        }
+        healthLogger.publish('dashboard initialized Node environment: ' + config.env);
+        healthLogger.publish('dashboard initialized Log level: ' + config.logLevel);
+        healthLogger.publish('dashboard initialized userDB source: ' + config.userSource);
+      });
+    });
+  });
 
-  server.listen(port);
-  logger.info('Dashboard initialization: DIMS Dashboard running on port %s', server.address().port);
-  logger.info('Dashboard initialization: REDIS host, port, database: ', config.redisHost, config.redisPort, config.redisDatabase);
-  logger.info('Dashboard initialization: Node environment: ', config.env);
-  logger.info('Dashboard initialization: Log level:', config.logLevel);
-  logger.info('Dashboard initialization: UserDB source: ', config.userSource);
-  healthLogger.publish('dashboard initialized DIMS Dashboard running on port ' + server.address().port);
-  healthLogger.publish('dashboard initialized Node environment: ' + config.env);
-  healthLogger.publish('dashboard initialized Log level: ' + config.logLevel);
-});
+} else {
+  module.exports = server;
+}
 
 process.on('SIGTERM', function () {
-  logger.debug('SIGTERM received');
-  healthLogger.publish('dashboard eceived SIGTERM, exiting...');
+  // logger.debug('SIGTERM received');
+  healthLogger.publish('dashboard received SIGTERM, exiting...');
   server.close(function () {
-    logger.debug('Server close');
+    // logger.debug('Server close');
     process.exit(0);
   });
 });
