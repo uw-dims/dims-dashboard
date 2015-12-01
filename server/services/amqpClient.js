@@ -11,6 +11,7 @@ var q = require('q');
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 
+/* istanbul ignore next */
 module.exports = function amqpClient() {
 
   var connectString = 'amqp://' + config.rpcUser + ':' + config.rpcPass + '@' + config.rpcServer;
