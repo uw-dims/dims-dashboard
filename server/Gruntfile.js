@@ -84,4 +84,5 @@ module.exports = function (grunt) {
   });
   grunt.registerTask('default', ['env:test', 'jshint', 'tape']);
   grunt.registerTask('test', ['env:test', 'tape']);
+  grunt.registerTask('hint', ['env:test', 'jshint']);
 };
