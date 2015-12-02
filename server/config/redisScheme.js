@@ -64,6 +64,11 @@ var makeSuffix = function (suffixType, param) {
   return suffix[suffixType](param);
 };
 
+// Add a suffix to a key
+var addSuffix = function (key, suffixType, param) {
+  return key + makeSuffix(suffixType, param);
+};
+
 var getDelimiter = function () {
   return config.delimiter;
 };
@@ -129,11 +134,6 @@ var addContent = function (options) {
     key = key + getDelimiter() + item;
   });
   return key;
-};
-
-// Add a suffix to a key
-var addSuffix = function (key, suffixType, param) {
-  return key + makeSuffix(suffixType, param);
 };
 
 // Add content to an existing key

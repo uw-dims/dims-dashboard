@@ -12,7 +12,7 @@ var config = require('../config/config'),
     _ = require('lodash-compat'),
     dimsUtils = require('../utils/util');
 
-module.exports = function Ticket(store) {
+module.exports = function Ticket(db) {
 
   var initialTicketConfig = {
     num: null,
@@ -22,44 +22,49 @@ module.exports = function Ticket(store) {
     open: true
   };
 
-  // var initialTopicConfig = {
-  //   parent: null,
-  //   type: null,
-  //   name: null,
-  //   dataType: 'hash'
-  // };
+  var initialTopicConfig = {
+    parent: null,
+    type: null,
+    name: null,
+    dataType: 'hash'
+  };
 
   var ticketPrototype = {
-
-    close: function close() {
-      var self = this;
-      self.open = false;
-      self.modifiedTime = dimsUtils.createTimestamp();
-      return store.setMetaData(keyGen.ticketKey(self), self.getTicketMetadata());
-    },
 
     // Obtains a counter value for the new ticket, sets the
     // created time, and adds the ticket to the database.
     // Adds the new ticket key to the set of all keys
     create: function create(type, creator) {
       var self = this;
+      var deferred = q.defer();
       self.creator = creator;
       self.type = type;
       self.open = true;
       self.createdTime = dimsUtils.createTimestamp();
       self.modifiedTime = self.createdTime;
       // Increment the ticket counter
-      return store.incrCounter(keyGen.ticketCounterKey())
+      return db.incrProxy(keyGen.ticketCounterKey())
       .then(function (reply) {
         // Save the counter value
         self.num = reply;
-        // Save the ticket
-        return q.all([
-          store.setMetaData(keyGen.ticketKey(self), self.getTicketMetadata()),
-          store.addKeyToSet(keyGen.ticketKey(self), keyGen.ticketSetKey()),
-          store.addKeyToSet(keyGen.ticketKey(self), keyGen.ticketOwnerKey(self)),
-          store.addKeyToSet(keyGen.ticketKey(self), keyGen.ticketOpenKey())
-        ]);
+        // Save the data to datastore
+        var multi = db.multi();
+        // Will save metaData to ticketKey
+        multi.hmset(keyGen.ticketKey(self), self.getTicketMetadata());
+        // Queue up saving key to sets
+        multi.zadd(keyGen.ticketSetKey(), self.createdTime, keyGen.ticketKey(self));
+        multi.zadd(keyGen.ticketOwnerKey(self), self.createdTime, keyGen.ticketKey(self));
+        multi.zadd(keyGen.ticketOpenKey(), self.createdTime, keyGen.ticketKey(self));
+        // return db.hmsetProxy(keyGen.ticketKey(self), self.getTicketMetadata());
+        multi.exec(function (err, replies) {
+          if (err) {
+            deferred.reject(err);
+          } else {
+            logger.debug('create: replies from multi.exec', replies);
+            deferred.resolve(self);
+          }
+        });
+        return deferred.promise;
       })
       .catch(function (err) {
         logger.error('models/Ticket.create had an err returned from redis', err);
@@ -86,29 +91,28 @@ module.exports = function Ticket(store) {
     // Resolves to self
     // Was getTicket - but doesn't return a ticket object, just the metadata
     // TODO: Do we still need this function?
-    // pullTicketMetadata: function pullTicketMetadata() {
-    //   var self = this,
-    //       key = keyGen.ticketKey(self);
-    //   return db.hgetallProxy(key).then(function (reply) {
-    //     var keyArray = key.split(':');
-    //     self.num = parseInt(keyArray[1]);
-    //     self.creator = reply.creator;
-    //     self.type = reply.type;
-    //     self.createdTime = _.parseInt(reply.createdTime);
-    //     self.modifiedTime = _.parseInt(reply.createdTime);
-    //     self.open = reply.open === 'true' ? true : false;
-    //     return self;
-    //   })
-    //   .catch(function (err) {
-    //     logger.error('Ticket.getTicket had an err returned from redis', err);
-    //     return new Error(err.toString());
-    //   });
-    // },
+    pullTicketMetadata: function pullTicketMetadata() {
+      var self = this,
+          key = keyGen.ticketKey(self);
+      return db.hgetallProxy(key).then(function (reply) {
+        var keyArray = key.split(':');
+        self.num = parseInt(keyArray[1]);
+        self.creator = reply.creator;
+        self.type = reply.type;
+        self.createdTime = _.parseInt(reply.createdTime);
+        self.modifiedTime = _.parseInt(reply.createdTime);
+        self.open = reply.open === 'true' ? true : false;
+        return self;
+      })
+      .catch(function (err) {
+        logger.error('Ticket.getTicket had an err returned from redis', err);
+        return new Error(err.toString());
+      });
+    },
 
     // Add a topic to this ticket. Creates topic object, saves to database.
     // Returns topic object
-    // dataType is string or set
-    addTopic: function addTopic(topicName, dataType, content) {
+    addTopic: function addTopic(topicName, dataType, content, score) {
       var self = this,
       // Create the topic object
           topic = topicFactory({
@@ -124,7 +128,7 @@ module.exports = function Ticket(store) {
       .then(function (reply) {
         if (!reply) {
           logger.debug('models/Ticket.addTopic. Topic does not exist. Save it. content, score', content, score);
-          return topic.save(content).then(function (reply) {
+          return topic.save(content, score).then(function (reply) {
             /* jshint unused: false */
             // Add the topic key to the sorted set of keys
             // The score is the created timestamp, so we don't need to save that
@@ -173,7 +177,15 @@ module.exports = function Ticket(store) {
     getTopicKeys: function getTopicKeys() {
       var self = this;
       // Get the keys
-      return listKeys(keyGen.topicSetKey(self));
+      return db.zrangeProxy(keyGen.topicSetKey(self), 0, -1)
+      .then(function (reply) {
+        logger.debug('Ticket.getTopicKeys reply', reply);
+        return reply;
+      })
+      .catch(function (err) {
+        logger.error('models/Ticket.getTopicKeys had an err returned from redis', err);
+        return new Error(err.toString());
+      });
     },
 
     // Construct topic object from a topic key
@@ -215,12 +227,13 @@ module.exports = function Ticket(store) {
   };
 
   var topicPrototype = {
-    // Save content (string)
-    save: function save(content) {
+    // Save some content and optional score to db
+    // for current topic object - was create
+    save: function save(content, score) {
       var self = this;
       logger.debug('models/ticket.js topic save ', content, score, self.dataType);
       // save the data
-      return store.setData(keyGen.topicKey(self), content);
+      return db.setData(keyGen.topicKey(self), self.dataType, content, score);
     },
 
     // Set the dataType in the topic object. Used to get the value from
