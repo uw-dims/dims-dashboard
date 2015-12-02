@@ -5,6 +5,12 @@ var q = require('q');
 module.exports = function Store(client) {
   var store = {};
 
+  // Create a timestamp, UTC, milliseconds from epoch
+  var timestamp = function () {
+    var now = new Date().getTime();
+    return now;
+  };
+
   var getMetaData = function getMetaData(key) {
     // return q.ninvoke(client, 'hgetall', key);
     return client.hgetallAsync(key);
@@ -41,6 +47,20 @@ module.exports = function Store(client) {
     });
   };
 
+  var exists = function exists(key, setKey) {
+    return client.zrankAsync(setKey, key)
+    .then(function (reply) {
+      return reply === null ? false : true;
+    })
+    .catch(function (err) {
+      throw new Error('Error from redis. ' + err.toString());
+    });
+  };
+
+  var addKeyToSet = function addKeyToSet(key, setKey) {
+    return client.zaddAsync(setKey, timestamp(), key);
+  };
+
   var incrCounter = function incrCounter(key) {
     // return q.ninvoke(client, 'incr', key);
     return client.incrAsync(key);
@@ -57,18 +77,20 @@ module.exports = function Store(client) {
     });
   };
 
-  var listAssociatedKeys = function list(key) {
+  var listKeys = function list(setKey) {
     // return q.ninvoke(client, 'zrange', 0, 1);
-    return client.zrangeAsync(key, 0, -1);
+    return client.zrangeAsync(setKey, 0, -1);
   };
 
   store.getMetaData = getMetaData;
   store.setMetaData = setMetaData;
   store.setData = setData;
   store.getData = getData;
+  store.exists = exists;
   store.incrCounter = incrCounter;
-  store.incrementKey =
-  store.listAssociatedKeys = listAssociatedKeys;
+  store.incrementKey = incrementKey;
+  store.listKeys = listKeys;
+  store.addKeyToSet = addKeyToSet;
 
   return store;
 };
