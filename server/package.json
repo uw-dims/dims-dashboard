@@ -18,13 +18,14 @@
     "test-json": "./node_modules/.bin/tape tests/spec/**/*.js | tap-json",
     "test-spec": "./node_modules/.bin/tape tests/spec/**/*.js | tap-spec",
     "tap": "./node_modules/.bin/tap tests/spec/**/*.js",
-    "coverage":"./node_modules/.bin/istanbul cover --print both --dir ../test/coverage ./node_modules/.bin/tape ./tests/spec/**/*.js"
+    "coverage": "./node_modules/.bin/istanbul cover --print both --dir ../test/coverage ./node_modules/.bin/tape ./tests/spec/**/*.js"
   },
   "dependencies": {
     "JSONStream": "^0.8.4",
     "amqplib": "^0.3.2",
     "args-list": "^0.3.3",
     "async": "^0.9.0",
+    "bluebird": "^3.0.6",
     "body-parser": "^1.9.2",
     "bookshelf": "^0.8.1",
     "carrier": "^0.1.14",
