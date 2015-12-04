@@ -1,5 +1,7 @@
 'use strict';
 
+var _ = require('lodash-compat');
+
 // module.exports = function redisScheme() {
 
 /**
@@ -136,10 +138,7 @@ var addContent = function (options) {
   return key;
 };
 
-// Add content to an existing key
-// var addContentToKey = function (key, content) {
-//   return key + config.delimiter + content;
-// };
+// topicTypes is deprecated
 
 var config =
   {
@@ -166,10 +165,21 @@ var config =
     'query': {
       'prefix': 'query'
     },
+    'ticketTypes': ['mitigation', 'activity', 'user'],
     'topicTypes': ['silk', 'cif', 'crosscor', 'cidrs', 'mitigation', 'data'],
+    'topicDataTypes': ['set', 'string'],
     'delimiter': ':',
     'contentDelimiter': '/'
   };
+
+var isValidTicketType = function isValidTicketType(type) {
+  return _.includes(config.ticketTypes, type);
+};
+
+var isValidTopicDataType = function isValidTopicDataType(type) {
+  return _.includes(config.topicDataTypes, type);
+};
+
 
 module.exports.makeBase = makeBase;
 module.exports.makeSuffix = makeSuffix;
@@ -178,5 +188,7 @@ module.exports.makeBase = makeBase;
 module.exports.addContent = addContent;
 module.exports.addSuffix = addSuffix;
 module.exports.config = config;
+module.exports.isValidTicketType = isValidTicketType;
+module.exports.isValidTopicDataType = isValidTopicDataType;
 
 // EOF

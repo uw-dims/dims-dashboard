@@ -1,7 +1,5 @@
 'use strict';
 
-var q = require('q');
-
 module.exports = function Store(client) {
   var store = {};
 
@@ -11,12 +9,12 @@ module.exports = function Store(client) {
     return now;
   };
 
-  var getMetaData = function getMetaData(key) {
+  var getMetadata = function getMetadata(key) {
     // return q.ninvoke(client, 'hgetall', key);
     return client.hgetallAsync(key);
   };
 
-  var setMetaData = function setMetaData(key, metaData) {
+  var setMetadata = function setMetadata(key, metaData) {
     // return q.ninvoke(client, 'hset', key, metaData);
     return client.hmsetAsync(key, metaData);
   };
@@ -47,7 +45,7 @@ module.exports = function Store(client) {
     });
   };
 
-  var exists = function exists(key, setKey) {
+  var existsInSet = function exists(key, setKey) {
     return client.zrankAsync(setKey, key)
     .then(function (reply) {
       return reply === null ? false : true;
@@ -82,11 +80,21 @@ module.exports = function Store(client) {
     return client.zrangeAsync(setKey, 0, -1);
   };
 
-  store.getMetaData = getMetaData;
-  store.setMetaData = setMetaData;
+  // item is an array
+  var addItem = function addItem(key, item) {
+    return client.saddAsync(key, item);
+  };
+
+  // item is an array
+  var removeItem = function removeItem(key, item) {
+    return client.sremAsync(key, item);
+  };
+
+  store.getMetadata = getMetadata;
+  store.setMetadata = setMetadata;
   store.setData = setData;
   store.getData = getData;
-  store.exists = exists;
+  store.existsInSet = existsInSet;
   store.incrCounter = incrCounter;
   store.incrementKey = incrementKey;
   store.listKeys = listKeys;

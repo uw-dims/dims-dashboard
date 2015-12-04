@@ -52,9 +52,9 @@ var timestamp = function () {
   var now = new Date().getTime();
   return now;
 };
-  
+
 test('models/store.js: Can save metadata', function (assert) {
-  store.setMetaData(metaKey, meta1)
+  store.setMetadata(metaKey, meta1)
   .then(function (reply) {
     assert.equal(reply, okResult, 'Should return ok when saving data');
     assert.end();
@@ -65,7 +65,7 @@ test('models/store.js: Can save metadata', function (assert) {
 });
 
 test('models/store.js: Can retrieve saved metadata', function (assert) {
-  store.getMetaData(metaKey)
+  store.getMetadata(metaKey)
   .then(function (reply) {
     assert.deepEqual(reply, meta1);
     assert.end();

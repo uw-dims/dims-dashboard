@@ -5,7 +5,9 @@ var config = require('../config/config'),
     keyGen = require('./keyGen'),
     keyExtract = require('./keyExtract'),
     logger = require('../utils/logger')(module),
-    _ = require('lodash-compat');
+    _ = require('lodash-compat'),
+    q = require('q'),
+    c = require('../config/redisScheme');
 
 
 module.exports = function Topic(store) {
@@ -14,19 +16,43 @@ module.exports = function Topic(store) {
 
   var initialTopicConfig = {
     parent: null,
-    type: null,
     name: null,
-    dataType: 'hash'
+    description: null,
+    creator: null,
+    dataType: 'string'
   };
 
-  var save = function save(key, metaKey, metaData, content) {
+  var timestamp = function () {
+    var now = new Date().getTime();
+    return now;
+  };
+
+  var save = function save(key, content, metaKey, metaData) {
     var data = {
       data: content
     };
-    return q.all([
-      store.setMetaData(metaKey, metaData),
-      store.setData(key, data)
-    ]);
+    if (metaData.dataType === 'string') {
+      return q.all([
+        store.setMetaData(metaKey, metaData),
+        store.setData(key, data)
+      ]);
+    } else if (metaData.dataType === 'set') {
+      return q.all([
+        store.setMetaData(metaKey, metaData),
+        store.addItem(key, content)
+      ]);
+    } else {
+      throw new Error('Invalid dataType supplied: ' + metaData.dataType);
+    }
+  };
+
+  // add items to a saved array
+  var addItems = function addItems(key, metaKey, metaData, content) {
+    return store.addItem(key, content);
+  };
+
+  var removeItems = function removeItems(key, content) {
+    return store.removeItem(key, content);
   };
 
   var create = function create(key, metaKey, metaData, content, setKey) {
@@ -60,18 +86,42 @@ module.exports = function Topic(store) {
   };
 
   var sanitizeName = function sanitizeName(name) {
-    
-  }
+
+  };
+
+  var verifyOptions = function verifyOptions(options) {
+    if (!options.hasOwnProperty('dataType')) {
+      return false;
+    }
+    if (!c.isValidTopicDataType(options.dataType)) {
+      return false;
+    }
+    return true;
+  };
 
   var topicPrototype = {
-    create: function (ticket, name, type, content) {
-
+    create: function (ticket, options) {
+      options = options || {};
       var self = this;
+      var createdTime = timestamp();
       var topic = topicFactory({
         parent: ticket,
-        type: type,
-
+        type: ticket.type,
+        dataType: options.type,
+        name: options.name,
+        description: options.description,
+        createdTime: createdTime,
+        modifiedTime: createdTime
+      });
+      return store.incrCounter(keyGen.topicCounterKey())
+      .then(function (reply) {
+        topic.num = reply;
+        var topicKey = keyGen.topicKey(topic);
       })
+      .catch(function (err) {
+        logger.error('create error: ', err.toString());
+        return new Error(err.toString());
+      });
 
     }
   };

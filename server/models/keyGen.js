@@ -5,10 +5,10 @@ var c = require('../config/redisScheme');
 
 var scrubPath = function scrubPath(path) {
   // Converts path to format used to create key
-  var newPath = path.replace('/', c.config.delimiter);
+  // var newPath = path.replace('/', c.config.delimiter);
   // logger.debug('models/keyGen scrubPath: path is ', newPath);
   // Strip trailing and initial, replace spaces with underscores
-  return _.trim(newPath, ' :').replace(' ', '_');
+  return _.trim(path, ' :').replace(' ', '_');
 };
 
 // Key Generator
@@ -20,7 +20,7 @@ var keyGen = {
   },
 
   ticketKey: function ticketKey(ticket) {
-    return c.makeBase('ticket', ticket.num);
+    return c.makeBase('ticket', ticket.type, ticket.num);
   },
 
   ticketSetKey: function ticketSetKey() {
@@ -63,7 +63,12 @@ var keyGen = {
   topicKey: function topicKey(topic) {
     // var key = this.ticketKey(topic.parent) + c.delimiter + topic.type + c.delimiter + topic.name;
     // return key;
-    return c.addContent(this.ticketKey(topic.parent), topic.type, topic.name);
+    return c.addContent(this.ticketKey(topic.parent), topic.name, topic.num);
+  },
+
+  // Counter for topics that need it - to ensure uniqueness
+  topicCounterKey: function topicCounterKey() {
+    return c.addSuffix(c.makeBase('ticket', 'topic'), 'counter');
   },
 
   // Key to list or set of topics associated to a ticket
