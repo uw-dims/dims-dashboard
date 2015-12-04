@@ -116,11 +116,11 @@ test('models/store.js: Can add key to a set of keys', function (assert) {
   });
 });
 
-test('models/store.js: Exists returns existence of key in a set', function (assert) {
-  store.exists(dataKey1, setKey1)
+test('models/store.js: existsInSet returns existence of key in a set', function (assert) {
+  store.existsInSet(dataKey1, setKey1)
   .then(function (reply) {
     assert.ok(reply, 'Returns true when key exists');
-    return store.exists(nonExistingKey1, setKey1);
+    return store.existsInSet(nonExistingKey1, setKey1);
   })
   .then(function (reply) {
     assert.notOk(reply, 'Returns false when key does not exist');
