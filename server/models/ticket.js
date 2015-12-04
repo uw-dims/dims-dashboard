@@ -78,12 +78,12 @@ module.exports = function Ticket(store) {
 
     close: function close() {
       var self = this;
-      self.metadata.open = false;
-      self.metadata.modifiedTime = timestamp();
       return self.exists()
       .then(function (reply) {
         if (reply) {
-          return store.setMetadata(keyGen.ticketKey(self), self.getTicketMetadata());
+          self.metadata.open = false;
+          self.metadata.modifiedTime = timestamp();
+          return store.setMetadata(keyGen.ticketKey(self.metadata), self.metadata);
         } else {
           return new Error('Cannot close a ticket that does not exist');
         }
@@ -96,12 +96,12 @@ module.exports = function Ticket(store) {
 
     open: function open() {
       var self = this;
-      self.metadata.open = true;
-      self.metadata.modifiedTime = timestamp();
       return self.exists()
       .then(function (reply) {
         if (reply) {
-          return store.setMetaData(keyGen.ticketKey(self), self.getTicketMetadata());
+          self.metadata.open = true;
+          self.metadata.modifiedTime = timestamp();
+          return store.setMetadata(keyGen.ticketKey(self.metadata), self.getTicketMetadata());
         } else {
           return new Error('Cannot open a ticket that does not exist');
         }
@@ -114,7 +114,7 @@ module.exports = function Ticket(store) {
 
     exists: function exists() {
       var self = this;
-      return store.existsInSet(keyGen.ticketKey(self), keyGen.ticketSetKey());
+      return store.existsInSet(keyGen.ticketKey(self.metadata), keyGen.ticketSetKey());
     },
 
     create: function create() {
@@ -226,11 +226,11 @@ module.exports = function Ticket(store) {
       // Create a new topic object
       logger.debug('Got to top of topicFromKey');
       logger.debug('key is ', key);
-      logger.debug('ticket key is ', keyGen.ticketKey(self));
+      logger.debug('ticket key is ', keyGen.ticketKey(self.metadata));
       var topic = topicFactory({
         parent: self,
         type: self.type,
-        name: keyExtract.topicName(key, keyGen.ticketKey(self))
+        name: keyExtract.topicName(key, keyGen.ticketKey(self.metadata))
       });
       // Get the stored datatype for the topic
       return topic.getDataType()
@@ -289,37 +289,38 @@ module.exports = function Ticket(store) {
     // Static method to return a ticket object populated from the
     // database for a given key
     getTicket: function getTicket(key) {
-      var thisKey = key;
-      return store.getMetaData(key)
+      return store.getMetadata(key)
       .then(function (reply) {
-        // Note: set num to integer since it derives from key, which is a string
-        config = {
-          num: keyExtract.ticketNum(thisKey),
-          creator: reply.creator,
-          type: reply.type,
-          createdTime: _.parseInt(reply.createdTime),
-          modifiedTime: _.parseInt(reply.modifiedTime),
-          open: reply.open === 'true' ? true : false
-        };
-        return ticketFactory(config);
+        if (reply !== null) {
+          config = castMetadata(reply);
+          var ticket = ticketFactory({
+            type: config.type,
+            description: config.description,
+            creator: config.creator
+          });
+          _.extend(ticket.metadata, config);
+          return ticket;
+        } else {
+          return null;
+        }
       })
       .catch(function (err) {
-        logger.error('Ticket.getTicket had an err returned from redis', err);
-        return err.toString();
+        logger.error('getTicket error: ', err.toString());
+        throw new Error(err.toString());
       });
     }
 
     // Static method to return array of keys for all tickets
-    // getAllTicketKeys: function getAllTicketKeys() {
-    //   logger.debug('Ticket.getAllTicketKeys ticketsetkey is ', keyGen.ticketSetKey());
-    //   return db.zrangeProxy(keyGen.ticketSetKey(), 0, -1).then(function (reply) {
-    //     return reply;
-    //   })
-    //   .catch(function (err, reply) {
-    //     logger.error('Ticket.getAllTickets had an err returned from redis', err, reply);
-    //     return new Error(err.toString());
-    //   });
-    // }
+    getAllTicketKeys: function getAllTicketKeys(option) {
+      logger.debug('Ticket.getAllTicketKeys ticketsetkey is ', keyGen.ticketSetKey());
+      return db.zrangeProxy(keyGen.ticketSetKey(), 0, -1).then(function (reply) {
+        return reply;
+      })
+      .catch(function (err, reply) {
+        logger.error('Ticket.getAllTickets had an err returned from redis', err, reply);
+        return new Error(err.toString());
+      });
+    }
   };
 
   // var topicPrototype = {
