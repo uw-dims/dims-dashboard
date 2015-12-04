@@ -10,12 +10,10 @@ module.exports = function Store(client) {
   };
 
   var getMetadata = function getMetadata(key) {
-    // return q.ninvoke(client, 'hgetall', key);
     return client.hgetallAsync(key);
   };
 
   var setMetadata = function setMetadata(key, metaData) {
-    // return q.ninvoke(client, 'hset', key, metaData);
     return client.hmsetAsync(key, metaData);
   };
 
@@ -24,12 +22,10 @@ module.exports = function Store(client) {
       data: json
     };
     var finalData = JSON.stringify(data);
-    // return q.ninvoke(client, 'set', finalData);
     return client.setAsync(key, finalData);
   };
 
   var getData = function getData(key) {
-    // return q.ninvoke(client, 'get', key)
     return client.getAsync(key)
     .then(function (reply) {
       try {
