@@ -1,6 +1,6 @@
 'use strict';
 
-var test = require('tape-catch');
+var test = require('tape');
 var _ = require('lodash-compat');
 var q = require('q');
 
@@ -90,7 +90,8 @@ var savedMeta;
 // };
 
 var failOnError = function (err, assert) {
-  logger.debug('TEST: Error ', err);
+  logger.error('TEST: Error ', err);
+  console.log('TEST: Error ', err);
   assert.fail(err);
   assert.end();
 };
@@ -152,10 +153,10 @@ test('models/ticket.js: Creating a ticket saves ticket key in sets of keys', fun
   ticket.create()
   .then(function (reply) {
     return q.all([
-      store.exists(activityKey1, ticketSetKey),
-      store.exists(activityKey1, ownerSetKey1),
-      store.exists(activityKey1, openSetKey),
-      store.exists(activityKey1, typeSetKey1)
+      store.existsInSet(activityKey1, ticketSetKey),
+      store.existsInSet(activityKey1, ownerSetKey1),
+      store.existsInSet(activityKey1, openSetKey),
+      store.existsInSet(activityKey1, typeSetKey1)
     ]);
   })
   .then(function (reply) {
@@ -208,7 +209,32 @@ test('models/ticket.js: Creating a ticket should generate a counter for the tick
   });
 });
 
-test('models/ticket.js: Closing a ticket should mark it as closed in the database', function (assert) {
+test('models/ticket.js: Exists reports presence of ticket key in set of keys', function (assert) {
+  var ticket = Ticket.ticketFactory(validOption1);
+  ticket.create()
+  .then(function (reply) {
+    return ticket.exists();
+  })
+  .then(function (reply) {
+    assert.ok(reply, 'Ticket exists reports true');
+    ticket.metadata.num = 5; // change key to invalid
+    return ticket.exists();
+  })
+  .then(function (reply) {
+    assert.notOk(reply, 'Ticket does not exist reports false');
+    return client.flushdbAsync();
+  })
+  .then(function (reply) {
+    assert.end();
+  })
+  .catch(function (err) {
+    failOnError(err, assert);
+  });
+
+});
+
+
+test('models/ticket.js: Closing a ticket should update it in database', function (assert) {
   var ticket = Ticket.ticketFactory(validOption1);
   ticket.create()
   .then(function (reply) {
@@ -223,6 +249,93 @@ test('models/ticket.js: Closing a ticket should mark it as closed in the databas
     // Cast types of the reply so we can compare
     reply = Ticket._private.castMetadata(reply);
     assert.equal(reply.open, false, 'metadata in database says ticket is closed');
+    assert.notEqual(reply.modifiedTime, reply.createdTime, 'modifiedTime was updated');
+    assert.equal(reply.modifiedTime, ticket.metadata.modifiedTime, 'modifiedTime in object was updated');
+    return client.flushdbAsync();
+  })
+  .then(function (reply) {
+    assert.end();
+  })
+  .catch(function (err) {
+    failOnError(err, assert);
+  });
+});
+
+test('models/ticket.js: Trying to close a ticket that does not exist returns Error', function (assert) {
+  var ticket = Ticket.ticketFactory(validOption1);
+  assert.throws(ticket.close());
+  client.flushdbAsync()
+  .then(function (reply) {
+    assert.end();
+  })
+  .catch(function (err) {
+    failOnError(err, assert);
+  });
+});
+
+test('models/ticket.js: Opening a ticket should update it in database', function (assert) {
+  var ticket = Ticket.ticketFactory(validOption1);
+  var closedModTime;
+  ticket.create()
+  .then(function (reply) {
+    assert.equal(ticket.metadata.open, true, 'created ticket is initially open');
+    return ticket.close();
+  })
+  .then(function (reply) {
+    assert.equal(ticket.metadata.open, false, 'after closing, ticket object says it is closed');
+    return store.getMetadata(activityKey1);
+  })
+  .then(function (reply) {
+    // Cast types of the reply so we can compare
+    reply = Ticket._private.castMetadata(reply);
+    assert.equal(reply.open, false, 'metadata in database says ticket is closed');
+    closedModTime = reply.modifiedTime;
+    return ticket.open();
+  })
+  .then(function (reply) {
+    assert.equal(ticket.metadata.open, true, 'ticket object now says it is open');
+    assert.notEqual(ticket.metadata.modifiedTime, closedModTime, 'modifiedTime was updated in object');
+    return store.getMetadata(activityKey1);
+  })
+  .then(function (reply) {
+    // Cast types of the reply so we can compare
+    reply = Ticket._private.castMetadata(reply);
+    assert.equal(reply.open, true, 'metadata in database says ticket is open');
+    assert.equal(reply.modifiedTime, ticket.metadata.modifiedTime, 'modifiedTime in database was updated');
+    return client.flushdbAsync();
+  })
+  .then(function (reply) {
+    assert.end();
+  })
+  .catch(function (err) {
+    failOnError(err, assert);
+  });
+});
+
+test('models/ticket.js: Trying to open a ticket that does not exist returns Error', function (assert) {
+  var ticket = Ticket.ticketFactory(validOption1);
+  assert.throws(ticket.open());
+  client.flushdbAsync()
+  .then(function (reply) {
+    assert.end();
+  })
+  .catch(function (err) {
+    failOnError(err, assert);
+  });
+});
+
+test('models/ticket.js: getTicket returns ticket object for retrieved ticket', function (assert) {
+  var ticket = Ticket.ticketFactory(validOption1);
+  ticket.create()
+  .then(function (reply) {
+    return Ticket.getTicket(activityKey1);
+  })
+  .then(function (reply) {
+    assert.deepEqual(reply, ticket, 'retrieved ticket matches');
+    return Ticket.getTicket('bob');
+  })
+  .then(function (reply) {
+    assert.equal(reply, null, 'getTicket returns null if ticket does not exist');
     return client.flushdbAsync();
   })
   .then(function (reply) {
