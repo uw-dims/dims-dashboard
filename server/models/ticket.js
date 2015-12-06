@@ -308,10 +308,13 @@ module.exports = function Ticket(store) {
         logger.error('getTicket error: ', err.toString());
         throw new Error(err.toString());
       });
-    }
+    },
 
-    // Static method to return array of keys for all tickets
-    getAllTicketKeys: function getAllTicketKeys(option) {
+    // Static method to return array of keys of tickets
+    //
+    getAllTicketKeys: function getAllTicketKeys(options) {
+      options = options || {};
+
       logger.debug('Ticket.getAllTicketKeys ticketsetkey is ', keyGen.ticketSetKey());
       return db.zrangeProxy(keyGen.ticketSetKey(), 0, -1).then(function (reply) {
         return reply;
