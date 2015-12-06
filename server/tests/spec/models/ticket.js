@@ -163,10 +163,10 @@ test('models/ticket.js: Creating a ticket saves ticket key in sets of keys', fun
     // Cast types of the reply so we can compare
     assert.deepEqual(reply, [true, true, true, true], 'Ticket key is stored in 4 sets');
     return q.all([
-      store.listKeys(ticketSetKey),
-      store.listKeys(ownerSetKey1),
-      store.listKeys(openSetKey),
-      store.listKeys(typeSetKey1)
+      store.listItems(ticketSetKey),
+      store.listItems(ownerSetKey1),
+      store.listItems(openSetKey),
+      store.listItems(typeSetKey1)
     ]);
   })
   .then(function (reply) {
@@ -195,7 +195,7 @@ test('models/ticket.js: Creating a ticket should generate a counter for the tick
   })
   .then(function (reply) {
     assert.equal(secondTicket.metadata.num, 2, 'Ticket counter is incremented');
-    return store.listKeys(ticketSetKey);
+    return store.listItems(ticketSetKey);
   })
   .then(function (reply) {
     assert.deepEqual(reply, ['dims:ticket:activity:1', 'dims:ticket:activity:2'], 'Unique keys generated using counter');
@@ -263,13 +263,13 @@ test('models/ticket.js: Closing a ticket should update it in database', function
 
 test('models/ticket.js: Trying to close a ticket that does not exist returns Error', function (assert) {
   var ticket = Ticket.ticketFactory(validOption1);
-  assert.throws(ticket.close());
-  client.flushdbAsync()
-  .then(function (reply) {
-    assert.end();
-  })
+  return ticket.close()
   .catch(function (err) {
-    failOnError(err, assert);
+    assert.ok(err instanceof Error, 'Error was thrown');
+    client.flushdbAsync()
+    .then(function (reply) {
+      assert.end();
+    });
   });
 });
 
@@ -314,13 +314,13 @@ test('models/ticket.js: Opening a ticket should update it in database', function
 
 test('models/ticket.js: Trying to open a ticket that does not exist returns Error', function (assert) {
   var ticket = Ticket.ticketFactory(validOption1);
-  assert.throws(ticket.open());
-  client.flushdbAsync()
-  .then(function (reply) {
-    assert.end();
-  })
+  return ticket.open()
   .catch(function (err) {
-    failOnError(err, assert);
+    assert.ok(err instanceof Error, 'Error was thrown');
+    client.flushdbAsync()
+    .then(function (reply) {
+      assert.end();
+    });
   });
 });
 
