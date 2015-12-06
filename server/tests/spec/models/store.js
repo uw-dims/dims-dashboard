@@ -69,6 +69,7 @@ var setupSets = function setupSets() {
 };
 
 var failOnError = function (err, assert) {
+  console.log(err);
   assert.fail(err);
   assert.end();
 };
@@ -154,26 +155,6 @@ test('models/store.js: Can retrieve saved data', function (assert) {
   });
 });
 
-test('models/store.js: Can add key to a sorted set of keys', function (assert) {
-  store.addKeyToSet(dataKey1, sortedSetKey1)
-  .then(function (reply) {
-    assert.equal(reply, 1);
-    return store.addKeyToSet (dataKey2, sortedSetKey1);
-  })
-  .then(function (reply) {
-    return client.zrangeAsync(sortedSetKey1, 0, -1);
-  })
-  .then(function (reply) {
-    assert.equal(reply.length, 2, 'Two keys now in set');
-    return client.flushdbAsync();
-  })
-  .then(function () {
-    assert.end();
-  })
-  .catch(function (err) {
-    failOnError(err, assert);
-  });
-});
 
 test('models/store.js: Can add items to sets', function (assert) {
   store.addItem(dataKey1, setKey1)
@@ -205,25 +186,91 @@ test('models/store.js: Can add items to sorted sets', function (assert) {
   store.addItem(dataKey1, sortedSetKey1, 0)
   .then (function (reply) {
     assert.equal(reply, 1, 'Added one item to the set');
-    return store.addItem([dataKey2, dataKey3], sortedSetKey1, 1);
+    return store.addItem(dataKey2, sortedSetKey1, 1);
   })
   .then (function (reply) {
-    assert.equal(reply, 2, 'Added two more items to the set');
+    assert.equal(reply, 1, 'Added one more item to the set');
+    return store.addItem(dataKey2, sortedSetKey1, 1);
+  })
+  .then (function (reply) {
+    assert.equal(reply, 0, 'Adding an existing item with same score returns 0');
     return store.addItem(dataKey2, sortedSetKey1, 2);
   })
   .then (function (reply) {
-    assert.equal(reply, 0, 'Adding an existing item returns 0');
+    assert.equal(reply, 0, 'Adding an existing item with different score returns 0');
     return client.zrangeAsync(sortedSetKey1, 0, -1);
   })
   .then (function (reply) {
-    assert.equal(reply.length, 3, 'Set now has 3 members');
-    return client.zrangeAsync(sortedSetKey1, 0, -1, 'WITHSCORES')
+    assert.equal(reply.length, 2, 'Set now has 2 members');
+    return client.zrangeAsync(sortedSetKey1, 0, -1, 'WITHSCORES');
   })
   .then(function (reply) {
     console.log(reply);
     return client.flushdbAsync();
   })
   .then(function () {
+    assert.end();
+  })
+  .catch(function (err) {
+    failOnError(err, assert);
+  });
+});
+
+test('models/store.js: Can remove items from sets', function (assert) {
+  setupSets()
+  .then(function (reply) {
+    return store.removeItem(dataKey1, setKey1);
+  })
+  .then(function (reply) {
+    assert.equals(reply, 1, 'Removed one item');
+    return client.smembersAsync(setKey1);
+  })
+  .then(function (reply) {
+    assert.deepEquals(reply, [dataKey2], 'Verified item was removed');
+    return store.removeItem([dataKey2, dataKey3], setKey2);
+  })
+  .then(function (reply) {
+    assert.equals(reply, 2, 'Removed two items');
+    return client.smembersAsync(setKey2);
+  })
+  .then(function (reply) {
+    assert.equals(reply.length, 0, 'Items were removed');
+    return client.flushdbAsync();
+  })
+  .then(function (reply) {
+    assert.end();
+  })
+  .catch(function (err) {
+    failOnError(err, assert);
+  });
+});
+
+test('models/store.js: Can remove items from sorted sets', function (assert) {
+  setupSortedSets()
+  .then(function (reply) {
+    return store.removeItem(dataKey1, sortedSetKey1);
+  })
+  .then(function (reply) {
+    assert.equals(reply, 1, 'Removed one item');
+    return client.zrangeAsync(sortedSetKey1, 0, -1);
+  })
+  .then(function (reply) {
+    assert.deepEquals(reply, [dataKey2], 'Verified item was removed');
+    return store.removeItem([dataKey2, dataKey3], sortedSetKey2);
+  })
+  .then(function (reply) {
+    assert.equals(reply, 2, 'Removed two items');
+    return client.zrangeAsync(sortedSetKey2, 0, -1);
+  })
+  .then(function (reply) {
+    assert.equals(reply.length, 0, 'Items were removed');
+    return client.zremAsync(sortedSetKey3, dataKey3, dataKey4);
+  })
+  .then(function (reply) {
+    console.log(reply);
+    return client.flushdbAsync();
+  })
+  .then(function (reply) {
     assert.end();
   })
   .catch(function (err) {
@@ -273,10 +320,36 @@ test('models/store.js: existsInSet returns existence of key in a set', function 
   });
 });
 
-test('models/store.js: existsInSet returns Error if set is not set or sortedSet', function (assert) {
+test('models/store.js: existsInSet throws Error if set is not set or sortedSet', function (assert) {
   store.setData(dataKey1, jsonData1)
   .then(function (reply) {
-    assert.throws(store.existsInSet(jsonData1, dataKey1));
+    return store.existsInSet(jsonData1, dataKey1);
+  })
+  .catch(function (err) {
+    assert.ok(err instanceof Error, 'Error was thrown');
+    client.flushdbAsync()
+    .then(function (reply) {
+      assert.end();
+    });
+  });
+});
+
+test('models/store.js: listItems should return members of a set', function (assert) {
+  setupSets()
+  .then(function (reply) {
+    return setupSortedSets();
+  })
+  .then(function (reply) {
+    return store.listItems(sortedSetKey1);
+  })
+  .then(function (reply) {
+    assert.equal(reply.length, 2, 'Returns two items from sorted set');
+    assert.deepEqual(reply, [dataKey1, dataKey2], 'Returns correct items from sorted set');
+    return store.listItems(setKey1);
+  })
+  .then(function (reply) {
+    assert.equal(reply.length, 2, 'Returns two items from set');
+    assert.deepEqual(reply, [dataKey1, dataKey2], 'Returns correct items from set');
     return client.flushdbAsync();
   })
   .then(function (reply) {
@@ -287,31 +360,28 @@ test('models/store.js: existsInSet returns Error if set is not set or sortedSet'
   });
 });
 
-test('models/store.js: Should return members of a set of keys', function (assert) {
-  store.listKeys(sortedSetKey1)
+test('models/store.js: listItems should throw error for invalid key', function (assert) {
+  store.setData(dataKey1, jsonData1)
   .then(function (reply) {
-    assert.equal(reply.length, 1, 'Set has one key');
-    assert.equal(reply[0], dataKey1, 'Correct key is returned');
-    return store.addKeyToSet(dataKey2, sortedSetKey1);
-  })
-  .then(function (reply) {
-    return store.listKeys(sortedSetKey1);
-  })
-  .then(function (reply) {
-    assert.equal(reply.length, 2, 'Set has two keys');
-    assert.equal(reply[0], dataKey1, 'Correct key is returned');
-    assert.equal(reply[1], dataKey2, 'Correct key is returned');
-    return store.listKeys(sortedSetKey2);
-  })
-  .then(function (reply) {
-    assert.equal(reply.length, 0, 'Empty set returns empty array');
-    return client.flushdbAsync();
-  })
-  .then(function (reply) {
-    assert.end();
+    return store.listItems(dataKey1);
   })
   .catch(function (err) {
-    failOnError(err, assert);
+    assert.ok(err instanceof Error, 'Error was thrown');
+    client.flushdbAsync()
+    .then(function (reply) {
+      assert.end();
+    });
+  });
+});
+
+test('models/store.js: listItems should throw error for non-existing key', function (assert) {
+  return store.listItems('bob:bob')
+  .catch(function (err) {
+    assert.ok(err instanceof Error, 'Error was thrown');
+    client.flushdbAsync()
+    .then(function (reply) {
+      assert.end();
+    });
   });
 });
 
@@ -333,14 +403,14 @@ test('models/store.js: Counter should increment', function (assert) {
   });
 });
 
-test('models/store.js: intersectKeys should return intersection of keys in sorted sets', function (assert) {
+test('models/store.js: intersectItems should return intersection of items in sorted sets', function (assert) {
   setupSortedSets()
-  .then(function(reply) {
-    return store.intersectKeys([sortedSetKey1, sortedSetKey2, sortedSetKey3], true);
+  .then(function (reply) {
+    return store.intersectItems([sortedSetKey1, sortedSetKey2, sortedSetKey3]);
   })
   .then(function (reply) {
     assert.deepEqual(reply, [], 'No keys in all sets');
-    return store.intersectKeys([sortedSetKey1, sortedSetKey2], true);
+    return store.intersectItems([sortedSetKey1, sortedSetKey2]);
   })
   .then(function (reply) {
     assert.deepEqual(reply, [dataKey2]);
@@ -354,14 +424,14 @@ test('models/store.js: intersectKeys should return intersection of keys in sorte
   });
 });
 
-test('models/store.js: intersectKeys should return intersection of keys in sets', function (assert) {
+test('models/store.js: intersetItems should return intersection of keys in sets', function (assert) {
   setupSets()
-  .then(function(reply) {
-    return store.intersectKeys([setKey1, setKey2, setKey3], false);
+  .then(function (reply) {
+    return store.intersectItems([setKey1, setKey2, setKey3], false);
   })
   .then(function (reply) {
     assert.deepEqual(reply, [], 'No keys in all sets');
-    return store.intersectKeys([setKey1, setKey2], false);
+    return store.intersectItems([setKey1, setKey2], false);
   })
   .then(function (reply) {
     assert.deepEqual(reply, [dataKey2]);
@@ -375,18 +445,18 @@ test('models/store.js: intersectKeys should return intersection of keys in sets'
   });
 });
 
-test('models/store.js: unionKeys should return union of keys in sorted sets', function (assert) {
+test('models/store.js: unionItems should return union of keys in sorted sets', function (assert) {
   setupSortedSets()
-  .then(function(reply) {
-    return store.unionKeys([sortedSetKey1, sortedSetKey2, sortedSetKey3], true);
+  .then(function (reply) {
+    return store.unionItems([sortedSetKey1, sortedSetKey2, sortedSetKey3], true);
   })
   .then(function (reply) {
     assert.deepEqual(reply, [dataKey1, dataKey2, dataKey3, dataKey4], 'Union contains one of each key');
-    return store.unionKeys([sortedSetKey1], true);
+    return store.unionItems([sortedSetKey1], true);
   })
   .then(function (reply) {
     assert.deepEqual(reply, [dataKey1, dataKey2], 'Union of self contains correct keys');
-    return store.unionKeys([sortedSetKey1, 'bob:bob'], true);
+    return store.unionItems([sortedSetKey1, 'bob:bob'], true);
   })
   .then(function (reply) {
     assert.deepEqual(reply, [dataKey1, dataKey2], 'Union of set and non-existing set contains correct keys');
@@ -400,19 +470,19 @@ test('models/store.js: unionKeys should return union of keys in sorted sets', fu
   });
 });
 
-test('models/store.js: unionKeys should return union of keys in sets', function (assert) {
+test('models/store.js: unionItems should return union of keys in sets', function (assert) {
   setupSets()
-  .then(function(reply) {
-    return store.unionKeys([setKey1, setKey2, setKey3], false);
+  .then(function (reply) {
+    return store.unionItems([setKey1, setKey2, setKey3], false);
   })
   .then(function (reply) {
     // Won't be ordered so sort result
     assert.deepEqual(reply.sort(), [dataKey1, dataKey2, dataKey3, dataKey4], 'Union contains one of each key');
-    return store.unionKeys([setKey1], false);
+    return store.unionItems([setKey1], false);
   })
   .then(function (reply) {
     assert.deepEqual(reply.sort(), [dataKey1, dataKey2], 'Union of self contains correct keys');
-    return store.unionKeys([setKey1, 'bob:bob'], false);
+    return store.unionItems([setKey1, 'bob:bob'], false);
   })
   .then(function (reply) {
     assert.deepEqual(reply.sort(), [dataKey1, dataKey2], 'Union of set and non-existing set contains correct keys');

@@ -39,11 +39,11 @@ module.exports = function Store(client) {
         return result.data;
       }
       catch (err) {
-        return new Error('Error parsing json. ' + err.toString());
+        throw new Error('Error parsing json. ' + err.toString());
       }
     })
     .catch(function (err) {
-      return new Error('Error from redis. ' + err.toString());
+      throw new Error('Error from redis. ' + err.toString());
     });
   };
 
@@ -52,9 +52,8 @@ module.exports = function Store(client) {
         promise;
     return client.typeAsync(setKey)
     .then(function (reply) {
-      console.log('reply from type', reply, item, setKey);
       if (reply !== setType && reply !== sortedSetType) {
-        return new Error ('existsInSet can only be called for sets and sorted sets');
+        throw new Error ('existsInSet can only be called for sets and sorted sets');
       }
       sorted = (reply === sortedSetType);
       console.log('sorted is ', sorted);
@@ -67,7 +66,7 @@ module.exports = function Store(client) {
       return reply === notExist ? false : true;
     })
     .catch(function (err) {
-      return new Error(err.toString());
+      throw err;
     });
 
   };
@@ -81,6 +80,32 @@ module.exports = function Store(client) {
       promise = client.saddAsync(setKey, item);
     }
     return promise;
+  };
+
+  // item can be an array. Removes from a set
+  var removeItem = function removeItem(item, setKey) {
+    var sorted;
+    var args = [];
+    if (typeof item === 'string') {
+      item = [item];
+    }
+    args.push(setKey);
+    args = _.union(args, item);
+    return client.typeAsync(setKey)
+    .then(function (reply) {
+      if (reply !== setType && reply !== sortedSetType) {
+        throw new Error ('listItems can only be called for sets and sorted sets');
+      }
+      sorted = (reply === sortedSetType);
+      if (sorted) {
+        return client.zremAsync.apply(client, args);
+      } else {
+        return client.sremAsync.apply(client, args);
+      }
+    })
+    .catch(function (err) {
+      throw err;
+    });
   };
 
   // var addKeyToSet = function addKeyToSet(key, setKey) {
@@ -98,67 +123,96 @@ module.exports = function Store(client) {
       return base + reply;
     })
     .catch(function (err) {
-      return new Error('Error from redis. ' + err.toString());
+      throw new Error('Error from redis. ' + err.toString());
     });
   };
 
   // list all keys in a sorted set
-  var listKeys = function listKeys(setKey) {
-    return client.zrangeAsync(setKey, 0, -1);
+  // var listKeys = function listKeys(setKey) {
+  //   return client.zrangeAsync(setKey, 0, -1);
+  // };
+
+  // List all items in a set or sorted set
+  var listItems = function listItems(key) {
+    var sorted;
+    // Get type
+    return client.typeAsync(key)
+    .then(function (reply) {
+      if (reply !== setType && reply !== sortedSetType) {
+        throw new Error ('listItems can only be called for sets and sorted sets');
+      }
+      sorted = (reply === sortedSetType);
+      console.log('sorted is ', sorted);
+      if (sorted) {
+        return client.zrangeAsync(key, 0, -1);
+      } else {
+        return client.smembersAsync(key);
+      }
+    })
+    .catch(function (err) {
+      throw new Error(err.toString());
+    });
   };
 
-  // keyArray: array of keys
-  // sorted - true for sorted sets, false for regular sets
-  var getKeysInSets = function listKeysInSets(keyArray) {
+  // Get array of results from an array of sorted sets
+  var getAllInSortedSets = function getAllInSortedSets(keyArray) {
     var promises = [];
     _.forEach(keyArray, function (value, index) {
-      client.typeAsync(setKey)
-      .then(function (reply) {
-
-      })
-      if (sorted) {
-        promises.push(client.zrangeAsync(value, 0, -1));
-      } else {
-        promises.push(client.smembersAsync(value));
-      }
+      promises.push(client.zrangeAsync(value, 0, -1));
     });
     return q.all(promises);
   };
 
-  var unionKeys = function unionKeys(setKeyArray, sorted) {
-    if (!sorted) {
-      return client.sunionAsync(setKeyArray);
-    } else {
-      return getKeysInSets(setKeyArray, sorted)
-      .then(function (reply) {
-        return _.union.apply(_, reply);
-      })
-      .catch(function (err) {
-        return new Error ('intersectKeys ', err.toString());
-      });
-    }
+  var unionItems = function unionItems(setKeyArray) {
+    var sorted;
+    return client.typeAsync(setKeyArray[0])
+    .then(function (reply) {
+      if (reply !== setType && reply !== sortedSetType) {
+        throw new Error ('unionKeys can only be called for sets and sorted sets');
+      }
+      sorted = (reply === sortedSetType);
+      if (!sorted) {
+        return client.sunionAsync(setKeyArray);
+      } else {
+        return getAllInSortedSets(setKeyArray)
+        .then(function (reply) {
+          return _.union.apply(_, reply);
+        })
+        .catch(function (err) {
+          return err;
+        });
+      }
+    })
+    .catch(function (err) {
+      throw err;
+    });
   };
 
   // Return array of items that are found in all keys in the input array.
   // Redis sortedSet or set
-  var intersectKeys = function intersectKeys(setKeyArray, sorted) {
-    if (!sorted) {
-      return client.sinterAsync.apply(client, setKeyArray);
-    } else {
-      return getKeysInSets(setKeyArray, sorted)
-      .then(function (reply) {
-        return _.intersection.apply(_, reply);
-        // return _.intersection(reply);
-      })
-      .catch(function (err) {
-        return new Error ('intersectKeys ', err.toString());
-      });
-    }
-  };
-
-  // item is an array. Removes from a set
-  var removeItem = function removeItem(key, item) {
-    return client.sremAsync(key, item);
+  var intersectItems = function intersectItems(setKeyArray) {
+    var sorted;
+    return client.typeAsync(setKeyArray[0])
+    .then(function (reply) {
+      if (reply !== setType && reply !== sortedSetType) {
+        throw new Error ('existsInSet can only be called for sets and sorted sets');
+      }
+      sorted = (reply === sortedSetType);
+      if (!sorted) {
+        return client.sinterAsync.apply(client, setKeyArray);
+      } else {
+        return getAllInSortedSets(setKeyArray)
+        .then(function (reply) {
+          return _.intersection.apply(_, reply);
+        })
+        .catch(function (err) {
+          throw err;
+        });
+      }
+    })
+    .catch(function (err) {
+      throw err;
+    });
   };
 
   store.getMetadata = getMetadata;
@@ -168,11 +222,11 @@ module.exports = function Store(client) {
   store.existsInSet = existsInSet;
   store.incrCounter = incrCounter;
   store.incrementKey = incrementKey;
-  store.listKeys = listKeys;
-  store.addKeyToSet = addKeyToSet;
+  store.listItems = listItems;
   store.addItem = addItem;
-  store.unionKeys = unionKeys;
-  store.intersectKeys = intersectKeys;
+  store.removeItem = removeItem;
+  store.unionItems = unionItems;
+  store.intersectItems = intersectItems;
 
   return store;
 };
