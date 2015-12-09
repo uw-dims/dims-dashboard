@@ -20,10 +20,15 @@ module.exports = function Store(client) {
   };
 
   var setMetadata = function setMetadata(key, metaData) {
+    // console.log('store.setMetadata key', key);
+    // console.log('store.setMetadata data', metaData);
     return client.hmsetAsync(key, metaData);
   };
 
+  // json must be JSON?
   var setData = function setData(key, json) {
+    // console.log('setData key is ', key);
+    // console.log('setData json is ', json);
     var data = {
       data: json
     };
@@ -47,6 +52,10 @@ module.exports = function Store(client) {
     });
   };
 
+  var deleteKey = function (key) {
+    return client.delAsync(key);
+  };
+
   var existsInSet = function exists(item, setKey) {
     var sorted,
         promise;
@@ -56,12 +65,12 @@ module.exports = function Store(client) {
         throw new Error ('existsInSet can only be called for sets and sorted sets');
       }
       sorted = (reply === sortedSetType);
-      console.log('sorted is ', sorted);
+      // console.log('sorted is ', sorted);
       promise = sorted ? client.zrankAsync(setKey, item) : client.sismemberAsync(setKey, item);
       return promise;
     })
     .then(function (reply) {
-      console.log('reply from promise', reply);
+      // console.log('reply from promise', reply);
       var notExist = sorted ? null : 0;
       return reply === notExist ? false : true;
     })
@@ -142,7 +151,7 @@ module.exports = function Store(client) {
         throw new Error ('listItems can only be called for sets and sorted sets');
       }
       sorted = (reply === sortedSetType);
-      console.log('sorted is ', sorted);
+      // console.log('sorted is ', sorted);
       if (sorted) {
         return client.zrangeAsync(key, 0, -1);
       } else {
@@ -195,7 +204,7 @@ module.exports = function Store(client) {
     return client.typeAsync(setKeyArray[0])
     .then(function (reply) {
       if (reply !== setType && reply !== sortedSetType) {
-        throw new Error ('existsInSet can only be called for sets and sorted sets');
+        throw new Error ('intersectItems can only be called for sets and sorted sets');
       }
       sorted = (reply === sortedSetType);
       if (!sorted) {
@@ -203,11 +212,29 @@ module.exports = function Store(client) {
       } else {
         return getAllInSortedSets(setKeyArray)
         .then(function (reply) {
+          // console.log('intersectItems, reply from get all ', reply);
           return _.intersection.apply(_, reply);
         })
         .catch(function (err) {
           throw err;
         });
+      }
+    })
+    .catch(function (err) {
+      throw err;
+    });
+  };
+
+  var countItems = function countItems(key) {
+    return client.typeAsync(key)
+    .then(function (reply) {
+      if (reply !== setType && reply !== sortedSetType) {
+        throw new Error ('countItems can only be called for sets and sorted sets');
+      }
+      if (reply === sortedSetType) {
+        return client.zcardAsync(key);
+      } else {
+        return client.scardAsync(key);
       }
     })
     .catch(function (err) {
@@ -227,6 +254,8 @@ module.exports = function Store(client) {
   store.removeItem = removeItem;
   store.unionItems = unionItems;
   store.intersectItems = intersectItems;
+  store.deleteKey = deleteKey;
+  store.countItems = countItems;
 
   return store;
 };

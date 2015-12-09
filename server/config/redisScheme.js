@@ -35,6 +35,12 @@ var makeSuffix = function (suffixType, param) {
     'closed': function () {
       return '.__closed';
     },
+    'private': function () {
+      return '.__private';
+    },
+    'public': function () {
+      return '.__public';
+    },
     'topics': function () {
       return '.__topics';
     },
@@ -165,7 +171,7 @@ var config =
     'query': {
       'prefix': 'query'
     },
-    'ticketTypes': ['mitigation', 'activity', 'user'],
+    'ticketTypes': ['mitigation', 'activity'],
     'topicTypes': ['silk', 'cif', 'crosscor', 'cidrs', 'mitigation', 'data'],
     'topicDataTypes': ['set', 'string'],
     'delimiter': ':',

@@ -86,7 +86,7 @@ test('models/store.js: Can save metadata', function (assert) {
     assert.equal(reply, okResult, 'Should return ok when saving data');
     return client.flushdbAsync();
   })
-  .then(function (reply) {
+  .then(function () {
     assert.end();
   })
   .catch(function (err) {
@@ -97,7 +97,7 @@ test('models/store.js: Can save metadata', function (assert) {
 test('models/store.js: Can retrieve saved metadata', function (assert) {
   // First save the metadata
   store.setMetadata(metaKey, meta1)
-  .then(function (reply) {
+  .then(function () {
     // Now retrieve it
     return store.getMetadata(metaKey);
   })
@@ -105,7 +105,7 @@ test('models/store.js: Can retrieve saved metadata', function (assert) {
     assert.deepEqual(reply, meta1);
     return client.flushdbAsync();
   })
-  .then(function (reply) {
+  .then(function () {
     assert.end();
   })
   .catch(function (err) {
@@ -123,7 +123,7 @@ test('models/store.js: Can save data', function (assert) {
     assert.equal(reply, okResult, 'Should return ok when saving string data');
     return client.flushdbAsync();
   })
-  .then(function (reply) {
+  .then(function () {
     assert.end();
   })
   .catch(function (err) {
@@ -218,7 +218,7 @@ test('models/store.js: Can add items to sorted sets', function (assert) {
 
 test('models/store.js: Can remove items from sets', function (assert) {
   setupSets()
-  .then(function (reply) {
+  .then(function () {
     return store.removeItem(dataKey1, setKey1);
   })
   .then(function (reply) {
@@ -237,7 +237,7 @@ test('models/store.js: Can remove items from sets', function (assert) {
     assert.equals(reply.length, 0, 'Items were removed');
     return client.flushdbAsync();
   })
-  .then(function (reply) {
+  .then(function () {
     assert.end();
   })
   .catch(function (err) {
@@ -247,7 +247,7 @@ test('models/store.js: Can remove items from sets', function (assert) {
 
 test('models/store.js: Can remove items from sorted sets', function (assert) {
   setupSortedSets()
-  .then(function (reply) {
+  .then(function () {
     return store.removeItem(dataKey1, sortedSetKey1);
   })
   .then(function (reply) {
@@ -270,7 +270,7 @@ test('models/store.js: Can remove items from sorted sets', function (assert) {
     console.log(reply);
     return client.flushdbAsync();
   })
-  .then(function (reply) {
+  .then(function () {
     assert.end();
   })
   .catch(function (err) {
@@ -280,7 +280,7 @@ test('models/store.js: Can remove items from sorted sets', function (assert) {
 
 test('models/store.js: existsInSet returns existence of item in a sorted set', function (assert) {
   setupSortedSets()
-  .then(function (reply) {
+  .then(function () {
     return store.existsInSet(dataKey1, sortedSetKey1);
   })
   .then(function (reply) {
@@ -291,7 +291,7 @@ test('models/store.js: existsInSet returns existence of item in a sorted set', f
     assert.notOk(reply, 'Returns false when key does not exist');
     return client.flushdbAsync();
   })
-  .then(function (reply) {
+  .then(function () {
     assert.end();
   })
   .catch(function (err) {
@@ -301,7 +301,7 @@ test('models/store.js: existsInSet returns existence of item in a sorted set', f
 
 test('models/store.js: existsInSet returns existence of key in a set', function (assert) {
   setupSets()
-  .then(function (reply) {
+  .then(function () {
     return store.existsInSet(dataKey1, setKey1);
   })
   .then(function (reply) {
@@ -312,7 +312,7 @@ test('models/store.js: existsInSet returns existence of key in a set', function 
     assert.notOk(reply, 'Returns false when key does not exist');
     return client.flushdbAsync();
   })
-  .then(function (reply) {
+  .then(function () {
     assert.end();
   })
   .catch(function (err) {
@@ -322,13 +322,13 @@ test('models/store.js: existsInSet returns existence of key in a set', function 
 
 test('models/store.js: existsInSet throws Error if set is not set or sortedSet', function (assert) {
   store.setData(dataKey1, jsonData1)
-  .then(function (reply) {
+  .then(function () {
     return store.existsInSet(jsonData1, dataKey1);
   })
   .catch(function (err) {
     assert.ok(err instanceof Error, 'Error was thrown');
     client.flushdbAsync()
-    .then(function (reply) {
+    .then(function () {
       assert.end();
     });
   });
@@ -336,10 +336,10 @@ test('models/store.js: existsInSet throws Error if set is not set or sortedSet',
 
 test('models/store.js: listItems should return members of a set', function (assert) {
   setupSets()
-  .then(function (reply) {
+  .then(function () {
     return setupSortedSets();
   })
-  .then(function (reply) {
+  .then(function () {
     return store.listItems(sortedSetKey1);
   })
   .then(function (reply) {
@@ -349,10 +349,10 @@ test('models/store.js: listItems should return members of a set', function (asse
   })
   .then(function (reply) {
     assert.equal(reply.length, 2, 'Returns two items from set');
-    assert.deepEqual(reply, [dataKey1, dataKey2], 'Returns correct items from set');
+    assert.deepEqual(reply.sort(), [dataKey1, dataKey2], 'Returns correct items from set');
     return client.flushdbAsync();
   })
-  .then(function (reply) {
+  .then(function () {
     assert.end();
   })
   .catch(function (err) {
@@ -362,13 +362,13 @@ test('models/store.js: listItems should return members of a set', function (asse
 
 test('models/store.js: listItems should throw error for invalid key', function (assert) {
   store.setData(dataKey1, jsonData1)
-  .then(function (reply) {
+  .then(function () {
     return store.listItems(dataKey1);
   })
   .catch(function (err) {
     assert.ok(err instanceof Error, 'Error was thrown');
     client.flushdbAsync()
-    .then(function (reply) {
+    .then(function () {
       assert.end();
     });
   });

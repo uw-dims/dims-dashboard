@@ -8,18 +8,22 @@ var yaml = require('js-yaml');
 var fs = require('fs');
 var path = require('path');
 var _ = require('lodash-compat');
-var redis = require('redis');
 var q = require('q');
 
 var ROOT_DIR = __dirname + '/../';
 var diContainer = require(path.join(ROOT_DIR, '/services/diContainer'))();
-var client = redis.createClient();
+var bluebird = require('bluebird');
+var redis = require('redis');
+
+var client = bluebird.promisifyAll(redis.createClient());
+bluebird.promisifyAll(client.multi());
 
 diContainer.factory('Attributes', require(path.join(ROOT_DIR, '/models/attributes')));
-diContainer.factory('db', require(path.join(ROOT_DIR, '/utils/redisProxy')));
+diContainer.factory('attributeService', require(path.join(ROOT_DIR, '/services/attributes')));
 diContainer.register('client', client);
 
 var Attributes = diContainer.get('Attributes');
+var attributeService = diContainer.get('attributeService');
 console.log('ROOT_DIR is %s', ROOT_DIR);
 
 (function () {
@@ -32,6 +36,11 @@ console.log('ROOT_DIR is %s', ROOT_DIR);
     var doc;
     try {
       doc = yaml.safeLoad(fs.readFileSync(yamlPath, 'utf8'));
+      // var yamlDoc = yaml.safeDump(doc, {
+      //   flowLevel: 2
+      // });
+      // fs.writeFileSync(path.join(__dirname, './userAttributesDump.yml'), yamlDoc);
+      // console.log(yamlDoc);
     } catch (err) {
       console.error('Cannot read file at ' + yamlPath + '. Error: ', err);
       return;
@@ -49,14 +58,15 @@ console.log('ROOT_DIR is %s', ROOT_DIR);
       attrPromises.push(attributes.updateAttributes(user, newConfig));
     });
     return q.all(attrPromises)
-    .then(function (reply) {
-      // print the result and quit redis client
+    .then(function () {
+      // print the result, save to a new file, and quit redis client
       Attributes.getAllAttributes()
       .then(function (reply) {
-        console.log(reply);
-        client.quit(function (err, reply) {
-          console.log('redis quit reply ', reply, err);
-        });
+        console.log('bootstrapAttributes: returned from Attributes.getAllAttributes(): ', reply);
+        return attributeService.attributesToFile();
+      })
+      .then(function () {
+        return client.quitAsync();
       })
       .catch(function (err) {
         console.log(err);
@@ -64,6 +74,7 @@ console.log('ROOT_DIR is %s', ROOT_DIR);
       .done();
     });
   };
+
 
   if (!module.parent) {
     bootstrapAttributes.runBootstrap();

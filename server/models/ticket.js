@@ -24,16 +24,14 @@ module.exports = function Ticket(store) {
     },
     'activity': {
       name: 'activity'
-    },
-    'user': {
-      name: 'user'
     }
   };
 
   var validOptions = {
     creator: 'creator',
     type: 'type',
-    description: 'description'
+    description: 'description',
+    private: 'private'
   };
 
   var isValidType = function (type) {
@@ -46,7 +44,8 @@ module.exports = function Ticket(store) {
 
   var validateConfig = function (config) {
     var defaultConfig = {
-      description: ''
+      description: '',
+      private: false
     };
     // var newConfig = _.extend({}, defaultConfig, config);
     _.defaults(config, defaultConfig);
@@ -58,10 +57,14 @@ module.exports = function Ticket(store) {
     if (!isValidType(config.type)) {
       return null;
     }
+    if (typeof config.private !== 'boolean') {
+      return null;
+    }
     return {
       creator: config.creator,
       description: config.description,
-      type: config.type
+      type: config.type,
+      private: config.private
     };
   };
 
@@ -71,12 +74,37 @@ module.exports = function Ticket(store) {
     metadata.modifiedTime = _.parseInt(metadata.modifiedTime);
     metadata.num = _.parseInt(metadata.num);
     metadata.open = metadata.open === 'true' ? true : false;
+    metadata.private = metadata.private === 'true' ? true : false;
     return metadata;
   };
 
   // Add key to a set with current time as score
-  var saveKey = function addToSet(key, setKey) {
-    return store.addItem(key, setKey, timestamp());
+  var saveKey = function addToSet(metadata, setKey) {
+    return store.addItem(keyGen.ticketKey(metadata), setKey, timestamp());
+  };
+
+  var saveMetadata = function saveMetadata(metadata) {
+    return store.setMetadata(keyGen.ticketKey(metadata), metadata);
+  };
+
+  var removeKey = function removeKey(metadata, setKey) {
+    return store.removeItem(keyGen.ticketKey(metadata), setKey);
+  };
+
+  var getMetadata = function getMetadata(key) {
+    // Get metadata from store
+    return store.getMetadata(key)
+    .then(function (reply) {
+      // coerce types
+      if (reply !== null) {
+        return castMetadata(reply);
+      } else {
+        return null;
+      }
+    })
+    .catch(function (err) {
+      throw err;
+    });
   };
 
   var ticketPrototype = {
@@ -88,7 +116,11 @@ module.exports = function Ticket(store) {
         if (reply) {
           self.metadata.open = false;
           self.metadata.modifiedTime = timestamp();
-          return store.setMetadata(keyGen.ticketKey(self.metadata), self.metadata);
+          return q.all([
+            saveMetadata(self.metadata),
+            removeKey(self.metadata, keyGen.ticketOpenKey()),
+            saveKey(self.metadata, keyGen.ticketClosedKey())
+          ]);
         } else {
           throw new Error('Cannot close a ticket that does not exist');
         }
@@ -105,7 +137,11 @@ module.exports = function Ticket(store) {
         if (reply) {
           self.metadata.open = true;
           self.metadata.modifiedTime = timestamp();
-          return store.setMetadata(keyGen.ticketKey(self.metadata), self.getTicketMetadata());
+          return q.all([
+            saveMetadata(self.metadata),
+            removeKey(self.metadata, keyGen.ticketClosedKey()),
+            saveKey(self.metadata, keyGen.ticketOpenKey())
+          ]);
         } else {
           throw new Error('Cannot open a ticket that does not exist');
         }
@@ -115,6 +151,88 @@ module.exports = function Ticket(store) {
       });
     },
 
+    makePrivate: function makePrivate() {
+      var self = this;
+      return self.exists()
+      .then(function (reply) {
+        if (reply) {
+          self.metadata.private = true;
+          self.metadata.modifiedTime = timestamp();
+          return q.all([
+            saveMetadata(self.metadata),
+            removeKey(self.metadata, keyGen.ticketPublicKey()),
+            saveKey(self.metadata, keyGen.ticketPrivateKey())
+          ]);
+        } else {
+          throw new Error('Cannot make private a ticket that does not exist');
+        }
+      })
+      .catch(function (err) {
+        throw err;
+      });
+    },
+
+    makePublic: function makePublic() {
+      var self = this;
+      return self.exists()
+      .then(function (reply) {
+        if (reply) {
+          self.metadata.private = false;
+          self.metadata.modifiedTime = timestamp();
+          return q.all([
+            saveMetadata(self.metadata),
+            removeKey(self.metadata, keyGen.ticketPrivateKey()),
+            saveKey(self.metadata, keyGen.ticketPublicKey())
+          ]);
+        } else {
+          throw new Error('Cannot make public a ticket that does not exist');
+        }
+      })
+      .catch(function (err) {
+        throw err;
+      });
+    },
+
+    updateDescription: function updateDescription(description) {
+      var self = this;
+      return self.exists()
+      .then(function (reply) {
+        if (reply) {
+          self.metadata.modifiedTime = timestamp();
+          self.description = description;
+          return saveMetadata(self.metadata);
+        } else {
+          throw new Error('Cannot update a ticket that does not exist');
+        }
+      })
+      .catch(function (err) {
+        throw err;
+      });
+    },
+
+    deleteTicket: function deleteTicket() {
+      var self = this;
+      var privKey, openKey;
+      if (self.metadata.private) {
+        privKey = keyGen.ticketPrivateKey();
+      } else {
+        privKey = keyGen.ticketPublicKey();
+      }
+      if (self.metadata.open) {
+        openKey = keyGen.ticketOpenKey();
+      } else {
+        openKey = keyGen.ticketClosedKey();
+      }
+      return q.all([
+        store.deleteKey(keyGen.ticketKey(self.metadata)),
+        removeKey(self.metadata, keyGen.ticketSetKey()),
+        removeKey(self.metadata, keyGen.ticketOwnerKey(self.metadata.creator)),
+        removeKey(self.metadata, openKey),
+        removeKey(self.metadata, keyGen.ticketTypeKey(self.metadata.type)),
+        removeKey(self.metadata, privKey)
+      ]);
+    },
+
     exists: function exists() {
       var self = this;
       return store.existsInSet(keyGen.ticketKey(self.metadata), keyGen.ticketSetKey());
@@ -122,21 +240,29 @@ module.exports = function Ticket(store) {
 
     create: function create() {
       var self = this;
+      var privKey;
       self.metadata.createdTime = timestamp();
       self.metadata.modifiedTime = self.metadata.createdTime;
       self.metadata.open = true;
+      self.key = keyGen.ticketKey(self.metadata);
       // Increment the ticket counter
       return store.incrCounter(keyGen.ticketCounterKey())
       .then(function (reply) {
         // Save the counter value
         self.metadata.num = reply;
+        if (self.metadata.private) {
+          privKey = keyGen.ticketPrivateKey();
+        } else {
+          privKey = keyGen.ticketPublicKey();
+        }
         // Save the ticket
         return q.all([
-          store.setMetadata(keyGen.ticketKey(self.metadata), self.metadata),
-          saveKey(keyGen.ticketKey(self.metadata), keyGen.ticketSetKey()),
-          saveKey(keyGen.ticketKey(self.metadata), keyGen.ticketOwnerKey(self.metadata)),
-          saveKey(keyGen.ticketKey(self.metadata), keyGen.ticketOpenKey()),
-          saveKey(keyGen.ticketKey(self.metadata), keyGen.ticketTypeKey(self.metadata.type))
+          saveMetadata(self.metadata),
+          saveKey(self.metadata, keyGen.ticketSetKey()),
+          saveKey(self.metadata, keyGen.ticketOwnerKey(self.metadata.creator)),
+          saveKey(self.metadata, keyGen.ticketOpenKey()),
+          saveKey(self.metadata, keyGen.ticketTypeKey(self.metadata.type)),
+          saveKey(self.metadata, privKey)
         ]);
       })
       .catch(function (err) {
@@ -150,126 +276,24 @@ module.exports = function Ticket(store) {
     getTicketMetadata: function getTicketMetadata() {
       var self = this;
       return self.metadata;
-    },
-
-    // Add a topic to this ticket. Creates topic object, saves to database.
-    // Returns topic object
-    // dataType is string or set
-    addTopic: function addTopic(topicName, dataType, content) {
-      var self = this,
-      // Create the topic object
-          topic = topicFactory({
-            parent: self,
-            type: self.type,
-            name: topicName,
-            dataType: dataType
-          });
-      logger.debug('models/Ticket.addTopic. Content is ', content);
-      logger.debug('models/Ticket.addTopic. topicName is ', topicName);
-      // Check to see if it already exists
-      return topic.exists()
-      .then(function (reply) {
-        if (!reply) {
-          logger.debug('models/Ticket.addTopic. Topic does not exist. Save it. content, score', content, score);
-          return topic.save(content).then(function (reply) {
-            /* jshint unused: false */
-            // Add the topic key to the sorted set of keys
-            // The score is the created timestamp, so we don't need to save that
-            // elsewhere - can get the score from the set
-            return db.zaddProxy(keyGen.topicSetKey(self), dimsUtils.createTimestamp(), keyGen.topicKey(topic));
-          })
-          .then(function (reply) {
-            /* jshint unused: false */
-            return topic;
-          })
-          .catch(function (err) {
-            logger.error('models/Ticket.addTopic had an err returned from redis', err, reply);
-            throw new Error(err.toString());
-          });
-        } else {
-          logger.debug('models/Ticket.addTopic. Topic already exists. Return rejection to caller ');
-          throw new Error('Topic already exists.');
-        }
-      });
-    },
-
-    // Get all topics attached to this ticket and return as Topic objects
-    getTopics: function getTopics() {
-      var self = this,
-          promises = [];
-      // First get the array of topic keys
-      return self.getTopicKeys()
-      .then(function (topicKeys) {
-        var topicPromise;
-        for (var i = 0; i < topicKeys.length; i++) {
-          topicPromise = self.topicFromKey(topicKeys[i]);
-          promises.push(topicPromise);
-        }
-        return q.all(promises);
-      })
-      .then(function (topics) {
-        return topics;
-      })
-      .catch(function (err) {
-        logger.error('Ticket.getTopics had an err returned from redis', err);
-        throw err;
-      });
-    },
-
-    // Get keys of all topics attached to this ticket
-    getTopicKeys: function getTopicKeys() {
-      var self = this;
-      // Get the keys
-      return listKeys(keyGen.topicSetKey(self));
-    },
-
-    // Construct topic object from a topic key
-    topicFromKey: function topicFromKey(key) {
-      var self = this;
-      // Create a new topic object
-      logger.debug('Got to top of topicFromKey');
-      logger.debug('key is ', key);
-      logger.debug('ticket key is ', keyGen.ticketKey(self.metadata));
-      var topic = topicFactory({
-        parent: self,
-        type: self.type,
-        name: keyExtract.topicName(key, keyGen.ticketKey(self.metadata))
-      });
-      // Get the stored datatype for the topic
-      return topic.getDataType()
-      .then(function (reply) {
-        logger.debug('Ticket.topicFromKey:reply from getDataType ', reply);
-        // Set the dataType in the topic object
-        topic.setDataType(reply);
-        // Return the topic object
-        return topic;
-      })
-      .catch(function (err) {
-        logger.error('Ticket.topicFromKey had an err returned from redis', err);
-        throw err;
-      });
-    },
-
-    // Returns metadata of object as a string
-    paramString: function paramString() {
-      var self = this;
-      return self.num + ',' + self.type + ',' + self.creator + ',' + self.createdTime + ',' + self.open;
     }
 
   };
 
   // Factory function to create an unsaved ticket object
   var ticketFactory = function ticketFactory(options) {
+    var metadata = {};
     if (options === null || options === undefined) {
       return new Error('Failed to provide options to ticketFactory');
     } else {
       if (validateConfig(options) !== false) {
-        var metadata = {
+        metadata = {
           metadata: validateConfig(options)
         };
       } else {
         throw new Error ('Invalid options supplied to ticketFactory');
       }
+      // console.log(metadata);
       return (_.extend({}, ticketPrototype, metadata));
     }
   };
@@ -277,14 +301,15 @@ module.exports = function Ticket(store) {
   // all, open, closed, owned, of a particular type
   /**
     {
-      type: one of: all, activity, mitigation, user,
+      type: one of: all, activity, mitigation
       ownedBy: user,
-      open: true or false
+      open: true or false,
+      private: true or false
     }
   */
 
   var validateQuery = function validateQuery(options) {
-    var result;
+    var result = {};
     if (!options['type']) {
       return null;
     }
@@ -292,97 +317,146 @@ module.exports = function Ticket(store) {
     if (!isValidType(options.type) && options.type !== 'all') {
       return null;
     }
-    if (options.type === 'user' && !options['ownedBy']) {
+    if (options.hasOwnProperty('private')) {
+      if (typeof options.private !== 'boolean') {
+        return null;
+      }
+    }
+    if (options.private && !options['ownedBy']) {
       return null;
     }
-    if (options.hasOwnProperty(open)) {
-      if (!options.open instanceof 'boolean') {
+    if (options.hasOwnProperty('open')) {
+      if (typeof options.open !== 'boolean') {
         return null;
       }
     }
     result.type = options.type;
+    if (options['private']) {
+      result.private = options.private;
+    }
     if (options['ownedBy']) {
       result.ownedBy = options.ownedBy;
     }
-    if (options.hasOwnProperty(open)) {
+    if (options.hasOwnProperty('open')) {
       result.open = options.open;
     }
     return result;
   };
 
   var getTicketKeys = function getTicketKeys(options) {
+    // console.log('getTicketKeys options', options);
+    var keyArray = [];
     var query = validateQuery(options);
     if (query === null) {
       throw new Error('Invalid query supplied to retrieve tickets');
     }
+    if (query.type === 'all') {
+      keyArray.push(keyGen.ticketSetKey());
+    }
+    if (query.type === 'activity' || query.type === 'mitigation') {
+      keyArray.push(keyGen.ticketTypeKey(query.type));
+    }
+    if (query.hasOwnProperty('private')) {
+      if (query.private) {
+        keyArray.push(keyGen.ticketPrivateKey());
+      } else {
+        keyArray.push(keyGen.ticketPublicKey());
+      }
+    }
+    if (query.hasOwnProperty('open') ) {
+      if (query.open) {
+        keyArray.push(keyGen.ticketOpenKey());
+      } else {
+        keyArray.push(keyGen.ticketClosedKey());
+      }
+    }
+    if (query.hasOwnProperty('ownedBy')) {
+      keyArray.push(keyGen.ticketOwnerKey(query.ownedBy));
+    }
+    // console.log('getTicketKeys. keyArray is ', keyArray);
+    return store.intersectItems(keyArray);
   };
 
-  var getOpenTicketKeys = function getOpenTicketKeys() {
-    return store.listItems(keyGen.ticketOpenKey());
+  // var completeTicket = function completeTicket(config) {
+  //   config = castMetadata(config);
+  //   var ticket = ticketFactory({
+  //     type: config.type,
+  //     description: config.description,
+  //     creator: config.creator,
+  //     private: config.private
+  //   });
+  //   _.extend(ticket.metadata, config);
+  //   ticket.key = keyGen.ticketKey(ticket.metadata);
+  //   return ticket;
+  // };
+
+  // Returns ticket metadata and key
+  // Does not create full ticket object with functions
+  var getTicket = function getTicket(key) {
+    return getMetadata(key)
+    .then(function (reply) {
+      if (reply !== null) {
+        return {
+          key: key,
+          metadata: reply
+        };
+      } else {
+        return null;
+      }
+    })
+    .catch(function (err) {
+      throw err;
+    });
   };
 
-  var getAllTicketKeys = function getAllTicketKeys() {
-    return store.listItems(keyGen.ticketSetKey());
+  var getTickets = function getTickets(options) {
+    var promises = [];
+    return getTicketKeys(options)
+    .then(function (reply) {
+      _.forEach(reply, function (value, index) {
+        promises.push(getTicket(value));
+      });
+      return q.all(promises);
+    })
+    .catch(function (err) {
+      throw err;
+    });
   };
 
-  var getAllKeysOfType = function getAllKeysOfType(type, user) {
-
+  // Extends ticket retrieved from store to full ticket object with
+  // functions. Includes key as well.
+  var extendFactory = function extendFactory(config) {
+    var ticketObject = ticketFactory({
+      type: config.metadata.type,
+      description: config.metadata.description,
+      creator: config.metadata.creator,
+      private: config.metadata.private
+    });
+    _.extend(ticketObject.metadata, config.metadata);
+    ticketObject.key = config.key;
+    return ticketObject;
   };
 
-  var getAllOwnedKeys = function getAllOwnedKeys(owner) {
-
-  };
-
-  // This is what we're exposing
+  // This is what we're exposing publicly
   var ticket = {
-
     // Factory to create a new ticket object
     ticketFactory: ticketFactory,
-
-    // Static method to return a ticket object populated from the
+    // Static method to return a ticket populated from the
     // database for a given key
-    getTicket: function getTicket(key) {
-      return store.getMetadata(key)
-      .then(function (reply) {
-        if (reply !== null) {
-          config = castMetadata(reply);
-          var ticket = ticketFactory({
-            type: config.type,
-            description: config.description,
-            creator: config.creator
-          });
-          _.extend(ticket.metadata, config);
-          return ticket;
-        } else {
-          return null;
-        }
-      })
-      .catch(function (err) {
-        throw err;
-      });
-    },
-
-    // Static method to return array of keys of tickets
-    //
-    getAllTicketKeys: function getAllTicketKeys(options) {
-      options = options || {};
-      logger.debug('Ticket.getAllTicketKeys ticketsetkey is ', keyGen.ticketSetKey());
-      return db.zrangeProxy(keyGen.ticketSetKey(), 0, -1).then(function (reply) {
-        return reply;
-      })
-      .catch(function (err, reply) {
-        logger.error('Ticket.getAllTickets had an err returned from redis', err, reply);
-        return new Error(err.toString());
-      });
-    }
+    getTicket: getTicket,
+    // Static method to return array of tickets
+    getTickets: getTickets,
+    // extends ticket data from store to include functions
+    extendFactory: extendFactory
   };
 
-  // If testing, export some private functions
+  // If testing, export some private functions so we can test them
   if (process.env.NODE_ENV === 'test') {
     ticket._private = {
       castMetadata: castMetadata,
       validateConfig: validateConfig,
-      validateQuery: validateQuery
+      validateQuery: validateQuery,
+      getTicketKeys: getTicketKeys
     };
   }
 

@@ -7,6 +7,9 @@ module.exports = function (Bookshelf) {
     idAttribute: 'ident',
     email: function () {
       return this.hasMany(Email, 'member');
+    },
+    trustgroups: function () {
+      return this.belongsToMany(MemberTrustGroup, 'member');
     }
   });
 
@@ -27,9 +30,26 @@ module.exports = function (Bookshelf) {
     idAttribute: 'ident'
   });
 
+  var TrustGroups = Bookshelf.Collection.extend({
+    model: TrustGroup
+  });
+
   var MemberTrustGroup = Bookshelf.Model.extend({
     tableName: 'member_trustgroup',
-    idAttribute: ['member', 'trustGroup']
+    idAttribute: ['member', 'trustGroup'],
+    user: function () {
+      return this.belongsToMany(User, 'ident');
+    },
+    email: function () {
+      return this.belongsToMany(Email, 'member', 'email')
+    },
+    trustgroup: function () {
+      return this.belongsTo(TrustGroup, 'ident')
+    }
+  });
+
+  var MemberTrustGroups = Bookshelf.Collection.extend({
+    model: MemberTrustGroup
   });
 
   var MailingList = Bookshelf.Model.extend({
@@ -37,9 +57,17 @@ module.exports = function (Bookshelf) {
     idAttribute: ['lhs', 'trustgroup']
   });
 
+  var MailingLists = Bookshelf.Collection.extend({
+    model: MailingList
+  });
+
   var MemberMailingList = Bookshelf.Model.extend({
     tableName: 'member_mailinglist',
     idAttribute: ['member', 'lhs', 'trustgroup']
+  });
+
+  var MemberMailingLists = Bookshelf.Collection.extend({
+    model: MemberMailingList
   });
 
   var userModel = {
@@ -47,9 +75,13 @@ module.exports = function (Bookshelf) {
     Users: Users,
     Email: Email,
     TrustGroup: TrustGroup,
+    TrustGroups: TrustGroups,
     MemberTrustGroup: MemberTrustGroup,
+    MemberTrustGroups: MemberTrustGroups,
     MailingList: MailingList,
-    MemberMailingList: MemberMailingList
+    MailingLists: MailingLists,
+    MemberMailingList: MemberMailingList,
+    MemberMailingLists: MemberMailingLists
   };
 
   return userModel;

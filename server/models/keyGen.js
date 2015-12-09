@@ -20,6 +20,7 @@ var keyGen = {
   },
 
   ticketKey: function ticketKey(ticket) {
+    // console.log('ticketKey, ticket is ', ticket);
     return c.makeBase('ticket', ticket.type, ticket.num);
   },
 
@@ -35,11 +36,15 @@ var keyGen = {
     return c.addSuffix(c.makeRoot('ticket'), 'closed');
   },
 
-  ticketOwnerKey: function ticketOwnerKey(param) {
-    if (typeof param === 'string') {
-      return c.addSuffix(c.makeRoot('ticket'), 'owner', param);
-    }
-    return c.addSuffix(c.makeRoot('ticket'), 'owner', param.creator);
+  ticketPublicKey: function ticketPublicKey() {
+    return c.addSuffix(c.makeRoot('ticket'), 'public');
+  },
+  ticketPrivateKey: function ticketPrivateKey() {
+    return c.addSuffix(c.makeRoot('ticket'), 'private');
+  },
+
+  ticketOwnerKey: function ticketOwnerKey(owner) {
+    return c.addSuffix(c.makeRoot('ticket'), 'owner', owner);
   },
 
   ticketSubscriptionsKey: function ticketSubscriptionsKey(user) {
@@ -50,11 +55,12 @@ var keyGen = {
     return c.addSuffix(this.ticketKey(ticket), 'subscribers');
   },
 
-  ticketTypeKey: function ticketTypeKey(param) {
-    if (typeof param === 'string') {
-      return c.addSuffix(c.makeRoot('ticket'), 'type', param);
+  ticketTypeKey: function ticketTypeKey(type, owner) {
+    if (type !== 'private') {
+      return c.addSuffix(c.makeRoot('ticket'), 'type', type);
+    } else {
+      return c.addSuffix(c.makeRoot('ticket'), 'type', type, owner);
     }
-    return c.addSuffix(c.makeRoot('ticket'), 'type', param.type);
   },
 
   // Key to a topic
@@ -63,7 +69,13 @@ var keyGen = {
   topicKey: function topicKey(topic) {
     // var key = this.ticketKey(topic.parent) + c.delimiter + topic.type + c.delimiter + topic.name;
     // return key;
+    // console.log('topicKey topic is ', topic);
+    // console.log('topic parent is ', topic.parent);
     return c.addContent(this.ticketKey(topic.parent), topic.name, topic.num);
+  },
+
+  topicMetaKey: function topicMetaKey(topic) {
+    return c.addSuffix(this.topicKey(topic), 'metadata');
   },
 
   // Counter for topics that need it - to ensure uniqueness
@@ -73,17 +85,24 @@ var keyGen = {
 
   // Key to list or set of topics associated to a ticket
   // "ticket:type:num.__topics"
-  topicSetKey: function topicSetKey(ticket) {
+  topicSetKey: function topicSetKey(topic) {
     // return c.namespace + this.ticketKey(ticket) + c.topicSuffix;
-    return c.addSuffix(this.ticketKey(ticket), 'topics');
+    return c.addSuffix(this.ticketKey(topic.parent), 'topics');
   },
 
-  // Not sure if this is needed since timestamp is score in set of topics
-  // Key to a topic timestamp
-  // key_of_topic.__timestamp
-  // topicTimestampKey: function (topic) {
-  //   return this.topicKey(topic) + c.timestampSuffix;
-  // },
+  topicSetKeyFromTicketKey: function topicSetKeyFromTicketKey(key) {
+    return c.addSuffix(key, 'topics');
+  },
+
+  topicKeyFromMetaKey: function topicKeyFromMetaKey(key) {
+    var keyArray = key.split(c.config.delimiter);
+    var topicKeyArray = _.take(keyArray, 6);
+    return topicKeyArray.join(c.config.delimiter);
+  },
+
+  metaKeyFromKey: function metaKeyFromKey(key) {
+    return c.addSuffix(key, 'metadata');
+  },
 
   // Key to a file - generated from a file object
   fileKey: function (fileData) {

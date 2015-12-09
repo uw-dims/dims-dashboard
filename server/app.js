@@ -54,7 +54,10 @@ diContainer.factory('userRoute', require('./routes/user'));
 diContainer.factory('attributeRoute', require('./routes/attributes'));
 diContainer.factory('lmsearchRoute', require('./routes/lmsearch'));
 diContainer.factory('mitigationService', require('./services/mitigation'));
+diContainer.factory('ticketService', require('./services/ticket'));
 diContainer.factory('healthService', require('./services/healthService'));
+diContainer.factory('store', require('./models/store'));
+diContainer.factory('Topic', require('./models/topic'));
 
 // diContainer.factory('ticketService', require('./services/ticket'));
 
@@ -296,15 +299,15 @@ if (require.main === module) {
       require('./services/messaging')(io);
       server.listen(port, function () {
         console.log('[+++] Server listening');
-        healthLogger.publish('dashboard initialized DIMS Dashboard running on port ' + server.address().port);
+        healthLogger.publish('dashboard initialized DIMS Dashboard running on port ' + server.address().port, config.dashboardID);
         if (config.sslOn) {
-          healthLogger.publish('dashboard initialized SSL is on');
+          healthLogger.publish('dashboard initialized SSL is on', config.dashboardID);
         } else {
-          healthLogger.publish('dashboard initialized SSL is off');
+          healthLogger.publish('dashboard initialized SSL is off', config.dashboardID);
         }
-        healthLogger.publish('dashboard initialized Node environment: ' + config.env);
-        healthLogger.publish('dashboard initialized Log level: ' + config.logLevel);
-        healthLogger.publish('dashboard initialized userDB source: ' + config.userSource);
+        healthLogger.publish('dashboard initialized Node environment: ' + config.env, config.dashboardID);
+        healthLogger.publish('dashboard initialized Log level: ' + config.logLevel, config.dashboardID);
+        healthLogger.publish('dashboard initialized userDB source: ' + config.userSource, config.dashboardID);
       });
     });
   });
@@ -315,7 +318,7 @@ if (require.main === module) {
 
 process.on('SIGTERM', function () {
   // logger.debug('SIGTERM received');
-  healthLogger.publish('dashboard received SIGTERM, exiting...');
+  healthLogger.publish('dashboard received SIGTERM, exiting...', config.dashboardID);
   server.close(function () {
     // logger.debug('Server close');
     process.exit(0);

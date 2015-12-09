@@ -9,24 +9,6 @@ var logger = require('../../../utils/logger')(module);
 var keyGen = require('../../../models/keyGen');
 var extract = require('../../../models/keyExtract');
 
-// Enable service discovery for this test
-// var diContainer = require('../../../services/diContainer')();
-// var redis = require('redis');
-// var client = redis.createClient();
-// client.select(10, function (err, reply) {
-//   if (err) {
-//     console.error('test: redis client received error when selecting database ', err);
-//     throw new Error(err);
-//   }
-// });
-// diContainer.factory('db', require('../../../utils/redisProxy'));
-// diContainer.register('client', client);
-
-// diContainer.factory('Ticket', require('../../../models/ticket'));
-
-// var Ticket = diContainer.get('Ticket');
-// var db = diContainer.get('db');
-
 var bluebird = require('bluebird');
 var redis = require('redis');
 
@@ -56,11 +38,12 @@ var user = 'testUser'; // Simulates logged in user
 //     topicContents2 = 'aaaaaa',
 //     ticketType1 = 'data';
 
-var createOptions = function (creator, type, description) {
+var createOptions = function (creator, type, privacy, description) {
   return {
     creator: creator,
     type: type,
-    description: description
+    description: description,
+    private: privacy
   };
 };
 
@@ -73,16 +56,37 @@ var openSetKey = 'dims:ticket.__open';
 var typeSetKey1 = 'dims:ticket.__type.__activity';
 var ticketSetKey = 'dims:ticket.__keys';
 
-var validOption1 = createOptions(user1, 'activity');
-var expectedOption1 = createOptions(user1, 'activity');
+var validOption1 = createOptions(user1, 'activity', false);
+var expectedOption1 = createOptions(user1, 'activity', false);
 _.extend(expectedOption1, {description: ''});
-var validOption2 = createOptions(user1, 'activity', 'An activity');
-var extraOptions1 = createOptions(user1, 'activity', 'An activity');
+var validOption2 = createOptions(user1, 'activity');
+var expectedOption2 = createOptions(user1, 'activity', true, '');
+var extraOptions1 = createOptions(user1, 'activity', true, 'An activity');
 _.extend(extraOptions1, {'nancy': 'girl'});
+var expectedOption3 = createOptions(user1, 'activity', true, 'An activity');
 
-var savedTicket;
-var savedKey;
-var savedMeta;
+var createTickets = function createTickets() {
+  var activityConfig1 = createOptions('testuser1', 'activity');
+  var mitigationConfig1 = createOptions('testuser2', 'mitigation', false);
+  var privateConfig1 = createOptions('testuser2', 'activity', true);
+  var activityConfig2 = createOptions('testuser2', 'activity', false);
+  var ticket1 = Ticket.ticketFactory(activityConfig1);
+  var ticket2 = Ticket.ticketFactory(mitigationConfig1);
+  var ticket3 = Ticket.ticketFactory(privateConfig1);
+  var ticket4 = Ticket.ticketFactory(activityConfig2);
+  return q.all([
+    ticket1.create(),
+    ticket2.create(),
+    ticket3.create(),
+    ticket4.create()
+  ])
+  .then(function (reply) {
+    return ticket4.close();
+  })
+  .catch(function (err) {
+    throw err;
+  });
+};
 
 // var debugTicketCounter = function () {
 //   createCounter++;
@@ -103,8 +107,8 @@ test('models/ticket.js: TicketFactory returns ticket object with metadata', func
     assert.throws(Ticket.ticketFactory(createOptions('bob')), Error, 'Missing options throw Error');
     assert.throws(Ticket.ticketFactory(createOptions('bob', 'fred')), Error, 'Invalid type throws Error');
     assert.deepEqual((Ticket.ticketFactory(validOption1)).metadata, expectedOption1, 'description should be included as empty string if it was not present in options');
-    assert.deepEqual((Ticket.ticketFactory(validOption2)).metadata, validOption2, 'valid options should succeed');
-    assert.deepEqual((Ticket.ticketFactory(extraOptions1)).metadata, validOption2, 'extra options should be discarded');
+    assert.deepEqual((Ticket.ticketFactory(validOption2)).metadata, expectedOption2, 'valid options should succeed');
+    assert.deepEqual((Ticket.ticketFactory(extraOptions1)).metadata, expectedOption3, 'extra options should be discarded');
     assert.end();
   }, 1000);
 });
@@ -132,11 +136,12 @@ test('models/ticket.js: Creating a ticket saves metadata at ticketKey', function
   var ticket = Ticket.ticketFactory(validOption1);
   ticket.create()
   .then(function (reply) {
-    assert.deepEqual(reply, ['OK', 1, 1, 1, 1], 'Saving ticket returns correct reply');
+    assert.deepEqual(reply, ['OK', 1, 1, 1, 1, 1], 'Saving ticket returns correct reply');
     return store.getMetadata(activityKey1);
   })
   .then(function (reply) {
     // Cast types of the reply so we can compare
+    console.log(reply);
     assert.deepEqual(Ticket._private.castMetadata(reply), ticket.metadata, 'Metadata is stored in database');
     return client.flushdbAsync();
   })
@@ -331,7 +336,9 @@ test('models/ticket.js: getTicket returns ticket object for retrieved ticket', f
     return Ticket.getTicket(activityKey1);
   })
   .then(function (reply) {
-    assert.deepEqual(reply, ticket, 'retrieved ticket matches');
+    console.log(reply.metadata);
+    console.log(ticket.metadata);
+    assert.deepEqual(reply.metadata, ticket.metadata, 'retrieved ticket matches');
     return Ticket.getTicket('bob');
   })
   .then(function (reply) {
@@ -346,359 +353,209 @@ test('models/ticket.js: getTicket returns ticket object for retrieved ticket', f
   });
 });
 
+test('models/ticket.js: validateQuery validates query options', function (assert) {
+  var options = {
+    type: 'all'
+  };
+  assert.deepEqual(Ticket._private.validateQuery(options), options, 'options with only type: all validates');
+  options = {
+    bob: 'all'
+  };
+  assert.equal(Ticket._private.validateQuery(options), null, 'options without type fails validataion');
+  options = {
+    type: 'mitigation'
+  };
+  assert.deepEqual(Ticket._private.validateQuery(options), options, 'options with only type: mitigation validate');
+  options = {
+    type: 'activity'
+  };
+  assert.deepEqual(Ticket._private.validateQuery(options), options, 'options with only type: activity validate');
+  options = {
+    type: 'bob'
+  };
+  assert.equal(Ticket._private.validateQuery(options), null, 'invalid type does not validate');
+  options = {
+    type: 'all',
+    ownedBy: user1
+  };
+  assert.deepEqual(Ticket._private.validateQuery(options), options, 'options validate with type, owned by');
+  options = {
+    type: 'all',
+    ownedBy: user1,
+    private: true
+  };
+  assert.deepEqual(Ticket._private.validateQuery(options), options, 'options validate: all, ownedBy, true');
+  options = {
+    type: 'all',
+    private: true
+  };
+  assert.equal(Ticket._private.validateQuery(options), null, 'missing ownedBy does not validate');
+  options = {
+    type: 'all',
+    open: 'bridge'
+  };
+  assert.equal(Ticket._private.validateQuery(options), null, 'invalid value for open does not validate');
+  options = {
+    type: 'all',
+    ownedBy: user1,
+    private: 'bridge'
+  };
+  assert.equal(Ticket._private.validateQuery(options), null, 'invalid value for private does not validate');
+  options = {
+    type: 'all',
+    open: true
+  };
+  assert.deepEqual(Ticket._private.validateQuery(options), options, 'options validate');
+  options = {
+    type: 'all',
+    open: false
+  };
+  assert.deepEqual(Ticket._private.validateQuery(options), options, 'options validate');
+  options = {
+    type: 'all',
+    ownedBy: user1,
+    open: true,
+    bob: true
+  };
+  var expectedOptions = {
+    type: 'all',
+    ownedBy: user1,
+    open: true
+  };
+  assert.deepEqual(Ticket._private.validateQuery(options), expectedOptions, 'extra options are discarded');
+  assert.end();
+});
 
+test('models/ticket.js: getTicketKeys returns array of keys', function (assert) {
+  createTickets()
+  .then(function (reply) {
+    return Ticket._private.getTicketKeys({
+      type: 'all'
+    });
+  })
+  .then(function (reply) {
+    // console.log('test ', reply);
+    assert.equals(reply.length, 4);
+    return Ticket._private.getTicketKeys({
+      type: 'all',
+      ownedBy: 'testuser1'
+    });
+  })
+  .then(function (reply) {
+    // console.log('test ', reply);
+    assert.equals(reply.length, 1);
+    return Ticket._private.getTicketKeys({
+      type: 'all',
+      ownedBy: 'testuser1',
+      open: false
+    });
+  })
+  .then(function (reply) {
+    // console.log('test ', reply);
+    assert.equals(reply.length, 0);
+    return Ticket._private.getTicketKeys({
+      type: 'all',
+      open: true
+    });
+  })
+  .then(function (reply) {
+    // console.log('test ', reply);
+    assert.equals(reply.length, 3);
+    return Ticket._private.getTicketKeys({
+      type: 'all',
+      open: true,
+      private: true,
+      ownedBy: 'testuser2'
+    });
+  })
+  .then(function (reply) {
+    // console.log('test ', reply);
+    assert.equals(reply.length, 1);
+    return Ticket._private.getTicketKeys({
+      type: 'activity',
+      open: true,
+      private: false,
+      ownedBy: 'testuser2'
+    });
+  })
+  .then(function (reply) {
+    // console.log('test ', reply);
+    assert.equals(reply.length, 1);
+    return client.flushdbAsync();
+  })
+  .then(function (reply) {
+    assert.end();
+  })
+  .catch(function (err) {
+    failOnError(err, assert);
+  });
+});
 
-// test('models/ticket.js: getAllTicket keys', function (assert) {
-//   // Will report number of ticket keys we have saved so far
-//   Ticket.getAllTicketKeys()
-//   .then(function (reply) {
-//     assert.equal(reply.length, 4, 'Array should have 4 keys');
-//     assert.end();
-//   })
-//   .catch(function (err) {
-//     console.error(err);
-//   });
-// });
+test('models/ticket.js: getTickets returns array of ticket objects', function (assert) {
+  createTickets()
+  .then(function (reply) {
+    return Ticket.getTickets({
+      type: 'all'
+    });
+  })
+  .then(function (reply) {
+    assert.equals(reply.length, 4);
+    assert.ok(reply[0].hasOwnProperty('metadata'));
+    return Ticket.getTickets({
+      type: 'all',
+      ownedBy: 'testuser1'
+    });
+  })
+  .then(function (reply) {
+    assert.equals(reply.length, 1);
+    return Ticket.getTickets({
+      type: 'all',
+      ownedBy: 'testuser1',
+      open: false
+    });
+  })
+  .then(function (reply) {
+    // console.log('test ', reply);
+    assert.equals(reply.length, 0);
+    return Ticket.getTickets({
+      type: 'all',
+      open: true
+    });
+  })
+  .then(function (reply) {
+    // console.log('test ', reply);
+    assert.equals(reply.length, 3);
+    return Ticket.getTickets({
+      type: 'all',
+      open: true,
+      private: true,
+      ownedBy: 'testuser2'
+    });
+  })
+  .then(function (reply) {
+    // console.log('test ', reply);
+    assert.equals(reply.length, 1);
+    return Ticket.getTickets({
+      type: 'activity',
+      open: true,
+      private: false,
+      ownedBy: 'testuser2'
+    });
+  })
+  .then(function (reply) {
+    // console.log('test ', reply);
+    assert.equals(reply.length, 1);
+    return client.flushdbAsync();
+  })
+  .then(function (reply) {
+    assert.end();
+  })
+  .catch(function (err) {
+    failOnError(err, assert);
+  });
+});
 
-// test('models/ticket.js: getTicket should return populated ticket object', function (assert) {
-//   // Create the initial ticket
-//   var newTicket = Ticket.ticketFactory();
-//   var ticketMeta;
-//   newTicket.create(ticketType1, user)
-
-//   .then(function (meta) {
-//     debugTicketCounter(meta);
-//     var ticketKey = keyGen.ticketKey(meta);
-//     ticketMeta = meta;
-//     //Now retrieve a ticket object via getTicket static method
-//     return Ticket.getTicket(ticketKey);
-//   })
-//   .then(function (reply) {
-//     // reply is the new ticket object
-//     assert.deepEqual(reply, newTicket, 'Retrieved ticket object equals original object');
-//     assert.end();
-//   })
-//   .catch(function (err) {
-//     console.error(err);
-//   });
-// });
-
-
-// test('models/ticket.js: addTopic should return topic object with correct metadata', function (assert) {
-//   var newTicket = Ticket.ticketFactory();
-//   newTicket.create(ticketType1, user)
-//   .then(function (meta) {
-//     debugTicketCounter(meta);
-//     return newTicket.addTopic(topicName1, topicDataType1, topicContents1);
-//   })
-//   .then(function (reply) {
-//     assert.equal(typeof reply, 'object', 'Reply is an object');
-//     assert.equal(typeof (reply.save), 'function', 'Reply has save method');
-//     assert.equal(typeof (reply.setDataType), 'function', 'Reply has setDataType method');
-//     assert.equal(typeof (reply.getDataType), 'function', 'Reply has getDataType method');
-//     assert.equal(reply.parent.creator, user, 'Reply has correct parent.creator');
-//     assert.equal(reply.parent.type, ticketType1, 'Reply has correct parent.type');
-//     assert.equal(reply.parent.num, createCounter, 'Reply has correct parent counter');
-//     // Type of topic is same as parent
-//     assert.equal(reply.type, ticketType1, 'Reply topic type is the same as parent');
-//     assert.equal(reply.name, topicName1, 'Reply has correct topic name');
-//     assert.equal(reply.dataType, topicDataType1, 'Reply has correct topic dataType');
-//     assert.end();
-//   })
-//   .catch(function (err) {
-//     console.error(err);
-//   });
-// });
-
-// test('models/ticket.js: addTopic should return error if topic already exists', function (assert) {
-//   var newTicket = Ticket.ticketFactory();
-//   newTicket.create(ticketType1, user)
-//   .then(function (meta) {
-//     debugTicketCounter(meta);
-//     return newTicket.addTopic(topicName1, topicDataType1, topicContents1);
-//   })
-//   .then(function (reply) {
-//     return newTicket.addTopic(topicName1, topicDataType1, topicContents1);
-//   })
-//   .then(function (reply) {
-//     assert.ok(reply instanceof Error, 'Add topic that already exists should return an error');
-//     assert.end();
-//   })
-//   .catch(function (err) {
-//     console.error(err);
-//   });
-// });
-
-// test('models/ticket.js: addTopic should save the contents to the database correctly when dataType is hash', function (assert) {
-//   var newTicket = Ticket.ticketFactory();
-//   newTicket.create(ticketType1, user)
-//   .then(function (meta) {
-//     debugTicketCounter(meta);
-//     return newTicket.addTopic(topicName1, topicDataType1, topicContents1);
-//   })
-//   .then(function (reply) {
-//     // Topic key
-//     var key = keyGen.topicKey(reply);
-//     // Get value at key (hash)
-//     return db.hgetallProxy(key);
-//   })
-//   .then(function (reply) {
-//     assert.deepEqual(reply, topicContents1, 'Contents were saved correctly for hash');
-//     assert.end();
-//   })
-//   .catch(function (err) {
-//     console.error(err);
-//   });
-// });
-
-// test('models/ticket.js: addTopic should save the contents to the database correctly when dataType is string', function (assert) {
-//   var newTicket = Ticket.ticketFactory();
-//   newTicket.create(ticketType1, user)
-//   .then(function (meta) {
-//     debugTicketCounter(meta);
-//     return newTicket.addTopic(topicName2, topicDataType2, topicContents2);
-//   })
-//   .then(function (reply) {
-//     // Topic key
-//     var key = keyGen.topicKey(reply);
-//     // Get value at key (string)
-//     return db.getProxy(key);
-//   })
-//   .then(function (reply) {
-//     assert.equal(reply, topicContents2, 'Contents were saved correctly for string');
-//     assert.end();
-//   })
-//   .catch(function (err) {
-//     console.error(err);
-//   });
-// });
-
-
-// test('models/ticket.js: addTopic should save the topic key to the set of topics for this ticket', function (assert) {
-//   var newTicket = Ticket.ticketFactory();
-//   newTicket.create(ticketType1, user)
-//   .then(function (meta) {
-//     debugTicketCounter(meta);
-//     return newTicket.addTopic(topicName1, topicDataType1, topicContents1);
-//   })
-//     .then(function (reply) {
-//     // reply is topic object
-//     // setKey is key to set of Topics for this ticket
-//     var setKey = keyGen.topicSetKey(newTicket);
-//     // Key to this topic
-//     var topicKey = keyGen.topicKey(reply);
-//     // Rank should be greater than or equal to 0.
-//     assert.ok(client.zrank(setKey, topicKey) >= 0, 'Set of topics for the ticket contains the topic key');
-//     assert.end();
-//   })
-//   .catch(function (err) {
-//     console.error(err);
-//   });
-// });
-
-
-// test('models/ticket.js: Topic.setDatatype should set the dataType of the topic object', function (assert) {
-//   var newTicket = Ticket.ticketFactory();
-//   newTicket.create(ticketType1, user).then(function (meta) {
-//     debugTicketCounter(meta);
-//     return newTicket.addTopic(topicName1, topicDataType1, topicContents1);
-//   })
-//   .then(function (reply) {
-//     assert.equal(reply.dataType, topicDataType1, 'Original dataType is correct (from parent)');
-//     reply.setDataType(topicDataType2);
-//     assert.equal(reply.dataType, topicDataType2, 'DataType was modified');
-//     assert.end();
-//   })
-//   .catch(function (err) {
-//     console.error(err);
-//   });
-// });
-
-// test('models/ticket.js: Topic.getDataType should get the dataType from the database', function (assert) {
-//   var newTicket = Ticket.ticketFactory();
-//   newTicket.create(ticketType1, user).then(function (meta) {
-//     debugTicketCounter(meta);
-//     return newTicket.addTopic(topicName1, topicDataType1, topicContents1);
-//   })
-//   .then(function (reply) {
-//     assert.equal(reply.dataType, topicDataType1, 'Original datatype as created');
-//     return reply.getDataType();
-//   })
-//   .then(function (result) {
-//     assert.equal(result, topicDataType1, 'getDataType returns the topic dataType');
-//     assert.end();
-//   })
-//   .catch(function (err) {
-//     console.error(err);
-//   });
-// });
-
-// test('models/ticket.js: Topic.getTopicMetadata should should return metadata from object', function (assert) {
-//   var newTicket = Ticket.ticketFactory();
-//   newTicket.create(ticketType1, user).then(function (meta) {
-//     debugTicketCounter(meta);
-//     return newTicket.addTopic(topicName1, topicDataType1, topicContents1);
-//   })
-//   .then(function (reply) {
-//     var result = reply.getTopicMetadata();
-//     var expected = {
-//       parent: reply.parent,
-//       type: reply.type,
-//       name: reply.name,
-//       dataType: reply.dataType
-//     };
-//     assert.deepEqual(result, expected, 'getTopicMetadata returns metadata from object');
-//     assert.end();
-//   })
-//   .catch(function (err) {
-//     console.error(err);
-//   });
-// });
-
-// test('models/ticket.js: Topic.getContents should should return contents from database', function (assert) {
-//   var newTicket = Ticket.ticketFactory();
-//   var topicKey;
-//   newTicket.create(ticketType1, user).then(function (meta) {
-//     debugTicketCounter(meta);
-//     return newTicket.addTopic(topicName1, topicDataType1, topicContents1);
-//   })
-//   .then(function (reply) {
-//     topicKey = keyGen.topicKey(reply);
-//     return reply.getContents();
-//   })
-//   .then(function (reply) {
-//     return db.hgetallProxy(topicKey);
-//   })
-//   .then(function (reply) {
-//     assert.deepEqual(reply, topicContents1, 'Contents retrieved from database');
-//     assert.end();
-//   })
-//   .catch(function (err) {
-//     console.error(err);
-//   });
-// });
-
-// test('models/ticket.js: Topic.exists should report the existence of the topic', function (assert) {
-//   var newTicket = Ticket.ticketFactory();
-//   newTicket.create(ticketType1, user).then(function (meta) {
-//     debugTicketCounter(meta);
-//     return newTicket.addTopic(topicName1, topicDataType1, topicContents1);
-//   })
-//   .then(function (reply) {
-//     return reply.exists();
-//   })
-//   .then(function (result) {
-//     assert.ok(result, 'Existing topic reported as true');
-//     // Create a new topic for this ticket
-//     var newTopic = Ticket.topicFactory({
-//       parent: newTicket,
-//       type: newTicket.type,
-//       name: 'bob',
-//       dataType: 'string'
-//     });
-//     return newTopic.exists();
-//   })
-//   .then(function (result) {
-//     assert.notOk(result, 'Nonexisting topic reported as false');
-//     assert.end();
-//   })
-//   .catch(function (err) {
-//     console.error(err);
-//   });
-// });
-
-// test('models/ticket.js: Ticket.getTopicKeys should return the correct keys', function (assert) {
-//   var newTicket = Ticket.ticketFactory();
-//   var topicKey1,
-//       topicKey2;
-//   newTicket.create(ticketType1, user).then(function (meta) {
-//     debugTicketCounter(meta);
-//     return newTicket.addTopic(topicName2, topicDataType2, topicContents2);
-//   })
-//   .then(function (reply) {
-//     // Save key to this topic
-//     topicKey1 = keyGen.topicKey(reply);
-//     return newTicket.addTopic(topicName1, topicDataType1, topicContents1);
-//   })
-//   .then(function (reply) {
-//     // Save key to second topic
-//     topicKey2 = keyGen.topicKey(reply);
-//     return newTicket.getTopicKeys();
-//   })
-//   .then(function (reply) {
-//     assert.ok(_.indexOf(reply, topicKey1) > -1, 'Result contains first key');
-//     assert.ok(_.indexOf(reply, topicKey2) > -1, 'Result contains second key');
-//     assert.equal(reply.length, 2, 'Result only contains 2 keys');
-//     assert.end();
-//   })
-//   .catch(function (err) {
-//     console.error(err);
-//   });
-// });
-
-// test('models/ticket.js: Ticket.topicFromKey creates topic object from key', function (assert) {
-//   var newTicket = Ticket.ticketFactory();
-//   var firstTopic;
-//   newTicket.create(ticketType1, user).then(function (meta) {
-//     debugTicketCounter(meta);
-//     return newTicket.addTopic(topicName2 + '2', topicDataType2, topicContents2);
-//   })
-//   .then(function (reply) {
-//     // Save topic
-//     firstTopic = reply;
-//     // Get the key
-//     var topicKey = keyGen.topicKey(reply);
-//     return newTicket.topicFromKey(topicKey);
-//   })
-//   .then(function (reply) {
-//     // reply should equal firstTopic
-//     assert.deepEqual(reply, firstTopic, 'Topic created from key');
-//     assert.end();
-//   })
-//   .catch(function (err) {
-//     console.error(err);
-//   });
-// });
-
-// test('models/ticket.js: Ticket.getTopics should return array of Topic objects', function (assert) {
-//   var newTicket = Ticket.ticketFactory();
-//   var topicKey1, topic1,
-//       topicKey2, topic2;
-//   newTicket.create(ticketType1, user).then(function (meta) {
-//     debugTicketCounter(meta);
-//     return newTicket.addTopic(topicName2, topicDataType2, topicContents2);
-//   })
-//   .then(function (reply) {
-//     // Save the topic
-//     topic1 = reply;
-//     return newTicket.addTopic(topicName1, topicDataType1, topicContents1);
-//   })
-//   .then(function (reply) {
-//     // Save second topic
-//     topic2 = reply;
-//     // Get the topics
-//     return newTicket.getTopics();
-//   })
-//   .then(function (reply) {
-//     assert.equal(reply.length, 2, 'Result only contains 2 topics');
-//     // Set is sorted by time, so these should be in time order
-//     assert.deepEqual(reply[0], topic1, 'First topic key in array');
-//     assert.deepEqual(reply[1], topic2, 'Second topic key in array');
-//     assert.end();
-//   })
-//   .catch(function (err) {
-//     console.error(err);
-//   });
-// });
-
-// test('models/ticket.js: Finished', function (assert) {
-//   client.flushdb(function (reply) {
-//     client.quit(function (err, reply) {
-//       assert.end();
-//     });
-//   });
-// });
-test('models/store.js: Finished', function (assert) {
+test('models/ticket.js: Finished', function (assert) {
   client.flushdbAsync()
   .then(function (reply) {
     return client.quitAsync();

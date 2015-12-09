@@ -1,18 +1,16 @@
 'use strict';
 
 // Attributes route - retrieve and update all attributes via REST api
-// This is just a first cut - will be expanded
-// For now just read one yaml file - will save in database later
-// var yaml = require('js-yaml');
-// var fs = require('fs');
-// var path = require('path');
+var yaml = require('js-yaml');
+var fs = require('fs');
+var path = require('path');
 var logger = require('../utils/logger')(module);
 var validator = require('validator');
 var config = require('../config/config');
 var _ = require('lodash-compat');
 var resUtils = require('../utils/responseUtils');
 
-module.exports = function (Attributes) {
+module.exports = function (Attributes, attributeService) {
   var attributes = {};
   // Temporary
   // var yamlPath = path.join(__dirname, '../bootstrap/userAttributes.yml');
@@ -61,8 +59,8 @@ module.exports = function (Attributes) {
   attributes.update = function (req, res) {
     var user = getUser(req);
     var reqConfig = getConfig(req);
-    console.log(req.params.id);
-    console.log(req.body);
+    console.log('attribute route: req.params.id = ', req.params.id, user);
+    console.log('attribute route: req.body = ', req.body, reqConfig);
     if (user === -1) {
       res.status(400).send(resUtils.getFailReply({
         message: 'Invalid characters in username'
@@ -74,6 +72,10 @@ module.exports = function (Attributes) {
     } else {
       var attributesFactory = Attributes.attributesFactory(user);
       attributesFactory.updateAttributes(user, reqConfig)
+      .then(function (reply) {
+        // Save the current attributes to file so ipgrep can access
+        return attributeService.attributesToFile();
+      })
       .then(function (reply) {
         logger.debug('update reply ', reply);
         res.status(200).send(resUtils.getSuccessReply(null));

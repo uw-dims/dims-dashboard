@@ -6,25 +6,33 @@
 
 var _ = require('lodash-compat');
 var moment = require('moment');
-var redis = require('redis');
 var path = require('path');
 var ROOT_DIR = __dirname + '/../../';
 
 var keyGen = require(path.join(ROOT_DIR, '/models/keyGen'));
 
 var diContainer = require(path.join(ROOT_DIR, '/services/diContainer'))();
-var client = redis.createClient();
+// var client = redis.createClient();
+var bluebird = require('bluebird');
+var redis = require('redis');
+
+var client = bluebird.promisifyAll(redis.createClient());
+bluebird.promisifyAll(client.multi());
 
 diContainer.factory('anonService', require(path.join(ROOT_DIR, '/services/anonymize')));
-diContainer.factory('db', require(path.join(ROOT_DIR, '/utils/redisProxy')));
+// diContainer.factory('db', require(path.join(ROOT_DIR, '/utils/redisProxy')));
 diContainer.register('client', client);
 diContainer.factory('Ticket', require(path.join(ROOT_DIR, '/models/ticket')));
+diContainer.factory('Topic', require(path.join(ROOT_DIR, '/models/topic')));
 diContainer.factory('UserSettings', require(path.join(ROOT_DIR, '/models/userSettings')));
+diContainer.factory('UserModel', require(path.join(ROOT_DIR, '/models/user')));
+diContainer.factory('Attributes', require(path.join(ROOT_DIR, '/models/attributes')));
 diContainer.factory('mitigationService', require(path.join(ROOT_DIR, '/services/mitigation')));
+diContainer.factory('store', require(path.join(ROOT_DIR, '/models/store')));
+diContainer.register('Bookshelf', require(path.join(ROOT_DIR, '/utils/bookshelf')));
 
 var mitigationService = diContainer.get('mitigationService');
-// var anonService = diContainer.get('anonService');
-// var db = diContainer.get('db');
+var Bookshelf = diContainer.get('Bookshelf');
 
 (function () {
   var bootstrapMitigation = {};
@@ -40,15 +48,8 @@ var mitigationService = diContainer.get('mitigationService');
 
     mitigationService.initiateMitigation(ipPath, 'testuser1')
     .then(function (reply) {
-      // will fix this behavior later
-      ticketKey = keyGen.ticketKey(reply.parent);
-      console.log(ticketKey);
-      return mitigationService.removeIps(ticketKey + ':mitigation:user:testuser1', ['undefined']);
-    })
-    .then(function (reply) {
-      return mitigationService.removeIps(ticketKey + ':mitigation:user:testuser2', ['undefined']);
-    })
-    .then(function (reply) {
+      ticketKey = reply;
+      console.log('bootstrapMitigation ticketKey', ticketKey);
       return mitigationService.getUserIps(ticketKey, 'testuser1');
     })
     .then(function (reply) {
@@ -57,6 +58,7 @@ var mitigationService = diContainer.get('mitigationService');
       return mitigationService.getUserIps(ticketKey, 'testuser2');
     })
     .then(function (reply) {
+      console.log(reply);
       testuser2Ips = reply;
       testuser1Chunk = [
         _.slice(testuser1Ips, 0, 10),
@@ -73,92 +75,86 @@ var mitigationService = diContainer.get('mitigationService');
         _.slice(testuser2Ips, 13, 17)
       ];
       console.log(testuser2Chunk);
-
-      return mitigationService.testRemediate(ticketKey, 'testuser1', testuser1Chunk[i], time);
+      return mitigationService.remediate(ticketKey, 'testuser1', testuser1Chunk[i], time);
     })
     .then(function (reply) {
-      console.log(reply);
+      console.log('bootstrapMitigation. reply from remediate ', reply);
       k = k - 1;
       i = i + 1;
       var time = moment().subtract(k, 'days').format('x');
-      return mitigationService.testRemediate(ticketKey, 'testuser1', testuser1Chunk[i], time);
+      return mitigationService.remediate(ticketKey, 'testuser1', testuser1Chunk[i], time);
     })
     .then(function (reply) {
-      console.log(reply);
+      console.log('bootstrapMitigation. reply from remediate ', reply);
       k = k - 1;
       i = i + 1;
       var time = moment().subtract(k, 'days').format('x');
-      return mitigationService.testRemediate(ticketKey, 'testuser1', testuser1Chunk[i], time);
+      return mitigationService.remediate(ticketKey, 'testuser1', testuser1Chunk[i], time);
     })
     .then(function (reply) {
-      console.log(reply);
+      console.log('bootstrapMitigation. reply from remediate ', reply);
       k = k - 1;
       i = i + 1;
       var time = moment().subtract(k, 'days').format('x');
-      return mitigationService.testRemediate(ticketKey, 'testuser1', testuser1Chunk[i], time);
+      return mitigationService.remediate(ticketKey, 'testuser1', testuser1Chunk[i], time);
     })
     .then(function (reply) {
-      console.log(reply);
+      console.log('bootstrapMitigation. reply from remediate ', reply);
       k = k - 1;
       i = i + 1;
       var time = moment().subtract(k, 'days').format('x');
-      return mitigationService.testRemediate(ticketKey, 'testuser1', testuser1Chunk[i], time);
+      return mitigationService.remediate(ticketKey, 'testuser1', testuser1Chunk[i], time);
     })
     .then(function (reply) {
-      console.log(reply);
+      console.log('bootstrapMitigation. reply from remediate ', reply);
       k = k - 1;
       i = 0;
       var time = moment().subtract(k, 'days').format('x');
-      return mitigationService.testRemediate(ticketKey, 'testuser2', testuser2Chunk[i], time);
+      return mitigationService.remediate(ticketKey, 'testuser2', testuser2Chunk[i], time);
     })
     .then(function (reply) {
-      console.log(reply);
+      console.log('bootstrapMitigation. reply from remediate ', reply);
       k = k - 1;
       i = i + 1;
       var time = moment().subtract(k, 'days').format('x');
-      return mitigationService.testRemediate(ticketKey, 'testuser2', testuser2Chunk[i], time);
+      return mitigationService.remediate(ticketKey, 'testuser2', testuser2Chunk[i], time);
     })
     .then(function (reply) {
-      console.log(reply);
+      console.log('bootstrapMitigation. reply from remediate ', reply);
       k = k - 1;
       i = i + 1;
       var time = moment().subtract(k, 'days').format('x');
-      return mitigationService.testRemediate(ticketKey, 'testuser2', testuser2Chunk[i], time);
+      return mitigationService.remediate(ticketKey, 'testuser2', testuser2Chunk[i], time);
     })
     .then(function (reply) {
-      console.log(reply);
+      console.log('bootstrapMitigation. reply from remediate ', reply);
       k = k - 1;
       i = i + 1;
       var time = moment().subtract(k, 'days').format('x');
-      return mitigationService.testRemediate(ticketKey, 'testuser2', testuser2Chunk[i], time);
+      return mitigationService.remediate(ticketKey, 'testuser2', testuser2Chunk[i], time);
     })
     .then(function (reply) {
-      console.log(reply);
+      console.log('bootstrapMitigation. reply from remediate ', reply);
       k = k - 1;
       i = i + 1;
       var time = moment().subtract(k, 'days').format('x');
-      return mitigationService.testRemediate(ticketKey, 'testuser2', testuser2Chunk[i], time);
+      return mitigationService.remediate(ticketKey, 'testuser2', testuser2Chunk[i], time);
     })
-    .then(function (reply) {
-      return mitigationService.removeIps(ticketKey + ':mitigation:mitigated', ['undefined']);
-    })
-    .then(function (reply) {
+    .then(function () {
       return mitigationService.getMitigated(ticketKey);
     })
     .then(function (reply) {
-      console.log(reply);
-      client.quit(function (err, reply) {
-        console.log('quit reply ', reply);
+      console.log('bootstrapMitigation. reply from getMitigated', reply);
+      return client.quitAsync();
+    })
+    .then(function () {
+      Bookshelf.knex.destroy(function (err, reply) {
+        console.log(err, reply);
       });
     })
     .catch(function (err) {
       console.log(err);
-      console.log(err.stack);
-      client.quit(function (err, reply) {
-        console.log('quit reply ', reply);
-      });
-    })
-    .done();
+    });
   };
 
   if (!module.parent) {

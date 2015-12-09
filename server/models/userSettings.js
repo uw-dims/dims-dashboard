@@ -11,7 +11,7 @@ var _ = require('lodash-compat'),
     logger = require('../utils/logger')(module),
     keyGen = require('./keyGen');
 
-module.exports = function UserSettings(db) {
+module.exports = function UserSettings(client) {
 
   var convertBoolean = function convertBoolean(config) {
     for (var key in config) {
@@ -43,31 +43,25 @@ module.exports = function UserSettings(db) {
 
   // create and save a userSetting object for a user
   var create = function create(user, settings) {
-    var deferred = q.defer();
-    var multi = db.multi();
-    multi.hmset(keyGen.userSettingsKey(user), settings);
-    multi.sadd(keyGen.userSettingsSetKey(), keyGen.userSettingsKey(user));
-    multi.exec(function (err, replies) {
-      if (err) {
-        deferred.reject(new Error(err));
-      } else {
-        deferred.resolve('ok');
-      }
-    });
-    return deferred.promise;
+    // var deferred = q.defer();
+    // var multi = client.multi();
+    return q.all([
+      client.hmsetAsync(keyGen.userSettingsKey(user), settings),
+      client.saddAsync(keyGen.userSettingsSetKey(), keyGen.userSettingsKey(user))
+    ]);
   };
 
   var save = function save(user, settings) {
-    return db.hmsetProxy(keyGen.userSettingsKey(user), settings);
+    return client.hmsetAsync(keyGen.userSettingsKey(user), settings);
   };
 
   // Wrap the redis function for get, return promise
   var get = function get(user) {
-    return db.hgetallProxy(keyGen.userSettingsKey(user));
+    return client.hgetallAsync(keyGen.userSettingsKey(user));
   };
 
   var exists = function (user) {
-    return db.sismemberProxy(keyGen.userSettingsSetKey(), keyGen.userSettingsKey(user));
+    return client.sismemberAsync(keyGen.userSettingsSetKey(), keyGen.userSettingsKey(user));
   };
 
   // Static function to get settings object for a user. Returns userSettings object.
