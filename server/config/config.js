@@ -116,7 +116,7 @@ config.serverPath = __dirname;
 // /opt/dims/data in the Dashboard container will map to host
 // /data/dashboard
 config.userDataPath = '/opt/dims/data/dashboard/';
-config.demoDatastorePath = '/opt/dims/data/dashboard/data/';
+config.dashboardDataPath = '/opt/dims/data/dashboard/data/';
 config.uploadPath = '/opt/dims/data/dashboard/upload/';
 config.logmonPath = '/opt/dims/data/logmon/';
 
@@ -249,5 +249,21 @@ config.fanoutExchanges = {
 
 config.appLogExchange = 'logs';
 config.healthExchange = 'health';
+
+config.healthID = 'dashboard';
+config.messagingHealthID = 'messaging';
+
+var uuidSet = function uuidSet() {
+  console.log('in uuidSet');
+  return {
+    dashboard: uuid.v4(),
+    redis: uuid.v4(),
+    postgresql: uuid.v4(),
+    messaging: uuid.v4()
+  };
+};
+
+config.UUIDs = uuidSet();
+
 
 module.exports = config;

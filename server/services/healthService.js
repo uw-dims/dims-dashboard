@@ -4,19 +4,21 @@ var config = require('../config/config');
 var healthLogger = require('../utils/healthLogger');
 
 module.exports = function healthService(UserModel) {
+
   var checkHealth = function checkHealth() {
-    healthLogger.publish('dashboard healthy');
+    healthLogger.publish('dashboard healthy', config.healthID);
     checkPostgres();
   };
 
   var checkPostgres = function checkPostgres() {
+    var id = 'postgresql';
     UserModel.Users.forge()
     .fetch({ withRelated: ['email']})
     .then(function (reply) {
-      healthLogger.publish('postgresql healthy at postgresql://' + config.userDBHost + '/' + config.userDatabase);
+      healthLogger.publish('postgresql healthy at postgresql://' + config.userDBHost + '/' + config.userDatabase, id);
     })
     .catch(function (err) {
-      healthLogger.publish('postgresql unhealthy at postgresql://' + config.userDBHost + '/' + config.userDatabase + '. Error: ', err.toString());
+      healthLogger.publish('postgresql unhealthy at postgresql://' + config.userDBHost + '/' + config.userDatabase + '. Error: '+ err.toString(), id);
     })
     .done();
   };

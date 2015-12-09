@@ -1,5 +1,7 @@
 'use strict';
 
+var _ = require('lodash-compat');
+
 // module.exports = function redisScheme() {
 
 /**
@@ -33,6 +35,12 @@ var makeSuffix = function (suffixType, param) {
     'closed': function () {
       return '.__closed';
     },
+    'private': function () {
+      return '.__private';
+    },
+    'public': function () {
+      return '.__public';
+    },
     'topics': function () {
       return '.__topics';
     },
@@ -62,6 +70,11 @@ var makeSuffix = function (suffixType, param) {
     throw new Error('Invalid suffix type was supplied: ' + suffixType);
   }
   return suffix[suffixType](param);
+};
+
+// Add a suffix to a key
+var addSuffix = function (key, suffixType, param) {
+  return key + makeSuffix(suffixType, param);
 };
 
 var getDelimiter = function () {
@@ -131,15 +144,7 @@ var addContent = function (options) {
   return key;
 };
 
-// Add a suffix to a key
-var addSuffix = function (key, suffixType, param) {
-  return key + makeSuffix(suffixType, param);
-};
-
-// Add content to an existing key
-// var addContentToKey = function (key, content) {
-//   return key + config.delimiter + content;
-// };
+// topicTypes is deprecated
 
 var config =
   {
@@ -166,10 +171,21 @@ var config =
     'query': {
       'prefix': 'query'
     },
+    'ticketTypes': ['mitigation', 'activity'],
     'topicTypes': ['silk', 'cif', 'crosscor', 'cidrs', 'mitigation', 'data'],
+    'topicDataTypes': ['set', 'string'],
     'delimiter': ':',
     'contentDelimiter': '/'
   };
+
+var isValidTicketType = function isValidTicketType(type) {
+  return _.includes(config.ticketTypes, type);
+};
+
+var isValidTopicDataType = function isValidTopicDataType(type) {
+  return _.includes(config.topicDataTypes, type);
+};
+
 
 module.exports.makeBase = makeBase;
 module.exports.makeSuffix = makeSuffix;
@@ -178,5 +194,7 @@ module.exports.makeBase = makeBase;
 module.exports.addContent = addContent;
 module.exports.addSuffix = addSuffix;
 module.exports.config = config;
+module.exports.isValidTicketType = isValidTicketType;
+module.exports.isValidTopicDataType = isValidTopicDataType;
 
 // EOF

@@ -10,7 +10,7 @@ var _ = require('lodash-compat'),
     keyExtract = require('./keyExtract'),
     dimsUtils = require('../utils/util');
 
-module.exports = function Attributes(client) {
+module.exports = function Attributes(db) {
 
   // Not sure yet if we need a config object for all the attributes
   // in this - maybe just return empty config applied on the
@@ -30,16 +30,25 @@ module.exports = function Attributes(client) {
   // Since we're using sets and sorted sets, can use same function for save and create
   var save = function save(user, type, value) {
     logger.debug('user=%s type=%s value=%s', user, type, value);
-    return q.all([
-      client.saddAsync(keyGen.attributeKey(user, type), value),
-      client.zaddAsync(keyGen.attributeSetKey(type), dimsUtils.createTimestamp(), keyGen.attributeKey(user, type))
-    ]);
+    var deferred = q.defer();
+    var multi = db.multi();
+    multi.sadd(keyGen.attributeKey(user, type), value);
+    multi.zadd(keyGen.attributeSetKey(type), dimsUtils.createTimestamp(), keyGen.attributeKey(user, type));
+    multi.exec(function (err, replies) {
+      if (err) {
+        deferred.reject(new Error(err));
+      } else {
+        logger.debug('reply from save', replies);
+        deferred.resolve('ok');
+      }
+    });
+    return deferred.promise;
   };
 
   // Get an attribute (returns promise with array of values);
   var get = function get(user, type) {
     var result = {};
-    return client.smembersAsync(keyGen.attributeKey(user, type))
+    return db.smembersProxy(keyGen.attributeKey(user, type))
     .then(function (reply) {
       result[type] = reply;
       return result;
@@ -51,7 +60,7 @@ module.exports = function Attributes(client) {
   };
 
   var attributeExists = function attributeExists(user, type) {
-    return client.existsAsync(keyGen.attributeKey(user, type));
+    return db.existsProxy(keyGen.attributeKey(user, type));
   };
 
   // This saves/updates all attributes
@@ -66,7 +75,7 @@ module.exports = function Attributes(client) {
   var getAllAttributes = function getAllAttributes() {
     var promises = [];
     var users = [];
-    return client.zrangeAsync(keyGen.attributeSetKey(), 0, -1)
+    return db.zrangeProxy(keyGen.attributeSetKey(), 0, -1)
     .then(function (reply) {
       _.forEach(reply, function (value, index) {
         // get the user from the key

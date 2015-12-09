@@ -54,7 +54,11 @@ diContainer.factory('userRoute', require('./routes/user'));
 diContainer.factory('attributeRoute', require('./routes/attributes'));
 diContainer.factory('lmsearchRoute', require('./routes/lmsearch'));
 diContainer.factory('mitigationService', require('./services/mitigation'));
+diContainer.factory('ticketService', require('./services/ticket'));
 diContainer.factory('healthService', require('./services/healthService'));
+diContainer.factory('store', require('./models/store'));
+diContainer.factory('Topic', require('./models/topic'));
+diContainer.factory('attributeService', require('./services/attributes'));
 
 // diContainer.factory('ticketService', require('./services/ticket'));
 
@@ -281,31 +285,31 @@ if (config.sslOn) {
 
 if (require.main === module) {
   appLogger = require('./utils/appLogger');
-  appLogger.on('logger-ready', function () {
-    console.log('[+++] appLogger received logger-ready event');
-    healthLogger = require('./utils/healthLogger');
-    healthLogger.on('logger-ready', function () {
-      console.log('[+++] healthLogger received logger-ready event');
-      // Run the healthService
-      var healthService = diContainer.get('healthService');
-      healthService.run();
-      console.log('[+++] Finished running healthService');
-      // Set up socket.io to listen on same port as https
-      io = socket.listen(server);
-      // Initialize messaging - fanout publish, subscribe, sockets
-      require('./services/messaging')(io);
-      server.listen(port, function () {
-        console.log('[+++] Server listening');
-        healthLogger.publish('dashboard initialized DIMS Dashboard running on port ' + server.address().port);
-        if (config.sslOn) {
-          healthLogger.publish('dashboard initialized SSL is on');
-        } else {
-          healthLogger.publish('dashboard initialized SSL is off');
-        }
-        healthLogger.publish('dashboard initialized Node environment: ' + config.env);
-        healthLogger.publish('dashboard initialized Log level: ' + config.logLevel);
-        healthLogger.publish('dashboard initialized userDB source: ' + config.userSource);
-      });
+  appLogger.on('logger-ready-logs', function () {
+    console.log('[+++] appLogger received logger-ready-logs event');
+  });
+  healthLogger = require('./utils/healthLogger');
+  healthLogger.on('logger-ready-health', function () {
+    console.log('[+++] healthLogger received logger-ready-health event');
+    // Run the healthService
+    var healthService = diContainer.get('healthService');
+    healthService.run();
+    console.log('[+++] Finished running healthService');
+    // Set up socket.io to listen on same port as https
+    io = socket.listen(server);
+    // Initialize messaging - fanout publish, subscribe, sockets
+    require('./services/messaging')(io);
+    server.listen(port, function () {
+      console.log('[+++] Server listening');
+      healthLogger.publish('dashboard initialized DIMS Dashboard running on port ' + server.address().port, config.healthID);
+      if (config.sslOn) {
+        healthLogger.publish('dashboard initialized SSL is on', config.healthID);
+      } else {
+        healthLogger.publish('dashboard initialized SSL is off', config.healthID);
+      }
+      healthLogger.publish('dashboard initialized Node environment: ' + config.env, config.healthID);
+      healthLogger.publish('dashboard initialized Log level: ' + config.logLevel, config.healthID);
+      healthLogger.publish('dashboard initialized userDB source: ' + config.userSource, config.healthID);
     });
   });
 
@@ -315,9 +319,11 @@ if (require.main === module) {
 
 process.on('SIGTERM', function () {
   // logger.debug('SIGTERM received');
-  healthLogger.publish('dashboard received SIGTERM, exiting...');
+  healthLogger.publish('dashboard received SIGTERM, exiting...', config.healthID);
+  healthLogger.connection.close();
+  appLogger.connection.close();
   server.close(function () {
-    // logger.debug('Server close');
+    console.log('Server close');
     process.exit(0);
   });
 });

@@ -12,7 +12,7 @@ module.exports = function (logExchange) {
     amqpConnect.createConnection();
     amqpConnect.on('ready', function () {
       console.log('[+++] amqpLogger received ready signal for %s', exchange);
-      amqpConnect.emit('logger-ready');
+      amqpConnect.emit('logger-ready-' + exchange);
     });
     amqpConnect.on('connection-close', onClose.bind(this));
     // Add publish function

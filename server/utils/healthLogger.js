@@ -11,17 +11,29 @@ console.log('[+++] HealthLogger starting...');
 var label = 'utils/healthLogger.js';
 var logLevel = 'INFO';
 
-var format = function format(msg, level) {
+// Used for discrete UUIDs for different subsystems
+var uuidSet = function uuidSet() {
+  return {
+    dashboard: uuid.v4(),
+    redis: uuid.v4(),
+    postgresql: uuid.v4(),
+    messaging: uuid.v4()
+  };
+};
+
+var UUIDs = uuidSet();
+
+var format = function format(msg, id, level) {
   return moment().toISOString() + ' ' + os.hostname() + ' ' +
-      uuid.v4() + ' ' + config.appName + ' [' + label  + '] [' + process.pid + '] ' + level + ' ' +
+      UUIDs[id] + ' ' + config.appName + ' [' + label  + '] [' + process.pid + '] ' + level + ' ' +
       msg;
 };
 
-var publish = function (msg) {
+var publish = function (msg, id) {
   // Only publish health on dev or production systems, not when running tests
   if (config.env !== 'test') {
     try {
-      healthLogger.pub(format(msg, logLevel));
+      healthLogger.pub(format(msg, id, logLevel));
     } catch (err) {
       console.log('[!!!] healthLogger publish error: ' + err);
     }
