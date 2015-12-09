@@ -8,32 +8,40 @@ var keyGen = require('../../../models/keyGen');
 // Mock ticket and topic objects
 // Just properties - don't need functions
 var ticketConfig = {
-  num: 5,
-  creator: 'user1',
-  type: 'analysis',
-  createdTime: 1437828843121,
-  open: true
+  metadata: {
+    num: 5,
+    creator: 'user1',
+    type: 'analysis',
+    createdTime: 1437828843121,
+    open: true
+  }
 };
 var ticket1 = _.extend({}, ticketConfig);
 var topicConfig = {
-  parent: ticket1,
-  type: 'analysis',
-  name: 'topic1',
-  dataType: 'hash'
+  metadata: {
+    parent: ticket1,
+    type: 'analysis',
+    name: 'topic1',
+    datatype: 'hash',
+    num: 4
+  }
 };
+
 var topic1 = _.extend({}, topicConfig);
+console.log('ticket1', ticket1);
+console.log('topic1', topic1);
 var user1 = 'user1';
-var ticketKey1 = 'dims:ticket:5';
+var ticketKey1 = 'dims:ticket:analysis:5';
 var ticketCounterKey1 = 'dims:ticket.__counter';
 var ticketSetKey1 = 'dims:ticket.__keys';
 var ticketOwnedUser1 = 'dims:ticket.__owner.__user1';
 var ticketSubbedByUser1 = 'dims:ticket.__subscriptions.__user1';
-var ticketUsersSubbedTo = 'dims:ticket:5.__subscribers';
+var ticketUsersSubbedTo = 'dims:ticket:analysis:5.__subscribers';
 var ticketTypeSet = 'dims:ticket.__type.__analysis';
 var ticketsOpen = 'dims:ticket.__open';
 var ticketsClosed = 'dims:ticket.__closed';
-var topicSetKey1 = 'dims:ticket:5.__topics';
-var topicKey1 = 'dims:ticket:5:analysis:topic1';
+var topicSetKey1 = 'dims:ticket:analysis:5.__topics';
+var topicKey1 = 'dims:ticket:analysis:5:topic1:4';
 // var topicTimestampKey = 'dims:ticket:5:data:topic1.__timestamp';
 
 var userObject = {
@@ -68,19 +76,18 @@ var userSettingsKey1 = 'dims:userSetting:user1';
 var userSettingsSetKey1 = 'dims:userSetting.__keys';
 
 test('models/keyGen.js: keyGen should return keys for tickets and topics', function (assert) {
-  assert.equal(keyGen.ticketKey(ticket1), ticketKey1, 'Returns correct ticket key');
+  assert.equal(keyGen.ticketKey(ticket1.metadata), ticketKey1, 'Returns correct ticket key');
   assert.equal(keyGen.ticketSetKey(), ticketSetKey1, 'Returns correct ticket set key');
   assert.equal(keyGen.ticketCounterKey(), ticketCounterKey1, 'Returns correct ticket counter key');
-  assert.equal(keyGen.ticketOwnerKey(ticket1), ticketOwnedUser1, 'Returns correct key to tickets owned by this user, ticket input');
   assert.equal(keyGen.ticketOwnerKey(user1), ticketOwnedUser1, 'Returns correct key to tickets owned by this user, user input');
   assert.equal(keyGen.ticketSubscriptionsKey(user1), ticketSubbedByUser1, 'Returns correct key to ticket subscriptions for this user with user input');
-  assert.equal(keyGen.ticketSubscribersKey(ticket1), ticketUsersSubbedTo, 'Returns correct key to users subscribed to this ticket');
-  assert.equal(keyGen.ticketTypeKey(ticket1), ticketTypeSet, 'Returns correct key to set of tickets for a type, ticket input');
+  assert.equal(keyGen.ticketSubscribersKey(ticket1.metadata), ticketUsersSubbedTo, 'Returns correct key to users subscribed to this ticket');
+  assert.equal(keyGen.ticketTypeKey(ticket1.metadata.type), ticketTypeSet, 'Returns correct key to set of tickets for a type, ticket input');
   assert.equal(keyGen.ticketTypeKey('analysis'), ticketTypeSet, 'Returns correct key to set of tickets for a type, type input');
   assert.equal(keyGen.ticketOpenKey(), ticketsOpen, 'Returns correct key to set of open tickets');
   assert.equal(keyGen.ticketClosedKey(), ticketsClosed, 'Returns correct key to set of closed tickets');
-  assert.equal(keyGen.topicSetKey(ticket1), topicSetKey1, 'Returns correct key to list of topics for this ticket');
-  assert.equal(keyGen.topicKey(topic1), topicKey1, 'Returns correct topic key');
+  assert.equal(keyGen.topicSetKey(topic1.metadata), topicSetKey1, 'Returns correct key to list of topics for this ticket');
+  assert.equal(keyGen.topicKey(topic1.metadata), topicKey1, 'Returns correct topic key');
 
   assert.end();
 });

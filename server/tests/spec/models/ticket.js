@@ -60,7 +60,7 @@ var validOption1 = createOptions(user1, 'activity', false);
 var expectedOption1 = createOptions(user1, 'activity', false);
 _.extend(expectedOption1, {description: ''});
 var validOption2 = createOptions(user1, 'activity');
-var expectedOption2 = createOptions(user1, 'activity', true, '');
+var expectedOption2 = createOptions(user1, 'activity', false, '');
 var extraOptions1 = createOptions(user1, 'activity', true, 'An activity');
 _.extend(extraOptions1, {'nancy': 'girl'});
 var expectedOption3 = createOptions(user1, 'activity', true, 'An activity');

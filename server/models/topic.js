@@ -132,8 +132,8 @@ module.exports = function Topic(store) {
 
   // Data should be JSON?
   var saveData = function saveData(metadata, data) {
-    // console.log('saveData metadata is ', metadata);
-    // console.log('saveData data is ', data);
+    console.log('saveData metadata is ', metadata);
+    console.log('saveData data is ', data);
     return store.setData(keyGen.topicKey(metadata), data);
   };
 

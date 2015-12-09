@@ -29,6 +29,7 @@ var createTicketOptions = function (creator, type, privacy, description) {
 };
 
 var createTickets = function createTickets() {
+  console.log('start createTickets');
   var activityConfig1 = createTicketOptions('testuser1', 'activity');
   var mitigationConfig1 = createTicketOptions('testuser2', 'mitigation', false);
   var privateConfig1 = createTicketOptions('testuser2', 'activity', true);
@@ -45,6 +46,7 @@ var createTickets = function createTickets() {
   ])
   .then(function (reply) {
     return ticket4.close();
+    console.log('end createTickets');
   })
   .catch(function (err) {
     throw err;
@@ -58,7 +60,7 @@ var failOnError = function (err, assert) {
 };
 
 test('models/topic.js: TopicFactory returns topic object with metadata', function (assert) {
-  setTimeout(function() {
+  setTimeout(function () {
     var topic, ticket;
     createTickets()
     .then(function () {
@@ -88,7 +90,7 @@ test('models/topic.js: TopicFactory returns topic object with metadata', functio
   }, 1000);
 });
 
-test('models/topic.js: string topic can be created', function(assert) {
+test('models/topic.js: string topic can be created', function (assert) {
   var topic, ticket;
   createTickets()
   .then(function () {
@@ -101,7 +103,6 @@ test('models/topic.js: string topic can be created', function(assert) {
       description: 'CIF results',
       datatype: 'string'
     });
-    console.log('test', topic.metadata);
     return topic.create('string data');
   })
   .then(function (reply) {

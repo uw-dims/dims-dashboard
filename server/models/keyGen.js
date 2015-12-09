@@ -19,9 +19,10 @@ var keyGen = {
     return c.addSuffix(c.makeRoot('ticket'), 'counter');
   },
 
-  ticketKey: function ticketKey(ticket) {
+  ticketKey: function ticketKey(ticketMetadata) {
     // console.log('ticketKey, ticket is ', ticket);
-    return c.makeBase('ticket', ticket.type, ticket.num);
+    // console.log('ticketKey: ticket.type', ticketMetadata.type, 'ticket.num', ticketMetadata.num);
+    return c.makeBase('ticket', ticketMetadata.type, ticketMetadata.num);
   },
 
   ticketSetKey: function ticketSetKey() {
@@ -51,31 +52,34 @@ var keyGen = {
     return c.addSuffix(c.makeRoot('ticket'), 'subscriptions', user);
   },
 
-  ticketSubscribersKey: function ticketSubscribersKey(ticket) {
-    return c.addSuffix(this.ticketKey(ticket), 'subscribers');
+  ticketSubscribersKey: function ticketSubscribersKey(ticketMetadata) {
+    return c.addSuffix(this.ticketKey(ticketMetadata), 'subscribers');
   },
 
-  ticketTypeKey: function ticketTypeKey(type, owner) {
-    if (type !== 'private') {
+  ticketTypeKey: function ticketTypeKey(type) {
+    // if (type !== 'private') {
       return c.addSuffix(c.makeRoot('ticket'), 'type', type);
-    } else {
-      return c.addSuffix(c.makeRoot('ticket'), 'type', type, owner);
-    }
+    // } else {
+    //   return c.addSuffix(c.makeRoot('ticket'), 'type', type, owner);
+    // }
   },
 
   // Key to a topic
   // "ticket:num:topicname:topicnum" aka key_of_parentTicket:topicname:topicnum
   // Only includes counter if it exists
-  topicKey: function topicKey(topic) {
+  topicKey: function topicKey(topicMeta) {
     // var key = this.ticketKey(topic.parent) + c.delimiter + topic.type + c.delimiter + topic.name;
     // return key;
     // console.log('topicKey topic is ', topic);
     // console.log('topic parent is ', topic.parent);
-    return c.addContent(this.ticketKey(topic.parent), topic.name, topic.num);
+    console.log('[+++] topicKey - topicMetata = ', topicMeta);
+
+    return c.addContent(this.ticketKey(topicMeta.parent.metadata), topicMeta.name, topicMeta.num);
   },
 
-  topicMetaKey: function topicMetaKey(topic) {
-    return c.addSuffix(this.topicKey(topic), 'metadata');
+  topicMetaKey: function topicMetaKey(topicMeta) {
+    console.log('[+++] topicMetaKey = ', topicMeta);
+    return c.addSuffix(this.topicKey(topicMeta), 'metadata');
   },
 
   // Counter for topics that need it - to ensure uniqueness
@@ -85,9 +89,10 @@ var keyGen = {
 
   // Key to list or set of topics associated to a ticket
   // "ticket:type:num.__topics"
-  topicSetKey: function topicSetKey(topic) {
+  topicSetKey: function topicSetKey(topicMeta) {
+    console.log('[+++] topicSetKey topic', topicMeta);
     // return c.namespace + this.ticketKey(ticket) + c.topicSuffix;
-    return c.addSuffix(this.ticketKey(topic.parent), 'topics');
+    return c.addSuffix(this.ticketKey(topicMeta.parent.metadata), 'topics');
   },
 
   topicSetKeyFromTicketKey: function topicSetKeyFromTicketKey(key) {
