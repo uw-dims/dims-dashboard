@@ -251,5 +251,19 @@ config.appLogExchange = 'logs';
 config.healthExchange = 'health';
 
 config.healthID = 'dashboard';
+config.messagingHealthID = 'messaging';
+
+var uuidSet = function uuidSet() {
+  console.log('in uuidSet');
+  return {
+    dashboard: uuid.v4(),
+    redis: uuid.v4(),
+    postgresql: uuid.v4(),
+    messaging: uuid.v4()
+  };
+};
+
+config.UUIDs = uuidSet();
+
 
 module.exports = config;

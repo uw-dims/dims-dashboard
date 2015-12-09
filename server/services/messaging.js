@@ -35,7 +35,7 @@ module.exports = function (io) {
   });
   messaging.amqp.on('connection-created', function () {
     logger.debug('Connection established');
-    healthLogger.publish('messaging healthy messaging amqp connection established');
+    healthLogger.publish('messaging healthy messaging amqp connection established', config.messagingHealthID);
     fanoutSetup();
   });
   messaging.amqp.on('connection-close', onConnectionClose.bind(this));
@@ -75,7 +75,7 @@ module.exports = function (io) {
       // Listen for successful fanout creation
       messaging.amqp.on(getEventName(name, 'ready'), function (reply) {
         logger.debug('Received ready event for fanout %s', value.name);
-        healthLogger.publish('messaging/' + name + ' healthy ' + name + ' fanout ready');
+        healthLogger.publish('messaging/' + name + ' healthy ' + name + ' fanout ready', config.messagingHealthID);
         // Save fanout connection items
         messaging.fanouts[name].fanout = _.assign({}, reply);
       });

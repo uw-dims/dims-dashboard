@@ -2,7 +2,6 @@
 
 var config = require('../config/config');
 var healthLogger = require('../utils/healthLogger');
-var uuid = require('node-uuid');
 
 module.exports = function healthService(UserModel) {
 
@@ -12,7 +11,7 @@ module.exports = function healthService(UserModel) {
   };
 
   var checkPostgres = function checkPostgres() {
-    var id = 'postgres';
+    var id = 'postgresql';
     UserModel.Users.forge()
     .fetch({ withRelated: ['email']})
     .then(function (reply) {

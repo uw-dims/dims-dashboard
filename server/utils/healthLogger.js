@@ -12,15 +12,20 @@ var label = 'utils/healthLogger.js';
 var logLevel = 'INFO';
 
 // Used for discrete UUIDs for different subsystems
-var uuidSet = {
-  dashboard: uuid.v4(),
-  redis: uuid.v4(),
-  postgresql: uuid.v4()
+var uuidSet = function uuidSet() {
+  return {
+    dashboard: uuid.v4(),
+    redis: uuid.v4(),
+    postgresql: uuid.v4(),
+    messaging: uuid.v4()
+  };
 };
+
+var UUIDs = uuidSet();
 
 var format = function format(msg, id, level) {
   return moment().toISOString() + ' ' + os.hostname() + ' ' +
-      uuidSet[id] + ' ' + config.appName + ' [' + label  + '] [' + process.pid + '] ' + level + ' ' +
+      UUIDs[id] + ' ' + config.appName + ' [' + label  + '] [' + process.pid + '] ' + level + ' ' +
       msg;
 };
 
