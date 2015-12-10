@@ -103,6 +103,7 @@ test('models/topic.js: string topic can be created', function (assert) {
       description: 'CIF results',
       datatype: 'string'
     });
+    console.log('[+++] topicFactory result ', topic);
     return topic.create('string data');
   })
   .then(function (reply) {
@@ -166,40 +167,40 @@ test('models/topic.js: set topic can be created', function(assert) {
   });
 });
 
-// test('models/topic.js: topic object can be retrieved', function (assert) {
-//   var topic, ticket;
-//   createTickets()
-//   .then(function () {
-//     return Ticket.getTicket('dims:ticket:activity:1');
-//   })
-//   .then(function (reply) {
-//     ticket = reply;
-//     topic = Topic.topicFactory(ticket, {
-//       name: 'cif',
-//       description: 'CIF results',
-//       datatype: 'string'
-//     });
-//     // console.log(topic);
-//     return topic.create('string data');
-//   })
-//   .then(function (reply) {
-//     assert.deepEqual(reply, ['OK', 1, 'OK']);
-//     return Topic._private.getTopicObject('dims:ticket:activity:1:cif:1.__meta');
-//   })
-//   .then(function (reply) {
-//     console.log('test reply', reply);
-//     console.log('test ', reply.metadata);
-//     console.log('test', reply.metadata.parent);
-//     // assert.equal(reply, 'string data', 'string data was saved');
-//     return client.flushdbAsync();
-//   })
-//   .then(function () {
-//     assert.end();
-//   })
-//   .catch(function (err) {
-//     failOnError(err, assert);
-//   });
-// });
+test('models/topic.js: topic object can be retrieved', function (assert) {
+  var topic, ticket;
+  createTickets()
+  .then(function () {
+    return Ticket.getTicket('dims:ticket:activity:1');
+  })
+  .then(function (reply) {
+    ticket = reply;
+    topic = Topic.topicFactory(ticket, {
+      name: 'cif',
+      description: 'CIF results',
+      datatype: 'string'
+    });
+    console.log('[+++] test topic object retrieved ', topic);
+    return topic.create('string data');
+  })
+  .then(function (reply) {
+    assert.deepEqual(reply, ['OK', 1, 'OK']);
+    return Topic.getTopic('dims:ticket:activity:1:cif:1');
+  })
+  .then(function (reply) {
+    console.log('test reply', reply);
+    console.log('test ', reply.metadata);
+    console.log('test', reply.metadata.parent);
+    // assert.equal(reply, 'string data', 'string data was saved');
+    return client.flushdbAsync();
+  })
+  .then(function () {
+    assert.end();
+  })
+  .catch(function (err) {
+    failOnError(err, assert);
+  });
+});
 
 test('models/topic.js: can retrieve topic with data', function (assert) {
   var topic1, topic2, ticket;

@@ -19,7 +19,7 @@ var ticketConfig = {
 var ticket1 = _.extend({}, ticketConfig);
 var topicConfig = {
   metadata: {
-    parent: ticket1,
+    parent: ticket1.metadata,
     type: 'analysis',
     name: 'topic1',
     datatype: 'hash',

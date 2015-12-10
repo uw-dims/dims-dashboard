@@ -74,7 +74,7 @@ var keyGen = {
     // console.log('topic parent is ', topic.parent);
     console.log('[+++] topicKey - topicMetata = ', topicMeta);
 
-    return c.addContent(this.ticketKey(topicMeta.parent.metadata), topicMeta.name, topicMeta.num);
+    return c.addContent(this.ticketKey(topicMeta.parent), topicMeta.name, topicMeta.num);
   },
 
   topicMetaKey: function topicMetaKey(topicMeta) {
@@ -92,7 +92,7 @@ var keyGen = {
   topicSetKey: function topicSetKey(topicMeta) {
     console.log('[+++] topicSetKey topic', topicMeta);
     // return c.namespace + this.ticketKey(ticket) + c.topicSuffix;
-    return c.addSuffix(this.ticketKey(topicMeta.parent.metadata), 'topics');
+    return c.addSuffix(this.ticketKey(topicMeta.parent), 'topics');
   },
 
   topicSetKeyFromTicketKey: function topicSetKeyFromTicketKey(key) {

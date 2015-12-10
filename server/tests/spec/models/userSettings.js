@@ -9,23 +9,22 @@ var keyGen = require('../../../models/keyGen');
 
 // Enable service discovery for this test
 var diContainer = require('../../../services/diContainer')();
+var bluebird = require('bluebird');
 var redis = require('redis');
 
-logger.debug('TEST filedata: do the test with redis');
-var client = redis.createClient();
-// Add the regular proxy to diContainer
-client.select(10, function (err, reply) {
-  if (err) {
-    logger.error('test: redis client received error when selecting database ', err);
-  } else {
-    logger.debug('test: redis has selected db', 10, 'reply is ', reply);
-  }
+var client = bluebird.promisifyAll(redis.createClient());
+bluebird.promisifyAll(client.multi());
+client.selectAsync(10).then (function (reply) {
+})
+.catch(function (err) {
+  console.error(err.toString());
 });
-diContainer.factory('db', require('../../../utils/redisProxy'));
+
 diContainer.register('client', client);
+
 diContainer.factory('UserSettings', require('../../../models/userSettings'));
 var UserSettings = diContainer.get('UserSettings');
-var db = diContainer.get('db');
+var client = diContainer.get('client');
 
 // Some data
 var user1 = 'user1';
@@ -131,7 +130,7 @@ test('models/userSettings: UserSettings object saveSettings method should save s
   userSettings.saveSettings()
   .then(function (reply) {
     logger.debug('TEST debug savesettings reply is ', reply);
-    return db.hgetallProxy(keyGen.userSettingsKey(userSettings));
+    return client.hgetallAsync(keyGen.userSettingsKey(userSettings));
   })
   .then(function (reply) {
     logger.debug('TEST debug hmgetall reply is ', reply);
@@ -151,7 +150,7 @@ test('models/userSettings: UserSettings object createSettings method should save
   userSettings.createSettings()
   .then(function (reply) {
     logger.debug('TEST debug createsettings reply is ', reply);
-    return db.hgetallProxy(keyGen.userSettingsKey(userSettings));
+    return client.hgetallAsync(keyGen.userSettingsKey(userSettings));
   })
   .then(function (reply) {
     logger.debug('TEST debug hmgetall reply is ', reply);
@@ -172,7 +171,7 @@ test('model/userSettings: UserSettings object createSettings method should save 
   userSettings.createSettings()
   .then(function (reply) {
     logger.debug('TEST debug savesettings reply is ', reply);
-    return db.sismemberProxy(keyGen.userSettingsSetKey(), keyGen.userSettingsKey(userSettings));
+    return client.sismemberAsync(keyGen.userSettingsSetKey(), keyGen.userSettingsKey(userSettings));
   })
   .then(function (reply) {
     logger.debug('TEST debug sismember reply is ', reply);
@@ -256,15 +255,16 @@ test('models/userSettings: getUserSettings static method returns UserSettings ob
   });
 });
 
-// if (config.testWithRedis) {
-  test('models/fileData.js: Finished', function (assert) {
-    logger.debug('Quitting redis');
-    client.flushdb(function (reply) {
-      logger.debug('flushdb reply ', reply);
-      client.quit(function (err, reply) {
-        logger.debug('quit reply ', reply);
-        assert.end();
-      });
-    });
+test('models/topic.js: Finished', function (assert) {
+  client.flushdbAsync()
+  .then(function (reply) {
+    return client.quitAsync();
+  })
+  .then(function (reply) {
+    assert.end();
+  })
+  .catch(function (err) {
+    console.error(err.toString());
+    assert.end();
   });
-// }
+});

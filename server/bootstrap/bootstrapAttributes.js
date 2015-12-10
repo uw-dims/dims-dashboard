@@ -22,10 +22,12 @@ diContainer.factory('Attributes', require(path.join(ROOT_DIR, '/models/attribute
 diContainer.factory('attributeService', require(path.join(ROOT_DIR, '/services/attributes')));
 diContainer.register('client', client);
 diContainer.factory('UserModel', require(path.join(ROOT_DIR, '/models/user')));
+diContainer.register('Bookshelf', require(path.join(ROOT_DIR, '/utils/bookshelf')));
 
 var Attributes = diContainer.get('Attributes');
 var attributeService = diContainer.get('attributeService');
 var UserModel = diContainer.get('UserModel');
+var Bookshelf = diContainer.get('Bookshelf');
 console.log('ROOT_DIR is %s', ROOT_DIR);
 
 (function () {
@@ -83,6 +85,11 @@ console.log('ROOT_DIR is %s', ROOT_DIR);
       })
       .then(function () {
         return client.quitAsync();
+      })
+      .then(function () {
+        Bookshelf.knex.destroy(function (err, reply) {
+          console.log(err, reply);
+        });
       })
       .catch(function (err) {
         console.log(err);
