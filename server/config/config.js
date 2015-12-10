@@ -1,3 +1,5 @@
+'use strict';
+
 var uuid = require('node-uuid');
 
 var config = {};
@@ -254,7 +256,6 @@ config.healthID = 'dashboard';
 config.messagingHealthID = 'messaging';
 
 var uuidSet = function uuidSet() {
-  console.log('in uuidSet');
   return {
     dashboard: uuid.v4(),
     redis: uuid.v4(),
