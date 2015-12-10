@@ -34,8 +34,11 @@ console.log('ROOT_DIR is %s', ROOT_DIR);
 
   var bootstrapAttributes = {};
 
-  exports.runBootstrap = bootstrapAttributes.runBootstrap = function () {
-    console.log('Running bootstrapAttributes');
+  // options is array of initial users who should have initial attributes assigned.
+  // Should contain 4 userIds...
+
+  exports.runBootstrap = bootstrapAttributes.runBootstrap = function (options) {
+    console.log('input users', options);
     var users = [];
     var yamlPath = path.join(__dirname, './userAttributes.yml');
     var doc;
@@ -50,11 +53,14 @@ console.log('ROOT_DIR is %s', ROOT_DIR);
       console.error('Cannot read file at ' + yamlPath + '. Error: ', err);
       return;
     }
-
+    // Get the current users
     return UserModel.Users.forge().fetch()
     .then(function (collection) {
       _.forEach(collection.toJSON(), function (value, key) {
-        users.push(value.ident);
+        // If user is in options, then save it
+        if (_.includes(options, value.ident)) {
+          users.push(value.ident);
+        }
       });
       // Now have array of actual usernames
       var attrPromises = [];
@@ -100,7 +106,7 @@ console.log('ROOT_DIR is %s', ROOT_DIR);
 
 
   if (!module.parent) {
-    bootstrapAttributes.runBootstrap();
+    bootstrapAttributes.runBootstrap(process.argv.slice(2));
   }
 
 })();

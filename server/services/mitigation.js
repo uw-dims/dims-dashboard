@@ -80,18 +80,16 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
     var unknownIps = [];
     var users = [];
 
+    // TODO - add userservice so we don't have to call the model directly
     return UserModel.Users.forge().fetch()
-      .then(function (collection) {
-        //console.log(collection);
-        console.log(collection.toJSON());
-    // return Attributes.getAllAttributes()
+    .then(function (collection) {
       _.forEach(collection.toJSON(), function (value) {
         users.push(value.ident);
       });
       console.log(users);
       return ticket.create();
     })
-    .then(function (reply) {
+    .then(function () {
       console.log('-----------------------------------');
       console.log('Ticket created. Now assign IPs to users who are tracking them');
       return anonService.setup({
