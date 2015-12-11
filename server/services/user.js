@@ -239,7 +239,8 @@ module.exports = function (UserModel, Bookshelf) {
       logger.error(err);
       throw err;
     });
-  }
+  };
+
 
   // Get login info
 

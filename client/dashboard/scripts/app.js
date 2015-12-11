@@ -105,6 +105,10 @@ var constants = {
       'name': 'logs',
       'event': 'logs:data'
     },
+    'health': {
+      'name': 'health',
+      'event': 'health:data'
+    },
     'devops': {
       'name': 'devops',
       'event': 'devops:data'
@@ -112,15 +116,11 @@ var constants = {
     'test': {
       'name': 'test',
       'event': 'test:data'
-    },
-    'health': {
-      'name': 'health',
-      'event': 'health:data'
-    },
-    'dimstr': {
-      'name': 'dimstr',
-      'event': 'dimstr:data'
     }
+    // 'dimstr': {
+    //   'name': 'dimstr',
+    //   'event': 'dimstr:data'
+    // }
   }
   //'logExchange': 'devops',
   //'chatExchange': 'chat',

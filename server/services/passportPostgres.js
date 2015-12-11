@@ -10,12 +10,14 @@ module.exports = function (UserModel) {
 
   passportPostgres.serialize = function (user, done) {
     // logger.debug('services/passport-static.serializeUser. user ident is ', user.get('ident'));
+    // this just returns the user id
     done(null, user.get('ident'));
   };
 
   passportPostgres.deserialize = function deserialize(ident, done) {
     new UserModel.User({ident: ident}).fetch().then(function (user) {
       // logger.debug('services/passport.deserializeUser: retrieved user ident ', user.get('ident'));
+      // this returns a user object
       return done(null, user);
     }, function (error) {
       return done(error);

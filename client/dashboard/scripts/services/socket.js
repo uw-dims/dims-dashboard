@@ -29,7 +29,7 @@
 
     $rootScope.$on('authenticated', function () {
       $log.debug('ClientSockets authenticated handler');
-      // Establish each socket
+      //Establish each socket
       try {
         _.forEach(['chatExchanges', 'fanoutExchanges'], function (value, index) {
           _.forEach(constants[value], function (value, key) {
