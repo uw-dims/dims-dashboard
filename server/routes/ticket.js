@@ -86,7 +86,7 @@ module.exports = function (ticketService, mitigationService) {
     var config = {
       type: 'all'
     };
-    return ticketService.listTickets(config)
+    ticketService.listTickets(config)
     .then(function (reply) {
       console.log(reply);
       res.status(200).send(resUtils.getSuccessReply(reply));
@@ -108,18 +108,26 @@ module.exports = function (ticketService, mitigationService) {
     logger.debug('routes/ticket SHOW, id: ', req.params.id);
     // var ticket = new Ticket();
     var ticket;
-    Ticket.getTicket(req.params.id).then(function (reply) {
-      // logger.debug('SHOW getTicket reply', reply);
-      ticket = reply; // update the ticket
-      // Get array of associated topic keys
-      return Topic.getTopics(ticket.key);
-    }).then(function (reply) {
-        // Send back ticket key, metadata, array of associated topic keys
-        res.status(200).send({data: packageTicket(ticket, reply)});
-      }, function (err, reply) {
-        /* jshint unused: false */
-        res.status(400).send(err.toString());
-      });
+    ticketService.getTicket(req.params.id)
+    .then(function (reply) {
+      console.log(reply);
+      res.status(200).send(resUtils.getSuccessReply(reply));
+    })
+    .catch(function (err) {
+      res.status(400).send(resUtils.getErrorReply(err));
+    });
+    // Ticket.getTicket(req.params.id).then(function (reply) {
+    //   // logger.debug('SHOW getTicket reply', reply);
+    //   ticket = reply; // update the ticket
+    //   // Get array of associated topic keys
+    //   return Topic.getTopics(ticket.key);
+    // }).then(function (reply) {
+    //     // Send back ticket key, metadata, array of associated topic keys
+    //     res.status(200).send({data: packageTicket(ticket, reply)});
+    //   }, function (err, reply) {
+    //     /* jshint unused: false */
+    //     res.status(400).send(err.toString());
+    //   });
   };
 
 

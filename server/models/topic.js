@@ -88,7 +88,14 @@ module.exports = function Topic(store) {
       } else {
         throw new Error ('Invalid options supplied to topicFactory');
       }
-      // console.log(metadata);
+      
+      if (metadata.metadata.parent.type === 'mitigation') {
+        // Mitigation use name as keyname
+        metadata.metadata.keyname = metadata.metadata.name;
+      } else {
+        metadata.metadata.keyname = 'topic';
+      }
+      console.log('topicfactory metadata is ', metadata);
       return (_.extend({}, topicPrototype, metadata));
     }
   };
@@ -235,6 +242,44 @@ module.exports = function Topic(store) {
     });
   };
 
+  var getTopicsMetadata = function getTopicsMetadata(key) {
+    var promises = [];
+    return store.listItems(keyGen.topicSetKeyFromTicketKey(key))
+    .then(function (reply) {
+      // console.log(reply);
+      _.forEach(reply, function (value, index) {
+        promises.push(getTopicMetadata(value));
+      });
+      return q.all(promises);
+    })
+    .catch(function (err) {
+      throw err;
+    });
+  };
+
+  // Get metadata for a topic from a topic key
+  var getTopicMetadata = function getTopicMetdata(key) {
+    // console.log('getTopic key', key);
+    var topic = {};
+    var metaKey = keyGen.metaKeyFromKey(key);
+    // console.log('getTopicMetaKey ', metaKey);
+    return getMetadata(metaKey)
+    .then(function (reply) {
+      // console.log(reply);
+      topic.metadata = reply;
+      topic.key = key;
+      return topic;
+    })
+    .then(function (reply) {
+      // console.log(reply);
+      topic.data = reply;
+      return topic;
+    })
+    .catch(function (err) {
+      throw err;
+    });
+  };
+
   // score is optional
   var topicPrototype = {
     create: function (data, score) {
@@ -278,6 +323,8 @@ module.exports = function Topic(store) {
     topicFactory: topicFactory,
     getTopic: getTopic,
     getTopics: getTopics,
+    getTopicMetadata: getTopicMetadata,
+    getTopicsMetadata: getTopicsMetadata,
     extendFactory: extendFactory
   };
 

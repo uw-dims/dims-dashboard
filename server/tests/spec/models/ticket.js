@@ -26,18 +26,6 @@ var Ticket = require('../../../models/ticket')(store);
 // Bootstrap some data
 var user = 'testUser'; // Simulates logged in user
 
-// var topicName1 = 'topicHashData',
-//     topicDataType1 = 'hash',
-//     topicContents1 = {
-//       'field1': 'value1',
-//       'field2': 'value2'
-//     },
-//     topicName2 = 'topicStringData',
-//     topicDataType2 = 'string',
-//     // Set to one value until jenkins redis is updated from 2.2.10
-//     topicContents2 = 'aaaaaa',
-//     ticketType1 = 'data';
-
 var createOptions = function (creator, type, name, privacy, description) {
   return {
     creator: creator,

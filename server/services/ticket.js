@@ -10,15 +10,34 @@ var config = require('../config/config');
 var logger = require('../utils/logger')(module);
 var KeyGen = require('../models/keyGen');
 var q = require('q');
+var _ = require('lodash-compat');
 
-module.exports = function(Ticket, Topic) {
+module.exports = function (Ticket, Topic) {
   var ticketService = {};
 
+  // Returns ticket metadata and array of topic metadata
   var listTickets = function listTickets(config) {
-    return Ticket.getTickets(config);
+    var result = [];
+    return Ticket.getTickets(config)
+    .then(function (reply) {
+      _.forEach(reply, function (value, key) {
+        var ticket = value;
+        ticket.topics = [];
+
+      })
+    })
   };
 
-  var showTicket = function showTicket(id) {
+  var addTopics = function addTopics(ticket) {
+    var result = ticket;
+    return Topic.getTopicsMetadata(ticket.key)
+    .then(function (reply) {
+      
+    })
+  }
+
+  var getTicket = function showTicket(id) {
+    console.log('showTicket id ', id);
     return Ticket.getTicket(id)
     .then(function (reply) {
       return Topic.getTopics(reply.key);
@@ -64,7 +83,7 @@ module.exports = function(Ticket, Topic) {
   };
 
   ticketService.listTickets = listTickets;
-  ticketService.showTicket = showTicket;
+  ticketService.getTicket = getTicket;
   ticketService.createTicket = createTicket;
   ticketService.updateTicket = updateTicket;
   ticketService.deleteTicket = deleteTicket;

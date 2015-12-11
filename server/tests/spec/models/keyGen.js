@@ -23,7 +23,8 @@ var topicConfig = {
     type: 'analysis',
     name: 'topic1',
     datatype: 'hash',
-    num: 4
+    num: 4,
+    keyname: 'topic'
   }
 };
 

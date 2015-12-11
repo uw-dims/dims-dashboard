@@ -58,7 +58,7 @@ var keyGen = {
 
   ticketTypeKey: function ticketTypeKey(type) {
     // if (type !== 'private') {
-      return c.addSuffix(c.makeRoot('ticket'), 'type', type);
+    return c.addSuffix(c.makeRoot('ticket'), 'type', type);
     // } else {
     //   return c.addSuffix(c.makeRoot('ticket'), 'type', type, owner);
     // }
@@ -74,7 +74,7 @@ var keyGen = {
     // console.log('topic parent is ', topic.parent);
     // console.log('[+++] topicKey - topicMetata = ', topicMeta);
 
-    return c.addContent(this.ticketKey(topicMeta.parent), 'topic', topicMeta.num);
+    return c.addContent(this.ticketKey(topicMeta.parent), topicMeta.keyname, topicMeta.num);
   },
 
   topicMetaKey: function topicMetaKey(topicMeta) {
