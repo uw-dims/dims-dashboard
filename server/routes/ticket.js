@@ -83,7 +83,10 @@ module.exports = function (ticketService, mitigationService) {
     logger.debug('routes/ticket GET');
     console.log(req.params);
     console.log(req.body);
-    return ticketService.listTickets()
+    var config = {
+      type: 'all'
+    };
+    return ticketService.listTickets(config)
     .then(function (reply) {
       console.log(reply);
       res.status(200).send(resUtils.getSuccessReply(reply));

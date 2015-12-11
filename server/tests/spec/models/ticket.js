@@ -38,12 +38,13 @@ var user = 'testUser'; // Simulates logged in user
 //     topicContents2 = 'aaaaaa',
 //     ticketType1 = 'data';
 
-var createOptions = function (creator, type, privacy, description) {
+var createOptions = function (creator, type, name, privacy, description) {
   return {
     creator: creator,
     type: type,
     description: description,
-    private: privacy
+    private: privacy,
+    name: name
   };
 };
 
@@ -56,20 +57,20 @@ var openSetKey = 'dims:ticket.__open';
 var typeSetKey1 = 'dims:ticket.__type.__activity';
 var ticketSetKey = 'dims:ticket.__keys';
 
-var validOption1 = createOptions(user1, 'activity', false);
-var expectedOption1 = createOptions(user1, 'activity', false);
+var validOption1 = createOptions(user1, 'activity', 'Activity 1', false);
+var expectedOption1 = createOptions(user1, 'activity', 'Activity 1', false);
 _.extend(expectedOption1, {description: ''});
-var validOption2 = createOptions(user1, 'activity');
-var expectedOption2 = createOptions(user1, 'activity', false, '');
-var extraOptions1 = createOptions(user1, 'activity', true, 'An activity');
+var validOption2 = createOptions(user1, 'activity', 'Activity 2');
+var expectedOption2 = createOptions(user1, 'activity', 'Activity 2', false, '');
+var extraOptions1 = createOptions(user1, 'activity', 'Activity3', true, 'An activity');
 _.extend(extraOptions1, {'nancy': 'girl'});
-var expectedOption3 = createOptions(user1, 'activity', true, 'An activity');
+var expectedOption3 = createOptions(user1, 'activity', 'Activity3', true, 'An activity');
 
 var createTickets = function createTickets() {
-  var activityConfig1 = createOptions('testuser1', 'activity');
-  var mitigationConfig1 = createOptions('testuser2', 'mitigation', false);
-  var privateConfig1 = createOptions('testuser2', 'activity', true);
-  var activityConfig2 = createOptions('testuser2', 'activity', false);
+  var activityConfig1 = createOptions('testuser1', 'activity', 'Activity 1');
+  var mitigationConfig1 = createOptions('testuser2', 'mitigation', 'Mitigation 1', false);
+  var privateConfig1 = createOptions('testuser2', 'activity', 'Activity2', true);
+  var activityConfig2 = createOptions('testuser2', 'activity', 'Activity 3', false);
   var ticket1 = Ticket.ticketFactory(activityConfig1);
   var ticket2 = Ticket.ticketFactory(mitigationConfig1);
   var ticket3 = Ticket.ticketFactory(privateConfig1);
@@ -106,6 +107,7 @@ test('models/ticket.js: TicketFactory returns ticket object with metadata', func
     assert.throws(Ticket.ticketFactory(createOptions()), Error, 'options with undefined values throw Error');
     assert.throws(Ticket.ticketFactory(createOptions('bob')), Error, 'Missing options throw Error');
     assert.throws(Ticket.ticketFactory(createOptions('bob', 'fred')), Error, 'Invalid type throws Error');
+    assert.throws(Ticket.ticketFactory(createOptions('bob', 'activity')), Error, 'Missing name throws Error');
     assert.deepEqual((Ticket.ticketFactory(validOption1)).metadata, expectedOption1, 'description should be included as empty string if it was not present in options');
     assert.deepEqual((Ticket.ticketFactory(validOption2)).metadata, expectedOption2, 'valid options should succeed');
     assert.deepEqual((Ticket.ticketFactory(extraOptions1)).metadata, expectedOption3, 'extra options should be discarded');
@@ -136,7 +138,9 @@ test('models/ticket.js: Creating a ticket saves metadata at ticketKey', function
   var ticket = Ticket.ticketFactory(validOption1);
   ticket.create()
   .then(function (reply) {
-    assert.deepEqual(reply, ['OK', 1, 1, 1, 1, 1], 'Saving ticket returns correct reply');
+    assert.deepEqual(reply,
+      { key: keyGen.ticketKey(ticket.metadata),
+        metadata: ticket.metadata}, 'Saving ticket returns correct reply');
     return store.getMetadata(activityKey1);
   })
   .then(function (reply) {
@@ -145,7 +149,7 @@ test('models/ticket.js: Creating a ticket saves metadata at ticketKey', function
     assert.deepEqual(Ticket._private.castMetadata(reply), ticket.metadata, 'Metadata is stored in database');
     return client.flushdbAsync();
   })
-  .then(function (reply) {
+  .then(function () {
     assert.end();
   })
   .catch(function (err) {
@@ -156,7 +160,7 @@ test('models/ticket.js: Creating a ticket saves metadata at ticketKey', function
 test('models/ticket.js: Creating a ticket saves ticket key in sets of keys', function (assert) {
   var ticket = Ticket.ticketFactory(validOption1);
   ticket.create()
-  .then(function (reply) {
+  .then(function () {
     return q.all([
       store.existsInSet(activityKey1, ticketSetKey),
       store.existsInSet(activityKey1, ownerSetKey1),
@@ -181,7 +185,7 @@ test('models/ticket.js: Creating a ticket saves ticket key in sets of keys', fun
       [ 'dims:ticket:activity:1' ] ], 'Ticket key is only key in the 4 sets');
     return client.flushdbAsync();
   })
-  .then(function (reply) {
+  .then(function () {
     assert.end();
   })
   .catch(function (err) {
@@ -499,6 +503,7 @@ test('models/ticket.js: getTickets returns array of ticket objects', function (a
     });
   })
   .then(function (reply) {
+    console.log(reply);
     assert.equals(reply.length, 4);
     assert.ok(reply[0].hasOwnProperty('metadata'));
     return Ticket.getTickets({
@@ -507,6 +512,7 @@ test('models/ticket.js: getTickets returns array of ticket objects', function (a
     });
   })
   .then(function (reply) {
+    console.log(reply);
     assert.equals(reply.length, 1);
     return Ticket.getTickets({
       type: 'all',

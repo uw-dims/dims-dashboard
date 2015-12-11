@@ -28,7 +28,6 @@ var Attributes = diContainer.get('Attributes');
 var attributeService = diContainer.get('attributeService');
 var UserModel = diContainer.get('UserModel');
 var Bookshelf = diContainer.get('Bookshelf');
-console.log('ROOT_DIR is %s', ROOT_DIR);
 
 (function () {
 

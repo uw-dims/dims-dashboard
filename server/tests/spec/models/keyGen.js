@@ -41,7 +41,7 @@ var ticketTypeSet = 'dims:ticket.__type.__analysis';
 var ticketsOpen = 'dims:ticket.__open';
 var ticketsClosed = 'dims:ticket.__closed';
 var topicSetKey1 = 'dims:ticket:analysis:5.__topics';
-var topicKey1 = 'dims:ticket:analysis:5:topic1:4';
+var topicKey1 = 'dims:ticket:analysis:5:topic:4';
 // var topicTimestampKey = 'dims:ticket:5:data:topic1.__timestamp';
 
 var userObject = {

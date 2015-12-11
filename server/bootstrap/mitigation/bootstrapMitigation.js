@@ -48,8 +48,9 @@ var Bookshelf = diContainer.get('Bookshelf');
     var time = moment().subtract(k, 'days').format('x');
     var user1 = options[0];
     var user2 = options[1];
+    var description = 'IPs needing mitigation. Report back and submit IPs you have mitigated';
 
-    mitigationService.initiateMitigation(ipPath, user1)
+    mitigationService.initiateMitigation(ipPath, user1, 'Action Needed: 2015-11-21 Compromised IPs', description)
     .then(function (reply) {
       ticketKey = reply;
       console.log('bootstrapMitigation ticketKey', ticketKey);

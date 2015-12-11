@@ -31,7 +31,8 @@ module.exports = function Ticket(store) {
     creator: 'creator',
     type: 'type',
     description: 'description',
-    private: 'private'
+    private: 'private',
+    name: 'name'
   };
 
   var isValidType = function (type) {
@@ -50,7 +51,7 @@ module.exports = function Ticket(store) {
     // var newConfig = _.extend({}, defaultConfig, config);
     _.defaults(config, defaultConfig);
     // Must contain creator and type
-    if (!config[validOptions.creator] || !config[validOptions.type]) {
+    if (!config[validOptions.creator] || !config[validOptions.type] || !config[validOptions.name]) {
       return null;
     }
     // Type must be valid
@@ -64,7 +65,8 @@ module.exports = function Ticket(store) {
       creator: config.creator,
       description: config.description,
       type: config.type,
-      private: config.private
+      private: config.private,
+      name: config.name
     };
   };
 
@@ -264,6 +266,12 @@ module.exports = function Ticket(store) {
           saveKey(self.metadata, keyGen.ticketTypeKey(self.metadata.type)),
           saveKey(self.metadata, privKey)
         ]);
+      })
+      .then(function (reply) {
+        return {
+          key: keyGen.ticketKey(self.metadata),
+          metadata: self.metadata
+        };
       })
       .catch(function (err) {
         // logger.error('models/Ticket.create had an err returned from redis', err.toString());

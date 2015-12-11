@@ -72,13 +72,13 @@ var keyGen = {
     // return key;
     // console.log('topicKey topic is ', topic);
     // console.log('topic parent is ', topic.parent);
-    console.log('[+++] topicKey - topicMetata = ', topicMeta);
+    // console.log('[+++] topicKey - topicMetata = ', topicMeta);
 
-    return c.addContent(this.ticketKey(topicMeta.parent), topicMeta.name, topicMeta.num);
+    return c.addContent(this.ticketKey(topicMeta.parent), 'topic', topicMeta.num);
   },
 
   topicMetaKey: function topicMetaKey(topicMeta) {
-    console.log('[+++] topicMetaKey = ', topicMeta);
+    // console.log('[+++] topicMetaKey = ', topicMeta);
     return c.addSuffix(this.topicKey(topicMeta), 'metadata');
   },
 
@@ -90,7 +90,7 @@ var keyGen = {
   // Key to list or set of topics associated to a ticket
   // "ticket:type:num.__topics"
   topicSetKey: function topicSetKey(topicMeta) {
-    console.log('[+++] topicSetKey topic', topicMeta);
+    // console.log('[+++] topicSetKey topic', topicMeta);
     // return c.namespace + this.ticketKey(ticket) + c.topicSuffix;
     return c.addSuffix(this.ticketKey(topicMeta.parent), 'topics');
   },

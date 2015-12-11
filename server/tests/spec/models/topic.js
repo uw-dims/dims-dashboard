@@ -19,21 +19,22 @@ var store = require('../../../models/store')(client);
 var Ticket = require('../../../models/ticket')(store);
 var Topic = require('../../../models/topic')(store);
 
-var createTicketOptions = function (creator, type, privacy, description) {
+var createOptions = function (creator, type, name, privacy, description) {
   return {
     creator: creator,
     type: type,
     description: description,
-    private: privacy
+    private: privacy,
+    name: name
   };
 };
 
 var createTickets = function createTickets() {
   console.log('start createTickets');
-  var activityConfig1 = createTicketOptions('testuser1', 'activity');
-  var mitigationConfig1 = createTicketOptions('testuser2', 'mitigation', false);
-  var privateConfig1 = createTicketOptions('testuser2', 'activity', true);
-  var activityConfig2 = createTicketOptions('testuser2', 'activity', false);
+  var activityConfig1 = createOptions('testuser1', 'activity', 'Activity 1');
+  var mitigationConfig1 = createOptions('testuser2', 'mitigation', 'Mitigation 1', false);
+  var privateConfig1 = createOptions('testuser2', 'activity', 'Activity2', true);
+  var activityConfig2 = createOptions('testuser2', 'activity', 'Activity 3', false);
   var ticket1 = Ticket.ticketFactory(activityConfig1);
   var ticket2 = Ticket.ticketFactory(mitigationConfig1);
   var ticket3 = Ticket.ticketFactory(privateConfig1);
@@ -54,7 +55,7 @@ var createTickets = function createTickets() {
 };
 
 var failOnError = function (err, assert) {
-  console.log('TEST: Error ', err);
+  console.log('TEST: Error ', err.stack);
   assert.fail(err);
   assert.end();
 };
@@ -109,7 +110,7 @@ test('models/topic.js: string topic can be created', function (assert) {
   .then(function (reply) {
     console.log('test after create', topic.metadata);
     assert.deepEqual(reply, ['OK', 1, 'OK'], 'reply from create is valid');
-    return store.getData('dims:ticket:activity:1:cif:1');
+    return store.getData('dims:ticket:activity:1:topic:1');
   })
   .then(function (reply) {
     assert.deepEqual(reply, 'string data', 'string data was saved');
@@ -142,15 +143,15 @@ test('models/topic.js: set topic can be created', function(assert) {
   })
   .then(function (reply) {
     assert.deepEqual(reply, ['OK', 1, 3], 'correct responses received');
-    return store.listItems('dims:ticket:activity:1:cif:1');
+    return store.listItems('dims:ticket:activity:1:topic:1');
   })
   .then(function (reply) {
     assert.deepEqual(reply.sort(), ['1', '2', '3'], 'set data was saved');
     return store.listItems('dims:ticket:activity:1.__topics');
   })
   .then(function (reply) {
-    assert.deepEqual(reply, ['dims:ticket:activity:1:cif:1'], 'key was saved in topic set');
-    return store.getMetadata('dims:ticket:activity:1:cif:1.__meta');
+    assert.deepEqual(reply, ['dims:ticket:activity:1:topic:1'], 'key was saved in topic set');
+    return store.getMetadata('dims:ticket:activity:1:topic:1.__meta');
   })
   .then(function (reply) {
     console.log(reply);
@@ -185,7 +186,7 @@ test('models/topic.js: topic object can be retrieved', function (assert) {
   })
   .then(function (reply) {
     assert.deepEqual(reply, ['OK', 1, 'OK']);
-    return Topic.getTopic('dims:ticket:activity:1:cif:1');
+    return Topic.getTopic('dims:ticket:activity:1:topic:1');
   })
   .then(function (reply) {
     console.log('test reply', reply);
@@ -225,7 +226,7 @@ test('models/topic.js: can retrieve topic with data', function (assert) {
   })
   .then(function (reply) {
     assert.deepEqual(reply, ['OK', 1, 'OK']);
-    return Topic.getTopic('dims:ticket:activity:1:cif:1');
+    return Topic.getTopic('dims:ticket:activity:1:topic:1');
   })
   .then(function (reply) {
     console.log('test reply', reply);
@@ -234,7 +235,8 @@ test('models/topic.js: can retrieve topic with data', function (assert) {
     return topic2.create({ data: {'one': 'two'}});
   })
   .then(function (reply) {
-    return Topic.getTopic('dims:ticket:activity:1:cif:2');
+    console.log('reply from creating 2nd topic');
+    return Topic.getTopic('dims:ticket:activity:1:topic:2');
   })
   .then(function (reply) {
     console.log(reply);

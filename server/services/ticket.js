@@ -14,10 +14,7 @@ var q = require('q');
 module.exports = function(Ticket, Topic) {
   var ticketService = {};
 
-  var listTickets = function getTickets() {
-    var config = {
-      type: 'activity'
-    };
+  var listTickets = function listTickets(config) {
     return Ticket.getTickets(config);
   };
 

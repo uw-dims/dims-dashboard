@@ -1,6 +1,6 @@
 // 'use strict';
 
-// var test = require('tape-catch');
+// var test = require('tape');
 // var q = require('q');
 
 // var config = require('../../../config/config');
@@ -16,10 +16,8 @@
 
 // var knex = require('knex')(dbConfig);
 // var Bookshelf = require('bookshelf')(knex);
-// // module we're testing
 // var UserModel = require('../../../models/user')(Bookshelf);
 
-// // Add virtuals plug-in
 // Bookshelf.plugin('virtuals');
 
 // test.skip('models/user.js: some tests', function (assert) {
@@ -43,9 +41,9 @@
 
 // });
 
-// test.skip('models/user.js: get email info', function (assert) {
+// test('models/user.js: get email info', function (assert) {
 //   UserModel.Email
-//   .where({member: 'testuser1'})
+//   .where({email: 'linda.parsons@nextcentury.com'})
 //   .fetch()
 //   .then(function (response) {
 //     console.log(response.toJSON());
@@ -121,18 +119,16 @@
 // });
 
 // test.skip('models/user.js: **trustgroup with users', function (assert) {
-
-
 //   var rawSQL = "SELECT " +
 //   "m.ident, m.descr, m.affiliation, m.tz_info, m.im_info, m.tel_info, m.sms_info, "
 //   + "m.post_info, m.bio_info, m.airport, m.entered, m.activity, m.image, m.sysadmin, "
-//   + "mt.trustgroup, mt.state, mt.email, m.image, m.uuid "
+//   + "mt.trustgroup, mt.state, mt.email, m.image, m.uuid, mt.admin"
 //   + " FROM member m " +
 //   "JOIN member_trustgroup mt  ON m.ident = mt.member "
 //   + " JOIN trustgroup tg ON tg.ident = mt.trustgroup "
 //   + "WHERE tg.ident = ?";
 
-//   Bookshelf.knex.raw(rawSQL, ['test'])
+//   Bookshelf.knex.raw(rawSQL, ['dims'])
 //   .then(function (collection) {
 //     // collection = collection.toJSON();
 //     console.log('response', collection.rows);
@@ -147,47 +143,91 @@
 // });
 
 
-// test.skip('models/user.js: TrustGroups with users', function (assert) {
-//   UserModel.MemberTrustGroups.forge()
-//   .fetch({withRelated: ['users', 'trustgroups']})
-//   .then(function (collection) {
-//     console.log('member trust groups', collection.toJSON());
-//     assert.end();
-//   })
-//   .catch(function (err) {
-//     console.log(err);
-//     assert.end();
-//   });
-// });
+// // test.skip('models/user.js: TrustGroups with users', function (assert) {
+// //   UserModel.MemberTrustGroups.forge()
+// //   .fetch({withRelated: ['users', 'trustgroups']})
+// //   .then(function (collection) {
+// //     console.log('member trust groups', collection.toJSON());
+// //     assert.end();
+// //   })
+// //   .catch(function (err) {
+// //     console.log(err);
+// //     assert.end();
+// //   });
+// // });
 
-// test.skip('models/user.js: TrustGroups with users', function (assert) {
-//   UserModel.MemberTrustGroup
-//   .where({trustgroup: 'test'})
-//   .fetch({withRelated: ['users', 'trustgroups']})
-//   .then(function (collection) {
-//     console.log('member trust groups', collection.toJSON());
-//     assert.end();
-//   })
-//   .catch(function (err) {
-//     console.log(err);
-//     assert.end();
-//   });
-// });
+// // test('models/user.js: One trustGroup with members by trustgroup', function (assert) {
+// //   UserModel.MemberTrustGroups
+// //   .query('where', 'trustgroup', '=', 'dims')
+// //   .fetch()
+// //   .then(function (collection) {
+// //     console.log('member trust groups', collection.toJSON());
+// //     assert.end();
+// //   })
+// //   .catch(function (err) {
+// //     console.log(err);
+// //     assert.end();
+// //   });
+// // });
 
-// test.skip('models/user.js: TrustGroup with users', function (assert) {
-//   UserModel.MemberTrustGroup
-//   .where('trustgroup', 'test')
-//   .fetch({withRelated: ['users']})
-//   .then(function (collection) {
-//     console.log('member trust groups', collection.toJSON());
-//     assert.end();
-//   })
-//   .catch(function (err) {
-//     console.log(err);
-//     assert.end();
-//   });
-// });
+// // test('models/user.js: Trustgroups by member', function (assert) {
+// //   UserModel.MemberTrustGroups
+// //   .query('where', 'member', '=', 'lparsons')
+// //   .fetch()
+// //   .then(function (collection) {
+// //     console.log('member trust groups', collection.toJSON());
+// //     assert.end();
+// //   })
+// //   .catch(function (err) {
+// //     console.log(err);
+// //     assert.end();
+// //   });
+// // });
 
+// // test('models/user.js: Get info for one trust group -  dims', function (assert) {
+// //   UserModel.TrustGroups
+// //   .query('where', 'ident', '=', 'dims')
+// //   .fetch()
+// //   .then(function (collection) {
+// //     console.log('trust groups', collection.toJSON());
+// //     assert.end();
+// //   })
+// //   .catch(function (err) {
+// //     console.log(err);
+// //     assert.end();
+// //   });
+// // });
+
+// // test('models/user.js: get all in member trust groups', function (assert) {
+// //   UserModel.MemberTrustGroups.forge()
+// //   .fetch()
+// //   .then(function (collection) {
+// //     console.log('member trust groups', collection.toJSON());
+// //     assert.end();
+// //   })
+// //   .catch(function (err) {
+// //     console.log(err);
+// //     assert.end();
+// //   });
+// // });
+
+
+// // test('models/user.js: TrustGroup with users', function (assert) {
+// //   UserModel.MemberTrustGroup
+// //   .where('trustgroup', 'test')
+// //   .fetch({withRelated: ['users']})
+// //   .then(function (collection) {
+// //     // Will fail here if null
+// //     console.log('member trust groups', collection.toJSON());
+// //     assert.end();
+// //   })
+// //   .catch(function (err) {
+// //     console.log(err);
+// //     assert.end();
+// //   });
+// // });
+
+// // Get all trust groups
 // // test('models/user.js: Just trust groups', function (assert) {
 // //   UserModel.TrustGroups.forge()
 // //   .fetch()
@@ -201,20 +241,8 @@
 // //   });
 // // });
 
-// // test('models/user.js: some more tests', function (assert) {
-// //   UserModel.MemberTrustGroups.forge()
-// //   .fetch()
-// //   .then(function (collection) {
-// //     console.log('member trust groups', collection.toJSON());
-// //     assert.end();
-// //   })
-// //   .catch(function (err) {
-// //     console.log(err);
-// //     assert.end();
-// //   });
-// // });
 
-// // test('models/user.js: some more tests', function (assert) {
+// // test('models/user.js: get all in mailing lists', function (assert) {
 // //   UserModel.MailingLists.forge()
 // //   .fetch()
 // //   .then(function (collection) {
@@ -227,7 +255,7 @@
 // //   });
 // // });
 
-// // test('models/user.js: some more tests', function (assert) {
+// // test('models/user.js: get all in member mailing lists', function (assert) {
 // //   UserModel.MemberMailingLists.forge()
 // //   .fetch()
 // //   .then(function (collection) {

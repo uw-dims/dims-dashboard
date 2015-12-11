@@ -68,11 +68,13 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
 
   var mapPath = config.dashboardDataPath + 'dashboard_user_attributes.yml';
 
-  var initiateMitigation = function initiateMitigation(ipPath, user) {
+  var initiateMitigation = function initiateMitigation(ipPath, user, ticketName, description) {
     var ipData = fs.readFileSync(ipPath, {encoding: 'utf-8'});
     var ticketConfig = {
       creator: user,
-      type: 'mitigation'
+      type: 'mitigation',
+      name: ticketName,
+      description: description
     };
     var ticket = Ticket.ticketFactory(ticketConfig);
     var binnedIps;

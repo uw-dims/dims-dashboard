@@ -57,6 +57,9 @@ module.exports = function Topic(store) {
     if (!isValidType(options.datatype)) {
       return null;
     }
+    // Replace spaces in name with underscores since it will be part of a key.
+    // options.name = options.name.replace(/  */g, '_');
+    // console.log(options.name);
     return {
       name: options.name,
       datatype: options.datatype,
@@ -133,7 +136,7 @@ module.exports = function Topic(store) {
   // Data should be JSON?
   var saveData = function saveData(metadata, data) {
     console.log('saveData metadata is ', metadata);
-    console.log('saveData data is ', data);
+    // console.log('saveData data is ', data);
     return store.setData(keyGen.topicKey(metadata), data);
   };
 
@@ -194,6 +197,7 @@ module.exports = function Topic(store) {
     // console.log('getTopicMetaKey ', metaKey);
     return getMetadata(metaKey)
     .then(function (reply) {
+      // console.log(reply);
       topic.metadata = reply;
       topic.key = key;
       // console.log(topic);

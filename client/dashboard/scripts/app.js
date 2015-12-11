@@ -122,10 +122,6 @@ var constants = {
     //   'event': 'dimstr:data'
     // }
   }
-  //'logExchange': 'devops',
-  //'chatExchange': 'chat',
-  //'logEvent': 'devops:data',
-  //'chatEvent': 'chat:data'
 };
 
 var rpcClientOptions = {
