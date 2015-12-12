@@ -17,30 +17,40 @@ module.exports = function (Ticket, Topic) {
 
   // Returns ticket metadata and array of topic metadata
   var listTickets = function listTickets(config) {
-    var result = [];
+    var promises = [];
     return Ticket.getTickets(config)
     .then(function (reply) {
       _.forEach(reply, function (value, key) {
         var ticket = value;
-        ticket.topics = [];
-
-      })
+        promises.push(addTopics(ticket));
+      });
+      return q.all(promises);
     })
+    .catch(function (err) {
+      console.log('caught error in listTickets');
+      throw err;
+    });
   };
 
   var addTopics = function addTopics(ticket) {
     var result = ticket;
+    console.log('addTopics input ticket', ticket);
     return Topic.getTopicsMetadata(ticket.key)
     .then(function (reply) {
-      
+      console.log('addtopics reply', reply);
+      result.topics = reply;
+      return result;
     })
-  }
+    .catch(function (err) {
+      throw err;
+    });
+  };
 
   var getTicket = function showTicket(id) {
     console.log('showTicket id ', id);
     return Ticket.getTicket(id)
     .then(function (reply) {
-      return Topic.getTopics(reply.key);
+      return addTopics(reply);
     })
     .catch(function (err) {
       throw err;

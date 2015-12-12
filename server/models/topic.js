@@ -78,7 +78,7 @@ module.exports = function Topic(store) {
   var topicFactory = function topicFactory(ticket, options) {
     var metadata = {};
     if (options === null || options === undefined) {
-      return new Error('Failed to provide options to topicFactory');
+      throw new Error('Failed to provide options to topicFactory');
     } else {
       if (validateOptions(options) !== null) {
         metadata = {
@@ -88,7 +88,7 @@ module.exports = function Topic(store) {
       } else {
         throw new Error ('Invalid options supplied to topicFactory');
       }
-      
+
       if (metadata.metadata.parent.type === 'mitigation') {
         // Mitigation use name as keyname
         metadata.metadata.keyname = metadata.metadata.name;
@@ -268,11 +268,6 @@ module.exports = function Topic(store) {
       // console.log(reply);
       topic.metadata = reply;
       topic.key = key;
-      return topic;
-    })
-    .then(function (reply) {
-      // console.log(reply);
-      topic.data = reply;
       return topic;
     })
     .catch(function (err) {

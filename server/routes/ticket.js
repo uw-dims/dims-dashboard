@@ -9,6 +9,7 @@ var logger = require('../utils/logger')(module);
 var KeyGen = require('../models/keyGen');
 var KeyExtract = require('../models/keyExtract');
 var resUtils = require('../utils/responseUtils');
+var _ = require('lodash-compat');
 
 module.exports = function (ticketService, mitigationService) {
 
@@ -81,18 +82,20 @@ module.exports = function (ticketService, mitigationService) {
 
   ticketRoute.list = function (req, res) {
     logger.debug('routes/ticket GET');
-    console.log(req.params);
-    console.log(req.body);
+    console.log('ticket route list req.params', req.params);
+    console.log('ticket route list req.body', req.body);
+    console.log('ticket route list req.query', req.query);
     var config = {
-      type: 'all'
+      type: 'activity'
     };
+    config = _.extend({}, config, req.query);
     ticketService.listTickets(config)
     .then(function (reply) {
-      console.log(reply);
+      console.log('ticket route list listtickets reply', reply);
       res.status(200).send(resUtils.getSuccessReply(reply));
     })
     .catch(function (err) {
-      res.status(400).send(resUtils.getErrorReply(err));
+      res.status(400).send(resUtils.getErrorReply(err.toString()));
     });
 
     // var ticket = Ticket.ticketFactory();

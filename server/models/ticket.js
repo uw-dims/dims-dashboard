@@ -356,7 +356,10 @@ module.exports = function Ticket(store) {
     var keyArray = [];
     var query = validateQuery(options);
     if (query === null) {
-      throw new Error('Invalid query supplied to retrieve tickets');
+      console.log('throw error for invalid query');
+      return q.fcall(function () {
+        throw new Error('Invalid query supplied to retrieve tickets');
+      })
     }
     if (query.type === 'all') {
       keyArray.push(keyGen.ticketSetKey());
@@ -427,6 +430,7 @@ module.exports = function Ticket(store) {
       return q.all(promises);
     })
     .catch(function (err) {
+      console.log('caught error in getTickets');
       throw err;
     });
   };
