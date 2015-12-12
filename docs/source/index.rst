@@ -10,14 +10,11 @@ Contents:
    :numbered:
    :maxdepth: 3
 
+   introduction
+   referenceddocs
+   using
 
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
 
 Contact
 -------
