@@ -18,6 +18,11 @@ var ticketKey = function ticketKey(topicKey) {
   return (_.slice(keyArray, 0, root.length + 1)).join(c.config.delimiter);
 };
 
+var isMitigation = function isMitigation(ticketKey) {
+  var keyArray = ticketKey.split(c.config.delimiter);
+  return keyArray[2] === 'mitigation';
+};
+
 // Topic portion of key only
 var topicData = function topicData(topicKey) {
   // Removes the parent key portion of the topic key and returns topic portion
@@ -123,6 +128,7 @@ module.exports = {
   ticketType: ticketType,
   ticketNum: ticketNum,
   ticketKey: ticketKey,
+  isMitigation: isMitigation,
   filePath: filePath,
   fileSubPath: fileSubPath,
   fileName: fileName,

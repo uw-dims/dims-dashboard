@@ -50,10 +50,10 @@ var dimsDashboardConfig = function ($routeProvider, $locationProvider, datepicke
     controller: 'UserCtrl as vm',
     templateUrl: '/views/partials/users.html'
   }).
-  when('/logmonitor', {
-    controller: 'LogMonitorCtrl as vm',
-    templateUrl: 'views/partials/logmonitormain.html'
-  }).
+  // when('/logmonitor', {
+  //   controller: 'LogMonitorCtrl as vm',
+  //   templateUrl: 'views/partials/logmonitormain.html'
+  // }).
   when('/login', {
     controller: 'LoginCtrl',
     templateUrl: 'views/partials/login.html'
@@ -116,11 +116,11 @@ var constants = {
     'test': {
       'name': 'test',
       'event': 'test:data'
+    },
+    'dimstr': {
+      'name': 'dimstr',
+      'event': 'dimstr:data'
     }
-    // 'dimstr': {
-    //   'name': 'dimstr',
-    //   'event': 'dimstr:data'
-    // }
   }
 };
 

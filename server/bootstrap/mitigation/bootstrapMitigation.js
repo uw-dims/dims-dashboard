@@ -45,12 +45,12 @@ var Bookshelf = diContainer.get('Bookshelf');
     var user1Ips, user2Ips, user1Chunk, user2Chunk;
     var k = 15;
     var i = 0;
-    var time = moment().subtract(k, 'days').format('x');
+    var time = moment().subtract(k+1, 'days').format('x');
     var user1 = options[0];
     var user2 = options[1];
     var description = 'IPs needing mitigation. Report back and submit IPs you have mitigated';
 
-    mitigationService.initiateMitigation(ipPath, user1, 'Action Needed: 2015-11-21 Compromised IPs', description)
+    mitigationService.initiateMitigation(ipPath, user1, 'Action Needed: 2015-11-21 Compromised IPs', description, time)
     .then(function (reply) {
       ticketKey = reply;
       console.log('bootstrapMitigation ticketKey', ticketKey);
@@ -78,7 +78,9 @@ var Bookshelf = diContainer.get('Bookshelf');
         _.slice(user2Ips, 11, 12),
         _.slice(user2Ips, 13, 17)
       ];
+      var time = moment().subtract(k, 'days').format('x');
       console.log(user2Chunk);
+      console.log('time will be ', time);
       return mitigationService.remediate(ticketKey, user1, user1Chunk[i], time);
     })
     .then(function (reply) {
@@ -86,6 +88,7 @@ var Bookshelf = diContainer.get('Bookshelf');
       k = k - 1;
       i = i + 1;
       var time = moment().subtract(k, 'days').format('x');
+      console.log('time will be ', time);
       return mitigationService.remediate(ticketKey, user1, user1Chunk[i], time);
     })
     .then(function (reply) {
@@ -93,6 +96,7 @@ var Bookshelf = diContainer.get('Bookshelf');
       k = k - 1;
       i = i + 1;
       var time = moment().subtract(k, 'days').format('x');
+      console.log('time will be ', time);
       return mitigationService.remediate(ticketKey, user1, user1Chunk[i], time);
     })
     .then(function (reply) {
@@ -100,6 +104,7 @@ var Bookshelf = diContainer.get('Bookshelf');
       k = k - 1;
       i = i + 1;
       var time = moment().subtract(k, 'days').format('x');
+      console.log('time will be ', time);
       return mitigationService.remediate(ticketKey, user1, user1Chunk[i], time);
     })
     .then(function (reply) {
@@ -107,6 +112,7 @@ var Bookshelf = diContainer.get('Bookshelf');
       k = k - 1;
       i = i + 1;
       var time = moment().subtract(k, 'days').format('x');
+      console.log('time will be ', time);
       return mitigationService.remediate(ticketKey, user1, user1Chunk[i], time);
     })
     .then(function (reply) {
@@ -114,6 +120,7 @@ var Bookshelf = diContainer.get('Bookshelf');
       k = k - 1;
       i = 0;
       var time = moment().subtract(k, 'days').format('x');
+      console.log('time will be ', time);
       return mitigationService.remediate(ticketKey, user2, user2Chunk[i], time);
     })
     .then(function (reply) {
@@ -121,6 +128,7 @@ var Bookshelf = diContainer.get('Bookshelf');
       k = k - 1;
       i = i + 1;
       var time = moment().subtract(k, 'days').format('x');
+      console.log('time will be ', time);
       return mitigationService.remediate(ticketKey, user2, user2Chunk[i], time);
     })
     .then(function (reply) {
@@ -128,6 +136,7 @@ var Bookshelf = diContainer.get('Bookshelf');
       k = k - 1;
       i = i + 1;
       var time = moment().subtract(k, 'days').format('x');
+      console.log('time will be ', time);
       return mitigationService.remediate(ticketKey, user2, user2Chunk[i], time);
     })
     .then(function (reply) {
@@ -135,6 +144,7 @@ var Bookshelf = diContainer.get('Bookshelf');
       k = k - 1;
       i = i + 1;
       var time = moment().subtract(k, 'days').format('x');
+      console.log('time will be ', time);
       return mitigationService.remediate(ticketKey, user2, user2Chunk[i], time);
     })
     .then(function (reply) {
@@ -142,13 +152,21 @@ var Bookshelf = diContainer.get('Bookshelf');
       k = k - 1;
       i = i + 1;
       var time = moment().subtract(k, 'days').format('x');
+      console.log('time will be ', time);
       return mitigationService.remediate(ticketKey, user2, user2Chunk[i], time);
     })
-    .then(function () {
+    .then(function (reply) {
+      console.log('bootstrapMitigation. reply from remediate ', reply);
       return mitigationService.getMitigated(ticketKey);
     })
     .then(function (reply) {
       console.log('bootstrapMitigation. reply from getMitigated', reply);
+      return mitigationService.getMitigatedData(ticketKey);
+    })
+    .then(function (reply) {
+      console.log('bootstrapMitigation. reply from getMitigatedData', reply);
+    })
+    .then(function (reply) {
       return client.quitAsync();
     })
     .then(function () {

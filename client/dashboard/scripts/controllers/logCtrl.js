@@ -8,19 +8,19 @@ angular.module('dimsDashboard.controllers').
     // Initialize
     $scope.logMaximized = true;
     $scope.logClass = 'logMax';
-    $scope.messages = '';
+    // $scope.messages = '';
 
-    $scope.offListen = function () {};
+    // $scope.offListen = function () {};
 
     // Listener for start and stop events. Will register as an Observer callback
     // for LogService
-    $scope.listener = function (event) {
-      if (event === 'start') {
-        $scope.start();
-      } else if (event === 'stop') {
-        $scope.stop();
-      }
-    };
+    // $scope.listener = function (event) {
+    //   if (event === 'start') {
+    //     $scope.start();
+    //   } else if (event === 'stop') {
+    //     $scope.stop();
+    //   }
+    // };
 
     // Register as a listener for LogService
     //LogService.registerObserverCallback($scope.listener);
@@ -48,32 +48,32 @@ angular.module('dimsDashboard.controllers').
     };
 
     // Start the log monitor
-    $scope.start = function () {
-      //LogService.setRunning(true);
-      $scope.messages = ''; // Re-initialize messages
-      $log.debug('controllers/LogCtrl event is ', constants.logEvent);
-      // Add listener for socket:constants.logEvent broadcast
-      $scope.offListen = $scope.$on('socket:' + constants.logEvent, function (event, data) {
-        $log.debug('LogCtrl: got a message ', event.name, data);
-        if (!data) {
-          $log.error('controllers/LogCtrl: Invalid message. ', 'event: ', event, 'data: ', JSON.stringify(data));
-          return;
-        }
-        $scope.$apply(function () {
-          $scope.messages = $scope.messages + formatter(new Date(), data);
-        });
-      });
-    };
+    // $scope.start = function () {
+    //   //LogService.setRunning(true);
+    //   $scope.messages = ''; // Re-initialize messages
+    //   $log.debug('controllers/LogCtrl event is ', constants.logEvent);
+    //   // Add listener for socket:constants.logEvent broadcast
+    //   $scope.offListen = $scope.$on('socket:' + constants.logEvent, function (event, data) {
+    //     $log.debug('LogCtrl: got a message ', event.name, data);
+    //     if (!data) {
+    //       $log.error('controllers/LogCtrl: Invalid message. ', 'event: ', event, 'data: ', JSON.stringify(data));
+    //       return;
+    //     }
+    //     $scope.$apply(function () {
+    //       $scope.messages = $scope.messages + formatter(new Date(), data);
+    //     });
+    //   });
+    // };
 
-    $scope.stop = function () {
-      // Remove listener for socket:constants.logEvent broadcast
-      $scope.offListen();
-      $rootScope.logmonOn = false;
-      //LogService.setRunning(false);
-    };
+    // $scope.stop = function () {
+    //   // Remove listener for socket:constants.logEvent broadcast
+    //   $scope.offListen();
+    //   $rootScope.logmonOn = false;
+    //   //LogService.setRunning(false);
+    // };
 
-    var formatter = function (date, message) {
-      return message + '\n';
-    };
+    // var formatter = function (date, message) {
+    //   return message + '\n';
+    // };
 
   });
