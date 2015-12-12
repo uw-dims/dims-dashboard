@@ -68,7 +68,67 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
 
   var mapPath = config.dashboardDataPath + 'dashboard_user_attributes.yml';
 
-  var initiateMitigation = function initiateMitigation(ipPath, user, ticketName, description) {
+  var listMitigations = function listMitigations(user) {
+    var promises = [];
+    return store.listItems(keyGen.ticketTypeKey('mitigation'))
+    .then(function (reply) {
+      // Array of keys to mitigations
+      console.log('listMitigations', reply);
+      _.forEach(reply, function (value, index) {
+        promises.push(getMitigation(value, user));
+      });
+      return q.all(promises);
+    })
+    .catch(function (err) {
+      console.log('caught error in listMitigations', err);
+      throw err;
+    });
+  };
+
+  var getMitigation = function getMitigation(key, user) {
+    var result = {};
+    result.key = key;
+    result.ips = {};
+    result.ips.user = user;
+    return q.all([
+        Ticket.getTicket(key),
+        getUserIps(key, user),
+        getMitigatedData(key)
+    ])
+    .then(function (reply) {
+      result.metadata = reply[0];
+      result.ips.data = reply[1];
+      result.data = reply[2];
+      return result;
+    })
+    .catch(function (err) {
+      throw err;
+    });
+  };
+
+  // var getTickets = function getTickets() {
+  //   // Get all mitigation tickets
+  //   var promises = [];
+  //   var config = {
+  //     type: 'mitigation'
+  //   };
+  //   return Ticket.getTickets(config)
+  //   .then(function (reply) {
+  //     _.forEach(reply, function (value, key) {
+  //       var ticket = value;
+  //       promises.push(addTopics(ticket));
+  //     });
+  //     return q.all(promises);
+  //   })
+  //   .catch(function (err) {
+  //     console.log('caught error in getTickets', err);
+  //     throw err;
+  //   });
+  // };
+
+  // var create = function create()
+
+  var initiateMitigation = function initiateMitigation(ipPath, user, ticketName, description, startTime) {
     var ipData = fs.readFileSync(ipPath, {encoding: 'utf-8'});
     var ticketConfig = {
       creator: user,
@@ -81,6 +141,11 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
     var initialIps = [];
     var unknownIps = [];
     var users = [];
+
+    if (startTime === undefined) {
+      time = dimsUtils.createTimestamp();
+      console.log('***time is undefined ');
+    }
 
     // TODO - add userservice so we don't have to call the model directly
     return UserModel.Users.forge().fetch()
@@ -136,7 +201,7 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
     })
     // Can't create mitigated topic yet since no IPs exist for that yet
     .then(function () {
-      return Topic.topicFactory(ticket, getTopicConfig('data')).create([0], dimsUtils.createTimestamp());
+      return Topic.topicFactory(ticket, getTopicConfig('data')).create([0], startTime);
     })
     .then(function () {
       // Return the key of the ticket
@@ -185,7 +250,9 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
 
     if (time === undefined) {
       time = dimsUtils.createTimestamp();
+      console.log('***time is undefined ');
     }
+    console.log('remediate. time is ', time);
     console.log('remediate. start. ips are ', ips);
     console.log('remediate. start. ips length = willMitigate = ', willMitigate);
 
@@ -251,8 +318,10 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
       var mappedKeys = reply;
       // console.log('getUserIps ', mappedKeys);
       console.log('getUserIps key is ', mappedKeys[user]);
-      // Get the number of IPs already mitigated
       return store.listItems(mappedKeys[user]);
+    })
+    .then(function (reply) {
+      return reply.sort();
     })
     .catch(function (err) {
       throw err;
@@ -263,18 +332,47 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
     return mapTopicKeys(ticketKey)
     .then(function (reply) {
       var mappedKeys = reply;
-      // Get the number of IPs already mitigated
       return store.listItems(mappedKeys.mitigated);
+    })
+    .then(function (reply) {
+      return reply.sort();
     })
     .catch(function (err) {
       throw err;
     });
   };
 
+  var getMitigatedData = function getMitigatedData(ticketKey) {
+    return mapTopicKeys(ticketKey)
+    .then(function (reply) {
+      var mappedKeys = reply;
+      return store.listItemsWithScores(mappedKeys.data);
+    })
+    .catch(function (err) {
+      throw err;
+    });
+  };
+
+  // Formats data - but we'll let the client do it for now
+  var formatData = function formatData(data) {
+    var result = [];
+    var chunked = _.chunk(data, 2);
+    _.forEach(chunked, function (value, index) {
+      result.push({
+        x: value[1],
+        y: value[0]
+      });
+    });
+    return result;
+  };
+
   mitigation.initiateMitigation = initiateMitigation;
   mitigation.remediate = remediate;
   mitigation.getUserIps = getUserIps;
   mitigation.getMitigated = getMitigated;
+  mitigation.listMitigations = listMitigations;
+  mitigation.getMitigatedData = getMitigatedData;
+  mitigation.getMitigation = getMitigation;
 
   return mitigation;
 

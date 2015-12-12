@@ -163,6 +163,20 @@ module.exports = function Store(client) {
     });
   };
 
+  var listItemsWithScores = function listItemsWithScores(key) {
+    // Get type
+    return client.typeAsync(key)
+    .then(function (reply) {
+      if (reply !== sortedSetType) {
+        throw new Error ('listItemsWithScores can only be called on sorted sets');
+      }
+      return client.zrangeAsync(key, 0, -1, 'WITHSCORES');
+    })
+    .catch(function (err) {
+      throw new Error(err.toString());
+    });
+  };
+
   // Get array of results from an array of sorted sets
   var getAllInSortedSets = function getAllInSortedSets(keyArray) {
     var promises = [];
@@ -256,6 +270,7 @@ module.exports = function Store(client) {
   store.intersectItems = intersectItems;
   store.deleteKey = deleteKey;
   store.countItems = countItems;
+  store.listItemsWithScores = listItemsWithScores;
 
   return store;
 };

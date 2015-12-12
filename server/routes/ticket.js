@@ -48,6 +48,17 @@ module.exports = function (ticketService, mitigationService) {
     return type;
   };
 
+  var getName = function (req) {
+    if (!req.body.name) {
+      return -1;
+    }
+    var name = req.body.name.trim();
+    if (name === '') {
+      return -1;
+    }
+    return name;
+  };
+
   var getDescription = function (req) {
     if (!req.body.description) {
       return '';
@@ -85,69 +96,120 @@ module.exports = function (ticketService, mitigationService) {
     console.log('ticket route list req.params', req.params);
     console.log('ticket route list req.body', req.body);
     console.log('ticket route list req.query', req.query);
-    var config = {
-      type: 'activity'
-    };
-    config = _.extend({}, config, req.query);
-    ticketService.listTickets(config)
-    .then(function (reply) {
-      console.log('ticket route list listtickets reply', reply);
-      res.status(200).send(resUtils.getSuccessReply(reply));
-    })
-    .catch(function (err) {
-      res.status(400).send(resUtils.getErrorReply(err.toString()));
-    });
+    var user = null,
+        config = [],
+        errMsg = '';
+    if (req.hasOwnProperty(user)) {
+      user = req.user.get('ident');
+    } else {
+      user = 'lparsons';
+    }
+    console.log('ticketRoute.list, user is', user);
 
-    // var ticket = Ticket.ticketFactory();
-    // Ticket.getTickets().then(function (reply) {
-    //   res.status(200).send({data: reply});
-    // }, function (err) {
-    //   res.status(400).send(err.toString());
-    // });
+    if (req.query.type === 'mitigation') {
+      console.log('go get mitigations');
+      mitigationService.listMitigations(user)
+      .then(function (reply) {
+        res.status(200).send(resUtils.getSuccessReply(reply));
+      })
+      .catch(function (err) {
+        res.status(400).send(resUtils.getErrorReply(err.toString()));
+      });
+    } else {
+
+      if (_.size(req.query) === 0) {
+        config.push({
+          type: 'activity',
+          private: false
+        });
+        config.push({
+          type: 'activity',
+          private: true,
+          ownedBy: user
+        });
+      } else {
+
+        var options = {};
+        if (!req.query.hasOwnProperty('private')) {
+          config.push(_.extend({}, {
+            private: true,
+            ownedBy: user,
+            type: 'activity'
+          }, req.query));
+          config.push(_.extend({}, {
+            private: false,
+            type: 'activity'
+          }, req.query));
+        } else if (req.query.private === 'true') {
+          console.log('private is true');
+          if (req.query.hasOwnProperty('ownedBy') && user !== req.query.ownedBy) {
+            res.status(400).send(resUtils.getErrorReply('Cannot get private tickets from another user'));
+          } else if (!req.query.hasOwnProperty('ownedBy')) {
+            config.push(_.extend({}, {ownedBy: user, type: 'activity'}, req.query));
+          } else {
+            config.push(_.extend({}, {type: 'activity'}, req.query));
+          }
+        } else {
+          console.log('private is false');
+          config.push(_.extend({}, {type: 'activity'}, req.query));
+        }
+      }
+      console.log('listTickets config is ', config);
+      ticketService.listTickets(config)
+      .then(function (reply) {
+        reply = _.flatten(reply);
+        console.log('ticket route list listtickets reply', reply);
+        res.status(200).send(resUtils.getSuccessReply(reply));
+      })
+      .catch(function (err) {
+        res.status(400).send(resUtils.getErrorReply(err.toString()));
+      });
+    }
   };
-
 
   ticketRoute.show = function (req, res) {
     logger.debug('routes/ticket SHOW, id: ', req.params.id);
     // var ticket = new Ticket();
     var ticket;
-    ticketService.getTicket(req.params.id)
-    .then(function (reply) {
-      console.log(reply);
-      res.status(200).send(resUtils.getSuccessReply(reply));
-    })
-    .catch(function (err) {
-      res.status(400).send(resUtils.getErrorReply(err));
-    });
-    // Ticket.getTicket(req.params.id).then(function (reply) {
-    //   // logger.debug('SHOW getTicket reply', reply);
-    //   ticket = reply; // update the ticket
-    //   // Get array of associated topic keys
-    //   return Topic.getTopics(ticket.key);
-    // }).then(function (reply) {
-    //     // Send back ticket key, metadata, array of associated topic keys
-    //     res.status(200).send({data: packageTicket(ticket, reply)});
-    //   }, function (err, reply) {
-    //     /* jshint unused: false */
-    //     res.status(400).send(err.toString());
-    //   });
+    if (KeyExtract.isMitigation(req.params.id)) {
+      mitigationService.getMitigated(req.params.id)
+      .then(function (reply) {
+        console.log(reply);
+        res.status(200).send(resUtils.getSuccessReply(reply));
+      })
+      .catch(function (err) {
+        res.status(400).send(resUtils.getErrorReply(err));
+      });
+    } else {
+      ticketService.getTicket(req.params.id)
+      .then(function (reply) {
+        console.log(reply);
+        res.status(200).send(resUtils.getSuccessReply(reply));
+      })
+      .catch(function (err) {
+        res.status(400).send(resUtils.getErrorReply(err.toString()));
+      });
+    }
   };
-
 
   ticketRoute.create = function (req, res) {
     logger.debug('routes/ticket CREATE');
     // Check for missing inputs
     var creator = getCreator(req);
     if (creator === -1) {
-      res.status(400).send('Error: Creator not supplied.');
+      res.status(400).send(resUtils.getErrorReply('Error: Creator not supplied.'));
     }
     var type = getType(req);
     if (type === -1) {
-      res.status(400).send('Error: Type not supplied.');
+      res.status(400).send(resUtils.getErrorReply('Error: Type not supplied.'));
+    }
+    var name = getName(req);
+    if (name === -1) {
+      res.status(400).send(resUtils.getErrorReply('Error: Name not supplied.'));
     }
     var privateTicket = getPrivate(req);
     if (privateTicket === -1) {
-      res.status(400).send('Error: Invalid privacy supplied.');
+      res.status(400).send(resUtils.getErrorReply('Error: Invalid privacy supplied.'));
     }
     var content = (req.body.content !== null && typeof req.body.content === undefined) ? req.body.content : null;
     var ticket = Ticket.ticketFactory({
@@ -157,7 +219,7 @@ module.exports = function (ticketService, mitigationService) {
       private: privateTicket
     });
     if (type === 'mitigation') {
-      MitigationService.create(ticket, content)
+      mitigationService.create(ticket, content)
       .then(function (reply) {
         res.status(201).send({data: packageTicket(reply)});
       })

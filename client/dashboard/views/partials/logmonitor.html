@@ -1,23 +1,16 @@
 <!-- <div ng-controller="LogCtrl"> -->
 <!-- <div class="{{ vm.logClass }}"> -->
+<!-- <div class="spacer10"> -->
+
+<!-- <div class="panel panel-default"> -->
+<!-- <div class="panel-body"> -->
 <div class="spacer10">
-<div class="panel panel-default">
-<div class="panel-body">
-<button type="button" class="btn btn-default" ng-click="vm.toggle(vm.type)">{{ vm.buttonText }} {{ vm.displayName }}</button>
-<button type="button" class="btn btn-default" ng-click="vm.clear()">Clear</button>
+<button type="button" class="btn btn-primary btn-sm" ng-click="vm.toggle(vm.type)">{{ vm.buttonText }} {{ vm.displayName }}</button>
+<button type="button" class="btn btn-default btn-sm" ng-click="vm.clear()">Clear</button>
 <div class="spacer10" ng-show="vm.logmonOn()">
-    <!-- <div class="popup-head">
-        <div class="popup-head-left">Log Monitor</div>
-        <div class="popup-head-right">
-          <span class="glyphicon glyphicon-chevron-down popup-btn" ng-click="hide()" ng-show="logMaximized"></span>
-          <span class="glyphicon glyphicon-chevron-up popup-btn" ng-click="show()" ng-hide="logMaximized"></span>
-          <span class="glyphicon glyphicon-remove popup-btn" ng-click="close()"></span>
-        </div>
-        <div style="clear: both"></div>
-    </div> -->
+    
     <div class="vm.logClass" style="white-space: pre; font-family: Monaco, monospace; font-size: 10px;" ng-show="vm.logMaximized">{{ vm.messages }} </div>
 </div>
 </div>
-</div>
-</div>
+<!-- </div> -->
 <!-- </div> -->

@@ -28,9 +28,14 @@
       var vm = this;
 
       vm.buttonText = 'Turn on';
+      vm.linesMax = 5000;
+
+      var formatter = function formatter(message) {
+        return message + '\n';
+      };
 
       vm.clear = function () {
-        vm.messages = '';
+        vm.messages = formatter('[*] Waiting for messages...');
       };
 
       function init() {
@@ -40,13 +45,10 @@
         vm.clear();
         vm.logClass = 'logMax';
         vm.logMaximized = true;
+        vm.lines = 0;
       }
 
       init();
-
-      var formatter = function formatter(date, message) {
-        return message + '\n';
-      };
 
       vm.toggle = function toggle(type) {
         //$log.debug('vm.toggle. rootScope.logmonOn is ', $rootScope.logmonOn);
@@ -72,7 +74,7 @@
 
       vm.offListen = function () {};
       vm.start = function () {
-        $log.debug('LogMonitor Directive: start')
+        $log.debug('LogMonitor Directive: start');
         LogService.setRunning(vm.type, true);
         vm.clear();
         $scope.offListen = $scope.$on('socket:' + constants.fanoutExchanges[vm.type].event, function (event, data) {
@@ -82,7 +84,13 @@
             return;
           }
           $scope.$apply(function () {
-            vm.messages = vm.messages + formatter(new Date(), data);
+            vm.lines++;
+            if (vm.lines < vm.linesMax ) {
+              vm.messages = vm.messages + formatter(data);
+            } else {
+              vm.messages = formatter('[*] Buffer max reached - clearing log');
+              vm.messages = formatter(data);
+            }
           });
         });
       };

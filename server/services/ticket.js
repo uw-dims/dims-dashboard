@@ -17,9 +17,25 @@ module.exports = function (Ticket, Topic) {
 
   // Returns ticket metadata and array of topic metadata
   var listTickets = function listTickets(config) {
+    console.log('in listTickets, config is ', config);
+    var promises = [];
+    _.forEach(config, function (value, index) {
+      console.log('in listTickets for each, value is ', value);
+      promises.push(listTicket(value));
+    });
+    return q.all(promises)
+    .catch(function (err) {
+      console.log('caught error in listTickets', err);
+      throw err;
+    });
+  };
+
+  var listTicket = function listTicket(config) {
+    console.log('in listTicket, config is ', config);
     var promises = [];
     return Ticket.getTickets(config)
     .then(function (reply) {
+      console.log('reply in listTicket', reply);
       _.forEach(reply, function (value, key) {
         var ticket = value;
         promises.push(addTopics(ticket));
@@ -27,17 +43,17 @@ module.exports = function (Ticket, Topic) {
       return q.all(promises);
     })
     .catch(function (err) {
-      console.log('caught error in listTickets');
+      console.log('caught error in listTicket', err);
       throw err;
     });
   };
 
   var addTopics = function addTopics(ticket) {
     var result = ticket;
-    console.log('addTopics input ticket', ticket);
+    // console.log('addTopics input ticket', ticket);
     return Topic.getTopicsMetadata(ticket.key)
     .then(function (reply) {
-      console.log('addtopics reply', reply);
+      // console.log('addtopics reply', reply);
       result.topics = reply;
       return result;
     })
@@ -46,7 +62,7 @@ module.exports = function (Ticket, Topic) {
     });
   };
 
-  var getTicket = function showTicket(id) {
+  var getTicket = function getTicket(id) {
     console.log('showTicket id ', id);
     return Ticket.getTicket(id)
     .then(function (reply) {

@@ -8,6 +8,9 @@
     $log.debug('LogMonitorCtrl. param is ', $routeParams.type);
     $log.debug('LogMonitorCtrl. routeParams is ', $routeParams);
 
+    $scope.logMaximized = true;
+    $scope.logClass = 'logMax';
+
     //TODO(lparsons) - generate this programatically
     $scope.tabs = [
     {
@@ -37,6 +40,28 @@
     //   health: 'health',
     //   dimstr: 'dimstr'
     // };
+
+     // Close the log monitor
+    $scope.close = function () {
+      $log.debug('controllers/LogCtrl.close');
+      $rootScope.logWindowOn = false;
+      //LogService.setRunning(false);
+      // $scope.offListen();
+    };
+
+    // Hide the log monitor
+    $scope.hide = function () {
+      $log.debug('controllers/LogCtrl.hide');
+      $scope.logMaximized = false;
+      $scope.logClass = 'logMin';
+    };
+
+    // Show the log monitor
+    $scope.show = function () {
+      $log.debug('controllers/LogCtrl.show');
+      $scope.logMaximized = true;
+      $scope.logClass = 'logMax';
+    };
 
     $scope.types = {
       logs: {

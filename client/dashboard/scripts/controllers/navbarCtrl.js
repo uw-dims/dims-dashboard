@@ -19,7 +19,7 @@
     // vm.settings = settings;
     // vm.messaging = messaging;
     vm.chat = chat;
-    //vm.logMonitor = logMonitor;
+    vm.logMonitor = logMonitor;
     vm.openSite = openSite;
     //vm.userSettings = userSettings;
     var associatedSites = {
@@ -69,6 +69,15 @@
         ChatService.start();
       }
     }
+
+    function logMonitor() {
+      console.log('in logMonitor, window on is ', $rootScope.logWindowOn);
+      if ($rootScope.logWindowOn) {
+        $rootScope.logWindowOn = false;
+      } else {
+        $rootScope.logWindowOn = true;
+      }
+    };
 
     // function logMonitor() {
     //   $rootScope.logmonOn = LogService.isRunning();
