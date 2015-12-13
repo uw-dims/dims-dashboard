@@ -39,17 +39,28 @@
         _.forEach(data, function (value, index) {
           value.graphOptions = getGraphOptions(value.metadata);
           result.push(value);
-        })
+        });
         return data;
       };
 
-      MitigationService.getMitigation()
-      .then(function (reply) {
-        vm.data = addOptions(reply);
-        $log.debug('vm.data is ', vm.data);
-        $log.debug('getMitigation vm.data is ', vm.data);
-        $log.debug('getMitigation vm.options is ', vm.options);
-      });
+      var init = function init() {
+        vm.showProgress = true;
+        vm.showMyIps = false;
+        MitigationService.getMitigation()
+        .then(function (reply) {
+          vm.data = addOptions(reply);
+          $log.debug('vm.data is ', vm.data);
+          $log.debug('getMitigation vm.data is ', vm.data);
+          $log.debug('getMitigation vm.options is ', vm.options);
+        });
+      };
+
+      init();
+
+      vm.updateMitigation = function updateMitigation() {
+
+      };
+
     }
   }
 

@@ -1,9 +1,9 @@
-<div class="query-tray-icon">
+<!-- <div class="query-tray-icon">
 <div style="width: 10px;">
 <span class="glyphicon glyphicon-search query-tray-btn {{ toolBtnClass }}" ng-click="getTools()" tooltip="{{ buttonTooltips.tools }}" tooltip-append-to-body="true" tooltip-placement="right"></span>
 
 </div>
-</div>
+</div> -->
 
 <div class="container main">
 <h1>{{title}}</h1>
@@ -21,7 +21,17 @@
 <div class="row">
 <div class="col-sm-2">
 <div class="panel panel-default"><div class="panel-body">
-<h2>System Status</h2></div>
+<h2>System Status</h2>
+<p>Dashboard <i class="fa fa-circle " style="color: green; float: right;"></i> </p>
+<p>DB: Postgresql <i class="fa fa-circle" style="color: green; float: right;"></i> </p>
+<p>DB: Redis <i class="fa fa-circle " style="color: green; float: right;"></i> </p>
+<p>DB: Elasticsearch <i class="fa fa-circle " style="color: red; float: right;"></i> </p>
+<p>Trident <i class="fa fa-circle " style="color: green; float: right;"></i> </p>
+<p>Message Broker<i class="fa fa-circle " style="color: green; float: right;"></i> </p>
+<p>CIF<i class="fa fa-circle " style="color: yellow; float: right;"></i> </p>
+
+
+</div>
 </div></div>
 <div class="col-sm-8">
 
