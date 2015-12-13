@@ -38,6 +38,8 @@ angular.module('dimsDashboard.controllers').
             return series;
           });
 
+          $log.debug('graphDataPoints', $scope.graphDataPoints);
+
           $scope.showResults = true;
 
           nv.addGraph(function() {

@@ -1,12 +1,6 @@
-
 <div class="query-tray-icon">
 <div style="width: 10px;">
-<!--  <span class="glyphicon glyphicon-folder-close query-tray-btn"  ng-click="queryToggle()" ng-show="isCollapsed"></span>
-<span class="glyphicon glyphicon-folder-open query-tray-btn" ng-click="queryToggle()" ng-show="!isCollapsed"></span> -->
 <span class="glyphicon glyphicon-search query-tray-btn {{ toolBtnClass }}" ng-click="getTools()" tooltip="{{ buttonTooltips.tools }}" tooltip-append-to-body="true" tooltip-placement="right"></span>
-<!-- <span class="glyphicon glyphicon-tasks query-tray-btn {{ ticketBtnClass }}" ng-click="getTickets()" tooltip="{{ buttonTooltips.tickets }}" tooltip-append-to-body="true" tooltip-placement="right"></span> -->
-<span class="glyphicon glyphicon-list query-tray-btn {{ savedBtnClass }}" ng-click="getSavedQueries()" tooltip="{{ buttonTooltips.saved }}" tooltip-append-to-body="true" tooltip-placement="right"></span>
-<!-- <span class="glyphicon glyphicon-cog query-tray-btn {{ settingsBtnClass }}" ng-click="getSettings()" tooltip="{{ buttonTooltips.settings }}" tooltip-append-to-body="true" tooltip-placement="right"></span> -->
 
 </div>
 </div>
@@ -14,209 +8,37 @@
 <div class="container main">
 <h1>{{title}}</h1>
 
-<div class="row" collapse="isCollapsed">
-
-<!-- Tools -->
-<div class="col-xs-2" >
-<div style="border: 1px solid #ddd;" ng-show="showTools">
-<div class="list-group" style="margin-bottom: 0px;"><a href="#" class="list-group-item disabled">
-<h5 class="list-group-item-heading">Choose a Tool</h5>
-</a></div>
-<div class="list-group" style="margin-bottom: 0px;">
-<a href="#" class="list-group-item {{t.selected}}" ng-repeat="t in availableTools" ng-click="setTool(t, $index)">{{t.desc}}</a>
-
-</div> <!-- End main list-group div -->
-</div> <!-- End enclosing div -->
-</div> <!-- End first col div -->
-
-<div class="col-xs-10" >
-<dims-search-form ng-show="currentSelectedTool.name === availableTools[0].name && showTools" tool="availableTools[0]" callback="callClient"></dims-search-form>
-<dims-search-form ng-show="currentSelectedTool.name === availableTools[1].name && showTools" tool="availableTools[1]" callback="callClient"></dims-search-form>
-<dims-search-form ng-show="currentSelectedTool.name === availableTools[2].name && showTools" tool="availableTools[2]" callback="callClient"></dims-search-form>
-<dims-search-form ng-show="currentSelectedTool.name === availableTools[3].name && showTools" tool="availableTools[3]" callback="callClient"></dims-search-form>
-
-</div>
-
 <!-- <div class="row">
-<dims-test-form current="currentSelectedTool" tool="availableTools[0]" ></dims-test-form>
-<dims-test-form current="currentSelectedTool" tool="availableTools[1]"></dims-test-form>
-<dims-select-files file-source="ip_lists" file-type="file" picker-model="fileTestData.name"></dims-select-files>
-<dims-select-files file-source="map_files" file-type="map" picker-model="mapTestData.name"></dims-select-files>
-
-<p>fileModel: {{ fileTestData }} </p>
-<p>mapModel: {{ mapTestData }}
+<div class="col-sm-8">
+<button type="button" class="btn btn-default" ng-click="source()">SOURCE</button>
+<button type="button" class="btn btn-default" ng-click="query()">QUERY</button>
+<button type="button" class="btn btn-default" ng-click="reset()">RESET</button>
+<button type="button" class="btn btn-default" ng-click="source()">SAVE</button>
+</div>
+<div class="col-sm-4"></div>
 </div> -->
 
-<!-- Saved Queries -->
-<div class="col-xs-2" >
-<div style="border: 1px solid #ddd;" ng-show="showSavedQueries">
-<div class="list-group" style="margin-bottom: 0px;"><a href="#" class="list-group-item disabled">
-<h5 class="list-group-item-heading">Saved Queries</h5>
-</a></div>
-<div class="list-group saved-query-group" style="margin-bottom: 0px;" >
-<a href="#" class="list-group-item {{q.selected}}" ng-repeat="q in savedQueries" ng-click="setQuery(q, $index)" >{{q.name}}</a>
-</div> <!-- End main list-group div -->
-</div> <!-- End enclosing div -->
-</div> <!-- End first col div -->
-
-<div class="col-xs-10" >
-<div class="panel panel-default" ng-show="currentSelectedQuery.name !== undefined && showSavedQueries">
-  <div class="panel-body" >
-  <h4>{{currentSelectedQuery.name}}</h4>
-  <p>{{currentSelectedQuery.desc}}</p>
-  <button type="button" class="btn btn-primary btn-sm" ng-click="placeholder()">Show Data</button>
-  </div>
+<div class="row">
+<div class="col-sm-2">
+<div class="panel panel-default"><div class="panel-body">
+<h2>System Status</h2></div>
 </div></div>
+<div class="col-sm-8">
 
-<!-- Tickets -->
-<div class="col-xs-2" >
-<div style="border: 1px solid #ddd;" ng-show="showTickets">
-<div class="list-group" style="margin-bottom: 0px;"><a href="#" class="list-group-item disabled">
-<h5 class="list-group-item-heading">Tickets</h5>
-</a></div>
-<div class="list-group ticket-group" style="margin-bottom: 0px;" >
-<a href="#" class="list-group-item {{t.selected}}" ng-repeat="t in tickets" ng-click="setTicket(t, $index)" >{{t.name}}</a>
-</div> <!-- End main list-group div -->
-</div> <!-- End enclosing div -->
-</div> <!-- End first col div -->
-
-<div class="col-xs-2">
-<div style="border: 1px solid #ddd;" ng-show="showTopicList && showTickets">
-<div class="list-group" style="margin-bottom: 0px;"><a href="#" class="list-group-item disabled">
-<h5 class="list-group-item-heading">{{ currentSelectedTicket.name }} Topics</h5>
-</a></div>
-<div class="list-group ticket-group" style="margin-bottom: 0px;" >
-<a href="#" class="list-group-item {{p.selected}}" ng-repeat="p in currentSelectedTicket.topics" ng-click="setTopic(p, $index)" >{{p.name}}</a>
-</div> <!-- End main list-group div -->
-</div> <!-- End enclosing div -->
-
-<div ng-show="(!showTopicList && !showTopic) && showTickets">
-<h4>Tickets</h4>
-<p>To select a ticket, click its name in the list.</p>
-</div>
-
-</div>
-
-<div class="col-xs-8" >
-
-<div ng-show="currentSelectedTicket.name !== undefined && showTopicList">
-  <!-- <div class="panel-body" > -->
-  <h4>{{currentSelectedTicket.name}}: {{ currentSelectedTicket.ticket.type }} Ticket</h4>
-  <p>Created {{ currentSelectedTicket.ticket.createdTime | date : 'medium' }} by {{ currentSelectedTicket.ticket.creator }}<br/>
-  Status: {{ currentSelectedTicket.ticket.open ? 'Open' : 'Closed'}}</p>
-  <!-- Topic info here -->
-  <div ng-show="showTopic">
-  <h4>{{ currentSelectedTopic.name }} </h4>
-    <p>{{ currentSelectedTopic.shortDesc}}</p>
-  </div>
-
-
-  <!-- </div> -->
-</div>
-
-</div>
-
-
-
-<!-- Settings -->
-<div class="col-xs-12 settings">
-<div class="panel panel-default" ng-show="showSettings" >
-  <div class="panel-body" >
-
-  <h3>Settings</h3>
-
-
-
-  <div class="row"> <!-- Start of Messaging -->
-
-    <div class="col-sm-2">
-      <button type="button" class="btn btn-primary btn-sm" ng-click="toggleLogMonitor()" ng-hide="logmonOn">Turn Log Monitor On</button>
-      <button type="button" class="btn btn-primary btn-sm" ng-click="toggleLogMonitor()" ng-show="logmonOn">Turn Log Monitor Off</button>
-    </div>
-
-    <div class="col-sm-2">
-      <button type="button" class="btn btn-primary btn-sm" ng-click="toggleChat()" ng-hide="chatOn">Turn Chat On</button>
-      <button type="button" class="btn btn-primary btn-sm" ng-click="toggleChat()" ng-show="chatOn">Turn Chat Off</button>
-    </div>
-  </div> <!-- End of Messaging -->
-
-
-  </div>
-</div></div>
-
-</div> <!-- end of row -->
-
-<!-- Show graph -->
-<div ng-if="showResults && showGraph">
-<div id="chart" class="with-3d-shadow with-transitions" >
-    <svg style="height: 500px;"></svg>
-  </div>
-  </div>
-
-<!-- End show Graph-->
-
-<div class="row" style="margin-top: 20px;" ng-if="showCif"><div class="col-xs-12" >
-<h2>Current Results</h2>
-<div class="row"><div class="col-sm-12 "><strong>{{ bob }}</strong></div></div>
-<div class="table-responsive" ng-repeat="dr in displayData.results" ng-show="currentSelectedTopic.responseType === 'json'">
-<table class="table table-striped table-hover table-bordered" ><tbody>
-<tr>
-<th>Address</th>
-<th>Prefix</th>
-<th>Report Time</th>
-<th>Restriction</th>
-<th>Confidence</th>
-
-<th>ASN</th>
-<th>CC</th>
-<th>ASN Desc</th>
-<th>Description</th>
-<th>ID</th>
-<th>Related ID</th>
-<th>Alt ID</th>
-
-</tr>
-<tr ng-repeat="r in dr.results">
-<td>{{ r.address }}</td>
-<td>{{ r.prefix }}</td>
-<td>{{ r.reporttime }}</td>
-<td>{{ r.restriction }}</td>
-<td>{{ r.confidence }}</td>
-
-<td>{{ r.asn }}</td>
-<td>{{ r.cc }}</td>
-<td>{{ r.asn_desc | characters:25 }}</td>
-<td>{{ r.description | characters:25 }}</td>
-<td>{{ r.id }}</td>
-<td>{{ r.relatedid }}</td>
-<td>{{ r.alternativeid | characters:25 }}
-
-<!-- </tr> -->
-</tbody></table>
+<div class="row">
+<div class="panel panel-default"><div class="panel-body">
+<h2>Remediations</h2>
+<mitigation></mitigation>
 </div>
 </div>
 </div>
 
-<!-- <div class="row" style="margin-top: 20px;" ng-if="showMitigation"><div class="col-xs-12" >
-<h2>Mitigation Data</h2>
-{{ rawData }}
-</div></div> -->
-
-<div class="row" style="margin-top: 10px;"><div class="col-xs-12">
-<dims-raw-results></dims-raw-results>
-</div></div>
+<div class="row">
+<div class="panel panel-default"><div class="panel-body">
+<h2>Watching</h2>
+<tickets></tickets>
+</div></div></div>
 
 </div>
-
-<!-- <div class="row" style="margin-top: 20px;"><div class="col-xs-12" >
-<div class="panel panel-default">
-  <div class="panel-body">Current Main Graph</div>
 </div>
-</div></div>
-<div class="row"><div class="col-xs-12">
-<div class="panel panel-default">
-  <div class="panel-body">Current Data</div>
-</div>
-</div></div>
- -->
 </div>

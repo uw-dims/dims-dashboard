@@ -66,12 +66,13 @@ var Topic = diContainer.get('Topic');
 
     var users,
         name = [
-          'rw2b cif 1 Flow Analysis 9-2014 65',
-          'rw3 Flow Analysis 9-2014 95',
-          'rw6 Flow Analysis 1-2014',
-          'rw9 Flow Analysis 3-2014',
-          'cif3 Search APT1 intrusion',
-          'cif4 Suspicious CIDR'
+          'Suspicious CIDR',
+          'Search APT1 intrusion',
+          'Flow Analysis 3-2014',
+          'Flow Analysis 1-2014',
+          'Flow Analysis 1-2014',
+          'Flow Analysis 9-2014 95',
+          'Flow Analysis 9-2014 65'
         ];
 
     var config = [],
@@ -79,7 +80,7 @@ var Topic = diContainer.get('Topic');
           tickets = [],
           topics = [];
 
-    topics[0] = [
+    topics[5] = [
         {
           metadata: {
             name: 'Flow results',
@@ -105,7 +106,7 @@ var Topic = diContainer.get('Topic');
           file: path.join(DATA_PATH, '/data/prisemTestData/testcif1.txt')
         }];
 
-      topics[1] = [
+      topics[4] = [
         {
           metadata: {
             name: 'Flow results',
@@ -116,7 +117,7 @@ var Topic = diContainer.get('Topic');
         }
       ];
 
-      topics[2] = [
+      topics[3] = [
         {
           metadata: {
             name: 'Flow results',
@@ -127,7 +128,7 @@ var Topic = diContainer.get('Topic');
         }
       ];
 
-      topics[3] = [
+      topics[2] = [
         {
           metadata: {
             name: 'Flow results',
@@ -154,7 +155,7 @@ var Topic = diContainer.get('Topic');
         }
       ];
       // cif3
-      topics[4] = [
+      topics[1] = [
         {
           metadata: {
             name: 'CIF results',
@@ -180,7 +181,7 @@ var Topic = diContainer.get('Topic');
           file: path.join(DATA_PATH, '/mydata/dataFiles/rwfind_201302210110_18463.txt')
         }
       ];
-      topics[5] = [
+      topics[0] = [
         {
           metadata: {
             name: 'CIF search for 61.147.103.0/24',

@@ -19,12 +19,38 @@
     }
 
     function controllerFunc($scope) {
+      var vm = this;
+
+      var getGraphOptions = function getGraphOptions(metadata) {
+        var options = {
+          xLabel: 'Time',
+          yLabel: 'Total IPs Mitigated',
+          key: 'Total IPs',
+          withFocus: false,
+          yMax: metadata.initialNum,
+          yMin: 0
+        };
+        $log.debug('vm.getGraphOptions', options);
+        return options;
+      };
+
+      var addOptions = function addOptions(data) {
+        var result = [];
+        _.forEach(data, function (value, index) {
+          value.graphOptions = getGraphOptions(value.metadata);
+          result.push(value);
+        })
+        return data;
+      };
+
       MitigationService.getMitigation()
       .then(function (reply) {
-        $scope.mitigation = reply;
+        vm.data = addOptions(reply);
+        $log.debug('vm.data is ', vm.data);
+        $log.debug('getMitigation vm.data is ', vm.data);
+        $log.debug('getMitigation vm.options is ', vm.options);
       });
     }
-
   }
 
   angular

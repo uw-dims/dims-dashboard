@@ -58,10 +58,10 @@ var dimsDashboardConfig = function ($routeProvider, $locationProvider, datepicke
     controller: 'LoginCtrl',
     templateUrl: 'views/partials/login.html'
   }).
-  when('/mainnew', {
-    controller: 'MainnewCtrl',
-    templateUrl: 'views/partials/mainnew.html'
-  }).
+  // when('/mainnew', {
+  //   controller: 'MainnewCtrl',
+  //   templateUrl: 'views/partials/mainnew.html'
+  // }).
   otherwise({
     redirectTo: '/'
   });

@@ -16,13 +16,16 @@
 
     function linkFunc(scope, el, attr, ctrl) {
       // Don't need this yet
+      $log.debug('tickets.directive link function');
     }
 
     function controllerFunc($scope) {
+      var vm = this;
+
       TicketService.getTickets()
       .then(function (reply) {
         console.log('reply from getTickets');
-        $scope.tickets = reply;
+        vm.result = reply;
       });
 
     }

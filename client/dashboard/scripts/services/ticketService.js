@@ -8,14 +8,18 @@
 
   var TicketService = function (TicketApi, $log, $q) {
 
+
+
     var ticketService = {
       getTickets: function () {
+        $log.debug('TicketService.getTickets');
         var deferred = $q.defer();
         TicketApi.get({},
           function (resource) {
-            $log.debug('TicketService.getMitigation success callback data', resource.data);
+            $log.debug('TicketService.getTicket success callback data', resource.data);
             console.log(resource.data);
-            deferred.resolve(resource.data);
+            var result = resource.data.reverse();
+            deferred.resolve(result);
           },
           function (err) {
             $log.debug('TicketService.geTticket error callback', err);

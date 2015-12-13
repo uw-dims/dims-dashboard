@@ -1,22 +1,17 @@
 
 <div class="row">
-
 <div class="col-sm-12">
 
-<div class="row" ng-repeat="n in vm.data | orderBy" style="background-color: #EEE;margin:10px 0px;padding:4px">
+<div class="row" ng-repeat="n in vm.result | orderBy" style="background-color: #EEE;margin:10px 0px;padding:4px">
 
 <div class="row" style="margin:3px;padding:5px">
 <div><h3 style="color:#2e78b8; margin-bottom:4px">{{ n.metadata.name }}</h3>
 <p style="color:#222; font-size:10px;">
   Created by {{ n.metadata.creator }} &nbsp; &nbsp; Last updated: {{ n.metadata.modifiedTime | date : 'medium' }}</p>
   <p>{{ n.metadata.description }}</p>
-  <p><a ng-click="vm.toggleProgress()">Hide progress</a> | <a ng-click="vm.toggleIps()">Show my IPs</a></p>
-</div>
-<div class="row">
-<timeseries options="n.graphOptions" data="n.data" metadata></timeseries>
+  
 </div>
 
 </div>
 </div>
 </div>
-
