@@ -295,13 +295,7 @@ if (require.main === module) {
     var healthService = diContainer.get('healthService');
     healthService.run();
     console.log('[+++] Finished running healthService');
-    // Set up socket.io to listen on same port as https
-    io = socket.listen(server);
-    // Initialize messaging - fanout publish, subscribe, sockets
-    require('./services/messaging')(io);
-    server.listen(port, function () {
-      console.log('[+++] Server listening');
-      healthLogger.publish('dashboard initialized DIMS Dashboard running on port ' + server.address().port, config.healthID);
+    healthLogger.publish('dashboard initialized DIMS Dashboard running on port ' + server.address().port, config.healthID);
       if (config.sslOn) {
         healthLogger.publish('dashboard initialized SSL is on', config.healthID);
       } else {
@@ -310,8 +304,18 @@ if (require.main === module) {
       healthLogger.publish('dashboard initialized Node environment: ' + config.env, config.healthID);
       healthLogger.publish('dashboard initialized Log level: ' + config.logLevel, config.healthID);
       healthLogger.publish('dashboard initialized userDB source: ' + config.userSource, config.healthID);
-    });
   });
+
+  setTimeout(function () {
+    // Set up socket.io to listen on same port as https
+    io = socket.listen(server);
+    // Initialize messaging - fanout publish, subscribe, sockets
+    require('./services/messaging')(io);
+    server.listen(port, function () {
+      console.log('[+++] Server listening');
+    });
+  }, 2000);
+
 
 } else {
   module.exports = server;

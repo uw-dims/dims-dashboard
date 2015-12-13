@@ -1,7 +1,7 @@
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller('MainCtrl', ['$scope', 'DataService', 'TicketService', 'LogService', 'ChatService',  '$cookies', '$location', '$routeParams', '$log', '$filter', '$http', 'SettingsService', '$rootScope',
-      function ($scope, DataService, TicketService, LogService, ChatService, $cookies, $location, $routeParams, $log, $filter, $http, SettingsService, $rootScope) {
+  controller('MainCtrl', ['$scope', 'DataService', 'LogService', 'ChatService',  '$cookies', '$location', '$routeParams', '$log', '$filter', '$http', 'SettingsService', '$rootScope',
+      function ($scope, DataService, LogService, ChatService, $cookies, $location, $routeParams, $log, $filter, $http, SettingsService, $rootScope) {
 
     $scope.title = 'Data View';
 
@@ -179,29 +179,29 @@ angular.module('dimsDashboard.controllers').
       $scope.showCif = false;
     };
 
-    $scope.getTickets = function() {
-      if ($scope.isCollapsed) {
-        $scope.queryToggle();
-      } else if ($scope.showTickets) {
-        $scope.queryToggle();
-      }
-      $scope.showTools = false;
-      $scope.toolBtnClass = 'query-btn-inactive';
-      $scope.showSavedQueries = false;
-      $scope.savedBtnClass = 'query-btn-inactive';
-      // $scope.showSettings = false;
-      // $scope.settingsBtnClass = 'query-btn-inactive';
-      $scope.showTickets = true;
-      $scope.ticketBtnClass = 'query-btn-active';
-      if ($scope.tickets === null) {
-        TicketService.getTickets().then(function(reply) {
-          $scope.tickets = reply;
-          $log.debug('mainCtrl. tickets are ', $scope.tickets);
-        });
-      }
+    // $scope.getTickets = function() {
+    //   if ($scope.isCollapsed) {
+    //     $scope.queryToggle();
+    //   } else if ($scope.showTickets) {
+    //     $scope.queryToggle();
+    //   }
+    //   $scope.showTools = false;
+    //   $scope.toolBtnClass = 'query-btn-inactive';
+    //   $scope.showSavedQueries = false;
+    //   $scope.savedBtnClass = 'query-btn-inactive';
+    //   // $scope.showSettings = false;
+    //   // $scope.settingsBtnClass = 'query-btn-inactive';
+    //   $scope.showTickets = true;
+    //   $scope.ticketBtnClass = 'query-btn-active';
+    //   if ($scope.tickets === null) {
+    //     TicketService.getTickets().then(function(reply) {
+    //       $scope.tickets = reply;
+    //       $log.debug('mainCtrl. tickets are ', $scope.tickets);
+    //     });
+    //   }
 
 
-    };
+    // };
 
     // Set the tool selected in the Tools panel
     $scope.setTool = function(tool, row) {
@@ -228,30 +228,30 @@ angular.module('dimsDashboard.controllers').
     };
 
     // Set the ticket selected in the tickets panel
-    $scope.setTicket = function(ticket, row) {
-      $log.debug('setTickets scalled: ',ticket, row);
-      $scope.currentSelectedTicket = ticket;
-      $scope.currentSelectedTopic = null;
-      $scope.showTopic = false;
-      $scope.showResults = false;
-      $scope.rawResults = '';
-      var filtered = $filter('filter')($scope.tickets, {'selected': 'active'}, true);
-      $log.debug('filtered ', filtered);
-      angular.forEach(filtered, function(value,index) {
-        value.selected = '';
-      });
-      $scope.tickets[row].selected = 'active';
-      TicketService.getTicket($scope.tickets[row].key).then(function(reply) {
-        // Returns object with ticket metadata, key, array of topics
-        $scope.currentSelectedTicket.ticket = reply.ticket;
-        $scope.currentSelectedTicket.topics = reply.topics;
-        $log.debug('currentSelectedTicket is ', $scope.currentSelectedTicket);
-        $scope.showTopicList = true;
-        // $scope.ticketDescription = reply.description;
-        // $scope.ticketShortDesc = reply.shortDesc;
-        // $scope.ticketContent = reply.data;
-      });
-    };
+    // $scope.setTicket = function(ticket, row) {
+    //   $log.debug('setTickets scalled: ',ticket, row);
+    //   $scope.currentSelectedTicket = ticket;
+    //   $scope.currentSelectedTopic = null;
+    //   $scope.showTopic = false;
+    //   $scope.showResults = false;
+    //   $scope.rawResults = '';
+    //   var filtered = $filter('filter')($scope.tickets, {'selected': 'active'}, true);
+    //   $log.debug('filtered ', filtered);
+    //   angular.forEach(filtered, function(value,index) {
+    //     value.selected = '';
+    //   });
+    //   $scope.tickets[row].selected = 'active';
+    //   TicketService.getTicket($scope.tickets[row].key).then(function(reply) {
+    //     // Returns object with ticket metadata, key, array of topics
+    //     $scope.currentSelectedTicket.ticket = reply.ticket;
+    //     $scope.currentSelectedTicket.topics = reply.topics;
+    //     $log.debug('currentSelectedTicket is ', $scope.currentSelectedTicket);
+    //     $scope.showTopicList = true;
+    //     // $scope.ticketDescription = reply.description;
+    //     // $scope.ticketShortDesc = reply.shortDesc;
+    //     // $scope.ticketContent = reply.data;
+    //   });
+    // };
 
     $scope.setTopic = function(topic, row) {
       $log.debug('setTopic called. topic is ', topic, 'row is ', row);
