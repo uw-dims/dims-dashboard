@@ -86,19 +86,26 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
   };
 
   var getMitigation = function getMitigation(key, user) {
-    var result = {};
+    var result = {},
+        mappedKeys;
     result.key = key;
     result.ips = {};
     result.ips.user = user;
-    return q.all([
-        Ticket.getTicket(key),
-        getUserIps(key, user),
-        getMitigatedData(key)
-    ])
+    return mapTopicKeys(key)
     .then(function (reply) {
-      result.metadata = reply[0];
+      mappedKeys = reply;
+      return q.all([
+          Ticket.getTicket(key),
+          getUserIps(key, user),
+          getMitigatedData(key),
+          store.countItems(mappedKeys.initial)
+      ]);
+    })
+    .then(function (reply) {
+      result.metadata = reply[0].metadata;
       result.ips.data = reply[1];
       result.data = reply[2];
+      result.metadata.initialNum = reply[3];
       return result;
     })
     .catch(function (err) {
