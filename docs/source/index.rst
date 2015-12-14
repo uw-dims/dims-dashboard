@@ -10,8 +10,6 @@ Contents:
    :numbered:
    :maxdepth: 3
 
-   introduction
-   referenceddocs
    using
 
 
