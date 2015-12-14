@@ -9,6 +9,7 @@ var _ = require('lodash-compat');
 var dimsUtils = require('../utils/util');
 var keyGen = require('../models/keyGen');
 var c = require('../config/redisScheme');
+var naturalSort = require('javascript-natural-sort');
 
 module.exports = function (Ticket, Topic, anonService, Attributes, store, UserModel) {
 
@@ -103,7 +104,7 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
     })
     .then(function (reply) {
       result.metadata = reply[0].metadata;
-      result.ips.data = reply[1];
+      result.ips.data = reply[1].sort(naturalSort);
       result.data = reply[2];
       result.metadata.initialNum = reply[3];
       return result;

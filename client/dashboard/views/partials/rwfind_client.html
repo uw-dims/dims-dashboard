@@ -6,7 +6,7 @@
   <div class="form-group" show-errors>
     <label for="startDate" class="col-sm-2 control-label">Start Date/Hour</label>
     <div class="col-sm-3"><div class="input-group input-group-sm">
-      <input type="text" class="form-control"  datepicker-popup={{dateFormat}} ng-model="formData.startDate" is-open="dateConfig.startOpened" 
+      <input type="text" class="form-control"  datepicker-popup={{dateFormat}} ng-model="formData.startDate" is-open="dateConfig.startOpened"
           datepicker-options="dateConfig.dateOptions" max-date="dateConfig.tomorrow" ng-required="true" close-text="Close" type="date"/>
       <span class="input-group-btn">
           <button type="button" class="btn btn-default" ng-click="open($event, 'startOpened')"><i class="glyphicon glyphicon-calendar"></i></button>
@@ -15,13 +15,13 @@
     <div class="col-sm-2"><input type="number" class="form-control input-sm" ng-model="formData.startHour" name="startHour" min="00" max="24" integer /></div>
   </div>
   <div class="form-group"><div class="col-sm-10 col-sm-offset-1 help-block">
-    Optional if number of days is entered below. Hours are from 0 to 24. Default is 0 (midnight). 
+    Optional if number of days is entered below. Hours are from 0 to 24. Default is 0 (midnight).
   </div></div>
 
   <div class="form-group" show-errors>
     <label for="endDate" class="col-sm-2 control-label">End Date/Hour</label>
     <div class="col-sm-3"><div class="input-group input-group-sm">
-      <input type="text" class="form-control"  datepicker-popup={{dateFormat}} ng-model="formData.endDate" is-open="dateConfig.endOpened" 
+      <input type="text" class="form-control"  datepicker-popup={{dateFormat}} ng-model="formData.endDate" is-open="dateConfig.endOpened"
           datepicker-options="dateConfig.dateOptions" max-date="dateConfig.tomorrow" ng-required="true" close-text="Close" />
       <span class="input-group-btn">
           <button type="button" class="btn btn-default" ng-click="open($event,'endOpened')"><i class="glyphicon glyphicon-calendar"></i></button>
@@ -30,7 +30,7 @@
     <div class="col-sm-2"><input type="number" class="form-control input-sm" ng-model="formData.endHour" name="endHour" min="00" max="24" integer /></div>
   </div>
   <div class="form-group"><div class="col-sm-10 col-sm-offset-1 help-block">
-    Optional if number of days is entered below or if a start date is specified. Default end date is today. Hours are from 0 to 24. Default is 0 (midnight). 
+    Optional if number of days is entered below or if a start date is specified. Default end date is today. Hours are from 0 to 24. Default is 0 (midnight).
   </div></div>
 
   <div class="form-group" show-errors>
@@ -38,7 +38,7 @@
     <div class="col-sm-2">
       <input type="number" class="form-control input-sm" ng-model="formData.numDays" name="numDays" min="1" integer/>
     </div>
-    <p class="help-block">Optional: Use to specify date range as a certain number of days up to now. 
+    <p class="help-block">Optional: Use to specify date range as a certain number of days up to now.
     <span ng-if="rwfindForm.numDays.$error.integer">Must be an integer.</span></p>
   </div>
 
@@ -55,7 +55,7 @@
     <div class="col-sm-3">
       <textarea class="form-control input-sm" rows="3" ng-model="formData.ips" id="ipsId"></textarea>
     </div>
-    
+
     <label  class="col-sm-2 control-label">Or Choose File</label>
     <div class="col-sm-3" ng-show="showFiles">
       <dims-select-files file-source="ip_lists" file-type="file" picker-model="formData.fileName"></dims-select-files>
@@ -68,7 +68,7 @@
   <div class="form-group">
   <label  class="col-sm-2 control-label">Output Type</label>
     <div class="col-sm-3">
-      <select class="form-control input-sm" ng-model="formData.outputType" ng-options="o.value as o.label for o in outputTypes"> 
+      <select class="form-control input-sm" ng-model="formData.outputType" ng-options="o.value as o.label for o in outputTypes">
       </select>
     </div>
     <label  class="col-sm-2 control-label">Show Header?</label>
@@ -86,7 +86,7 @@
   </div>
   </div>
 
-  
+
   <div class="form-group">
   <div class="col-sm-3 col-sm-offset-2">
   <button type="button" class="btn btn-primary btn-sm" ng-click="callClient()"><span class="glyphicon glyphicon-flash"></span>Call rwfind</button>

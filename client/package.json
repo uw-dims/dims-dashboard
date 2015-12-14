@@ -5,7 +5,8 @@
   "private": true,
   "dependencies": {
     "javascript-natural-sort": "^0.7.1",
-    "lodash": "~2.4.1"
+    "lodash": "~2.4.1",
+    "angular-checkboxes": "^1.0.2"
   },
   "devDependencies": {
     "grunt": "~0.4.5",

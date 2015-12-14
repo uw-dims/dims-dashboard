@@ -8,7 +8,8 @@ var _ = require('lodash-compat'),
     logger = require('../utils/logger')(module),
     keyGen = require('./keyGen'),
     keyExtract = require('./keyExtract'),
-    dimsUtils = require('../utils/util');
+    dimsUtils = require('../utils/util'),
+    naturalSort = require('javascript-natural-sort');
 
 module.exports = function Attributes(client) {
 
@@ -41,6 +42,7 @@ module.exports = function Attributes(client) {
     var result = {};
     return client.smembersAsync(keyGen.attributeKey(user, type))
     .then(function (reply) {
+      reply.sort(naturalSort);
       result[type] = reply;
       return result;
     })

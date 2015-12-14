@@ -1,0 +1,28 @@
+<div class="modal-header">
+<h1 class="modal-title">IPs needing remediation</h1>
+</div>
+<div class="modal-body">
+<!-- <div class="container"> -->
+<div class="row"><div class="col-sm-12">
+<p>You are responsible for taking mitigating action against the following IP addresses. Check off the IPs you are submitting as remediated and click <strong>Submit</strong></p>
+</div></div>
+<form>
+<div mt-to="ipResults">
+<div class="row" ng-repeat="ipRow in ipRows track by $index">
+  <div class="col-md-4" ng-repeat="cell in ipRow track by $index">
+   <input type="checkbox" mt-checkbox="cell" />&nbsp;{{cell}}
+  </div>
+</div>
+</div>
+<div class="row spacer10" style="margin-left: 10px">
+<button type="submit" class="btn btn-primary" ng-click="remediate(ipResults)">Submit</button></div>
+</form>
+
+<!-- </div> -->
+</div>
+
+<div class="modal-footer">
+
+<button class="btn btn-default" ng-click="ok()">Close</button>
+
+</div>

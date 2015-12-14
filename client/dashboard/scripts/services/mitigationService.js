@@ -4,11 +4,20 @@
 
   var MitigationApi = function ($resource) {
     return $resource('api/ticket/:id', {
-      type: 'mitigation'
+      id: '@id'
+    }, {
+      update: {
+        method: 'PUT',
+        url: 'api/ticket/:id'
+      },
+      action: {
+        method: 'PUT',
+        url: 'api/ticket/:id/action'
+      }
     });
   };
 
-  var MitigationService = function (MitigationApi, $log, $q) {
+  var MitigationService = function (MitigationApi, $log, $q, $modal) {
 
     var parseData = function parseData(data) {
       var newArray = [];
@@ -44,7 +53,9 @@
       getMitigation: function () {
         $log.debug('MitigationService.getMitigation');
         var deferred = $q.defer();
-        MitigationApi.get({},
+        MitigationApi.get({
+          type: 'mitigation'
+        },
           function (resource) {
             $log.debug('MitigationService.getMitigation success callback data', resource.data);
             var result = parseResponse(resource.data);
@@ -55,6 +66,27 @@
             $log.debug('MitigationService.getMitigation error callback', err);
             deferred.reject(err);
           });
+        return deferred.promise;
+      },
+
+      remediate: function (id, ips) {
+        $log.debug('remediate id is ', id);
+        $log.debug('ips are ', ips);
+        var deferred = $q.defer();
+        MitigationApi.update({
+          id: id},
+          {type: 'mitigation',
+          action: 'remediate',
+          ips: ips
+        },
+        function (resource) {
+          $log.debug('MitigationService.remediate success ', resource);
+          deferred.resolve(resource);
+        },
+        function (err) {
+          $log.debug('MitigationService.remediate error callback', err);
+          deferred.reject(err);
+        });
         return deferred.promise;
       }
     };
@@ -68,6 +100,6 @@
   .factory('MitigationService', MitigationService);
 
   MitigationApi.$inject = ['$resource'];
-  MitigationService.$inject = ['MitigationApi', '$log', '$q'];
+  MitigationService.$inject = ['MitigationApi', '$log', '$q', '$modal'];
 
 }());

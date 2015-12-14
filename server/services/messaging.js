@@ -56,7 +56,11 @@ module.exports = function (io) {
 
   function saveMsg(msg, name) {
     if (getLogSave(name)) {
-      getReader(msg).pipe(logStream(getLogConfig(name)));
+      try {
+        getReader(msg).pipe(logStream(getLogConfig(name)));
+      } catch (err) {
+        logger.error(err);
+      }
     }
   }
 

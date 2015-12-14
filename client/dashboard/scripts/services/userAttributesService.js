@@ -18,12 +18,24 @@ angular.module('dimsDashboard.services')
 
     // Algorithm from http://stackoverflow.com/questions/19178782/how-to-reshape-an-array-with-lodash
     UserAttributesService.formatAttribute = function formatAttribute(attribute, cols) {
-      // $log.debug('formatAttribute', attribute);
-      return _.compact(attribute.map(function (el, i) {
-        if (i % cols === 0) {
-          return attribute.slice(i, i + cols);
+      return format(attribute, cols);
+    };
+
+    var format = function format(array, numCols) {
+      var numRows = _.ceil(array.length / numCols);
+      var rows = [];
+      for (var k = 0; k < numRows; k++) {
+        rows[k] = [];
+      }
+      var i = 0;
+      _.forEach(array, function (value, index) {
+        if (i > numRows - 1) {
+          i = 0;
         }
-      }));
+        rows[i].push(value);
+        i++;
+      });
+      return rows;
     };
 
     UserAttributesService.getAttributes = function getAttributes(user) {

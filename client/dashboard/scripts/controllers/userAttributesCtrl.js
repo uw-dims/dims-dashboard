@@ -21,6 +21,7 @@
         $log.debug('UserAttributeCtrl activate reply is ', vm.attributes);
         $log.debug('cidr is ', UserAttributesService.supportedTypes().cidr);
         vm.cidrRows = format(vm.attributes, UserAttributesService.supportedTypes().cidr, columns.cidr);
+        $log.debug('vm.cidrRows ', vm.cidrRows);
       });
     }
 

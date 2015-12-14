@@ -237,11 +237,31 @@ module.exports = function (ticketService, mitigationService) {
     }
   };
 
-  // Not implemented
   ticketRoute.update = function (req, res) {
-    logger.debug('routes/ticket UPDATE, not implemented ');
-    res.status(405).send('Ticket update not yet implemented.');
+    logger.debug('routes/ticket UPDATE');
+    console.log (req.body);
     var id = req.params.id;
+    if (!req.user) {
+      return res.status(500).send('Error: user is not defined in request');
+    }
+    var user = req.user.get('ident');
+    var options = req.body;
+    if (options.hasOwnProperty('type') && options.hasOwnProperty('action')) {
+      if (options.type === 'mitigation' && options.action === 'remediate') {
+        mitigationService.remediate(id, user, options.ips)
+        .then(function (reply) {
+          console.log(reply);
+          res.status(200).send(resUtils.getSuccessReply(reply));
+        })
+        .catch(function (err) {
+          res.status(400).send(resUtils.getErrorReply(err.toString()));
+        });
+      } else {
+        res.status(405).send('Ticket update not yet implemented.');
+      }
+    } else {
+      res.status(405).send('Ticket update not yet implemented.');
+    }
     // }, function (err,reply) {
     //     res.status(400).send(err.toString());
     //   });
