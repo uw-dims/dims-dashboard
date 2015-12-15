@@ -46,6 +46,7 @@
     "fileupload": "^0.3.0",
     "glossy": "^0.1.7",
     "hiredis": "^0.4.1",
+    "javascript-natural-sort": "^0.7.1",
     "js-yaml": "^3.3.1",
     "knex": "^0.8.6",
     "lodash": "^2.4.2",

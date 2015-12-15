@@ -70,6 +70,7 @@
         $scope.modalInstance = $modal.open({
           templateUrl: '../views/partials/myIps.html',
           controller: ModalInstanceCtrl,
+          size: 'lg',
           resolve: {
             data: function () {
               return data;
