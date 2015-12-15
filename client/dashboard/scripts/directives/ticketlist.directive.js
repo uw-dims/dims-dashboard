@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  function ticketList(TicketService, $log) {
+  function ticketlist(TicketService, $log) {
     var directive = {
       restrict: 'AEC',
       templateUrl: 'views/partials/ticketlist.html',
@@ -25,10 +25,10 @@
       TicketService.getTickets()
       .then(function (reply) {
         vm.result = reply;
-        $log.debug('reply from getTickets');
+        $log.debug('ticketlist reply from getTickets');
       })
       .catch(function (err) {
-        $log.error('ticketList getTickets: ', err);
+        $log.error('ticketlist getTickets: ', err);
       });
 
     }
@@ -37,8 +37,8 @@
 
   angular
     .module('dimsDashboard.directives')
-    .directive('ticketList', ticketList);
+    .directive('ticketlist', ticketlist);
 
-  ticketList.$inject = ['TicketService', '$log'];
+  ticketlist.$inject = ['TicketService', '$log'];
 
 }());
