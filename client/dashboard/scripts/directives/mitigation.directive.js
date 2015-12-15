@@ -27,13 +27,16 @@
           yLabel: 'Total IPs Mitigated',
           key: 'Total IPs',
           withFocus: false,
-          yMax: metadata.initialNum,
-          yMin: 0
+          initialNum: metadata.initialNum,
+          unknownNum: metadata.unknownNum,
+          mitigatedNum: metadata.mitigatedNum
+
         };
         $log.debug('vm.getGraphOptions', options);
         return options;
       };
 
+      // Add options for graphing
       var addOptions = function addOptions(data) {
         var result = [];
         _.forEach(data, function (value, index) {
@@ -43,22 +46,24 @@
         return data;
       };
 
-      var init = function init() {
-        vm.showProgress = true;
-        vm.progressText = 'Hide progress';
+      var getMitigation = function getMitigation() {
         MitigationService.getMitigation()
         .then(function (reply) {
           vm.data = addOptions(reply);
-          $log.debug('vm.data is ', vm.data);
-          $log.debug('getMitigation vm.data is ', vm.data);
-          $log.debug('getMitigation vm.options is ', vm.options);
+        })
+        .catch(function (err) {
+          $log.debug(err);
         });
       };
 
-      vm.toggleProgress = function toggleProgress() {
-        vm.showProgress = (vm.showProgress) ? false : true;
-        vm.progressText = (vm.showProgress) ? 'Hide progress' : 'Show progress';
+      var init = function init() {
+        getMitigation();
       };
+
+      // vm.toggleProgress = function toggleProgress() {
+      //   vm.showProgress = (vm.showProgress) ? false : true;
+      //   vm.progressText = (vm.showProgress) ? 'Hide progress' : 'Show progress';
+      // };
 
       // Settings link handler - creates the modal window
       $scope.showIps = function showIps(data, key) {
@@ -74,16 +79,11 @@
             }
           }
         });
+        // Get the updated data after submitting
         $scope.modalInstance.result
         .then(function (reply) {
           $log.debug('reply from modal', reply);
-          MitigationService.getMitigation()
-          .then(function (reply) {
-            vm.data = addOptions(reply);
-            $log.debug('vm.data is ', vm.data);
-            $log.debug('getMitigation vm.data is ', vm.data);
-            $log.debug('getMitigation vm.options is ', vm.options);
-          });
+          getMitigation();
         }, function () {
           $log.debug('modal dismissed at: ', new Date());
         });
@@ -91,11 +91,9 @@
 
       var ModalInstanceCtrl = function ($scope, $modalInstance, data, key) {
         $scope.title = 'IPs to Mitigate';
-        $scope.cols = 3;
+        $scope.cols = 4;
         $scope.data = data;
-        $log.debug('data in controller', data);
         $scope.key = key;
-        $log.debug('key in controller is ', key);
         $scope.cancel = function () {
           $modalInstance.dismiss('cancel');
         };
@@ -108,25 +106,24 @@
           for (var k = 0; k < numRows; k++) {
             rows[k] = [];
           }
+          $log.debug('empty rows ', rows);
           var i = 0;
-          _.forEach(array, function (value, index) {
-            if (i > numRows - 1) {
-              i = 0;
-            }
+          _.forEach(array, function (value) {
+            i = (i > numRows - 1) ? 0 : i;
             rows[i].push(value);
             i++;
           });
           return rows;
         };
+
         $scope.ipRows = format(data, $scope.cols);
         $scope.ipResults = [];
+
         $scope.remediate = function (results) {
-          $log.debug('remediate formdata', $scope.ipResults);
           $scope.ipResults = angular.copy(results);
-          $log.debug('remediate formdata', $scope.ipResults);
+          $log.debug('remediated ips', $scope.ipResults);
           MitigationService.remediate($scope.key, $scope.ipResults)
           .then(function (reply) {
-            $log.debug('modal reply from remediate', reply);
             $scope.ok({
               success: true,
               data: $scope.ipResults

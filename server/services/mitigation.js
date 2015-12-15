@@ -99,7 +99,9 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
           Ticket.getTicket(key),
           getUserIps(key, user),
           getMitigatedData(key),
-          store.countItems(mappedKeys.initial)
+          store.countItems(mappedKeys.initial),
+          store.countItems(mappedKeys.unknown),
+          store.countItems(mappedKeys.mitigated)
       ]);
     })
     .then(function (reply) {
@@ -107,6 +109,8 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
       result.ips.data = reply[1].sort(naturalSort);
       result.data = reply[2];
       result.metadata.initialNum = reply[3];
+      result.metadata.unknownNum = reply[4];
+      result.metadata.mitigatedNum = reply[5];
       return result;
     })
     .catch(function (err) {
