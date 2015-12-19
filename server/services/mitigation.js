@@ -74,7 +74,7 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
     return store.listItems(keyGen.ticketTypeKey('mitigation'))
     .then(function (reply) {
       // Array of keys to mitigations
-      console.log('listMitigations', reply);
+      // console.log('listMitigations', reply);
       _.forEach(reply, function (value, index) {
         promises.push(getMitigation(value, user));
       });

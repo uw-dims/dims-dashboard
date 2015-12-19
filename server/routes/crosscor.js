@@ -15,7 +15,7 @@ module.exports = function (tools) {
     if (!req.user) {
       return res.status(500).send('Error: user is not defined in request');
     }
-    var id = req.user.get('ident');
+    var id = req.user.username;
 
     var rpcQueuebase = config.rpcQueueNames.crosscor,
         rpcClientApp = 'crosscor_client',

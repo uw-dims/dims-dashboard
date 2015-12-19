@@ -8,8 +8,6 @@
 
   var TicketService = function (TicketApi, $log, $q) {
 
-
-
     var ticketService = {
       getTickets: function () {
         $log.debug('TicketService.getTickets');

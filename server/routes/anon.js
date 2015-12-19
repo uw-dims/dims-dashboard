@@ -4,10 +4,6 @@ var logger = require('../utils/logger')(module);
 var _ = require('lodash-compat');
 var ChildProcess = require('../services/childProcess');
 
-/**
-  *
-  */
-
 module.exports = function (UserSettings, anonService) {
 
   var anon = {};
@@ -20,7 +16,7 @@ module.exports = function (UserSettings, anonService) {
     if (!req.user) {
       return res.status(500).send('Error: user is not defined in request');
     }
-    var id = req.user.get('ident');
+    var id = req.user.username;
 
 
     logger.debug('routes/anon.anonymize - Request: ', req.query);

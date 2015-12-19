@@ -59,6 +59,7 @@ diContainer.factory('healthService', require('./services/healthService'));
 diContainer.factory('store', require('./models/store'));
 diContainer.factory('Topic', require('./models/topic'));
 diContainer.factory('attributeService', require('./services/attributes'));
+diContainer.factory('userService', require('./services/user'));
 
 // diContainer.factory('ticketService', require('./services/ticket'));
 

@@ -61,9 +61,11 @@ angular.module('dimsDashboard.services')
       return obj ? Object.keys(obj) : [];
     };
 
-    UserService.getUsers = function getUsers() {
+    UserService.getUsers = function getUsers(tg) {
       var deferred = $q.defer();
-      UserApi.get({},
+      UserApi.get({
+        tg: tg
+      },
         function (resource) {
           $log.debug('UserService.getUsers success callback data: ', resource.data);
           deferred.resolve(resource.data);

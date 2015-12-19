@@ -11,18 +11,29 @@ module.exports = function (UserModel, Bookshelf) {
   var sqlQuery = 'SELECT ' +
   'm.ident, m.descr, m.affiliation, m.tz_info, m.im_info, m.tel_info, m.sms_info, ' +
   'm.post_info, m.bio_info, m.airport, m.entered, m.activity, m.image, m.sysadmin, ' +
-  'mt.trustgroup, mt.state, mt.email, m.image, m.uuid, mt.admin ' +
+  'mt.trustgroup, mt.state, mt.email, m.image, m.uuid, mt.admin, tg.descr as tgdesc, ' +
+  'me.pgpkey_id, me.pgpkey_expire, me.verified, me.keyring, me.keyring_update_at, ' +
+  'me.verify_token ' +
   'FROM member m ' +
   'JOIN member_trustgroup mt  ON m.ident = mt.member ' +
   'JOIN trustgroup tg ON tg.ident = mt.trustgroup ' +
-  'WHERE tg.ident = ?';
+  'JOIN member_email me ON mt.email = me.email ';
 
-  var sqlAddOn = 'AND m.ident = ?';
+  var sqlAddByUser = 'WHERE m.ident = ?';
+  var sqlAddByTG = 'WHERE tg.ident = ?';
+  var sqlAddByTGUser = 'WHERE tg.ident = ? AND  m.ident = ?';
+
+  var authTgQuery = 'SELECT ' +
+  'mt.trustgroup, mt.state, mt.email, tg.descr as tgdesc, mt.admin ' +
+  'FROM member_trustgroup mt ' +
+  'JOIN trustgroup tg ON tg.ident = mt.trustgroup ' +
+  'WHERE mt.member = ?';
 
   var fieldMapping = {
     ident: 'username',
     descr: 'name',
     affiliation: 'affiliation',
+    tgdesc: 'tgDescription',
     tz_info: 'tz',
     im_info: 'im',
     tel_info: 'phone',
@@ -33,7 +44,7 @@ module.exports = function (UserModel, Bookshelf) {
     entered: 'entered',
     activity: 'activity',
     sysadmin: 'isSysadmin',
-    image: 'image',
+    // image: 'image',
     login_attempts: 'loginAttempts',
     login_try_begin: 'loginTryBegin',
     trustgroup: 'trustgroup',
@@ -63,13 +74,44 @@ module.exports = function (UserModel, Bookshelf) {
     nom_enabled: 'nomEnabled'
   };
 
+  var authMapping = {
+    auth: {
+      ident: 'username',
+      password: 'password'
+    },
+    session: {
+      ident: 'username',
+      descr: 'name',
+      sysadmin: 'isSysadmin'
+    }
+  };
+
+  // Fields we want from member_trustgroup when
+  // doing auth
+  var authTgMapping = {
+    auth: {
+      state: 'state'
+    },
+    session: {
+      state: 'state',
+      tgdesc: 'tgDescription',
+      email: 'email',
+      admin: 'admin'
+    }
+  };
+
+  // States a user can login under
+  var authStates = [
+    'active',
+    'soonidle',
+    'idle',
+    'approved'
+  ];
+
   // var tgMapping = _.chain(fieldMapping)
   //   .omit('ident', 'descr')
   //   .extend(tgFields)
   //   .value();
-
-  console.log(fieldMapping);
-  console.log(tgMapping);
 
   // will reduce if key is not in mapping
   var applyMapping = function applyMapping(json, mapping) {
@@ -150,26 +192,61 @@ module.exports = function (UserModel, Bookshelf) {
     });
   };
 
+  // Get user's trustgroups for the purpose of auth
+  var getUserAuthTg = function getUserAuthTg(user, type) {
+    if (type !== 'auth' && type !== 'session') {
+      throw new Error('Invalid type supplied: ', type);
+    }
+    var result = {},
+        sql = authTgQuery,
+        binding = [user];
+    result.loginTgs = [];
+    result.trustgroups = {}
+    return Bookshelf.knex.raw(sql, binding)
+    .then(function (reply) {
+      _.forEach(reply.rows, function (value, index) {
+        // value.trustgroup is id of trustgroup
+        result.trustgroups[value.trustgroup] = applyMapping(value, authTgMapping[type]);
+        // Add trustgroup id to array if state allows login
+        if (_.includes(authStates, result.trustgroups[value.trustgroup].state)) {
+          result.loginTgs.push(value.trustgroup);
+        }
+      });
+      return result;
+    })
+    .catch(function (err) {
+      logger.error(err);
+      throw new Error('userService.getTrustgroupByUser: ', err);
+    });
+  };
+
   // Get info for all users in a trustgroup
   // Returns more info than preceeding methods
-  var getUsersInitialInfo = function getUsersInitialInfo(trustgroup, user) {
-    var sql, binding;
+  var getUsersInfo = function getUsersInfo(trustgroup, user) {
+    var sql, binding,
+        getOne,
+        result = [];
     // Getting all users
-    console.log(trustgroup);
-    console.log(user);
     if (user === undefined) {
-      sql = sqlQuery;
+      sql = sqlQuery + sqlAddByTG;
       binding = [trustgroup];
+      getOne = false;
     } else {
       // Getting one user
-      sql = sqlQuery + sqlAddOn;
+      sql = sqlQuery + sqlAddByTGUser;
       binding = [trustgroup, user];
+      getOne = true;
     }
-    console.log(sqlQuery);
-    console.log(binding);
     return Bookshelf.knex.raw(sql, binding)
-    .then(function (collection) {
-      return collection.rows;
+    .then(function (reply) {
+      _.forEach(reply.rows, function (value, index) {
+        result.push(applyMapping(value, fieldMapping));
+      });
+      if (getOne) {
+        return result[0];
+      } else {
+        return result;
+      }
     })
     .catch(function (err) {
       logger.error(err);
@@ -200,30 +277,37 @@ module.exports = function (UserModel, Bookshelf) {
   };
 
   // user is optional
-  var getUsersInfo = function getUsersInfo(trustgroup, user) {
-    var promises = [],
-        param;
-    if (user !== undefined) {
-      param = [trustgroup, user];
-    } else {
-      param = [trustgroup];
-    }
-    return getUsersInitialInfo.apply(this, param)
-    .then(function (reply) {
-      // Iterate over result and get more info from Email model
-      _.forEach(reply, function (value, index) {
-        promises.push(addEmailInfo(value));
-      });
-      return q.all(promises);
-    })
-    .catch(function (err) {
-      logger.error(err);
-      throw new Error('userService.getUsersInfo: ', err);
-    });
-  };
+  // var getUsersInfo = function getUsersInfo(trustgroup, user) {
+  //   var promises = [],
+  //       param;
+  //   if (user !== undefined) {
+  //     param = [trustgroup, user];
+  //   } else {
+  //     param = [trustgroup];
+  //   }
+  //   return getUsersInitialInfo.apply(this, param)
+  //   .then(function (reply) {
+  //     console.log(reply);
+  //     // Iterate over result and get more info from Email model
+  //     // _.forEach(reply, function (value, index) {
+  //     //   promises.push(addEmailInfo(value));
+  //     // });
+  //     // return q.all(promises);
+  //     return reply;
+  //   })
+  //   .catch(function (err) {
+  //     logger.error(err);
+  //     throw new Error('userService.getUsersInfo: ', err);
+  //   });
+  // };
 
   // Throws error if not found
-  var getAuthInfo = function getAuthInfo(user) {
+  // Returns ident, password, array of trustgroups
+  var getAuthInfo = function getAuthInfo(user, type) {
+    if (type !== 'auth' && type !== 'session') {
+      throw new Error('Invalid type supplied: ', type);
+    }
+    var result = {};
     return UserModel.User
     .where({ident: user})
     .fetch()
@@ -231,25 +315,44 @@ module.exports = function (UserModel, Bookshelf) {
       if (response === null) {
         throw new Error('User does not exist');
       }
-      response = _.pick(response.toJSON(), 'ident', 'password', 'descr');
-      console.log(response);
-      return applyMapping(response, fieldMapping);
+      // response = _.pick(response.toJSON(), 'ident', 'password', 'descr');
+      result = applyMapping(response.toJSON(), authMapping[type]);
+      return getUserAuthTg(result.username, type);
+    })
+    .then (function (reply) {
+      if (_.isEmpty(reply.trustgroups)) {
+        throw new Error('User is not in a trust group');
+      }
+      // Check to see if user can log into any tgs
+      if (reply.loginTgs.length === 0) {
+        throw new Error('User is not authorized to log into a trust group due to state');
+      }
+      result.trustgroups = reply.trustgroups;
+      result.loginTgs = reply.loginTgs;
+      return result;
     })
     .catch(function (err) {
-      logger.error(err);
       throw err;
     });
   };
 
+  var getUserLogin = function getUserLogin(user) {
+    return getAuthInfo(user, 'auth');
+  };
+
+  var getUserSession = function getUserSession(user) {
+    return getAuthInfo(user, 'session');
+  };
 
   // Get login info
 
-  userService.getAllTrustgroups = getAllTrustgroups;
-  userService.getOneTrustgroup = getOneTrustgroup;
-  userService.getUsersByTrustgroup = getUsersByTrustgroup;
+  // userService.getAllTrustgroups = getAllTrustgroups;
+  // userService.getOneTrustgroup = getOneTrustgroup;
+  // userService.getUsersByTrustgroup = getUsersByTrustgroup;
   userService.getTrustgroupByUser = getTrustgroupByUser;
   userService.getUsersInfo = getUsersInfo;
-  userService.getAuthInfo = getAuthInfo;
+  userService.getUserLogin = getUserLogin;
+  userService.getUserSession = getUserSession;
 
   return userService;
 

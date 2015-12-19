@@ -35,7 +35,7 @@ angular.module('dimsDashboard.controllers').
             // Emit event so socket can resolve
             $log.debug('LoginCtrl.login: Broadcast authenticated');
             $rootScope.$broadcast('authenticated');
-
+            $rootScope.$broadcast('currentUser-ready');
           } else {
             $scope.error = err;
             $log.debug('LoginCtrl login error', err);

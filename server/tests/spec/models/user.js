@@ -170,19 +170,19 @@
 // //   });
 // // });
 
-// // test('models/user.js: Trustgroups by member', function (assert) {
-// //   UserModel.MemberTrustGroups
-// //   .query('where', 'member', '=', 'lparsons')
-// //   .fetch()
-// //   .then(function (collection) {
-// //     console.log('member trust groups', collection.toJSON());
-// //     assert.end();
-// //   })
-// //   .catch(function (err) {
-// //     console.log(err);
-// //     assert.end();
-// //   });
-// // });
+// test('models/user.js: Trustgroups by member', function (assert) {
+//   UserModel.MemberTrustGroups
+//   .query('where', 'member', '=', 'lparsons')
+//   .fetch()
+//   .then(function (collection) {
+//     console.log('member trust groups', collection.toJSON());
+//     assert.end();
+//   })
+//   .catch(function (err) {
+//     console.log(err);
+//     assert.end();
+//   });
+// });
 
 // // test('models/user.js: Get info for one trust group -  dims', function (assert) {
 // //   UserModel.TrustGroups

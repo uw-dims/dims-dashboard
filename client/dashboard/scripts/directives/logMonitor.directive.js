@@ -19,12 +19,12 @@
 
     function linkFunc(scope, el, attr, ctrl) {
       // Don't need this yet
-      $log.debug('In linkFunc, exchange is ', scope.exchange);
+      // $log.debug('In linkFunc, exchange is ', scope.exchange);
     }
 
     function controllerFunc($scope) {
       //vm.messages = '';
-      $log.debug('LogMonitor Directive: In controllerFunc, exchange is ', $scope.exchange);
+      // $log.debug('LogMonitor Directive: In controllerFunc, exchange is ', $scope.exchange);
       var vm = this;
 
       vm.buttonText = 'Turn on';
@@ -51,18 +51,10 @@
       init();
 
       vm.toggle = function toggle(type) {
-        //$log.debug('vm.toggle. rootScope.logmonOn is ', $rootScope.logmonOn);
-        //$rootScope.logmonOn[type] = LogService.isRunning(type);
         if (LogService.isRunning(type)) {
-          // Turn it off
-          //$rootScope.logmonOn[type] = false;
-          $log.debug('LogMonitor Directive Turning log monitor off for ', type);
           vm.buttonText = 'Turn on';
           LogService.stop(type);
         } else {
-          // Turn it on
-          //$rootScope.logmonOn[type] = true;
-          $log.debug('LogMonitor Directive Turning log monitor on');
           vm.buttonText = 'Turn off';
           LogService.start(type);
         }
@@ -74,7 +66,6 @@
 
       vm.offListen = function () {};
       vm.start = function () {
-        $log.debug('LogMonitor Directive: start');
         LogService.setRunning(vm.type, true);
         vm.clear();
         $scope.offListen = $scope.$on('socket:' + constants.fanoutExchanges[vm.type].event, function (event, data) {
@@ -96,12 +87,9 @@
       };
 
       vm.listener = function (event) {
-        $log.debug('LogMonitor Directive listener. event: ', event);
         if (event === 'start') {
-          $log.debug('LogMonitor Directive: listener. event is start');
           vm.start();
         } else if (event === 'stop') {
-          $log.debug('LogMonitor Directive: listener. event is stop');
           vm.stop();
         }
       };

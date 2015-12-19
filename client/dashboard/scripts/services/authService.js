@@ -21,6 +21,7 @@ angular.module('dimsDashboard.services')
           function (resource) {
             $log.debug('AuthService:login success callback. data is ', resource.data);
             $rootScope.currentUser = resource.data.user;
+            $rootScope.currentUser.currentTg = resource.data.settings.currentTg;
             SettingsService.data = resource.data.settings;
             return cb();
           },
@@ -36,15 +37,6 @@ angular.module('dimsDashboard.services')
           var cb = callback || angular.noop;
           $rootScope.$emit('logout');
           ChatService.stop();
-          //LogService.stop();
-          // ChatSocket.then(function (socket) {
-          //   socket.removeAllListeners(constants.chatEvent);
-          //   socket.disconnect();
-          // });
-          // LogSocket.then(function (socket) {
-          //   socket.removeAllListeners(constants.logEvent);
-          //   socket.disconnect();
-          // });
           SessionService.delete(function (res) {
               $rootScope.currentUser = null;
               return cb();
@@ -60,9 +52,11 @@ angular.module('dimsDashboard.services')
           SessionService.get(function (resource) {
             $log.debug('AuthService:currentUser. data returned from session is ', resource.data);
             $rootScope.currentUser = resource.data.user;
+            $rootScope.currentUser.currentTg = resource.data.settings.currentTg;
             SettingsService.data = resource.data.settings;
-            $rootScope.$emit('authenticated');
+            // $rootScope.$emit('authenticated');
+            $rootScope.$broadcast('currentUser-ready');
           });
         }
-      }
+      };
   });

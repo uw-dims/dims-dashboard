@@ -3,16 +3,25 @@
 (function () {
   'use strict';
 
-  function UserCtrl($scope, UserService, $log, $location) {
+  function UserCtrl($scope, UserService, $log, $location, $rootScope) {
     var vm = this;
 
     function activate() {
-      UserService.getUsers()
-      .then(function (reply) {
-        vm.users = reply;
-        $log.debug('userCtrl getUsers reply', vm.users);
-      });
+      if ($scope.currentUser) {
+        vm.trustgroup = $scope.currentUser.currentTg;
+        vm.tgDescription = $scope.currentUser.trustgroups[vm.trustgroup].tgDescription;
+        UserService.getUsers(vm.trustgroup)
+        .then(function (reply) {
+          vm.users = reply;
+          $log.debug('userCtrl getUsers reply', vm.users);
+        });
+      }
     }
+
+    $scope.$on('switch-tg', function () {
+      activate();
+    });
+
 
     vm.getUser = function getUser(user) {
       UserService.getUser(user)
@@ -33,7 +42,7 @@
     .module('dimsDashboard.controllers')
     .controller('UserCtrl', UserCtrl);
 
-  UserCtrl.$inject = ['$scope', 'UserService', '$log', '$location'];
+  UserCtrl.$inject = ['$scope', 'UserService', '$log', '$location', '$rootScope'];
 
 }());
 

@@ -194,17 +194,17 @@ angular.module('dimsDashboard.filters', []);
 
  _.mixin(_.string.exports());
 
-dimsDashboard.run(function($rootScope, $location, $log, AuthService) {
+dimsDashboard.run(function ($rootScope, $location, $log, AuthService) {
   //watching the value of the currentUser variable.
-  $rootScope.$watch('currentUser', function(currentUser) {
+  $rootScope.$watch('currentUser', function (currentUser) {
     // if no currentUser and on a page that requires authorization then try to update it
     // will trigger 401s if user does not have a valid session
-    $log.debug('Run: watch currentUser handler. currentUser is ',currentUser);
+    $log.debug('Run: watch currentUser handler. currentUser is ', currentUser);
     $log.debug('Run: watch currentUser handler. path is ', $location.path());
-    if (!currentUser && (['/login'].indexOf($location.path()) === -1 )) {
+    if (!currentUser && (['/login'].indexOf($location.path()) === -1)) {
       $log.debug('Run: watch currentUser handler. First if. No currentUser and not on login page. Call AuthService.currentUser()');
       AuthService.currentUser();
-    } else if (['/login'].indexOf($location.path()) === 0 ) {
+    } else if (['/login'].indexOf($location.path()) === 0) {
       $log.debug('Run: watch currentUser handler. 2nd if. currentUser is ', currentUser);
       $log.debug('Run: watch currentUser handler. 2nd if. location ', $location.path());
       $location.path('/login');
@@ -215,7 +215,7 @@ dimsDashboard.run(function($rootScope, $location, $log, AuthService) {
   });
 
   // On catching 401 errors, redirect to the login page.
-  $rootScope.$on('event:auth-loginRequired', function() {
+  $rootScope.$on('event:auth-loginRequired', function () {
     $log.debug('Run: auth-loginRequired event handler. Caught 401, redirect to login page');
     $location.path('/login');
     return false;

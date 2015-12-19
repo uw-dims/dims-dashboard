@@ -5,8 +5,9 @@
 // Includes
 var _ = require('lodash-compat');
 var logger = require('../utils/logger')(module);
+var resUtils = require('../utils/responseUtils');
 
-module.exports = function (UserModel) {
+module.exports = function (UserModel, userService) {
 
   var userRoute = {};
 
@@ -77,17 +78,24 @@ module.exports = function (UserModel) {
     */
   userRoute.list = function (req, res) {
     logger.debug('in GET (list)');
-    UserModel.Users.forge()
-      .fetch({ withRelated: ['email']})
-      .then(function (collection) {
-        //console.log(collection);
-        // console.log(collection.toJSON());
-        var reply = processUsers(collection);
-        res.status(200).send({data: reply});
-      }).catch(function (err) {
-        logger.error('list error:', err);
-        res.status(400).send(err.toString());
-      });
+    userService.getUsersInfo(req.query.tg)
+    .then(function (reply) {
+      res.status(200).send(resUtils.getSuccessReply(reply));
+    })
+    .catch(function (err) {
+      res.status(400).send(resUtils.getErrorReply(err.toString()));
+    })
+    // UserModel.Users.forge()
+    //   .fetch({ withRelated: ['email']})
+    //   .then(function (collection) {
+    //     //console.log(collection);
+    //     // console.log(collection.toJSON());
+    //     var reply = processUsers(collection);
+    //     res.status(200).send({data: reply});
+    //   }).catch(function (err) {
+    //     logger.error('list error:', err);
+    //     res.status(400).send(err.toString());
+    //   });
   };
 
   /**

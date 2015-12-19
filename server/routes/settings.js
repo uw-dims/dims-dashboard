@@ -10,7 +10,7 @@ module.exports = function (UserSettings) {
 
   settings.get = function (req, res) {
     // id is from logged in user
-    var id = req.user.get('ident');
+    var id = req.user.username;
     logger.debug('routes/settings get: id = ', id);
     // Create new UserSettings object
     var userSettings = UserSettings.userSettingsFactory(id);
@@ -26,7 +26,7 @@ module.exports = function (UserSettings) {
   };
 
   settings.update = function (req, res) {
-    var id = req.user.get('ident');
+    var id = req.user.username;
 
     var userSettings = UserSettings.userSettingsFactory(id, req.body.settings);
     userSettings.saveSettings()
