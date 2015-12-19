@@ -84,7 +84,7 @@ module.exports = function (UserModel, userService) {
     })
     .catch(function (err) {
       res.status(400).send(resUtils.getErrorReply(err.toString()));
-    })
+    });
     // UserModel.Users.forge()
     //   .fetch({ withRelated: ['email']})
     //   .then(function (collection) {
@@ -105,21 +105,30 @@ module.exports = function (UserModel, userService) {
     */
   userRoute.show = function (req, res) {
     logger.debug('in GET (show). id is ', req.params.id);
-    UserModel.User.forge({ident: req.params.id})
-      .fetch({require: true, withRelated: ['email']})
-      .then(function (user) {
-        user = user.toJSON();
-        // For now, just use first email in array.
-        var userResult = _.assign(parseUser(user), parseEmail(user.email[0]));
-        // userResult.email = [];
-        // user.email.forEach(function (email, index, array) {
-        //   userResult.email.push(parseEmail(email));
-        // });
-        res.status(200).send({data: userResult});
-      }).catch(function (err) {
-        logger.error('show error:', err);
-        res.status(400).send(err.toString());
-      });
+    logger.debug('query is ', req.params.query);
+    userService.getUsersInfo(req.query.tg, req.params.id)
+    .then(function (reply) {
+      console.log('userRoute.show ', reply);
+      res.status(200).send(resUtils.getSuccessReply(reply));
+    })
+    .catch(function (err) {
+      res.status(400).send(resUtils.getErrorReply(err.toString()));
+    });
+    // UserModel.User.forge({ident: req.params.id})
+    //   .fetch({require: true, withRelated: ['email']})
+    //   .then(function (user) {
+    //     user = user.toJSON();
+    //     // For now, just use first email in array.
+    //     var userResult = _.assign(parseUser(user), parseEmail(user.email[0]));
+    //     // userResult.email = [];
+    //     // user.email.forEach(function (email, index, array) {
+    //     //   userResult.email.push(parseEmail(email));
+    //     // });
+    //     res.status(200).send({data: userResult});
+    //   }).catch(function (err) {
+    //     logger.error('show error:', err);
+    //     res.status(400).send(err.toString());
+    //   });
   };
   return userRoute;
 };

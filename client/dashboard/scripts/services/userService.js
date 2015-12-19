@@ -76,9 +76,11 @@ angular.module('dimsDashboard.services')
       return deferred.promise;
     };
 
-    UserService.getUser = function getUser(ident) {
+    UserService.getUser = function getUser(tg, ident) {
       var deferred = $q.defer();
-      UserApi.get({id: ident},
+      UserApi.get({id: ident,
+        tg: tg
+      },
         function (resource) {
           $log.debug('UserService.getUser success callback data: ', resource.data);
           deferred.resolve(resource.data);

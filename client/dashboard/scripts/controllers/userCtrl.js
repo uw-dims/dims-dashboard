@@ -24,7 +24,8 @@
 
 
     vm.getUser = function getUser(user) {
-      UserService.getUser(user)
+      vm.trustgroup = $scope.currentUser.currentTg;
+      UserService.getUser(vm.trustgroup, user)
       .then(function (reply) {
         vm.profile = UserService.convertToDisplay(reply);
       });

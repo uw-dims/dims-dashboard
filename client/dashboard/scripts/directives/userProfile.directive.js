@@ -11,7 +11,8 @@
       controllerAs: 'vm',
       link: linkFunc,
       scope: {
-        username: '='
+        username: '=',
+        tg: '='
       }
     };
 
