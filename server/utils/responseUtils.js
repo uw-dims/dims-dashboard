@@ -26,3 +26,10 @@ var getFailReply = function getFailReply(errorObj) {
 };
 
 exports.getFailReply = getFailReply;
+
+var validRegex = function validRegex() {
+  return /^[a-z0-9 _-]+$/i;
+};
+
+exports.validRegex = validRegex;
+

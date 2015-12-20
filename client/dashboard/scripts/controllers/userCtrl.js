@@ -22,7 +22,6 @@
       activate();
     });
 
-
     vm.getUser = function getUser(user) {
       vm.trustgroup = $scope.currentUser.currentTg;
       UserService.getUser(vm.trustgroup, user)

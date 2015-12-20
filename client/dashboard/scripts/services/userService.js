@@ -24,7 +24,12 @@ angular.module('dimsDashboard.services')
       airport: 'Home Airport',
       bio: 'Biography',
       entered: 'Start Time',
-      activity: 'Last Activity'
+      activity: 'Last Activity',
+      admin: 'Admin',
+      isSysadmin: 'SysAdmin',
+      tgDescription: 'Trust Group',
+      trustgroup: 'Trust Group ID',
+      pgpkeyExpires: 'PGP Key Expiration'
     };
 
     var emailMapping = {
@@ -35,7 +40,7 @@ angular.module('dimsDashboard.services')
 
     UserService.convertToDisplay = function convertToDisplay(data) {
       var newData = {};
-      var emailArray =[];
+      var emailArray = [];
       _.each(fieldMapping, function (value, key, list) {
         if (data[key] instanceof Array) {
           $log.debug('is array ', data[key]);
@@ -61,13 +66,14 @@ angular.module('dimsDashboard.services')
       return obj ? Object.keys(obj) : [];
     };
 
+    // Gets all users in a trust group (tg)
     UserService.getUsers = function getUsers(tg) {
       var deferred = $q.defer();
       UserApi.get({
         tg: tg
       },
         function (resource) {
-          $log.debug('UserService.getUsers success callback data: ', resource.data);
+          $log.debug('UserService.getUsers success callback result: ', resource);
           deferred.resolve(resource.data);
         }, function (err) {
           $log.debug('UserService.getUsers failure callback err: ', err);
@@ -76,13 +82,14 @@ angular.module('dimsDashboard.services')
       return deferred.promise;
     };
 
-    UserService.getUser = function getUser(tg, ident) {
+    // Gets info for user (username) in trust group (tg)
+    UserService.getUser = function getUser(tg, username) {
       var deferred = $q.defer();
-      UserApi.get({id: ident,
+      UserApi.get({id: username,
         tg: tg
       },
         function (resource) {
-          $log.debug('UserService.getUser success callback data: ', resource.data);
+          $log.debug('UserService.getUser success callback result: ', resource);
           deferred.resolve(resource.data);
         }, function (err) {
           $log.debug('UserService.getUser failure callback err: ', err);
@@ -92,5 +99,4 @@ angular.module('dimsDashboard.services')
     };
 
     return UserService;
-
   });

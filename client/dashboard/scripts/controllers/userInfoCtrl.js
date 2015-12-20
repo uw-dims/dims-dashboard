@@ -23,12 +23,6 @@
       attributes: false
     };
 
-    // var activateTab = function activateTab(num) {
-    //   if (num >= 0 && num <= 2) {
-    //     $scope.tabs[num].active = true;
-    //   }
-    // };
-
     var activateTab = function activateTab(type) {
       if (type !== undefined && $scope.active.hasOwnProperty(type)) {
         $log.debug('type is ', type);
@@ -37,11 +31,6 @@
     };
 
     activateTab($routeParams.type);
-
-    // if ($routeParams.type === 'settings') {
-    //   activateTab(2);
-    // }
-
   }
 
   // Plug controller function into AngularJS
@@ -51,7 +40,5 @@
 
   UserInfoCtrl.$inject = ['$scope', 'UserService', '$log', '$routeParams', '$location', '$rootScope'];
 
-
 }());
 
-// EOF

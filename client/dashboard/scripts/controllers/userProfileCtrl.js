@@ -27,7 +27,6 @@
     }
 
     activate();
-
   }
 
   // Plug controller function into AngularJS
@@ -39,4 +38,3 @@
 
 }());
 
-// EOF

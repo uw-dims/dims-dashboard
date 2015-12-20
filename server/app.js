@@ -3,6 +3,8 @@
 var express = require('express')
   , config = require('./config/config')
   , bodyParser = require('body-parser')
+  , expressValidator = require('express-validator')
+  , _ = require('lodash-compat')
  // , compress = require('compression')
  // , cookieSession = require('cookie-session')
   , json = require('express-json')
@@ -97,6 +99,20 @@ app.use(bodyParser.urlencoded({
   limit: '50mb'
 }));
 app.use(bodyParser.json());
+// Custom validators:
+// isArray - check that the value is an array
+// isValidtype - check that the value is contained in an array
+//    of acceptable values (types)
+app.use(expressValidator({
+  customValidators: {
+    isArray: function (value) {
+      return Array.isArray(value);
+    },
+    isValidType: function (value, types) {
+      return _.includes(types, value);
+    }
+  }
+}));
 //app.use(flash());
 
 // Cookies and session

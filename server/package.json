@@ -43,6 +43,7 @@
     "express": "^4.12.4",
     "express-json": "^1.0.0",
     "express-session": "^1.7.6",
+    "express-validator": "^2.18.0",
     "fileupload": "^0.3.0",
     "glossy": "^0.1.7",
     "hiredis": "^0.4.1",
