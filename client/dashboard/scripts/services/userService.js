@@ -38,18 +38,16 @@ angular.module('dimsDashboard.services')
       pgpkeyExpires: 'PGP Key Expiration'
     };
 
+    // currently not used
     UserService.convertToDisplay = function convertToDisplay(data) {
       var newData = {};
       var emailArray = [];
       _.each(fieldMapping, function (value, key, list) {
         if (data[key] instanceof Array) {
-          $log.debug('is array ', data[key]);
           _.each(data[key], function (value, index, array) {
             var emailData = {};
-            $log.debug('in each email value, index now', value, index);
             var originalData = value;
             _.each(emailMapping, function (value, key, list) {
-              $log.debug('inner loop', value, key);
               emailData[value] = originalData[key];
             });
             emailArray.push(emailData);
@@ -73,7 +71,6 @@ angular.module('dimsDashboard.services')
         tg: tg
       },
         function (resource) {
-          $log.debug('UserService.getUsers success callback result: ', resource);
           deferred.resolve(resource.data);
         }, function (err) {
           $log.debug('UserService.getUsers failure callback err: ', err);
@@ -89,11 +86,10 @@ angular.module('dimsDashboard.services')
         tg: tg
       },
         function (resource) {
-          $log.debug('UserService.getUser success callback result: ', resource);
           deferred.resolve(resource.data);
         }, function (err) {
           $log.debug('UserService.getUser failure callback err: ', err);
-          deferred.resolve(err);
+          deferred.reject(err);
         });
       return deferred.promise;
     };

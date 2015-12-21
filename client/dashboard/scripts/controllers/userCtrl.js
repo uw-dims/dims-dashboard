@@ -13,7 +13,6 @@
         UserService.getUsers(vm.trustgroup)
         .then(function (reply) {
           vm.users = reply;
-          $log.debug('userCtrl getUsers reply', vm.users);
         });
       }
     }

@@ -28,8 +28,8 @@ module.exports = function (Attributes, attributeService) {
     req.checkParams('id', 'UserID contains invalid characters').matches(resUtils.validRegex());
     var errors = req.validationErrors(true);
     if (errors) {
-      console.log(errors);
-      res.status(400).send(resUtils.getErrorReply('Validation errors: ' + util.inspect(errors)));
+      logger.error('show validation errors: ', errors);
+      res.status(400).send(resUtils.getErrorReply(resUtils.getValidateError(errors)));
       return;
     }
     var user = req.params.id;
@@ -56,8 +56,8 @@ module.exports = function (Attributes, attributeService) {
     req.checkBody('items', 'Request must contain items array').isArray();
     var errors = req.validationErrors(true);
     if (errors) {
-      console.log(errors);
-      res.status(400).send(resUtils.getErrorReply('Validation errors: ' + util.inspect(errors)));
+      logger.error('update validation errors: ', errors);
+      res.status(400).send(resUtils.getErrorReply(resUtils.getValidateError(errors)));
       return;
     }
     var promise = (req.body.action === 'add') ? Attributes.save(req.params.id, req.body.type, req.body.items) : Attributes.remove(req.params.id, req.body.type, req.body.items);

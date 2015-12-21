@@ -122,15 +122,13 @@ module.exports = function Attributes(client) {
     });
     return q.all(promises)
     .then(function (reply) {
-      logger.debug('return from getAttributes', reply);
       _.forEach(reply, function (value, index) {
-        logger.debug('value is ', value);
         _.assign(attributes[user], value);
       });
       return attributes;
     })
     .catch(function (err) {
-      logger.error('Could not get attributes for this user');
+      logger.error('Could not get attributes for this user', err);
       return new Error(err.toString());
     });
   };

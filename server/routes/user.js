@@ -18,11 +18,11 @@ module.exports = function (UserModel, userService) {
     * Invoked via GET https://dashboard_url/api/user/
     */
   userRoute.list = function (req, res) {
-
     req.checkQuery('tg', 'Trust group ID missing or invalid').matches(resUtils.validRegex());
     var errors = req.validationErrors(true);
     if (errors) {
-      res.status(400).send(resUtils.getErrorReply('Validation errors: ' + util.inspect(errors)));
+      logger.error('list validation errors: ', errors);
+      res.status(400).send(resUtils.getErrorReply(resUtils.getValidateError(errors)));
       return;
     }
     userService.getUsersInfo(req.query.tg)
@@ -41,20 +41,17 @@ module.exports = function (UserModel, userService) {
     * Invoked via GET https://dashboard_url/api/user/id
     */
   userRoute.show = function (req, res) {
-    logger.debug('in GET (show). id is ', req.params.id);
-    logger.debug('query is ', req.query);
-
     req.checkQuery('tg', 'Trust group ID missing or invalid').matches(resUtils.validRegex());
     req.checkParams('id', 'UserID contains invalid characters').matches(resUtils.validRegex());
     var errors = req.validationErrors(true);
     if (errors) {
-      res.status(400).send(resUtils.getErrorReply('Validation errors: ' + util.inspect(errors)));
+      logger.error('show validation errors: ', errors);
+      res.status(400).send(resUtils.getErrorReply(resUtils.getValidateError(errors)));
       return;
     }
 
     userService.getUsersInfo(req.query.tg, req.params.id)
     .then(function (reply) {
-      console.log('userRoute.show ', reply);
       if (reply === undefined) {
         res.status(404).send(resUtils.getErrorReply('The user you requested does not exist in the specified trust group.'));
       } else {
@@ -67,7 +64,7 @@ module.exports = function (UserModel, userService) {
     .done();
   };
 
-  // Returns just what is needed for list of users
+  // Returns just what is needed for list of users - not used
   var reduceUser = function reduceUser(user) {
     var result = {
       username: user.username,

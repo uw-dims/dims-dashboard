@@ -28,7 +28,7 @@ angular.module('dimsDashboard.services')
           // Failure, send error to callback
           function (err) {
             $log.debug('AuthService:login failure callback. err is ', err);
-            return cb(err.data);
+            return cb(err.data.message);
           });
         },
 
@@ -42,7 +42,7 @@ angular.module('dimsDashboard.services')
               return cb();
             },
             function (err) {
-              return cb(err.data);
+              return cb(err.data.message);
             });
         },
 
@@ -54,7 +54,7 @@ angular.module('dimsDashboard.services')
             $rootScope.currentUser = resource.data.user;
             $rootScope.currentUser.currentTg = resource.data.settings.currentTg;
             SettingsService.data = resource.data.settings;
-            // $rootScope.$emit('authenticated');
+            $rootScope.$emit('authenticated');
             $rootScope.$broadcast('currentUser-ready');
           });
         }

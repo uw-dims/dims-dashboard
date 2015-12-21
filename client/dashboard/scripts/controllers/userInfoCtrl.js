@@ -3,11 +3,8 @@
 (function () {
   'use strict';
 
-  function UserInfoCtrl($scope, UserService, $log, $routeParams, $location, $rootScope) {
+  function UserInfoCtrl($scope, UserService, $log, $routeParams, $location) {
     var vm = this;
-    $log.debug('UserInfoCtrl. param is ', $routeParams.type);
-    $log.debug('UserInfoCtrl. routeParams is ', $routeParams);
-
     $scope.tabs = [
     {
       active: true
@@ -38,7 +35,7 @@
     .module('dimsDashboard.controllers')
     .controller('UserInfoCtrl', UserInfoCtrl);
 
-  UserInfoCtrl.$inject = ['$scope', 'UserService', '$log', '$routeParams', '$location', '$rootScope'];
+  UserInfoCtrl.$inject = ['$scope', 'UserService', '$log', '$routeParams', '$location'];
 
 }());
 

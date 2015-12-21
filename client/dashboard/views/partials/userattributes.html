@@ -7,19 +7,22 @@
     <div class="spacer20">
       <div class="row" ng-repeat="cidrRow in vm.cidrRows track by $index">
         <div class="col-md-3" ng-repeat="cell in cidrRow track by $index"> {{ cell }}</div>
-        <!-- <div class="col-md-4">{{ row[0] }}</div>
-        <div class="col-md-4">{{ row[1] }}</div>
-        <div class="col-md-4">{{ row[2] }}</div> -->
       </div>
       </div>
     </tab>
 
     <tab heading="Domains">
       <div class="spacer20">
+        <div class="row" ng-repeat="domainRow in vm.domainRows track by $index">
+        <div class="col-md-3" ng-repeat="cell in domainRow track by $index"> {{ cell }}</div>
+        </div>
       </div>
     </tab>
     <tab heading="TLP">
       <div class="spacer20">
+        <div class="row" ng-repeat="tlpRow in vm.tlpRows track by $index">
+        <div class="col-md-3" ng-repeat="cell in tlpRow track by $index"> {{ cell }}</div>
+        </div>
       </div>
     </tab>
 

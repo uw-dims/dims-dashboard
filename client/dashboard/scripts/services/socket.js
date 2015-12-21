@@ -39,9 +39,9 @@
       try {
         _.forEach(['chatExchanges', 'fanoutExchanges'], function (value, index) {
           _.forEach(constants[value], function (value, key) {
-            // $log.debug('ClientSockets set up appSocket for ', value.name);
+            $log.debug('ClientSockets set up appSocket for ', value.name);
             if (appSockets.hasOwnProperty(value.name)) {
-              // $log.debug('ClientSockets appSocket for %s already exists', value.name);
+              $log.debug('ClientSockets appSocket for %s already exists', value.name);
               appSockets[value.name].socket.connect();
               appSockets[value.name].socket.forward(value.event);
             } else {

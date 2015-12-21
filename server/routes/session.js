@@ -6,6 +6,7 @@ var util = require('util');
 var validator = require('validator');
 
 var logger = require('../utils/logger')(module);
+var resUtils = require('../utils/responseUtils');
 
 module.exports = function (UserSettings, userService) {
 
@@ -79,7 +80,9 @@ module.exports = function (UserSettings, userService) {
         logger.error('login: Unsuccessful Response from passport.authenticate. err', err);
         var message = (info !== null && info !== undefined) ? info : '';
         message = message + ((err !== null && err !== undefined) ? err : '');
+        logger.error('login: Unsuccessful. Message is ', message);
         res.status(400).send(resUtils.getErrorReply(message));
+        return;
       }
       // Get data for user session object
       userService.getUserSession(user.username)

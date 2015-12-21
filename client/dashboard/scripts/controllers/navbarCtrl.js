@@ -16,12 +16,9 @@
 
     // Bindable members
     vm.logout = logout;
-    // vm.settings = settings;
-    // vm.messaging = messaging;
     vm.chat = chat;
     vm.logMonitor = logMonitor;
     vm.openSite = openSite;
-    //vm.userSettings = userSettings;
     var associatedSites = {
       opstrust: 'https://portal.uw.ops-trust.net',
       opstrustwiki: 'https://wiki.uw.ops-trust.net/dims/bin/view/Main/WebHome'
@@ -47,52 +44,23 @@
       });
     }
 
-    // Settings link handler - creates the modal window
-    // function settings(size) {
-    //   var modalInstance = $modal.open({
-    //     templateUrl: '../views/partials/settings.html',
-    //     controller: 'SettingsCtrl'
-    //   });
-    // };
-
     function chat() {
-      //$rootScope.chatOn = ChatService.isRunning();
       if (ChatService.isRunning()) {
-        // Turn it off
-        //$rootScope.chatOn = false;
         $log.debug('navbarCtrl: Turning chat off');
         ChatService.stop();
       } else {
-        // Turn it on
-        //$rootScope.chatOn = true;
         $log.debug('navbarCtrl: Turning chat on');
         ChatService.start();
       }
     }
 
     function logMonitor() {
-      console.log('in logMonitor, window on is ', $rootScope.logWindowOn);
       if ($rootScope.logWindowOn) {
         $rootScope.logWindowOn = false;
       } else {
         $rootScope.logWindowOn = true;
       }
-    };
-
-    // function logMonitor() {
-    //   $rootScope.logmonOn = LogService.isRunning();
-    //   if ($scope.logmonOn) {
-    //     // Turn it off
-    //     $rootScope.logmonOn = false;
-    //     $log.debug('Turning log monitor off');
-    //     LogService.stop();
-    //   } else {
-    //     // Turn it on
-    //     $rootScope.logmonOn = true;
-    //     $log.debug('Turning log monitor on');
-    //     LogService.start();
-    //   }
-    // }
+    }
   }
 
 }());

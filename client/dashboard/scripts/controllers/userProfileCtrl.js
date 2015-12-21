@@ -3,30 +3,32 @@
 (function () {
   'use strict';
 
-  function UserProfileCtrl($scope, $log, $location, UserService, $rootScope) {
+  function UserProfileCtrl($scope, $log, UserService, $rootScope) {
     var vm = this;
-    vm.profile = {};
+    // Function to return all keys in an object. Used in template
     vm.keys = UserService.keys;
+    vm.profile = {};
 
-    function init() {
-      $scope.id = angular.copy($scope.username);
-      $scope.tg = angular.copy($scope.tg);
-      console.log('userProfileCtrl.init. $scope is ', $scope);
-    }
-
-    init();
-
-    function activate() {
-      $log.debug('userProfileCtrl username is ', $scope.id);
-      UserService.getUser($scope.tg, $scope.id)
+    vm.activate = function activate() {
+      // Get current trustgroup of currentUser
+      var trustgroup = $rootScope.currentUser.currentTg;
+      // Specified when calling directive
+      vm.username = angular.copy($scope.username);
+      // Get info for the user. Must be in currentTg
+      UserService.getUser(trustgroup, vm.username)
       .then(function (reply) {
-        $log.debug('userProfileCtrl.js reply is ', reply);
         vm.profile = UserService.convertToDisplay(reply);
-        $log.debug('userProfileCtrl.js profile is ', vm.profile);
+      })
+      .catch(function (err) {
+        $log.debug('userProfileCtrl.activate error from getUser is ', err);
       });
-    }
+    };
 
-    activate();
+    vm.activate();
+
+    $scope.$on('switch-tg', function () {
+      vm.activate();
+    });
   }
 
   // Plug controller function into AngularJS
@@ -34,7 +36,7 @@
     .module('dimsDashboard.controllers')
     .controller('UserProfileCtrl', UserProfileCtrl);
 
-  UserProfileCtrl.$inject = ['$scope', '$log', '$location', 'UserService', '$rootScope'];
+  UserProfileCtrl.$inject = ['$scope', '$log', 'UserService', '$rootScope'];
 
 }());
 

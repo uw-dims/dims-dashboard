@@ -1,5 +1,7 @@
 'use strict';
 
+var _ = require('lodash-compat');
+
 var getSuccessReply = function getSuccessReply(data) {
   return {
     status: 'success',
@@ -32,4 +34,14 @@ var validRegex = function validRegex() {
 };
 
 exports.validRegex = validRegex;
+
+var getValidateError = function getValidateError(errors) {
+  var response = '';
+  _.forEach(errors, function (value, key) {
+    response += 'Validation error: ' + value.msg + ', value supplied: ' + value.value + ' ';
+  });
+  return response;
+};
+
+exports.getValidateError = getValidateError;
 
