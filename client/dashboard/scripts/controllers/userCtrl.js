@@ -13,7 +13,6 @@
         UserService.getUsers(vm.trustgroup)
         .then(function (reply) {
           vm.users = reply;
-          $log.debug('userCtrl getUsers reply', vm.users);
         });
       }
     }
@@ -22,9 +21,9 @@
       activate();
     });
 
-
     vm.getUser = function getUser(user) {
-      UserService.getUser(user)
+      vm.trustgroup = $scope.currentUser.currentTg;
+      UserService.getUser(vm.trustgroup, user)
       .then(function (reply) {
         vm.profile = UserService.convertToDisplay(reply);
       });

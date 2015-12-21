@@ -4,7 +4,7 @@
 angular.module('dimsDashboard.services')
 
   .factory('AttributeApi', function ($resource) {
-    return $resource('/api/attributes');
+    return $resource('/api/attributes/:id');
   })
 
   .factory('UserAttributesService', function (AttributeApi, $log, $q) {
@@ -12,7 +12,8 @@ angular.module('dimsDashboard.services')
     UserAttributesService.supportedTypes = function () {
       return {
         cidr: 'cidr',
-        domain: 'domain'
+        domain: 'domain',
+        tlp: 'tlp'
       };
     };
 
@@ -39,28 +40,25 @@ angular.module('dimsDashboard.services')
     };
 
     UserAttributesService.getAttributes = function getAttributes(user) {
-      $log.debug('userAttributesService.getAttributes for ', user);
-      return UserAttributesService.getAllAttributes()
-        .then(function (reply) {
-          $log.debug('userAttributesService.getAttributes reply from getAllAttributes', reply);
-          $log.debug(JSON.stringify(reply));
-          $log.debug(reply[user]);
-          return reply[user];
-        })
-        .catch(function (err) {
-          $log.error('UserAttributesService.getAttributes error ', err);
-          return new Error (err);
-        });
+      var deferred = $q.defer();
+      AttributeApi.get({
+        id: user
+      }, function (resource) {
+        deferred.resolve(resource.data);
+      }, function (err) {
+        $log.error('UserAttributesService.getAttributes failure callback err: ', err);
+        deferred.reject(err);
+      });
+      return deferred.promise;
     };
 
     UserAttributesService.getAllAttributes = function getAllAttributes() {
       var deferred = $q.defer();
       AttributeApi.get({},
         function (resource) {
-          $log.debug('UserAttributesService.getAttributes success callback data: ', resource.data);
           deferred.resolve(resource.data);
         }, function (err) {
-          $log.error('UserAttributesService.getAttributes failure callback err: ', err);
+          $log.error('UserAttributesService.getAllAttributes failure callback err: ', err);
           deferred.reject(err);
         });
       return deferred.promise;

@@ -1,49 +1,38 @@
 'use strict';
 
 // Attributes route - retrieve and update all attributes via REST api
-var yaml = require('js-yaml');
-var fs = require('fs');
-var path = require('path');
-var logger = require('../utils/logger')(module);
+var util = require('util');
 var validator = require('validator');
-var config = require('../config/config');
 var _ = require('lodash-compat');
+
+var logger = require('../utils/logger')(module);
+var config = require('../config/config');
 var resUtils = require('../utils/responseUtils');
 
 module.exports = function (Attributes, attributeService) {
   var attributes = {};
-  // Temporary
-  // var yamlPath = path.join(__dirname, '../bootstrap/userAttributes.yml');
 
-  // return attributes for all users
   attributes.list = function (req, res) {
     Attributes.getAllAttributes()
     .then(function (reply) {
       res.status(200).send(resUtils.getSuccessReply(reply));
     })
     .catch(function (err) {
-      res.status(400).send(resUtils.getErrorReply(err));
+      res.status(400).send(resUtils.getErrorReply(err.toString()));
     })
     .done();
   };
 
   // return attributes for a user
   attributes.show = function (req, res) {
-    // Old way we read data from a file
-    // try {
-    //   var doc = yaml.safeLoad(fs.readFileSync(yamlPath, 'utf8'));
-    //   res.status(200).send({data: doc});
-    // } catch (err) {
-    //   logger.error('Cannot read file at ' + yamlPath + '. Error: ', err);
-    //   return res.status(400).send(err);
-    // }
-    // Now using redis
-    var user = getUser(req);
-    if (user === -1) {
-      res.status(400).send(resUtils.getFailReply({
-        message: 'Invalid characters in username'
-      }));
+    req.checkParams('id', 'UserID contains invalid characters').matches(resUtils.validRegex());
+    var errors = req.validationErrors(true);
+    if (errors) {
+      logger.error('show validation errors: ', errors);
+      res.status(400).send(resUtils.getErrorReply(resUtils.getValidateError(errors)));
+      return;
     }
+    var user = req.params.id;
     var attributesFactory = Attributes.attributesFactory(user);
     attributesFactory.getAttributes(user)
     .then(function (reply) {
@@ -53,65 +42,39 @@ module.exports = function (Attributes, attributeService) {
       res.status(400).send(resUtils.getErrorReply(err));
     })
     .done();
-
   };
 
+  // config contained in body
+  // type: type of attribute
+  // action: add or remove
+  // items: array of items to add or remove
   attributes.update = function (req, res) {
-    var user = getUser(req);
-    var reqConfig = getConfig(req);
-    console.log('attribute route: req.params.id = ', req.params.id, user);
-    console.log('attribute route: req.body = ', req.body, reqConfig);
-    if (user === -1) {
-      res.status(400).send(resUtils.getFailReply({
-        message: 'Invalid characters in username'
-      }));
-    } else if (reqConfig === -1) {
-      res.status(400).send(resUtils.getFailReply({
-        message: 'Attribute type supplied was invalid'
-      }));
-    } else {
-      var attributesFactory = Attributes.attributesFactory(user);
-      attributesFactory.updateAttributes(user, reqConfig)
-      .then(function (reply) {
-        // Save the current attributes to file so ipgrep can access
-        return attributeService.attributesToFile();
-      })
-      .then(function (reply) {
-        logger.debug('update reply ', reply);
-        res.status(200).send(resUtils.getSuccessReply(null));
-      })
-      .catch(function (err) {
-        res.status(400).send(resUtils.getErrorReply(err));
-      })
-      .done();
+    var validActions = ['add', 'remove'];
+    req.checkParams('id', 'UserID contains invalid characters').matches(resUtils.validRegex());
+    req.checkBody('type', 'Request must contain valid type').isValidType(config.defaultAttributes);
+    req.checkBody('action', 'Request must contain valid action').isValidType(validActions);
+    req.checkBody('items', 'Request must contain items array').isArray();
+    var errors = req.validationErrors(true);
+    if (errors) {
+      logger.error('update validation errors: ', errors);
+      res.status(400).send(resUtils.getErrorReply(resUtils.getValidateError(errors)));
+      return;
     }
+    var promise = (req.body.action === 'add') ? Attributes.save(req.params.id, req.body.type, req.body.items) : Attributes.remove(req.params.id, req.body.type, req.body.items);
+    promise
+    .then(function (reply) {
+      // Save the current attributes to file so ipgrep can access
+      return attributeService.attributesToFile();
+    })
+    .then(function (reply) {
+      logger.debug('update reply ', reply);
+      res.status(200).send(resUtils.getSuccessReply(null));
+    })
+    .catch(function (err) {
+      res.status(400).send(resUtils.getErrorReply(err));
+    })
+    .done();
   };
-
-  // Will add validation/sanitization
-  // Todo: Add returning messages to the validation
-  function getConfig(req) {
-    var valid = true;
-    if (!req.body) {
-      return -1;
-    }
-    _.forEach(req.body, function (value, key) {
-      console.log(key);
-      if (!_.includes(config.defaultAttributes, key)) {
-        valid = false;
-      }
-    });
-    if (!valid) {
-      return -1;
-    }
-    return req.body;
-  }
-
-  function getUser(req) {
-    if (!validator.isAlphanumeric(req.params.id)) {
-      return -1;
-    }
-    return req.params.id;
-  }
 
   return attributes;
 };

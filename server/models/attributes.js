@@ -30,9 +30,17 @@ module.exports = function Attributes(client) {
   // Value is array - can be >= 0 entries
   // Since we're using sets and sorted sets, can use same function for save and create
   var save = function save(user, type, value) {
-    logger.debug('user=%s type=%s value=%s', user, type, value);
+    logger.debug('save: user=%s type=%s value=%s', user, type, value);
     return q.all([
       client.saddAsync(keyGen.attributeKey(user, type), value),
+      client.zaddAsync(keyGen.attributeSetKey(type), dimsUtils.createTimestamp(), keyGen.attributeKey(user, type))
+    ]);
+  };
+
+  var remove = function remove(user, type, value) {
+    logger.debug('remove: user=%s type=%s value=%s', user, type, value);
+    return q.all([
+      client.sremAsync(keyGen.attributeKey(user, type), value),
       client.zaddAsync(keyGen.attributeSetKey(type), dimsUtils.createTimestamp(), keyGen.attributeKey(user, type))
     ]);
   };
@@ -84,7 +92,7 @@ module.exports = function Attributes(client) {
         var k = 0;
         while (k < zipped.length) {
           if (k !== zipped.length - 1) {
-            if (zipped[k][0] === zipped[k+1][0]) {
+            if (zipped[k][0] === zipped[k + 1][0]) {
               merged.push((_.merge(zipped[k], zipped[k + 1])));
               k = k + 2;
             } else {
@@ -114,15 +122,13 @@ module.exports = function Attributes(client) {
     });
     return q.all(promises)
     .then(function (reply) {
-      logger.debug('return from getAttributes', reply);
       _.forEach(reply, function (value, index) {
-        logger.debug('value is ', value);
         _.assign(attributes[user], value);
       });
       return attributes;
     })
     .catch(function (err) {
-      logger.error('Could not get attributes for this user');
+      logger.error('Could not get attributes for this user', err);
       return new Error(err.toString());
     });
   };
@@ -134,7 +140,9 @@ module.exports = function Attributes(client) {
 
   return {
     attributesFactory: attributesFactory,
-    getAllAttributes: getAllAttributes
+    getAllAttributes: getAllAttributes,
+    save: save,
+    remove: remove
   };
 
 };

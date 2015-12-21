@@ -6,70 +6,11 @@
 var _ = require('lodash-compat');
 var logger = require('../utils/logger')(module);
 var resUtils = require('../utils/responseUtils');
+var util = require('util');
 
 module.exports = function (UserModel, userService) {
 
   var userRoute = {};
-
-  var processUsers = function processUsers(collection) {
-    var users = collection.toJSON();
-    var result = [];
-    users.forEach(function (user, index, array) {
-      result.push(reduceUser(user));
-    });
-    return result;
-  };
-
-  // Returns just what is needed for list of users
-  var reduceUser = function reduceUser(user) {
-    var result = {
-      username: user.ident,
-      name: user.descr,
-      tz: user.tz_info,
-      phone: user.tel_info,
-      sms: user.sms_info,
-      im: user.im_info
-    };
-    // Just send back first email for now:
-    result.email = user.email[0].email;
-    // result.email = [];
-    // user.email.forEach(function (email, index, array) {
-    //   result.email.push(email.email);
-    // });
-    return result;
-  };
-
-  // We're parsing here since Bookshelf is having issues getting related
-  // records when parsing in the model.
-  var parseUser = function parseUser(user) {
-    return {
-      username: user.ident,
-      name: user.descr,
-      affiliation: user.affiliation,
-      tz: user.tz_info,
-      im: user.im_info,
-      phone: user.tel_info,
-      sms: user.sms_info,
-      post: user.post_info,
-      bio: user.bio_info,
-      airport: user.airport,
-      entered: user.entered,
-      activity: user.activity,
-      isSysadmin: user.sysadmin,
-      image: user.image,
-      loginAttempts: user.login_attempts,
-      loginTryBegin: user.login_try_begin
-    };
-  };
-
-  var parseEmail = function parseEmail (attrs) {
-    return {
-        member: attrs.member,
-        email: attrs.email,
-        pgpkeyId: attrs.pgpkey_id,
-        pgpkeyExpires: attrs.pgpkey_expire
-      };
-  };
 
   /**
     * @description Returns list of all users
@@ -77,7 +18,13 @@ module.exports = function (UserModel, userService) {
     * Invoked via GET https://dashboard_url/api/user/
     */
   userRoute.list = function (req, res) {
-    logger.debug('in GET (list)');
+    req.checkQuery('tg', 'Trust group ID missing or invalid').matches(resUtils.validRegex());
+    var errors = req.validationErrors(true);
+    if (errors) {
+      logger.error('list validation errors: ', errors);
+      res.status(400).send(resUtils.getErrorReply(resUtils.getValidateError(errors)));
+      return;
+    }
     userService.getUsersInfo(req.query.tg)
     .then(function (reply) {
       res.status(200).send(resUtils.getSuccessReply(reply));
@@ -85,17 +32,7 @@ module.exports = function (UserModel, userService) {
     .catch(function (err) {
       res.status(400).send(resUtils.getErrorReply(err.toString()));
     })
-    // UserModel.Users.forge()
-    //   .fetch({ withRelated: ['email']})
-    //   .then(function (collection) {
-    //     //console.log(collection);
-    //     // console.log(collection.toJSON());
-    //     var reply = processUsers(collection);
-    //     res.status(200).send({data: reply});
-    //   }).catch(function (err) {
-    //     logger.error('list error:', err);
-    //     res.status(400).send(err.toString());
-    //   });
+    .done();
   };
 
   /**
@@ -104,22 +41,41 @@ module.exports = function (UserModel, userService) {
     * Invoked via GET https://dashboard_url/api/user/id
     */
   userRoute.show = function (req, res) {
-    logger.debug('in GET (show). id is ', req.params.id);
-    UserModel.User.forge({ident: req.params.id})
-      .fetch({require: true, withRelated: ['email']})
-      .then(function (user) {
-        user = user.toJSON();
-        // For now, just use first email in array.
-        var userResult = _.assign(parseUser(user), parseEmail(user.email[0]));
-        // userResult.email = [];
-        // user.email.forEach(function (email, index, array) {
-        //   userResult.email.push(parseEmail(email));
-        // });
-        res.status(200).send({data: userResult});
-      }).catch(function (err) {
-        logger.error('show error:', err);
-        res.status(400).send(err.toString());
-      });
+    req.checkQuery('tg', 'Trust group ID missing or invalid').matches(resUtils.validRegex());
+    req.checkParams('id', 'UserID contains invalid characters').matches(resUtils.validRegex());
+    var errors = req.validationErrors(true);
+    if (errors) {
+      logger.error('show validation errors: ', errors);
+      res.status(400).send(resUtils.getErrorReply(resUtils.getValidateError(errors)));
+      return;
+    }
+
+    userService.getUsersInfo(req.query.tg, req.params.id)
+    .then(function (reply) {
+      if (reply === undefined) {
+        res.status(404).send(resUtils.getErrorReply('The user you requested does not exist in the specified trust group.'));
+      } else {
+        res.status(200).send(resUtils.getSuccessReply(reply));
+      }
+    })
+    .catch(function (err) {
+      res.status(400).send(resUtils.getErrorReply(err.toString()));
+    })
+    .done();
   };
+
+  // Returns just what is needed for list of users - not used
+  var reduceUser = function reduceUser(user) {
+    var result = {
+      username: user.username,
+      name: user.name,
+      tz: user.tz_info,
+      phone: user.tel_info,
+      sms: user.sms_info,
+      im: user.im_info
+    };
+    return result;
+  };
+
   return userRoute;
 };

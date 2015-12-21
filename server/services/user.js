@@ -262,12 +262,6 @@ module.exports = function (UserModel, Bookshelf) {
         var result =  response.toJSON();
         _.omit(result, 'member');
         _.extend(userInfo, result);
-        // userInfo.pgpkey_id = result.pgpkey_id;
-        // userInfo.verified = result.verified;
-        // userInfo.pgpkey_expire = result.pgpkey_expire;
-        // userInfo.keyring = result.keyring;
-        // userInfo.keyring_update_at = result.keyring_update_at;
-        // userInfo.verify_token = result.verify_token;
         return applyMapping(userInfo, fieldMapping);
       })
       .catch(function (err) {
@@ -276,30 +270,6 @@ module.exports = function (UserModel, Bookshelf) {
       });
   };
 
-  // user is optional
-  // var getUsersInfo = function getUsersInfo(trustgroup, user) {
-  //   var promises = [],
-  //       param;
-  //   if (user !== undefined) {
-  //     param = [trustgroup, user];
-  //   } else {
-  //     param = [trustgroup];
-  //   }
-  //   return getUsersInitialInfo.apply(this, param)
-  //   .then(function (reply) {
-  //     console.log(reply);
-  //     // Iterate over result and get more info from Email model
-  //     // _.forEach(reply, function (value, index) {
-  //     //   promises.push(addEmailInfo(value));
-  //     // });
-  //     // return q.all(promises);
-  //     return reply;
-  //   })
-  //   .catch(function (err) {
-  //     logger.error(err);
-  //     throw new Error('userService.getUsersInfo: ', err);
-  //   });
-  // };
 
   // Throws error if not found
   // Returns ident, password, array of trustgroups
@@ -315,7 +285,6 @@ module.exports = function (UserModel, Bookshelf) {
       if (response === null) {
         throw new Error('User does not exist');
       }
-      // response = _.pick(response.toJSON(), 'ident', 'password', 'descr');
       result = applyMapping(response.toJSON(), authMapping[type]);
       return getUserAuthTg(result.username, type);
     })
@@ -344,8 +313,6 @@ module.exports = function (UserModel, Bookshelf) {
     return getAuthInfo(user, 'session');
   };
 
-  // Get login info
-
   // userService.getAllTrustgroups = getAllTrustgroups;
   // userService.getOneTrustgroup = getOneTrustgroup;
   // userService.getUsersByTrustgroup = getUsersByTrustgroup;
@@ -355,7 +322,6 @@ module.exports = function (UserModel, Bookshelf) {
   userService.getUserSession = getUserSession;
 
   return userService;
-
 };
 
 

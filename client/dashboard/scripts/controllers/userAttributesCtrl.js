@@ -8,8 +8,8 @@
     var vm = this;
     var columns = {
       cidr: 4,
-      domain: 1,
-      tlp: 1
+      domain: 2,
+      tlp: 3
     };
 
     vm.attributes = {};
@@ -17,22 +17,17 @@
     function activate() {
       UserAttributesService.getAttributes($rootScope.currentUser.username)
       .then(function (reply) {
-        vm.attributes = reply;
-        $log.debug('UserAttributeCtrl activate reply is ', vm.attributes);
-        $log.debug('cidr is ', UserAttributesService.supportedTypes().cidr);
+        vm.attributes = reply[$rootScope.currentUser.username];
         vm.cidrRows = format(vm.attributes, UserAttributesService.supportedTypes().cidr, columns.cidr);
-        $log.debug('vm.cidrRows ', vm.cidrRows);
+        vm.domainRows = format(vm.attributes, UserAttributesService.supportedTypes().domain, columns.domain);
+        vm.tlpRows = format(vm.attributes, UserAttributesService.supportedTypes().tlp, columns.tlp);
       });
     }
 
     activate();
 
     var format = function format(attributes, type, cols) {
-      $log.debug('type is ', type);
-      $log.debug('attributes is ', attributes);
-      $log.debug('cols is ', cols);
       if (attributes.hasOwnProperty(type)) {
-        $log.debug('cidr atts is ', attributes[type]);
         return UserAttributesService.formatAttribute(attributes[type], cols);
       } else {
         return [];

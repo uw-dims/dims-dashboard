@@ -95,6 +95,7 @@
       };
 
       vm.stop = function () {
+        $log.debug('LogMonitor Directive: stop')
         $scope.offListen();
         LogService.setRunning(vm.type, false);
       };
