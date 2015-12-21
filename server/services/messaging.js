@@ -87,8 +87,9 @@ module.exports = function (io) {
       messaging.amqp.on(getEventName(name, 'received'), function (msg) {
         // Socket emits message with data event (will go to client)
         messaging.sockets[name].socket.emit(getEventName(name, 'data'), msg);
-        // Stream to log file
-        saveMsg(msg, name);
+        // Stream to log file - will be saving these via some other
+        // mechanism to elasticsearch
+        // saveMsg(msg, name);
       });
       // Save events that are being listened to so we can remove them later
       messaging.fanoutEvents.push(getEventName(name, 'received'));
