@@ -28,7 +28,7 @@
       var vm = this;
 
       vm.buttonText = 'Turn on';
-      vm.linesMax = 5000;
+      vm.linesMax = 10000;
 
       var formatter = function formatter(message) {
         return message + '\n';

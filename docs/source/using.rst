@@ -16,8 +16,10 @@ sub-sections will go through the:
 
 ..
 
-The demo application is not using https, so you won't need to worry about
-certificates when logging in.
+The demo application is not currently using https, so you won't need to worry about
+certificates when logging in. Make sure you are logged out of the dashboard
+(if you are already logged in) and reload the login page if you are already
+on that page (to make sure your client has the latest version).
 
 Mitigation Scenario
 -------------------
@@ -34,13 +36,15 @@ The main dashboard will display.
 ..
 
 
-**Remediations are mitigation activities in the system** where the logged in
-user has IPs that are compromised and need to be remediated.
+**Remediations** are mitigation activities in the system where the logged in
+user (lparsons in the screenshots) has IPs that are compromised and
+need to be remediated.
 Currently the system contains one of these
 "Mitigation scenario" activities which was bootstrapped programmatically.
 
 **Hover over the graph to display data points.** Note the number of mitigated IPs
-at the most recent data point:
+at the most recent data point (the dates may differ than that in the
+screenshot):
 
 .. figure:: demo/remediations1.png
    :width: 100%
@@ -49,9 +53,9 @@ at the most recent data point:
 ..
 
 
-Click **View my IPs needing mitigation** link to display a modal window where the user can
+Click **View my IPs needing mitigation** link to display a modal window where you can
 submit IPs that have been mitigated. Right now the UI for this consists of the modal
-displaying all remaining IPs the user needs to address.
+displaying all remaining IPs you need to address.
 
 .. figure:: demo/view_my_ips.png
    :width: 100%
@@ -126,10 +130,9 @@ System health
 -------------
 
 The status area on the left is mostly static at present. However, a link to open
-the consul UI in a new tab is now present.
+the consul UI in a new tab exists.
 
-Click **Open Consul view** and the Consul UI will open in a new tab with the
-**nodes** tab selected.
+Click **Open Consul view**:
 
 .. figure:: demo/openconsul.png
   :width: 100%
@@ -137,30 +140,27 @@ Click **Open Consul view** and the Consul UI will open in a new tab with the
 
 ..
 
+and the Consul UI will open in a new tab with the
+**NODES** tab selected.
+
 .. figure:: demo/consului.png
   :width: 100%
   :align: center
 
 ..
 
+(You can demonstrate the Consul UI at this point if desired.)
+
 Live log streaming
 ------------------
 
-1. *Live log streams* - The live long monitoring is now a popup panel so as
-   to persist data across page views.
-   That means the buffers won't be cleared if you go to a different section on the
-   site (new page load).
+The live log monitoring is now a popup panel so as
+to persist data across page views.
+That means the buffers won't be cleared if you go to a different section on the
+site (e.g. new page load).
 
-   .. note::
 
-      I've changed the name in the title bar to *Live log streaming*. This is not
-      reflected in the screen shots. I've also changed the navigation bar so there is a menu
-      called **Logging**. The first item in the menu is **Live log streaming**.
-
-   ..
-
-   Click **Logging** in the Navigation bar and select **Live log streaming**.
-   The Live log streaming window anchored to the bottom of the window will display.
+1. Click **Logging** in the Navigation bar and select **Live log streaming**.
 
    .. figure:: demo/logmon1.png
       :width: 100%
@@ -168,19 +168,30 @@ Live log streaming
 
    ..
 
+   The Live log streaming window anchored to the bottom of the browser window will display.
+
+   .. figure:: demo/openstreaming.png
+      :width: 100%
+      :align: center
+
+   ..
+
+
    There are tabs for the log exchanges the server monitors. Each tab has a button to turn on/
    turn off that particular log monitor. The user can clear the buffer using the “Clear” button.
-   The user can hide the window by clicking the minimize button, and then maximize it by
-   clicking the maximize button.  Clicking the close button (X) turns off all monitors and
-   closes the window. The window can also be closed by clicking “Log Monitor” in the Nav bar.
+   The user can hide the window by clicking the minimize button (down arrow in title bar),
+   and then maximize it by
+   clicking the maximize button (up arrow).  Clicking the close button (X) turns off all monitors and
+   closes the window. The window can also be closed by clicking **Logging > Live log streaming**
+   in the Nav bar.
    (This is  a toggle - if the window is active, clicking it closes the window. If the
    window is closed, clicking the button opens the window.)
 
-   The Log Monitors window, like the Chat window, is independent of other page views.
+   The *Live log streaming* window, like the *Chat* window, is independent of other page views.
    So it will remain active even if you go to a different view via a menu or
    navigation button.
 
-2. Click on Devops tab and click button **Turn on Devops**
+2. Click on **Devops** tab and click button **Turn on Devops**
 
    .. figure:: demo/logmon2.png
       :width: 100%
@@ -199,7 +210,13 @@ Live log streaming
 
 
 4. You could start an activity that reports to devops via another program, or wait a
-   couple minutes and you’ll probably get info on Health
+   couple minutes and you’ll probably get info on Health:
+
+   .. figure:: demo/healthlog1.png
+      :width: 100%
+      :align: center
+
+   ..
 
 
 5. Click the minimize button:
@@ -233,7 +250,7 @@ Live log streaming
    users will display behind the streaming window. Minimize the streaming log display
    to view the users:
 
-   .. figure:: demo/minimize.png
+   .. figure:: demo/minimize2.png
       :width: 100%
       :align: center
 
@@ -248,8 +265,30 @@ Live log streaming
 Chat
 ----
 
-1. Click the chat icon in the Nav bar to open the chat window. Unless you’re
-   chatting with someone else who is logged in, there isn’t much to see (you can send messages to yourself).
+1. Click the chat icon in the Nav bar to open the chat window:
+
+   .. figure:: demo/clickchaticon.png
+      :width: 100%
+      :align: center
+
+   ..
+
+   Unless you’re
+   chatting with someone else who is logged in, there isn’t much to see (you can send messages to yourself however). Enter a message in the message area of the chat box and press **Enter** key.
+
+   .. figure:: demo/chat1.png
+      :width: 50%
+      :align: center
+
+   ..
+
+   The message you sent will appear in your chat window:
+
+   .. figure:: demo/chat2.png
+      :width: 50%
+      :align: center
+
+   ..
 
 ..
 
@@ -268,7 +307,7 @@ User display and trust groups
    The system remembers your last selection. If you have never selected a trust group,
    it will choose the first one in your list of trust groups when you first log in.
 
-2. Display your profile information by selection ``dittrich > Profile`` in the nav bar.
+2. Display your profile information by selecting ``dittrich > Profile`` in the nav bar.
    Note that the trust group info now displays in the profile.
 
    .. figure:: demo/dimstrustgroupinprofile.png
