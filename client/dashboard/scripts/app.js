@@ -3,7 +3,7 @@
 
 var dimsDashboardConfig = function ($routeProvider, $locationProvider, datepickerConfig, datepickerPopupConfig) {
   $routeProvider.when('/', {
-    controller: 'MainCtrl',
+    controller: 'MainCtrl as vm',
     templateUrl: 'views/partials/main.html'
   }).
   when('/uploadfile', {
