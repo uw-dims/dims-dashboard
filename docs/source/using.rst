@@ -9,6 +9,7 @@ Currently this section contains a demo runthrough with commentary. The following
 sub-sections will go through the:
 
 #. Mitigation Scenario
+#. System health
 #. Live log streaming
 #. Chat
 #. User display and trust group info - show users by trust group
@@ -24,8 +25,7 @@ Mitigation Scenario
 Go to ``demo.prisem.washington.edu`` and log in using your ops-trust username
 and password.
 
-The main dashboard will display. A static (for now) **System Status** summary
-is on the left.
+The main dashboard will display.
 
 .. figure:: demo/dashboard.png
    :width: 100%
@@ -119,6 +119,27 @@ UI display/functions (creating, sharing, subscribing) are currently in progress 
 not online
 (server side API and associated modules exist). The only thing you can see right
 now in the UI is the list of activities.
+
+..
+
+System health
+-------------
+
+The status area on the left is mostly static at present. However, a link to open
+the consul UI in a new tab is now present.
+
+Click **Open Consul view** and the Consul UI will open in a new tab with the
+**nodes** tab selected.
+
+.. figure:: demo/openconsul.png
+  :width: 100%
+  :align: center
+
+..
+
+.. figure:: demo/consului.png
+  :width: 100%
+  :align: center
 
 ..
 
