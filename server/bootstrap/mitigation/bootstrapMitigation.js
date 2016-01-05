@@ -91,16 +91,30 @@ var Bookshelf = diContainer.get('Bookshelf');
             i = i + numRemediate;
             currTime = moment().subtract(k, 'days').format('x');
             k = k - 1;
-            promises.push(mitigationService.remediate(ticketKey, currUser, currIps, currTime));
+            // promises.push(mitigationService.remediate(ticketKey, currUser, currIps, currTime));
+            promises.push({
+              ticketKey: ticketKey,
+              currUser: currUser,
+              currIps: currIps,
+              currTime: currTime
+            });
           }
         }
       });
-      return q.all(promises);
+      var lastPromise = promises.reduce(function (promise, config) {
+        return promise.then(function() {
+          return mitigationService.remediate(config.ticketKey, config.currUser, config.currIps, config.currTime);
+        });
+      }, q.resolve());
+      return lastPromise;
+      // return q.all(promises);
     })
     .then(function (reply) {
-      console.log('reply from q.all ', reply);
+      console.log('reply from lastPromise ', reply);
+      return mitigationService.getMitigated(ticketKey);
     })
     .then(function (reply) {
+      console.log('bootstrapMitigation. reply from getMitigatedData', reply);
       return client.quitAsync();
     })
     .then(function () {
