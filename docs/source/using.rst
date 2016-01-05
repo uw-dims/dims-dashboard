@@ -5,76 +5,96 @@ Using the Dashboard
 
 This section will introduce basic usage of the DIMS Dashboard.
 
-Currently this section contains a demo runthrough with commentary.
+Currently this section contains a demo runthrough with commentary. The following
+sub-sections will go through the:
 
-1. Go to ``demo.prisem.washington.edu`` and log in using your ops-trust username
-   and password.
+#. Mitigation Scenario
+#. Live log streaming
+#. Chat
+#. User display and trust group info - show users by trust group
 
-2. The main dashboard will display. A static (for now) **System Status** summary
-   is on the left.
+..
 
-  .. figure:: demo/dashboard.png
-     :width: 100%
-     :align: left
+The demo application is not using https, so you won't need to worry about
+certificates when logging in.
 
-  ..
+Mitigation Scenario
+-------------------
 
+Go to ``demo.prisem.washington.edu`` and log in using your ops-trust username
+and password.
 
-3. **Remediations** are mitigation activities in the system where the logged in
-   user has IPs that are compromised and need to be remediated.
-   Currently the system contains one of these
-   "Mitigation scenario" activities which was bootstrapped programmatically.
+The main dashboard will display. A static (for now) **System Status** summary
+is on the left.
 
-   Hover over the graph to display data points. Note the number of mitigated IPs
-   at the most recent data point:
+.. figure:: demo/dashboard.png
+   :width: 100%
+   :align: left
 
-   .. figure:: demo/remediations1.png
-     :width: 100%
-     :align: left
-
-   ..
-
-   Click “View my IPs needing mitigation” link to display a modal window where the user can
-   submit IPs that have been mitigated. Right now the UI for this consists of the modal
-   displaying all remaining IPs the user needs to address.
+..
 
 
-   .. figure:: demo/view_my_ips.png
-     :width: 100%
-     :align: left
+**Remediations are mitigation activities in the system** where the logged in
+user has IPs that are compromised and need to be remediated.
+Currently the system contains one of these
+"Mitigation scenario" activities which was bootstrapped programmatically.
 
-   ..
+**Hover over the graph to display data points.** Note the number of mitigated IPs
+at the most recent data point:
 
-   This mitigation activity has IPs that need to be remediated for the users
-   dittrich, lparsons, mboggess, and swarner. So your IPs will look different
-   than those in this figure.
+.. figure:: demo/remediations1.png
+   :width: 100%
+   :align: center
 
-   .. figure:: demo/remediations2.png
-     :width: 100%
-     :align: left
+..
 
-   ..
 
-   Check off some IPs indicating that they have been mitigated and click *Submit*.
+Click **View my IPs needing mitigation** link to display a modal window where the user can
+submit IPs that have been mitigated. Right now the UI for this consists of the modal
+displaying all remaining IPs the user needs to address.
 
-   .. figure:: demo/remediations3.png
-     :width: 100%
-     :align: left
+.. figure:: demo/view_my_ips.png
+   :width: 100%
+   :align: center
 
-   ..
+..
 
-   The modal window will close and the graph will be updated. Hover over the
-   last data point to verify. For this user, the total IPs mitigated is now 39.
+This mitigation activity has IPs that need to be remediated for the users
+dittrich, lparsons, mboggess, and swarner. So your IPs will look different
+than those in this figure.
 
-   .. figure:: demo/remediations4.png
-     :width: 100%
-     :align: left
+.. figure:: demo/remediations2.png
+   :width: 100%
+   :align: center
 
-   ..
+..
+
+
+
+**Check off some IPs indicating that they have been mitigated** and click *Submit*.
+
+.. figure:: demo/remediations3.png
+   :width: 100%
+   :align: center
+
+..
+
+
+The modal window will close and the graph will be updated. Hover over the
+last data point to verify. For this user, the total IPs mitigated is now 39.
+
+.. figure:: demo/remediations4.png
+   :width: 100%
+   :align: center
+
+..
+
+.. note::
 
    Currently, to start a new mitigation activity, a user will do so via the
    Dashboard (UI not available yet), using a form to submit the suspect IPs
-   that the user probably received on a Trident email list.  The system then automatically parses the list and bins the IPs according to attributes belonging
+   that the user probably received on a Trident email list.  The system then automatically
+   parses the list and bins the IPs according to attributes belonging
    to users, creating a new activity that will appear in the Remediations list for
    those users that are affected. There will also be some sort of notification.
    (In the future this creation would be automated by a service that can process
@@ -82,29 +102,30 @@ Currently this section contains a demo runthrough with commentary.
 
 ..
 
-4. The **Watching** section lists Activities that the user has subscribed to, either by
-   subscribing to a public activity created by someone else or by creating a new
-   activity.
+The **Watching** section lists Activities that the user has subscribed to, either by
+subscribing to a public activity created by someone else or by creating a new
+activity.
 
-   .. figure:: demo/activities.png
-     :width: 100%
-     :align: left
-
-   ..
-
-   Activities are collections of data, queries, etc. They can be public or
-   private.  If a user subscribes to a public activity, the user receives a notification
-   when new data is added to the activity. This is a first cut at the UI, and most of the
-   UI display/functions (creating, sharing, subscribing) are currently in progress and
-   not online
-   (server side API and associated modules exist).
-
-   I’m not sure how much more of the UI display of Activities I’ll get done by Tuesday,
-   but at least you can see the  list display.
+.. figure:: demo/activities.png
+  :width: 100%
+  :align: center
 
 ..
 
-5. *Live log streams* - The live long monitoring is now a popup panel so as
+Activities are collections of data, queries, etc. They can be public or
+private.  If a user subscribes to a public activity, the user receives a notification
+when new data is added to the activity. This is a first cut at the UI, and most of the
+UI display/functions (creating, sharing, subscribing) are currently in progress and
+not online
+(server side API and associated modules exist). The only thing you can see right
+now in the UI is the list of activities.
+
+..
+
+Live log streaming
+------------------
+
+1. *Live log streams* - The live long monitoring is now a popup panel so as
    to persist data across page views.
    That means the buffers won't be cleared if you go to a different section on the
    site (new page load).
@@ -120,42 +141,150 @@ Currently this section contains a demo runthrough with commentary.
    Click **Logging** in the Navigation bar and select **Live log streaming**.
    The Live log streaming window anchored to the bottom of the window will display.
 
+   .. figure:: demo/logmon1.png
+      :width: 100%
+      :align: center
 
-   There are tabs for the log exchanges the server monitors. Each tab has a button to turn on/turn off that particular log monitor. The user can clear the buffer using the “Clear” button. The user can hide the window by clicking the minimize button, and then maximize it by clicking the maximize button.  Clicking the close button (X) turns off all monitors and closes the window. The window can also be closed by clicking “Log Monitor” in the Nav bar. (This is  a toggle - if the window is active, clicking it closes the window. If the window is closed, clicking the button opens the window.)
+   ..
 
-   The Log Monitors window, like the Chat window, is independent of other page views. So it will remain active even if you go to a different view via a menu or navigation button.
+   There are tabs for the log exchanges the server monitors. Each tab has a button to turn on/
+   turn off that particular log monitor. The user can clear the buffer using the “Clear” button.
+   The user can hide the window by clicking the minimize button, and then maximize it by
+   clicking the maximize button.  Clicking the close button (X) turns off all monitors and
+   closes the window. The window can also be closed by clicking “Log Monitor” in the Nav bar.
+   (This is  a toggle - if the window is active, clicking it closes the window. If the
+   window is closed, clicking the button opens the window.)
 
-   So, clicking on Devops tab and click button “Turn on Devops":
+   The Log Monitors window, like the Chat window, is independent of other page views.
+   So it will remain active even if you go to a different view via a menu or
+   navigation button.
 
-   Do the same for Health:
+2. Click on Devops tab and click button **Turn on Devops**
 
-   You could start an activity that reports to devops, or wait a couple minutes and you’ll probably get info on Health:
+   .. figure:: demo/logmon2.png
+      :width: 100%
+      :align: center
+
+   ..
+
+   .. figure:: demo/logmon3.png
+      :width: 100%
+      :align: center
+
+   ..
 
 
-   Click the minimize button:
+3. Do the same for Health - click on Health tab and click button **Turn on Health**
+
+
+4. You could start an activity that reports to devops via another program, or wait a
+   couple minutes and you’ll probably get info on Health
+
+
+5. Click the minimize button:
+
+   .. figure:: demo/minimize.png
+      :width: 100%
+      :align: center
+
+   ..
 
    and the logs will minimize to the bottom of the window.
 
-   Then click maximize to open it again. The messages will still be there (maybe more).
+6. Then click maximize to open it again.
 
-   You can go to different locations in the app without clearing the log buffers. So go to Users > Find DIMS users for example:
+   .. figure:: demo/maximize1.png
+      :width: 100%
+      :align: center
 
-   (I didn’t show the result since there is personal data in the show users function.)
+   ..
 
-   Minimize the log display to view the results.
+   The messages will still be there (maybe more).
 
-   You can clear the log buffers individually by clicking “Clear” in a log tab. To clear all the buffers and close the display, click the “Log Monitor” link in the nav bar or just click the “X” in the monitor window title bar.
+   .. figure:: demo/maximize2.png
+      :width: 100%
+      :align: center
+
+   ..
+
+   You can go to different locations in the app without clearing the log buffers. So go to
+   **Users > Find DIMS users** to display users in your current trust group. The
+   users will display behind the streaming window. Minimize the streaming log display
+   to view the users:
+
+   .. figure:: demo/minimize.png
+      :width: 100%
+      :align: center
+
+   ..
+
+7. You can clear the log buffers individually by clicking **Clear** in a log tab.
+   To clear all the buffers and close the display, click the **Log Monitor** link in
+   the nav bar or just click the **X** in the monitor window title bar.
 
 ..
 
-6. Chat - click the chat icon in the Nav bar to open the chat window. Unless you’re
+Chat
+----
+
+1. Click the chat icon in the Nav bar to open the chat window. Unless you’re
    chatting with someone else who is logged in, there isn’t much to see (you can send messages to yourself).
 
 ..
 
-7. User information - I haven’t had time yet to update the UI to handle the new
-   information it can get from the server regarding the user’s trust groups, and the Attributes are still in a different tab than the profile data (not sure if I will have time to put them in the same tab by Tuesday or not - I will try). But you can show that the Dashboard displays User information collected from various sources in one UI.
+User display and trust groups
+-----------------------------
 
-   Get your user information via dittrich > Profile on the left side of the nav bar.
+1. Note that the name of the trust group you are logged into displays on the menu
+   bar:
 
+   .. figure:: demo/tginnavbar.png
+      :width: 100%
+      :align: center
+
+   ..
+
+   The system remembers your last selection. If you have never selected a trust group,
+   it will choose the first one in your list of trust groups when you first log in.
+
+2. Display your profile information by selection ``dittrich > Profile`` in the nav bar.
+   Note that the trust group info now displays in the profile.
+
+   .. figure:: demo/dimstrustgroupinprofile.png
+      :width: 100%
+      :align: center
+
+   ..
+
+3. Change your trust group by clicking on the current trust group in the nav bar and
+   selecting an option that displays in the menu. (If you are only in one trust group
+   then no options will display.)
+
+   .. figure:: demo/changetrustgroup1.png
+      :width: 100%
+      :align: center
+
+   ..
+
+4. Note that the trust group listed in your profile will change to the current
+   trust group:
+
+   .. figure:: demo/maintrustgroup.png
+      :width: 100%
+      :align: center
+
+   ..
+
+5. To see the users in your currently selected trust group, select
+   ``Users > Find DIMS Users`` on the nav bar. The list of users in the current trust
+   group will display.
+
+6. Again, change the trust group via the trust group menu in the nav bar. The list of
+   users will change to reflect the users in the new current trust group.
+
+   .. figure:: demo/changetodims.png
+      :width: 100%
+      :align: center
+
+   ..
 
