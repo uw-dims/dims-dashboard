@@ -5,7 +5,7 @@
   "private": true,
   "dependencies": {
     "javascript-natural-sort": "^0.7.1",
-    "lodash": "~2.4.1",
+    "lodash-compat": "^3.10.0",
     "angular-checkboxes": "^1.0.2"
   },
   "devDependencies": {

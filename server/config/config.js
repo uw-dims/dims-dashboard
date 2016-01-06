@@ -201,6 +201,12 @@ config.sockets = {
     'receive': false,
     'send': true,
     'publish': false
+  },
+  'dimstr': {
+    'ioPath': '/dimstr',
+    'receive': false,
+    'send': true,
+    'publish': false
   }
 };
 
