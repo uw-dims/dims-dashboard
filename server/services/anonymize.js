@@ -21,7 +21,7 @@ var fs = require('fs');
   * @param {string} user  ID of logged in user
   */
 
-module.exports = function (UserSettings) {
+module.exports = function () {
 
   var anonymize = {};
 
@@ -69,61 +69,60 @@ module.exports = function (UserSettings) {
     return deferred.promise;
   };
 
-  /** Sets up the inputArray. Returns promise with inputArray */
-  var _setInputs = function (params, id) {
+  /** Returns the initial inputArray */
+  var _setInputs = function (params, rpcDebug, rpcVerbose) {
 
-    var deferred = q.defer();
-    logger.debug('services/anonymize._setInputs start: type ', params.type, ' id ', id, ' stats ', params.stats);
+    logger.debug('services/anonymize._setInputs start: type ', params.type, ' stats ', params.stats, 'rpcDebug', rpcDebug, 'rpcVerbose', rpcVerbose);
     // console.log(params);
     var rpcQueuebase = config.rpcQueueNames.anon,
         rpcClientApp = 'anon_client',
-        ipgrepApp = 'ipgrep';
+        ipgrepApp = 'ipgrep',
+        inputArray;
 
     if (params.type === 'ipgrep') {
       // Need to fix this - not currently using it
       var inputArray = [config.bin + ipgrepApp, '-a', '--context', '-v', '-n', '/etc/ipgrep_networks.yml'];
-      deferred.resolve(inputArray);
     } else {
-      logger.debug('services/anonymize._setInputs. Not ipgrep, so get settings for ', id);
-      UserSettings.getUserSettings(id).then(function (reply) {
-          var settings = reply.settings;
-          logger.debug('service/anonymize._setInputs settings are ', settings);
-          var inputArray = [config.rpcbin + rpcClientApp, '--server', config.rpcServer,
-              '--queue-base', rpcQueuebase];
-          if (settings.rpcDebug === 'true') {
-            inputArray.push ('--debug');
-          }
-          if (settings.rpcVerbose === 'true') {
-            inputArray.push ('--verbose');
-          }
-          if (params.stats === 'true') {
-            inputArray.push('-s');
-          }
-          if (params.outputType === 'json') {
-            inputArray.push('-J');
-          }
-          if (params.mapName !== undefined) {
-            inputArray.push('-m');
-            inputArray.push(params.mapName);
-          } else {
-            // This may be temporary - anon service is not working with new .yml file in /etc
-            // so we will explicitly require it
-            inputArray.push('-m');
-            inputArray.push('/etc/ipgrep_networks.yml');
-          }
-          deferred.resolve(inputArray);
-        });
+      // logger.debug('services/anonymize._setInputs. Not ipgrep, so get settings for ', id);
+      // UserSettings.getUserSettings(id).then(function (reply) {
+      // var settings = reply.settings;
+      // logger.debug('service/anonymize._setInputs settings are ', settings);
+      var inputArray = [config.rpcbin + rpcClientApp, '--server', config.rpcServer,
+          '--queue-base', rpcQueuebase];
+      if (rpcDebug === 'true') {
+        inputArray.push ('--debug');
       }
-      return deferred.promise;
+      if (rpcVerbose === 'true') {
+        inputArray.push ('--verbose');
+      }
+      if (params.stats === 'true') {
+        inputArray.push('-s');
+      }
+      if (params.outputType === 'json') {
+        inputArray.push('-J');
+      }
+      if (params.mapName !== undefined) {
+        inputArray.push('-m');
+        inputArray.push(params.mapName);
+      } else {
+        // This may be temporary - anon service is not working with new .yml file in /etc
+        // so we will explicitly require it
+        inputArray.push('-m');
+        inputArray.push('/etc/ipgrep_networks.yml');
+      }
+    }
+    return inputArray;
   };
 
-  var setup = function setup(params, user) {
-    var deferred = q.defer();
+  // Returns promise with inputArray
+  var setup = function setup(params, rpcDebug, rpcVerbose) {
+    // var deferred = q.defer();
 
-    var data = params.data;
-    var id = user;
+    var data = params.data,
+        inputArray;
+    // var id = user;
 
-    logger.debug('services/anonymize.setup start. id is ', id);
+    // logger.debug('services/anonymize.setup start. id is ', id);
 
     if (!params.useFile) {
       logger.debug('services/anonymize.setup - not using file');
@@ -132,15 +131,9 @@ module.exports = function (UserSettings) {
       }
       // logger.debug('services/anonymize.setup - data is ', data);
     }
-
-    _setInputs(params, id).then(function (inputArray) {
-      logger.debug('services/anonymize.setup setInputs returned ', inputArray);
-      return _setFileInput(inputArray, params.type, params.useFile, data);
-
-    }).then(function (reply) {
-      deferred.resolve(reply);
-    });
-    return deferred.promise;
+    inputArray = _setInputs(params, rpcDebug, rpcVerbose);
+    logger.debug('services/anonymize.setup setInputs returned ', inputArray);
+    return _setFileInput(inputArray, params.type, params.useFile, data);
   };
 
   anonymize.setup = setup;
