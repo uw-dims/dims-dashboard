@@ -78,6 +78,7 @@ var Bookshelf = diContainer.get('Bookshelf');
       var userData = [];
       var simStartTime = moment().subtract(k + 1, 'days').format('x');
       var simEndTime = moment().subtract(1, 'days').format('x');
+      var chunkSize = 4;
       console.log('start and end time are ', simStartTime, simEndTime);
       _.forEach(options, function (value, index) {
         var userNumIps = userIps[index].length,
@@ -91,15 +92,15 @@ var Bookshelf = diContainer.get('Bookshelf');
         // start days out
         i = 0;
         var currLength = userNumIps;
-        if (maxRemediate > 5) {
-          var currRemediate = getRandom(1, Math.floor(maxRemediate / 5));
+        if (maxRemediate > chunkSize) {
+          var currRemediate = getRandom(1, Math.floor(maxRemediate / chunkSize));
           while (currRemediate >= 1 && i < maxRemediate) {
             console.log('in while, currRemediate is ', currRemediate, 'i is ', i);
             var currIps = _.slice(userIps[index], i, i + currRemediate);
             userData.push({ticketKey: ticketKey, currUser: currUser, currIps: currIps, currTime: getRandom(simStartTime, simEndTime)});
             i = i + currRemediate;
             currLength = currLength - currRemediate;
-            currRemediate = getRandom(1, Math.floor(maxRemediate / 5));
+            currRemediate = getRandom(1, Math.floor(maxRemediate / chunkSize));
           }
         }
         userData = _.sortBy(userData, 'currTime');

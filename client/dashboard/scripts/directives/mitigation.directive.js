@@ -21,7 +21,7 @@
     function controllerFunc($scope) {
       var vm = this;
 
-      var getGraphOptions = function getGraphOptions(metadata) {
+      var getGraphOptions = function getGraphOptions(metadata, trendline) {
         var options = {
           xLabel: 'Time',
           yLabel1: 'Total Mitigated out of known',
@@ -35,7 +35,8 @@
           yMax1: 0,
           yMin1: metadata.initialNum - metadata.unknownNum,
           yMax2: 0,
-          yMin2: metadata.initialNum
+          yMin2: metadata.initialNum,
+          trendline: trendline
         };
         $log.debug('vm.getGraphOptions', options);
         return options;
@@ -45,7 +46,7 @@
       var addOptions = function addOptions(data) {
         var result = [];
         _.forEach(data, function (value, index) {
-          value.graphOptions = getGraphOptions(value.metadata);
+          value.graphOptions = getGraphOptions(value.metadata, value.trendline);
           result.push(value);
         });
         return data;
