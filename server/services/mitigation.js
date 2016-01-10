@@ -110,6 +110,7 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
       result.metadata.initialNum = reply[3];
       result.metadata.unknownNum = reply[4];
       result.metadata.mitigatedNum = reply[5];
+      console.log(result.data);
       return result;
     })
     .catch(function (err) {
@@ -369,20 +370,20 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
       var mappedKeys = reply;
       return store.listItemsWithScores(mappedKeys.data);
     })
+    .then(function (reply) {
+      return formatData(reply);
+    })
     .catch(function (err) {
       throw err;
     });
   };
 
-  // Formats data - but we'll let the client do it for now
+  // Formats data to array of [x, y]
   var formatData = function formatData(data) {
     var result = [];
     var chunked = _.chunk(data, 2);
     _.forEach(chunked, function (value, index) {
-      result.push({
-        x: value[1],
-        y: value[0]
-      });
+      result.push([_.parseInt(value[1]), _.parseInt(value[0])]);
     });
     return result;
   };

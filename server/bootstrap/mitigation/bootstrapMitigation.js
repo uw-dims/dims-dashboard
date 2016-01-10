@@ -49,13 +49,14 @@ var Bookshelf = diContainer.get('Bookshelf');
     var k = 30;
     var i = 0;
     var submitTime = moment().subtract(k + 1, 'days').format('x');
-    var submitDisplayTime = moment().subtract(k + 1, 'days').format('L');
+    var submitDisplayTime = moment().subtract(k + 2, 'days').format('L');
     var user1 = options[0];
     var user2 = options[1];
     var description = 'IPs needing mitigation. As you mitigate IPs, submit them here.';
 
     var getRandom = function getRandom(min, max) {
-      return Math.floor(Math.random() * (max - min + 1) + min);
+      // Note we multiply by 1 to make sure min is interpreted as number
+      return Math.floor(Math.random() * (max - min + 1)) + (min * 1);
     };
 
     var ipData = fs.readFileSync(ipPath, {encoding: 'utf-8'});
@@ -74,59 +75,34 @@ var Bookshelf = diContainer.get('Bookshelf');
     .then(function (reply) {
       var userIps = reply;
       console.log('userIps in reply are', userIps);
-      var promises = [];
       var userData = [];
-      var simStartTime = moment().subtract(k, 'days').format('x');
-      var simEndTime = submitTime;
+      var simStartTime = moment().subtract(k + 1, 'days').format('x');
+      var simEndTime = moment().subtract(1, 'days').format('x');
       console.log('start and end time are ', simStartTime, simEndTime);
       _.forEach(options, function (value, index) {
         var userNumIps = userIps[index].length,
-          numRemediate,
-          maxSlices= 10,
-          currTime,
-          currSlice = 0,
-          lastSlice = 0,
           currUser = value;
         console.log('num user Ips for %s is %s ', currUser, userNumIps);
-         // What we will remediate per day (70%)
-        var maxRemediate = Math.floor(7 * userNumIps / 10);
+        // What we will remediate per day (60%)
+        var maxRemediate = Math.floor(6 * userNumIps / 10);
         console.log('maxRemediate is ', maxRemediate);
         // numRemediate = Math.floor((3 * userNumIps / 5) / maxDays);
         // console.log('numRemediate for this user is ', numRemediate);
         // start days out
         i = 0;
-        var l = 1;
         var currLength = userNumIps;
         if (maxRemediate > 5) {
           var currRemediate = getRandom(1, Math.floor(maxRemediate / 5));
-          while (currRemediate >= 1 && i < maxRemediate ) {
+          while (currRemediate >= 1 && i < maxRemediate) {
             console.log('in while, currRemediate is ', currRemediate, 'i is ', i);
-            var currIps = _.slice(userIps[index], i, i + currRemediate - 1);
-            userData.push({ticketKey: ticketKey, currUser: currUser, currIps: currIps, currTime: getRandom(simEndTime, simStartTime)});
+            var currIps = _.slice(userIps[index], i, i + currRemediate);
+            userData.push({ticketKey: ticketKey, currUser: currUser, currIps: currIps, currTime: getRandom(simStartTime, simEndTime)});
             i = i + currRemediate;
-            // l = l + currRemediate;
             currLength = currLength - currRemediate;
             currRemediate = getRandom(1, Math.floor(maxRemediate / 5));
           }
         }
-        console.log('unsorted userData is ', userData);
         userData = _.sortBy(userData, 'currTime');
-        console.log('sorted user data is ', userData);
-        // if (numRemediate > 0) {
-        //   for (var j = 0; j < maxDays; j++) {
-        //     var currIps = _.slice(userIps[index], i, i + numRemediate - 1);
-        //     i = i + numRemediate;
-        //     currTime = moment().subtract(k, 'days').format('x');
-        //     k = k - 1;
-        //     // promises.push(mitigationService.remediate(ticketKey, currUser, currIps, currTime));
-        //     promises.push({
-        //       ticketKey: ticketKey,
-        //       currUser: currUser,
-        //       currIps: currIps,
-        //       currTime: currTime
-        //     });
-        //   }
-        // }
       });
       var lastPromise = userData.reduce(function (promise, config) {
         return promise.then(function () {

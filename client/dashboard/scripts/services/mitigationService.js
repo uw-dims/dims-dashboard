@@ -29,25 +29,68 @@
 
     // Formats data - but we'll let the client do it for now
     var formatData = function formatData(data) {
+      console.log('formatData data', data);
       var result = [];
-      var chunked = _.chunk(data, 2);
-      _.forEach(chunked, function (value, index) {
+      // var chunked = _.chunk(data, 2);
+      // _.forEach(chunked, function (value, index) {
+      _.forEach(data, function (value, index) {
         result.push({
-          x: value[1],
-          y: value[0]
+          x: _.parseInt(value[0]),
+          y: _.parseInt(value[1])
         });
       });
       return result;
     };
 
+    var getTrendline = function getTrendline(data) {
+      console.log('in trendline, data', data);
+      var knownX = [];
+      var knownY = [];
+      _.forEach(data, function (value) {
+        knownX.push(value[0]);
+        knownY.push(value[1]);
+      });
+      return linearRegression(knownX, knownY);
+    };
+
     var parseResponse = function parseResponse(response) {
       var result = [];
       _.forEach(response, function (value, index) {
-        value.data = formatData(parseData(value.data));
-        result.push(value);
+        // value.data = formatData(parseData(value.data));
+        var item = _.extend({}, value);
+        console.log('item', item);
+        item.data = formatData(value.data);
+        item.trendline = getTrendline(value.data);
+        result.push(item);
       });
       return result;
     };
+
+    //http://trentrichardson.com/2010/04/06/compute-linear-regressions-in-javascript/
+    var linearRegression = function linearRegression(y,x){
+      var lr = {};
+      var n = y.length;
+      var sum_x = 0;
+      var sum_y = 0;
+      var sum_xy = 0;
+      var sum_xx = 0;
+      var sum_yy = 0;
+
+      for (var i = 0; i < y.length; i++) {
+
+        sum_x += x[i];
+        sum_y += y[i];
+        sum_xy += (x[i]*y[i]);
+        sum_xx += (x[i]*x[i]);
+        sum_yy += (y[i]*y[i]);
+      }
+
+      lr['slope'] = (n * sum_xy - sum_x * sum_y) / (n*sum_xx - sum_x * sum_x);
+      lr['intercept'] = (sum_y - lr.slope * sum_x)/n;
+      lr['r2'] = Math.pow((n*sum_xy - sum_x*sum_y)/Math.sqrt((n*sum_xx-sum_x*sum_x)*(n*sum_yy-sum_y*sum_y)),2);
+
+      return lr;
+  };
 
     var mitigationService = {
       getMitigation: function () {
@@ -57,7 +100,6 @@
           type: 'mitigation'
         },
           function (resource) {
-            $log.debug('MitigationService.getMitigation success callback data', resource.data);
             var result = parseResponse(resource.data);
             // Return the result
             deferred.resolve(result);

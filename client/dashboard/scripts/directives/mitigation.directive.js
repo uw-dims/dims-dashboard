@@ -24,13 +24,18 @@
       var getGraphOptions = function getGraphOptions(metadata) {
         var options = {
           xLabel: 'Time',
-          yLabel: 'Total IPs Mitigated',
-          key: 'Total IPs',
-          withFocus: false,
+          yLabel1: 'Total Mitigated out of known',
+          yLabel2: 'Total Mitigated out of all',
+          key1: 'Mitigated Known',
+          key2: 'Mitigated All',
+          withFocus: true,
           initialNum: metadata.initialNum,
           unknownNum: metadata.unknownNum,
-          mitigatedNum: metadata.mitigatedNum
-
+          mitigatedNum: metadata.mitigatedNum,
+          yMax1: 0,
+          yMin1: metadata.initialNum - metadata.unknownNum,
+          yMax2: 0,
+          yMin2: metadata.initialNum
         };
         $log.debug('vm.getGraphOptions', options);
         return options;
@@ -49,6 +54,7 @@
       var getMitigation = function getMitigation() {
         MitigationService.getMitigation()
         .then(function (reply) {
+          console.log('directive getMitigation reply', reply);
           vm.data = addOptions(reply);
         })
         .catch(function (err) {

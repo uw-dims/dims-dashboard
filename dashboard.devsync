@@ -22,6 +22,8 @@ SOURCE=${SOURCE:="$HOME"}
 OWNER=${OWNER:="dims"}
 
 sudo rsync -ah --exclude '.git' --exclude 'node_modules' --exclude 'public' --exclude 'logs' --exclude '.DS*' --exclude '*.css' --exclude 'bower_components' ${SOURCE}/dims-dashboard/ ${DEST}/dims-dashboard/
+# If we want to mirror how actual install done - rsync the node_modules
+# sudo rsync -ah --exclude '.git' --exclude 'public' --exclude 'logs' --exclude '.DS*' --exclude '*.css'  ${SOURCE}/dims-dashboard/ ${DEST}/dims-dashboard/
 # So user running grunt can configure
 sudo chown -R $USER:$USER ${DEST}/dims-dashboard
 cd ${DEST}/dims-dashboard/client
