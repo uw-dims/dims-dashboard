@@ -23,49 +23,65 @@
     function controllerFunc($scope) {
       var vm = this;
 
-      var getTrendPoints = function getTrendPoints(trendline, xInt, yMax) {
-        var points = [];
-        points.push({
-          x: xInt,
-          y: 0
-        });
-        points.push({
-          x: getFinalVal(yMax, trendline),
-          y: yMax
-        });
-        return points;
-
+      var getTrendX = function getTrendX(trendline, y) {
+        return Math.floor((y - trendline.intercept) / trendline.slope);
       };
 
-      var getFinalVal = function getFinalVal(y, trendline) {
-        return Math.floor((y - trendline.intercept) / trendline.slope);
+      var getTrendY = function getTrendY(trendline, x) {
+        return Math.floor(x * trendline.slope + trendline.intercept);
       };
 
       // This plots one set of data on two different axis, plus a trendline
       function init() {
         vm.graphOptions = angular.copy($scope.options);
-        vm.data = angular.copy($scope.data);
+        vm.dataKnown = angular.copy($scope.data);
+        vm.dataAll = angular.copy($scope.data);
         $log.debug('graphOptions', vm.graphOptions);
+        // vm.trendPoints = [{
+        //   x: vm.data[0].x,
+        //   y: 0
+        // }, {
+        //   x: vm.data[vm.data.length - 1].x,
+        //   y: getTrendY(vm.graphOptions.trendline, vm.data[vm.data.length - 1].x)
+        // }];
+        // For using estimated endpoint - not used since there is a bug in the graph library
+        vm.trendPoints = [{
+          x: vm.dataKnown[0].x,
+          y: 0
+        }, {
+          x: getTrendX(vm.graphOptions.trendline, vm.graphOptions.initialNum - vm.graphOptions.unknownNum),
+          y: vm.graphOptions.initialNum - vm.graphOptions.unknownNum
+        }];
         // Need two arrays of data - will plot twice on two axes
-        vm.graphData = [{
-          values: vm.data,
-          key: vm.graphOptions.key1,
+        vm.graphData = [];
+
+        vm.graphData.push({
+          values: vm.dataAll,
+          key: vm.graphOptions.keyAll,
           yAxis: 2,
           type: 'line'
-        }];
+        });
         vm.graphData.push({
-          values: vm.data,
-          key: vm.graphOptions.key2,
+          values: vm.trendPoints,
+          key: 'Trend for ' + vm.graphOptions.keyAll,
+          yAxis: 2,
+          type: 'line'
+        });
+        vm.graphData.push({
+          values: vm.dataKnown,
+          key: vm.graphOptions.keyKnown,
           yAxis: 1,
           type: 'line'
         });
         // Trendline
         vm.graphData.push({
-          values: getTrendPoints(vm.graphOptions.trendline, vm.data[0].x, vm.graphOptions.initialNum - vm.graphOptions.unknownNum),
-          key: 'Trend for ' + vm.graphOptions.key1,
-          yAxis: 2,
+          values: vm.trendPoints,
+          key: 'Trend for ' + vm.graphOptions.keyKnown,
+          yAxis: 1,
           type: 'line'
         });
+        
+        
         console.log('end of init. graphData: ', vm.graphData);
       }
 
@@ -88,41 +104,49 @@
         };
       };
 
+      vm.xTooltipFunction = function () {
+        return function (d) {
+          return d3.time.format('%b %-d, %Y %I:%M%p')(new Date(d));
+        };
+      };
+
       $log.debug('graphData', vm.graphData);
 
       nv.addGraph(function () {
         var chart = nv.models.multiChart()
           .options({
-            withFocus: false
+            withFocus: false,
+            interpolate: 'linear'
           })
           .margin({top: 30, right: 80, bottom: 60, left: 80})
           .color(d3.scale.category10().range());
 
-        if (vm.graphOptions.hasOwnProperty('yMax1') && vm.graphOptions.hasOwnProperty('yMin1')) {
-          chart.yDomain1([vm.graphOptions.yMin1, vm.graphOptions.yMax1]);
-        }
+        // chart.yDomain1([0, vm.graphOptions.initialNum]);
+        // chart.yDomain2([0, vm.graphOptions.initialNum - vm.graphOptions.unknownNum]);
 
-        if (vm.graphOptions.hasOwnProperty('yMax2') && vm.graphOptions.hasOwnProperty('yMin2')) {
-          chart.yDomain2([vm.graphOptions.yMin2, vm.graphOptions.yMax2]);
-        }
+        // Start with 0
+        chart.yDomain2([vm.graphOptions.initialNum, 0]);
+        chart.yDomain1([vm.graphOptions.initialNum - vm.graphOptions.unknownNum, 0]);
+
 
         chart.xAxis
           .tickFormat(vm.xAxisTickFormatFunction())
           .tickPadding(16)
-          .axisLabel(vm.graphOptions.xLabel);
+          .axisLabel(vm.graphOptions.xLabel)
+          .showMaxMin(false);
         // Need to explicitly set here - may be a bug in nvd3 for multichart as is should use the format
         // function for the x axis by default.
-        chart.tooltip.headerFormatter(vm.xAxisTickFormatFunction());
+        chart.tooltip.headerFormatter(vm.xTooltipFunction());
 
         chart.yAxis1
           .tickFormat(vm.yAxisTickFormatFunction())
           .tickPadding(8)
-          .axisLabel(vm.graphOptions.yLabel1);
+          .axisLabel(vm.graphOptions.yLabelKnown);
 
         chart.yAxis2
           .tickFormat(vm.yAxisTickFormatFunction())
           .tickPadding(8)
-          .axisLabel(vm.graphOptions.yLabel2);
+          .axisLabel(vm.graphOptions.yLabelAll);
 
         d3.select('#chart svg')
           .datum(vm.graphData)

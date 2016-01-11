@@ -1,0 +1,15 @@
+<div class="row" ng-if="vm.resultsFound">
+<div class="panel panel-default"><div class="panel-body">
+<h2>Remediations</h2>
+
+<div class="row">
+<div class="col-sm-12">
+
+<div class="row" ng-repeat="mitigationData in vm.mitigationsData | orderBy" style="background-color: #EEE;margin:10px 0px;padding:4px" >
+  <mitigation data="mitigationData"></mitigation>
+</div>
+
+</div>
+</div>
+
+</div></div></div>

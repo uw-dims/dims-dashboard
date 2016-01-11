@@ -80,8 +80,11 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
       return q.all(promises);
     })
     .catch(function (err) {
-      console.log('caught error in listMitigations', err);
-      throw err;
+      console.log('caught error in listMitigations', err.toString(), '- will return empty array');
+      // return no items found - empty array
+      return q.fcall(function () {
+        return [];
+      });
     });
   };
 

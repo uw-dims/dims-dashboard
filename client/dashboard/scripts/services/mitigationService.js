@@ -91,7 +91,7 @@
     };
 
     var mitigationService = {
-      getMitigation: function () {
+      getMitigations: function () {
         $log.debug('MitigationService.getMitigation');
         var deferred = $q.defer();
         MitigationApi.get({
@@ -103,9 +103,26 @@
             deferred.resolve(result);
           },
           function (err) {
-            $log.debug('MitigationService.getMitigation error callback', err);
+            $log.debug('MitigationService.getMitigations error callback', err);
             deferred.reject(err);
           });
+        return deferred.promise;
+      },
+
+      getMitigation: function (id) {
+        var deferred = $q.defer();
+        MitigationApi.get({
+          id: id,
+          type: 'mitigation'
+        },
+        function (resource) {
+          $log.debug('MitigationService.getMitigation success ', resource);
+          deferred.resolve(resource);
+        },
+        function (err) {
+          $log.debug('MitigationService.getMitigation error callback', err);
+          deferred.reject(err);
+        });
         return deferred.promise;
       },
 

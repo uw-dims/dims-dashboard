@@ -9,6 +9,7 @@
       controllerAs: 'vm',
       link: linkFunc,
       scope: {
+        data: '='
       }
     };
 
@@ -20,22 +21,27 @@
 
     function controllerFunc($scope) {
       var vm = this;
+      vm.data = angular.copy($scope.data);
+      vm.showProgress = false;
+      vm.progressText = 'Show graph';
+
+      vm.toggleProgress = function toggleProgress() {
+        vm.showProgress = (vm.showProgress) ? false : true;
+        vm.progressText = (vm.showProgress) ? 'Hide progress' : 'Show progress';
+      };
+
+      $log.debug('mitigation.directive input data ', vm.data);
 
       var getGraphOptions = function getGraphOptions(metadata, trendline) {
         var options = {
           xLabel: 'Time',
-          yLabel1: 'Total Mitigated out of known',
-          yLabel2: 'Total Mitigated out of all',
-          key1: 'Mitigated Known',
-          key2: 'Mitigated All',
-          withFocus: true,
+          yLabelKnown: 'Total Mitigated out of known',
+          yLabelAll: 'Total Mitigated out of all',
+          keyKnown: 'Mitigated Known',
+          keyAll: 'Mitigated All',
           initialNum: metadata.initialNum,
           unknownNum: metadata.unknownNum,
           mitigatedNum: metadata.mitigatedNum,
-          yMax1: 0,
-          yMin1: metadata.initialNum - metadata.unknownNum,
-          yMax2: 0,
-          yMin2: metadata.initialNum,
           trendline: trendline
         };
         $log.debug('vm.getGraphOptions', options);
@@ -52,28 +58,8 @@
         return data;
       };
 
-      var getMitigation = function getMitigation() {
-        MitigationService.getMitigation()
-        .then(function (reply) {
-          console.log('directive getMitigation reply', reply);
-          vm.data = addOptions(reply);
-        })
-        .catch(function (err) {
-          $log.debug(err);
-        });
-      };
-
-      var init = function init() {
-        getMitigation();
-      };
-
-      // vm.toggleProgress = function toggleProgress() {
-      //   vm.showProgress = (vm.showProgress) ? false : true;
-      //   vm.progressText = (vm.showProgress) ? 'Hide progress' : 'Show progress';
-      // };
-
       // Settings link handler - creates the modal window
-      $scope.showIps = function showIps(data, key) {
+      vm.showIps = function showIps(data, key) {
         $scope.modalInstance = $modal.open({
           templateUrl: '../views/partials/myIps.html',
           controller: ModalInstanceCtrl,
@@ -91,7 +77,10 @@
         $scope.modalInstance.result
         .then(function (reply) {
           $log.debug('reply from modal', reply);
-          getMitigation();
+          MitigationService.getMitigation(vm.data.key)
+          .then(function (reply) {
+            $log.debug('getMitigation reply', reply);
+          });
         }, function () {
           $log.debug('modal dismissed at: ', new Date());
         });
@@ -146,9 +135,6 @@
           });
         };
       };
-
-      init();
-
     }
   }
 
