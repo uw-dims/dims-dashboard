@@ -8,7 +8,8 @@
 
     // vm.openSite = openSite;
     var associatedSites = {
-      consul: 'http://10.142.29.117:8500/ui/#/dc1/nodes'
+      consul: 'http://10.142.29.117:8500/ui/#/dc1/nodes',
+      opstrust: 'https://portal.uw.ops-trust.net'
     };
     vm.w = {};
 
@@ -20,6 +21,11 @@
         $log.debug('MainCtrl window', id, 'is already opened');
       }
       vm.w[id].focus();
+    };
+
+    vm.notImplemented = function notImplemented() {
+      $log.debug('in notImplemented');
+      $window.alert('Not yet implemented');
     };
 
 

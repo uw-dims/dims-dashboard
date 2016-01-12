@@ -44,6 +44,10 @@
 
       init();
 
+      vm.addMitigation = function addMitigation() {
+        $log.debug('add mitigation called');
+      };
+
     }
   }
 

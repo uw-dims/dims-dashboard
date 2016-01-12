@@ -20,7 +20,23 @@
 
 <div class="row">
 <div class="col-sm-2">
-<div class="panel panel-default"><div class="panel-body">
+
+<div class="panel panel-default"><div class="panel-body" style="background-color: #53a07f">
+<div style="line-height: 40px;">
+<p style="color:white; font-size:14px; text-align:center; vertical-align:middle; margin:0; cursor:pointer;" ng-click="vm.openSite('consul')"><i class="fa fa-external-link-square fa-lg" style="color:white;"></i>&nbsp;&nbsp;&nbsp;SYSTEM STATUS</p></div>
+</div></div>
+
+<div class="panel panel-default"><div class="panel-body" style="background-color: #86b3bb">
+<div style="line-height: 40px;">
+<p style="color:white; font-size:14px; text-align:center; vertical-align:middle; margin:0; cursor:pointer;" ng-click="vm.openSite('opstrust')"><i class="fa fa-external-link-square fa-lg" style="color:white;"></i>&nbsp;&nbsp;&nbsp;OPS-TRUST</p></div>
+</div></div>
+
+<div class="panel panel-default"><div class="panel-body" style="background-color: #bbb">
+<div style="line-height: 40px;">
+<p style="color:white; font-size:14px; text-align:center; vertical-align:middle; margin:0; cursor:pointer;"  ng-click="vm.notImplemented()"><i class="fa fa-plus fa-lg" style="color:white;"></i>&nbsp;&nbsp;&nbsp;Add New Site</p></div>
+</div></div>
+
+<!-- <div class="panel panel-default"><div class="panel-body">
 <h2>System Status</h2>
 <p><a ng-click="vm.openSite('consul')" style="cursor: pointer;">Open Consul View</a></p>
 <p>Dashboard <i class="fa fa-circle " style="color: green; float: right;"></i> </p>
@@ -30,24 +46,24 @@
 <p>Trident <i class="fa fa-circle " style="color: green; float: right;"></i> </p>
 <p>Message Broker<i class="fa fa-circle " style="color: green; float: right;"></i> </p>
 <p>CIF<i class="fa fa-circle " style="color: yellow; float: right;"></i> </p>
-
+</div>
+</div> -->
 
 </div>
-</div></div>
 <div class="col-sm-8">
 
 <mitigations></mitigations>
 
 <div class="row">
-<div class="panel panel-default"><div class="panel-body">
-<h2>Watched activities</h2>
+<div class="panel panel-default"><div class="panel-body"><div tooltip="Activities you created or are subscribed to" tooltip-append-to-body="true" tooltip-placement="right">
+<h2 >Watched activities</h2></div>
 <ticketlist></ticketlist>
 </div></div></div>
 
 </div>
 <div class="col-sm-2">
 <div class="panel panel-default"><div class="panel-body">
-<h2>Notifications</h2>
+<h2 tooltip="Latest notifications will display here" tooltip-append-to-body="true" tooltip-placement="right">Notifications</h2>
 
 </div></div>
 </div>
