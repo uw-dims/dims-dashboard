@@ -27,36 +27,47 @@
 
       vm.toggleProgress = function toggleProgress() {
         vm.showProgress = (vm.showProgress) ? false : true;
-        vm.progressText = (vm.showProgress) ? 'Hide progress' : 'Show progress';
+        vm.progressText = (vm.showProgress) ? 'Hide graph' : 'Show graph';
       };
 
-      $log.debug('mitigation.directive input data ', vm.data);
-
-      var getGraphOptions = function getGraphOptions(metadata, trendline) {
+      var getGraphOptions = function getGraphOptions(metadata) {
         var options = {
           xLabel: 'Time',
           yLabelKnown: 'Total Mitigated out of known',
           yLabelAll: 'Total Mitigated out of all',
           keyKnown: 'Mitigated Known',
-          keyAll: 'Mitigated All',
-          initialNum: metadata.initialNum,
-          unknownNum: metadata.unknownNum,
-          mitigatedNum: metadata.mitigatedNum,
-          trendline: trendline
+          keyAll: 'Mitigated All'
+          // initialNum: metadata.initialNum,
+          // unknownNum: metadata.unknownNum,
+          // mitigatedNum: metadata.mitigatedNum,
+          // trendline: trendline
         };
         $log.debug('vm.getGraphOptions', options);
         return options;
       };
 
-      // Add options for graphing
-      var addOptions = function addOptions(data) {
-        var result = [];
-        _.forEach(data, function (value, index) {
-          value.graphOptions = getGraphOptions(value.metadata, value.trendline);
-          result.push(value);
-        });
-        return data;
+      var init = function init() {
+        $log.debug('in init function');
+        vm.data.metadata.userRemaining = vm.data.ips.data.length;
+        vm.data.metadata.knownNum = vm.data.metadata.initialNum - vm.data.metadata.unknownNum;
+        vm.showUserIps = (vm.data.metadata.userRemaining !== 0);
+        vm.userMessage = vm.showUserIps ?  'You have ' + vm.data.metadata.userRemaining + ' IPs left to mitigate. ' :
+        'You have no IPs to mitigate. ';
+        vm.graphOptions = getGraphOptions(vm.data.metadata)
+        $log.debug('vm data now ', vm.data);
       };
+
+      init();
+
+      // Add options for graphing
+      // var addOptions = function addOptions(data) {
+      //   var result = [];
+      //   _.forEach(data, function (value, index) {
+      //     value.graphOptions = getGraphOptions(value.metadata, value.trendline);
+      //     result.push(value);
+      //   });
+      //   return data;
+      // };
 
       // Settings link handler - creates the modal window
       vm.showIps = function showIps(data, key) {
@@ -79,7 +90,9 @@
           $log.debug('reply from modal', reply);
           MitigationService.getMitigation(vm.data.key)
           .then(function (reply) {
-            $log.debug('getMitigation reply', reply);
+            $log.debug('mitigation directive getMitigation reply', reply);
+            vm.data = vm.data = angular.copy(reply);
+            init();
           });
         }, function () {
           $log.debug('modal dismissed at: ', new Date());

@@ -3,18 +3,61 @@
 Ticket API
 ==========
 
-The dashboard server provides a REST api for working with *tickets*. Tickets
-are used to store
+The dashboard server provides a REST API for working with *tickets*.
+
+.. note::
+
+    One API design decision was how *open* to make the API - that is, would
+    the API automatically restrict data sent back for certain requests. For
+    example, we have the concept of *public* and *private* tickets. When
+    a GET request is made, do we want the API to return all tickets or a subset
+    such as all public and all private belonging to the current user?
+
+    The API is currently restrictive - a GET request to
+    /api/tickets would return all public activity tickets and all private tickets
+    owned by the calling user.
+
+    The API is intended to require authentication. The plan is that the
+    client would have obtained the token for the calling user and included
+    it with the API call. The server will then look up the attributes for
+    the user referenced by the token. These would be:
+
+    * username - user name (in Ops-trust) of the calling user
+    * trustgroup - trust group the user is logged into
+    * admin - is the user an admin in the trust group
+
+    This has not been implemented yet as we need to determine how to
+    integrate this with Trident and their login tokens, as well as have
+    a Trident instance running.
+
+    In the interim, the server currently authenticates users with the
+    Dashboard via their Ops-trust (Trident) usernames and passwords and
+    establishes a persistent login session for the user. This can be used
+    to protect the API endpoints when accessing via the Dashboard client, but
+    would prevent other clients from accessing. So the API is not
+    protected by the current authentication mechanism in order to
+    allow other clients access until
+    we get the token authentication implemented.
+
+    Until token authentication is implemented however, requests from
+    clients other than the Dashboard will not be able to retrieve
+    user private tickets.
+
+..
 
 
 HTTP Verbs
 ----------
 
-GET     /api/ticket      list
-POST    /api/ticket      create
-GET     /api/ticket/:id  show
-PUT     /api/ticket/:id  update
-DELETE  /api/ticket/:id  delete
+.. code-block:: none
+
+    GET     /api/ticket      list
+    POST    /api/ticket      create
+    GET     /api/ticket/:id  show
+    PUT     /api/ticket/:id  update
+    DELETE  /api/ticket/:id  delete
+
+..
 
 
 Retrieve a list of tickets
@@ -34,14 +77,17 @@ Returns HTTP status code and string reply
 Using curl:
   curl -k https://dashboard_url/api/ticket/
 
-Sample respons:
+Sample response:
 
- { "data": [
-     "ticket:1",
-     "ticket:2",
-     "ticket:3" ]
- }
+.. code_block:: none
 
+    { "data": [
+       "ticket:1",
+       "ticket:2",
+       "ticket:3" ]
+    }
+
+..
 
 Creating an activity
 --------------------

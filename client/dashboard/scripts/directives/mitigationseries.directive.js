@@ -34,29 +34,26 @@
       // This plots one set of data on two different axis, plus a trendline
       function init() {
         vm.graphOptions = angular.copy($scope.options);
-        vm.dataKnown = angular.copy($scope.data);
-        vm.dataAll = angular.copy($scope.data);
+        vm.input = angular.copy($scope.data);
+        // vm.dataKnown = angular.copy($scope.data.data);
+        // vm.dataAll = angular.copy($scope.data.data);
+        vm.initialNum = vm.input.metadata.initialNum;
+        vm.unknownNum = vm.input.metadata.unknownNum;
+        vm.trendline = vm.input.trendline;
         $log.debug('graphOptions', vm.graphOptions);
-        // vm.trendPoints = [{
-        //   x: vm.data[0].x,
-        //   y: 0
-        // }, {
-        //   x: vm.data[vm.data.length - 1].x,
-        //   y: getTrendY(vm.graphOptions.trendline, vm.data[vm.data.length - 1].x)
-        // }];
-        // For using estimated endpoint - not used since there is a bug in the graph library
+
         vm.trendPoints = [{
-          x: vm.dataKnown[0].x,
+          x: vm.input.data[0].x,
           y: 0
         }, {
-          x: getTrendX(vm.graphOptions.trendline, vm.graphOptions.initialNum - vm.graphOptions.unknownNum),
-          y: vm.graphOptions.initialNum - vm.graphOptions.unknownNum
+          x: getTrendX(vm.trendline, vm.initialNum - vm.unknownNum),
+          y: vm.initialNum - vm.unknownNum
         }];
         // Need two arrays of data - will plot twice on two axes
         vm.graphData = [];
 
         vm.graphData.push({
-          values: vm.dataAll,
+          values: vm.input.data,
           key: vm.graphOptions.keyAll,
           yAxis: 2,
           type: 'line'
@@ -68,7 +65,7 @@
           type: 'line'
         });
         vm.graphData.push({
-          values: vm.dataKnown,
+          values: vm.input.data,
           key: vm.graphOptions.keyKnown,
           yAxis: 1,
           type: 'line'
@@ -80,8 +77,8 @@
           yAxis: 1,
           type: 'line'
         });
-        
-        
+
+
         console.log('end of init. graphData: ', vm.graphData);
       }
 
@@ -125,8 +122,8 @@
         // chart.yDomain2([0, vm.graphOptions.initialNum - vm.graphOptions.unknownNum]);
 
         // Start with 0
-        chart.yDomain2([vm.graphOptions.initialNum, 0]);
-        chart.yDomain1([vm.graphOptions.initialNum - vm.graphOptions.unknownNum, 0]);
+        chart.yDomain2([vm.initialNum, 0]);
+        chart.yDomain1([vm.initialNum - vm.unknownNum, 0]);
 
 
         chart.xAxis

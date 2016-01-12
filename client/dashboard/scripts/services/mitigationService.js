@@ -19,15 +19,15 @@
 
   var MitigationService = function (MitigationApi, $log, $q, $modal) {
 
-    var parseData = function parseData(data) {
-      var newArray = [];
-      _.forEach(data, function (value, index) {
-        newArray.push(_.parseInt(value));
-      });
-      return newArray;
-    };
+    // var parseData = function parseData(data) {
+    //   var newArray = [];
+    //   _.forEach(data, function (value, index) {
+    //     newArray.push(_.parseInt(value));
+    //   });
+    //   return newArray;
+    // };
 
-    // Formats data - but we'll let the client do it for now
+    // Formats data
     var formatData = function formatData(data) {
       console.log('formatData data', data);
       var result = [];
@@ -55,17 +55,20 @@
       return linearRegression(knownY, knownX);
     };
 
-    var parseResponse = function parseResponse(response) {
+    var parseList = function parseList(response) {
       var result = [];
       _.forEach(response, function (value, index) {
-        // value.data = formatData(parseData(value.data));
-        var item = _.extend({}, value);
-        console.log('item', item);
-        item.data = formatData(value.data);
-        item.trendline = getTrendline(value.data);
-        result.push(item);
+        result.push(parseTicket(value));
       });
       return result;
+    };
+
+    var parseTicket = function parseTicket(ticketData) {
+      var item = _.extend({}, ticketData);
+      item.data = formatData(ticketData.data);
+      item.trendline = getTrendline(ticketData.data);
+      $log.debug('mitigationService.parseTicket. item is ', item);
+      return item;
     };
 
     //http://trentrichardson.com/2010/04/06/compute-linear-regressions-in-javascript/
@@ -98,7 +101,7 @@
           type: 'mitigation'
         },
           function (resource) {
-            var result = parseResponse(resource.data);
+            var result = parseList(resource.data);
             // Return the result
             deferred.resolve(result);
           },
@@ -117,7 +120,7 @@
         },
         function (resource) {
           $log.debug('MitigationService.getMitigation success ', resource);
-          deferred.resolve(resource);
+          deferred.resolve(parseTicket(resource.data));
         },
         function (err) {
           $log.debug('MitigationService.getMitigation error callback', err);

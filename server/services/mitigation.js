@@ -349,7 +349,8 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
       return reply.sort();
     })
     .catch(function (err) {
-      throw err;
+      logger.error('getUserIps caught error, will return empty array. Error: ', err.toString());
+      return [];
     });
   };
 
@@ -363,7 +364,8 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
       return reply.sort();
     })
     .catch(function (err) {
-      throw err;
+      logger.error('getMitigated caught error, will return empty array. Error: ', err.toString());
+      return [];
     });
   };
 
@@ -377,7 +379,8 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
       return formatData(reply);
     })
     .catch(function (err) {
-      throw err;
+      logger.error('getMitigatedData caught error, will return empty array. Error: ', err.toString());
+      return [];
     });
   };
 
