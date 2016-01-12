@@ -79,11 +79,18 @@ module.exports = function (ticketService, mitigationService) {
   };
 
   ticketRoute.show = function (req, res) {
-    logger.debug('routes/ticket SHOW, id: ', req.params.id);
+    logger.debug('SHOW, id: ', req.params.id);
+    console.log('routes/ticket SHOW query', req.query);
+    if (!req.user) {
+      return res.status(500).send('Error: user is not defined in request');
+    }
+    var user = req.user.username;
     // var ticket = new Ticket();
     var ticket;
+    // check for mitigation ticket request
     if (KeyExtract.isMitigation(req.params.id)) {
-      mitigationService.getMitigated(req.params.id)
+      // mitigationService.getMitigated(req.params.id)
+      mitigationService.getMitigation(req.params.id, user)
       .then(function (reply) {
         res.status(200).send(resUtils.getSuccessReply(reply));
       })

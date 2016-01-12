@@ -11,14 +11,13 @@ module.exports = function (UserSettings, anonService) {
   anon.anonymize = function (req, res) {
     var commandProgram,
         inputArray,
+        settings,
         params = req.query;
 
     if (!req.user) {
       return res.status(500).send('Error: user is not defined in request');
     }
     var id = req.user.username;
-
-
     logger.debug('routes/anon.anonymize - Request: ', req.query);
 
     if (!_.isEmpty(req.body)) {
@@ -41,7 +40,14 @@ module.exports = function (UserSettings, anonService) {
     if (_.isEmpty(params.type)) {
       params.type = 'anon';
     }
-    anonService.setup(params, id).then(function (reply) {
+
+    // First, get the settings for the user
+    UserSettings.getUserSettings(id)
+    .then(function (reply) {
+      settings = reply;
+      return anonService.setup(params, settings.rpcDebug, settings.rpcVerbose);
+    })
+    .then(function (reply) {
       inputArray = reply;
       logger.debug('routes/anon.anonymize. Response from anonService.setup: inputArray = ', inputArray);
       if (req.query.type === 'ipgrep') {
@@ -56,6 +62,9 @@ module.exports = function (UserSettings, anonService) {
       }, function (err, reply) {
         return res.status(500).send(reply);
       });
+    })
+    .catch(function (err) {
+      return res.status(500).send(reply);
     });
 
   };

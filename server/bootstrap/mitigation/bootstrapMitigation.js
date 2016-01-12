@@ -7,6 +7,9 @@
 var _ = require('lodash-compat');
 var moment = require('moment');
 var path = require('path');
+var q = require('q');
+var fs = require('fs');
+
 var ROOT_DIR = __dirname + '/../../';
 
 var keyGen = require(path.join(ROOT_DIR, '/models/keyGen'));
@@ -37,136 +40,85 @@ var Bookshelf = diContainer.get('Bookshelf');
 (function () {
   var bootstrapMitigation = {};
 
-  //options is array of 2 users to use for mitigation progress bootstrap
+  //options is array of users to use for mitigation progress bootstrap
   exports.runBootstrap = bootstrapMitigation.runBootstrap = function (options) {
 
     var ticketKey;
-    var ipPath = __dirname + '/mitigation_ips.txt';
+    var ipPath = __dirname + '/mitigation_ips2.txt';
     var user1Ips, user2Ips, user1Chunk, user2Chunk;
-    var k = 15;
+    var k = 30;
     var i = 0;
-    var time = moment().subtract(k+1, 'days').format('x');
+    var submitTime = moment().subtract(k + 1, 'days').format('x');
+    var submitDisplayTime = moment().subtract(k + 2, 'days').format('L');
     var user1 = options[0];
     var user2 = options[1];
-    var description = 'IPs needing mitigation. Report back and submit IPs you have mitigated';
+    var description = 'IPs needing mitigation. As you mitigate IPs, submit them here.';
 
-    mitigationService.initiateMitigation(ipPath, user1, 'Action Needed: 2015-11-21 Compromised IPs', description, time)
+    var getRandom = function getRandom(min, max) {
+      // Note we multiply by 1 to make sure min is interpreted as number
+      return Math.floor(Math.random() * (max - min + 1)) + (min * 1);
+    };
+
+    var ipData = fs.readFileSync(ipPath, {encoding: 'utf-8'});
+
+    mitigationService.initiateMitigation(ipData, user1, 'Action Needed: ' + submitDisplayTime + ' Compromised IPs', description, submitTime)
     .then(function (reply) {
       ticketKey = reply;
       console.log('bootstrapMitigation ticketKey', ticketKey);
-      return mitigationService.getUserIps(ticketKey, user1);
+      var promises = [];
+      _.forEach(options, function (value) {
+        console.log('bootstrapMitigation. Get ips for user ', value);
+        promises.push(mitigationService.getUserIps(ticketKey, value));
+      });
+      return q.all(promises);
     })
     .then(function (reply) {
-      console.log(reply);
-      user1Ips = reply;
-      return mitigationService.getUserIps(ticketKey, user2);
+      var userIps = reply;
+      console.log('userIps in reply are', userIps);
+      var userData = [];
+      var simStartTime = moment().subtract(k + 1, 'days').format('x');
+      var simEndTime = moment().subtract(1, 'days').format('x');
+      var chunkSize = 4;
+      console.log('start and end time are ', simStartTime, simEndTime);
+      _.forEach(options, function (value, index) {
+        var userNumIps = userIps[index].length,
+          currUser = value;
+        console.log('num user Ips for %s is %s ', currUser, userNumIps);
+        // What we will remediate per day (60%)
+        var maxRemediate = Math.floor(6 * userNumIps / 10);
+        console.log('maxRemediate is ', maxRemediate);
+        // numRemediate = Math.floor((3 * userNumIps / 5) / maxDays);
+        // console.log('numRemediate for this user is ', numRemediate);
+        // start days out
+        i = 0;
+        var currLength = userNumIps;
+        if (maxRemediate > chunkSize) {
+          var currRemediate = getRandom(1, Math.floor(maxRemediate / chunkSize));
+          while (currRemediate >= 1 && i < maxRemediate) {
+            console.log('in while, currRemediate is ', currRemediate, 'i is ', i);
+            var currIps = _.slice(userIps[index], i, i + currRemediate);
+            userData.push({ticketKey: ticketKey, currUser: currUser, currIps: currIps, currTime: getRandom(simStartTime, simEndTime)});
+            i = i + currRemediate;
+            currLength = currLength - currRemediate;
+            currRemediate = getRandom(1, Math.floor(maxRemediate / chunkSize));
+          }
+        }
+        userData = _.sortBy(userData, 'currTime');
+      });
+      var lastPromise = userData.reduce(function (promise, config) {
+        return promise.then(function () {
+          return mitigationService.remediate(config.ticketKey, config.currUser, config.currIps, config.currTime);
+        });
+      }, q.resolve());
+      return lastPromise;
+      // return q.all(promises);
     })
     .then(function (reply) {
-      console.log(reply);
-      user2Ips = reply;
-      user1Chunk = [
-        _.slice(user1Ips, 0, 10),
-        _.slice(user1Ips, 11, 15),
-        _.slice(user1Ips, 16, 17),
-        _.slice(user1Ips, 18, 19),
-        _.slice(user1Ips, 20, 25)
-      ];
-      user2Chunk = [
-        _.slice(user2Ips, 0, 2),
-        _.slice(user2Ips, 3, 6),
-        _.slice(user2Ips, 7, 10),
-        _.slice(user2Ips, 11, 12),
-        _.slice(user2Ips, 13, 17)
-      ];
-      var time = moment().subtract(k, 'days').format('x');
-      console.log(user2Chunk);
-      console.log('time will be ', time);
-      return mitigationService.remediate(ticketKey, user1, user1Chunk[i], time);
-    })
-    .then(function (reply) {
-      console.log('bootstrapMitigation. reply from remediate ', reply);
-      k = k - 1;
-      i = i + 1;
-      var time = moment().subtract(k, 'days').format('x');
-      console.log('time will be ', time);
-      return mitigationService.remediate(ticketKey, user1, user1Chunk[i], time);
-    })
-    .then(function (reply) {
-      console.log('bootstrapMitigation. reply from remediate ', reply);
-      k = k - 1;
-      i = i + 1;
-      var time = moment().subtract(k, 'days').format('x');
-      console.log('time will be ', time);
-      return mitigationService.remediate(ticketKey, user1, user1Chunk[i], time);
-    })
-    .then(function (reply) {
-      console.log('bootstrapMitigation. reply from remediate ', reply);
-      k = k - 1;
-      i = i + 1;
-      var time = moment().subtract(k, 'days').format('x');
-      console.log('time will be ', time);
-      return mitigationService.remediate(ticketKey, user1, user1Chunk[i], time);
-    })
-    .then(function (reply) {
-      console.log('bootstrapMitigation. reply from remediate ', reply);
-      k = k - 1;
-      i = i + 1;
-      var time = moment().subtract(k, 'days').format('x');
-      console.log('time will be ', time);
-      return mitigationService.remediate(ticketKey, user1, user1Chunk[i], time);
-    })
-    .then(function (reply) {
-      console.log('bootstrapMitigation. reply from remediate ', reply);
-      k = k - 1;
-      i = 0;
-      var time = moment().subtract(k, 'days').format('x');
-      console.log('time will be ', time);
-      return mitigationService.remediate(ticketKey, user2, user2Chunk[i], time);
-    })
-    .then(function (reply) {
-      console.log('bootstrapMitigation. reply from remediate ', reply);
-      k = k - 1;
-      i = i + 1;
-      var time = moment().subtract(k, 'days').format('x');
-      console.log('time will be ', time);
-      return mitigationService.remediate(ticketKey, user2, user2Chunk[i], time);
-    })
-    .then(function (reply) {
-      console.log('bootstrapMitigation. reply from remediate ', reply);
-      k = k - 1;
-      i = i + 1;
-      var time = moment().subtract(k, 'days').format('x');
-      console.log('time will be ', time);
-      return mitigationService.remediate(ticketKey, user2, user2Chunk[i], time);
-    })
-    .then(function (reply) {
-      console.log('bootstrapMitigation. reply from remediate ', reply);
-      k = k - 1;
-      i = i + 1;
-      var time = moment().subtract(k, 'days').format('x');
-      console.log('time will be ', time);
-      return mitigationService.remediate(ticketKey, user2, user2Chunk[i], time);
-    })
-    .then(function (reply) {
-      console.log('bootstrapMitigation. reply from remediate ', reply);
-      k = k - 1;
-      i = i + 1;
-      var time = moment().subtract(k, 'days').format('x');
-      console.log('time will be ', time);
-      return mitigationService.remediate(ticketKey, user2, user2Chunk[i], time);
-    })
-    .then(function (reply) {
-      console.log('bootstrapMitigation. reply from remediate ', reply);
+      console.log('reply from lastPromise ', reply);
       return mitigationService.getMitigated(ticketKey);
     })
     .then(function (reply) {
-      console.log('bootstrapMitigation. reply from getMitigated', reply);
-      return mitigationService.getMitigatedData(ticketKey);
-    })
-    .then(function (reply) {
       console.log('bootstrapMitigation. reply from getMitigatedData', reply);
-    })
-    .then(function (reply) {
       return client.quitAsync();
     })
     .then(function () {
@@ -177,6 +129,134 @@ var Bookshelf = diContainer.get('Bookshelf');
     .catch(function (err) {
       console.log(err);
     });
+
+  //   mitigationService.initiateMitigation(ipPath, user1, 'Action Needed: ' + submitDisplayTime + ' Compromised IPs', description, submitTime)
+  //   .then(function (reply) {
+  //     ticketKey = reply;
+  //     console.log('bootstrapMitigation ticketKey', ticketKey);
+  //     return mitigationService.getUserIps(ticketKey, user1);
+  //   })
+  //   .then(function (reply) {
+  //     console.log(reply);
+  //     user1Ips = reply;
+  //     return mitigationService.getUserIps(ticketKey, user2);
+  //   })
+  //   .then(function (reply) {
+  //     console.log(reply);
+  //     user2Ips = reply;
+  //     user1Chunk = [
+  //       _.slice(user1Ips, 0, 10),
+  //       _.slice(user1Ips, 11, 15),
+  //       _.slice(user1Ips, 16, 17),
+  //       _.slice(user1Ips, 18, 19),
+  //       _.slice(user1Ips, 20, 25)
+  //     ];
+  //     user2Chunk = [
+  //       _.slice(user2Ips, 0, 2),
+  //       _.slice(user2Ips, 3, 6),
+  //       _.slice(user2Ips, 7, 10),
+  //       _.slice(user2Ips, 11, 12),
+  //       _.slice(user2Ips, 13, 17)
+  //     ];
+  //     var time = moment().subtract(k, 'days').format('x');
+  //     console.log(user2Chunk);
+  //     console.log('time will be ', time);
+  //     return mitigationService.remediate(ticketKey, user1, user1Chunk[i], time);
+  //   })
+  //   .then(function (reply) {
+  //     console.log('bootstrapMitigation. reply from remediate ', reply);
+  //     k = k - 1;
+  //     i = i + 1;
+  //     var time = moment().subtract(k, 'days').format('x');
+  //     console.log('time will be ', time);
+  //     return mitigationService.remediate(ticketKey, user1, user1Chunk[i], time);
+  //   })
+  //   .then(function (reply) {
+  //     console.log('bootstrapMitigation. reply from remediate ', reply);
+  //     k = k - 1;
+  //     i = i + 1;
+  //     var time = moment().subtract(k, 'days').format('x');
+  //     console.log('time will be ', time);
+  //     return mitigationService.remediate(ticketKey, user1, user1Chunk[i], time);
+  //   })
+  //   .then(function (reply) {
+  //     console.log('bootstrapMitigation. reply from remediate ', reply);
+  //     k = k - 1;
+  //     i = i + 1;
+  //     var time = moment().subtract(k, 'days').format('x');
+  //     console.log('time will be ', time);
+  //     return mitigationService.remediate(ticketKey, user1, user1Chunk[i], time);
+  //   })
+  //   .then(function (reply) {
+  //     console.log('bootstrapMitigation. reply from remediate ', reply);
+  //     k = k - 1;
+  //     i = i + 1;
+  //     var time = moment().subtract(k, 'days').format('x');
+  //     console.log('time will be ', time);
+  //     return mitigationService.remediate(ticketKey, user1, user1Chunk[i], time);
+  //   })
+  //   .then(function (reply) {
+  //     console.log('bootstrapMitigation. reply from remediate ', reply);
+  //     k = k - 1;
+  //     i = 0;
+  //     var time = moment().subtract(k, 'days').format('x');
+  //     console.log('time will be ', time);
+  //     return mitigationService.remediate(ticketKey, user2, user2Chunk[i], time);
+  //   })
+  //   .then(function (reply) {
+  //     console.log('bootstrapMitigation. reply from remediate ', reply);
+  //     k = k - 1;
+  //     i = i + 1;
+  //     var time = moment().subtract(k, 'days').format('x');
+  //     console.log('time will be ', time);
+  //     return mitigationService.remediate(ticketKey, user2, user2Chunk[i], time);
+  //   })
+  //   .then(function (reply) {
+  //     console.log('bootstrapMitigation. reply from remediate ', reply);
+  //     k = k - 1;
+  //     i = i + 1;
+  //     var time = moment().subtract(k, 'days').format('x');
+  //     console.log('time will be ', time);
+  //     return mitigationService.remediate(ticketKey, user2, user2Chunk[i], time);
+  //   })
+  //   .then(function (reply) {
+  //     console.log('bootstrapMitigation. reply from remediate ', reply);
+  //     k = k - 1;
+  //     i = i + 1;
+  //     var time = moment().subtract(k, 'days').format('x');
+  //     console.log('time will be ', time);
+  //     return mitigationService.remediate(ticketKey, user2, user2Chunk[i], time);
+  //   })
+  //   .then(function (reply) {
+  //     console.log('bootstrapMitigation. reply from remediate ', reply);
+  //     k = k - 1;
+  //     i = i + 1;
+  //     var time = moment().subtract(k, 'days').format('x');
+  //     console.log('time will be ', time);
+  //     return mitigationService.remediate(ticketKey, user2, user2Chunk[i], time);
+  //   })
+  //   .then(function (reply) {
+  //     console.log('bootstrapMitigation. reply from remediate ', reply);
+  //     return mitigationService.getMitigated(ticketKey);
+  //   })
+  //   .then(function (reply) {
+  //     console.log('bootstrapMitigation. reply from getMitigated', reply);
+  //     return mitigationService.getMitigatedData(ticketKey);
+  //   })
+  //   .then(function (reply) {
+  //     console.log('bootstrapMitigation. reply from getMitigatedData', reply);
+  //   })
+  //   .then(function (reply) {
+  //     return client.quitAsync();
+  //   })
+  //   .then(function () {
+  //     Bookshelf.knex.destroy(function (err, reply) {
+  //       console.log(err, reply);
+  //     });
+  //   })
+  //   .catch(function (err) {
+  //     console.log(err);
+  //   });
   };
 
   if (!module.parent) {

@@ -62,6 +62,7 @@ var Bookshelf = diContainer.get('Bookshelf');
         }
       });
       // Now have array of actual usernames
+      console.log('bootstrapAttributes: users are ', users);
       var attrPromises = [];
       var i = 0;
       _.forEach(doc, function (config, user) {
@@ -72,12 +73,12 @@ var Bookshelf = diContainer.get('Bookshelf');
             newConfig[type] = value;
           }
         });
+        console.log('bootstrapAttributes. newConfig is ', newConfig);
         // Replace test users - there are 4
         var thisUser = users[i];
         i++;
         var attributes = Attributes.attributesFactory(thisUser);
         attrPromises.push(attributes.updateAttributes(thisUser, newConfig));
-
       });
       return q.all(attrPromises);
     })

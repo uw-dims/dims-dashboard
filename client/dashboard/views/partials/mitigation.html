@@ -1,21 +1,23 @@
-
-<div class="row">
-
-<div class="col-sm-12">
-
-<div class="row" ng-repeat="n in vm.data | orderBy" style="background-color: #EEE;margin:10px 0px;padding:4px">
-
-<div class="row" style="margin:3px;padding:5px">
-<div><h3 style="color:#2e78b8; margin-bottom:4px">{{ n.metadata.name }}</h3>
-<p style="color:#222; font-size:10px;">
-  Created by {{ n.metadata.creator }} &nbsp; &nbsp; Last updated: {{ n.metadata.modifiedTime | date : 'medium' }}</p>
-  <p><a style="cursor:pointer;" ng-click="showIps(n.ips.data, n.key)">View my IPs needing mitigation</a></p>
-</div>
-<div class="row">
-<timeseries options="n.graphOptions" data="n.data" metadata></timeseries>
+<div class="row ticket-item">
+  <div class="col-sm-12">
+    <h3 style="color:#2e78b8; margin-bottom:4px">{{ vm.data.metadata.name }}</h3>
+    <p style="color:#222; font-size:10px;">
+    Created by {{ vm.data.metadata.creator }} &nbsp; &nbsp; Last updated: {{ vm.data.metadata.modifiedTime | date : 'medium' }}</p>
+    <hr />
+    <p>Current status: {{vm.data.metadata.mitigatedNum}} out of {{vm.data.metadata.knownNum}} known IPs ({{vm.data.metadata.initialNum}} total IPs) have been mitigated. {{vm.userMessage}} </p>
+    </div>
 </div>
 
-</div>
-</div>
+<div class="row ticket-item-footer">
+<div class="col-sm-2">
+<i class="fa fa-line-chart icon-style"></i><a style="cursor:pointer;" ng-click="vm.toggleProgress()">{{vm.progressText}}</a>
 </div>
 
+<div class="col-sm-4" ng-if="vm.showUserIps">
+  <i class="fa fa-eye icon-style"></i><a style="cursor:pointer;" ng-click="vm.showIps(vm.data.ips.data, vm.data.key)">View/update your remaining IPs</a>
+</div>
+
+</div>
+<div class="row ticket-item" ng-if="vm.showProgress">
+<mitigationseries options="vm.graphOptions" data="vm.data" metadata></mitigationseries>
+</div>

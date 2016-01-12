@@ -3,7 +3,7 @@
 var config = require('../config/config');
 var logger = require('../utils/logger')(module);
 var q = require('q');
-var fs = require('fs');
+// var fs = require('fs');
 var ChildProcess = require('../services/childProcess');
 var _ = require('lodash-compat');
 var dimsUtils = require('../utils/util');
@@ -64,9 +64,8 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
     };
   };
 
-  // For testing
-  // var users = ['testuser1', 'testuser2', 'testuser3', 'testuser4'];
-
+  // Map File containing user attributes. This is updated by the attributes service
+  // every time a user's attributes change
   var mapPath = config.dashboardDataPath + 'dashboard_user_attributes.yml';
 
   var listMitigations = function listMitigations(user) {
@@ -81,8 +80,11 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
       return q.all(promises);
     })
     .catch(function (err) {
-      console.log('caught error in listMitigations', err);
-      throw err;
+      console.log('caught error in listMitigations', err.toString(), '- will return empty array');
+      // return no items found - empty array
+      return q.fcall(function () {
+        return [];
+      });
     });
   };
 
@@ -111,6 +113,7 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
       result.metadata.initialNum = reply[3];
       result.metadata.unknownNum = reply[4];
       result.metadata.mitigatedNum = reply[5];
+      console.log(result.data);
       return result;
     })
     .catch(function (err) {
@@ -140,8 +143,10 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
 
   // var create = function create()
 
-  var initiateMitigation = function initiateMitigation(ipPath, user, ticketName, description, startTime) {
-    var ipData = fs.readFileSync(ipPath, {encoding: 'utf-8'});
+  var initiateMitigation = function initiateMitigation(ipData, user, ticketName, description, startTime) {
+    console.log('Initiating mitigation: user %s, ticketName %s, description %s, startTime %s',
+      user, ticketName, description, startTime);
+    // var ipData = fs.readFileSync(ipPath, {encoding: 'utf-8'});
     var ticketConfig = {
       creator: user,
       type: 'mitigation',
@@ -155,8 +160,8 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
     var users = [];
 
     if (startTime === undefined) {
-      time = dimsUtils.createTimestamp();
-      console.log('***time is undefined ');
+      starTime = dimsUtils.createTimestamp();
+      console.log('initiateMitigation: time is undefined - using current time: ', startTime);
     }
 
     // TODO - add userservice so we don't have to call the model directly
@@ -165,7 +170,7 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
       _.forEach(collection.toJSON(), function (value) {
         users.push(value.ident);
       });
-      console.log(users);
+      console.log('initiateMitigation. all users: ', users);
       return ticket.create();
     })
     .then(function () {
@@ -176,9 +181,10 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
         useFile: false,
         type: 'anon',
         mapName: mapPath,
-        outputType: 'json'}, 'testuser2');
+        outputType: 'json'}, 'true', 'true');
     })
     .then(function (reply) {
+      console.log('initiateMitigation. reply from anonService.setup', reply);
       var anonChild = new ChildProcess();
       return anonChild.startProcess('python', reply);
     })
@@ -192,11 +198,11 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
           var userIps = [];
           userIps.push.apply(userIps, ipListToArray(binnedIps.matching[user]));
           console.log('-----------------------------------');
-          console.log('Added a topic for IPs belonging to user ', user, ' so they can be tracked.');
-          console.log('User ', user, ' is responsible for these IPs:');
+          console.log('Will add a topic for IPs belonging to user ', user, ' so they can be tracked.');
+          console.log('User ', user, ' is responsible for these IPs. Number: ', userIps.length);
           console.log('-----------------------------------');
-          console.log(binnedIps.matching[user]);
-          console.log(userIps);
+          // console.log(binnedIps.matching[user]);
+          // console.log(userIps);
           // Create topic to store this user's binned IPs
           return Topic.topicFactory(ticket, getTopicConfig('user', user))
            .create(userIps);
@@ -204,17 +210,24 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
       }));
     })
     .then(function () {
+      // Add unknown IPs to initial and to nonmatching
       initialIps.push.apply(initialIps, ipListToArray(binnedIps.nonmatching));
       unknownIps.push.apply(unknownIps, ipListToArray(binnedIps.nonmatching));
-      return Topic.topicFactory(ticket, getTopicConfig('unknown')).create(unknownIps);
+      console.log('Number of initialIps: ', initialIps.length);
+      console.log('Number of unknownIps: ', unknownIps.length);
+      var promises = [];
+      promises.push(Topic.topicFactory(ticket, getTopicConfig('unknown')).create(unknownIps));
+      promises.push(Topic.topicFactory(ticket, getTopicConfig('initial')).create(initialIps));
+      promises.push(Topic.topicFactory(ticket, getTopicConfig('data')).create([0], startTime));
+      return q.all(promises);
     })
-    .then(function () {
-      return Topic.topicFactory(ticket, getTopicConfig('initial')).create(initialIps);
-    })
-    // Can't create mitigated topic yet since no IPs exist for that yet
-    .then(function () {
-      return Topic.topicFactory(ticket, getTopicConfig('data')).create([0], startTime);
-    })
+    // .then(function () {
+    //   return Topic.topicFactory(ticket, getTopicConfig('initial')).create(initialIps);
+    // })
+    // // Can't create mitigated topic yet since no IPs exist for that yet
+    // .then(function () {
+    //   return Topic.topicFactory(ticket, getTopicConfig('data')).create([0], startTime);
+    // })
     .then(function () {
       // Return the key of the ticket
       return keyGen.ticketKey(ticket.metadata);
@@ -336,7 +349,8 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
       return reply.sort();
     })
     .catch(function (err) {
-      throw err;
+      logger.error('getUserIps caught error, will return empty array. Error: ', err.toString());
+      return [];
     });
   };
 
@@ -350,7 +364,8 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
       return reply.sort();
     })
     .catch(function (err) {
-      throw err;
+      logger.error('getMitigated caught error, will return empty array. Error: ', err.toString());
+      return [];
     });
   };
 
@@ -360,20 +375,21 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
       var mappedKeys = reply;
       return store.listItemsWithScores(mappedKeys.data);
     })
+    .then(function (reply) {
+      return formatData(reply);
+    })
     .catch(function (err) {
-      throw err;
+      logger.error('getMitigatedData caught error, will return empty array. Error: ', err.toString());
+      return [];
     });
   };
 
-  // Formats data - but we'll let the client do it for now
+  // Formats data to array of [x, y]
   var formatData = function formatData(data) {
     var result = [];
     var chunked = _.chunk(data, 2);
     _.forEach(chunked, function (value, index) {
-      result.push({
-        x: value[1],
-        y: value[0]
-      });
+      result.push([_.parseInt(value[1]), _.parseInt(value[0])]);
     });
     return result;
   };
