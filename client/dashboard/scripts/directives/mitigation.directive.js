@@ -30,44 +30,43 @@
         vm.progressText = (vm.showProgress) ? 'Hide graph' : 'Show graph';
       };
 
-      var getGraphOptions = function getGraphOptions(metadata) {
+      var getGraphOptions = function getGraphOptions() {
         var options = {
           xLabel: 'Time',
           yLabelKnown: 'Total Mitigated out of known',
           yLabelAll: 'Total Mitigated out of all',
           keyKnown: 'Mitigated Known',
-          keyAll: 'Mitigated All'
-          // initialNum: metadata.initialNum,
-          // unknownNum: metadata.unknownNum,
-          // mitigatedNum: metadata.mitigatedNum,
-          // trendline: trendline
+          keyAll: 'Mitigated All',
+          graphTitle: 'IP Remediation Progress'
         };
-        $log.debug('vm.getGraphOptions', options);
         return options;
       };
 
+      var getTrendX = function getTrendX(trendline, y) {
+        return Math.floor((y - trendline.intercept) / trendline.slope);
+      };
+
       var init = function init() {
-        $log.debug('in init function');
         vm.data.metadata.userRemaining = vm.data.ips.data.length;
         vm.data.metadata.knownNum = vm.data.metadata.initialNum - vm.data.metadata.unknownNum;
         vm.showUserIps = (vm.data.metadata.userRemaining !== 0);
         vm.userMessage = vm.showUserIps ?  'You have ' + vm.data.metadata.userRemaining + ' IPs left to mitigate. ' :
         'You have no IPs to mitigate. ';
-        vm.graphOptions = getGraphOptions(vm.data.metadata)
-        $log.debug('vm data now ', vm.data);
+        vm.graphOptions = getGraphOptions();
+        vm.anticipatedFinish = getTrendX(vm.data.trendline, vm.data.metadata.knownNum);
+        vm.displayAnticipated = moment(vm.anticipatedFinish).format('M/D/YYYY');
+        vm.statusMessage = vm.data.metadata.mitigatedNum < vm.data.metadata.knownNum ?
+          'Current trend anticipates remediation of all known IPs will finish on ' + vm.displayAnticipated + '. ' : '';
+        vm.data.trendPoints = [{
+          x: vm.data.data[0].x,
+          y: 0
+        }, {
+          x: vm.anticipatedFinish,
+          y: vm.data.metadata.knownNum
+        }];
       };
 
       init();
-
-      // Add options for graphing
-      // var addOptions = function addOptions(data) {
-      //   var result = [];
-      //   _.forEach(data, function (value, index) {
-      //     value.graphOptions = getGraphOptions(value.metadata, value.trendline);
-      //     result.push(value);
-      //   });
-      //   return data;
-      // };
 
       // Settings link handler - creates the modal window
       vm.showIps = function showIps(data, key) {
@@ -91,7 +90,7 @@
           MitigationService.getMitigation(vm.data.key)
           .then(function (reply) {
             $log.debug('mitigation directive getMitigation reply', reply);
-            vm.data = vm.data = angular.copy(reply);
+            vm.data = angular.copy(reply);
             init();
           });
         }, function () {

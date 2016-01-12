@@ -4,7 +4,7 @@
     <p style="color:#222; font-size:10px;">
     Created by {{ vm.data.metadata.creator }} &nbsp; &nbsp; Last updated: {{ vm.data.metadata.modifiedTime | date : 'medium' }}</p>
     <hr />
-    <p>Current status: {{vm.data.metadata.mitigatedNum}} out of {{vm.data.metadata.knownNum}} known IPs ({{vm.data.metadata.initialNum}} total IPs) have been mitigated. {{vm.userMessage}} </p>
+    <p>Current status: {{vm.data.metadata.mitigatedNum}} out of {{vm.data.metadata.knownNum}} known IPs ({{vm.data.metadata.initialNum}} total IPs) have been mitigated. {{vm.statusMessage}} {{vm.userMessage}} </p>
     </div>
 </div>
 

@@ -44,7 +44,7 @@ var Bookshelf = diContainer.get('Bookshelf');
   exports.runBootstrap = bootstrapMitigation.runBootstrap = function (options) {
 
     var ticketKey;
-    var ipPath = __dirname + '/mitigation_ips2.txt';
+    var ipPath = __dirname + '/demo_mitigation_ips.txt';
     var user1Ips, user2Ips, user1Chunk, user2Chunk;
     var k = 30;
     var i = 0;

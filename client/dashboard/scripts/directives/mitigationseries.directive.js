@@ -23,33 +23,19 @@
     function controllerFunc($scope) {
       var vm = this;
 
-      var getTrendX = function getTrendX(trendline, y) {
-        return Math.floor((y - trendline.intercept) / trendline.slope);
-      };
-
-      var getTrendY = function getTrendY(trendline, x) {
-        return Math.floor(x * trendline.slope + trendline.intercept);
-      };
-
+      $scope.$watch('data', init);
       // This plots one set of data on two different axis, plus a trendline
       function init() {
+        $log.debug('mitigationseries.directive init triggered');
         vm.graphOptions = angular.copy($scope.options);
         vm.input = angular.copy($scope.data);
         // vm.dataKnown = angular.copy($scope.data.data);
         // vm.dataAll = angular.copy($scope.data.data);
         vm.initialNum = vm.input.metadata.initialNum;
-        vm.unknownNum = vm.input.metadata.unknownNum;
-        vm.trendline = vm.input.trendline;
+        vm.knownNum = vm.input.metadata.knownNum;
+        vm.trendPoints = vm.input.trendPoints;
         $log.debug('graphOptions', vm.graphOptions);
 
-        vm.trendPoints = [{
-          x: vm.input.data[0].x,
-          y: 0
-        }, {
-          x: getTrendX(vm.trendline, vm.initialNum - vm.unknownNum),
-          y: vm.initialNum - vm.unknownNum
-        }];
-        // Need two arrays of data - will plot twice on two axes
         vm.graphData = [];
 
         vm.graphData.push({
@@ -70,7 +56,6 @@
           yAxis: 1,
           type: 'line'
         });
-        // Trendline
         vm.graphData.push({
           values: vm.trendPoints,
           key: 'Trend for ' + vm.graphOptions.keyKnown,
@@ -78,16 +63,10 @@
           type: 'line'
         });
 
+        vm.update();
 
         console.log('end of init. graphData: ', vm.graphData);
       }
-
-      init();
-      //options:
-      // xLabel
-      // yLabel
-      // withFocus
-      // key
 
       vm.xAxisTickFormatFunction = function () {
         return function (d) {
@@ -109,8 +88,19 @@
 
       $log.debug('graphData', vm.graphData);
 
+      var chart,
+          chartData;
+
+      vm.update = function update() {
+        if (chartData !== undefined) {
+          $log.debug('in vm.update chartData is ', chartData);
+          chartData.datum(vm.graphData).call(chart);
+          nv.utils.windowResize(chart.update);
+        }
+      };
+
       nv.addGraph(function () {
-        var chart = nv.models.multiChart()
+        chart = nv.models.multiChart()
           .options({
             withFocus: false,
             interpolate: 'linear'
@@ -123,8 +113,7 @@
 
         // Start with 0
         chart.yDomain2([vm.initialNum, 0]);
-        chart.yDomain1([vm.initialNum - vm.unknownNum, 0]);
-
+        chart.yDomain1([vm.knownNum, 0]);
 
         chart.xAxis
           .tickFormat(vm.xAxisTickFormatFunction())
@@ -146,7 +135,15 @@
           .axisLabel(vm.graphOptions.yLabelAll);
 
         d3.select('#chart svg')
-          .datum(vm.graphData)
+          .append('text')
+          .attr('x', 100)
+          .attr('y', 40)
+          .attr('text-anchor', 'middle')
+          .text(vm.graphOptions.graphTitle);
+
+        chartData = d3.select('#chart svg')
+          .datum(vm.graphData);
+        chartData
           .call(chart);
 
         nv.utils.windowResize(chart.update);
