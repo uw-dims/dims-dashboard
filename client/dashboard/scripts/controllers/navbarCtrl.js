@@ -18,21 +18,21 @@
     vm.logout = logout;
     vm.chat = chat;
     vm.logMonitor = logMonitor;
-    vm.openSite = openSite;
-    var associatedSites = {
-      opstrust: 'https://portal.uw.ops-trust.net',
-      opstrustwiki: 'https://wiki.uw.ops-trust.net/dims/bin/view/Main/WebHome'
-    };
-    vm.w = {};
+    // vm.openSite = openSite;
+    // var associatedSites = {
+    //   opstrust: 'https://portal.uw.ops-trust.net',
+    //   opstrustwiki: 'https://wiki.uw.ops-trust.net/dims/bin/view/Main/WebHome'
+    // };
+    // vm.w = {};
 
-    function openSite(id) {
-      if (!vm.w[id] || vm.w[id].closed) {
-        vm.w[id] = $window.open(associatedSites[id], "_blank");
-      } else {
-        $log.debug('NavbarCtrl window', id, 'is already opened');
-      }
-      vm.w[id].focus();
-    }
+    // function openSite(id) {
+    //   if (!vm.w[id] || vm.w[id].closed) {
+    //     vm.w[id] = $window.open(associatedSites[id], "_blank");
+    //   } else {
+    //     $log.debug('NavbarCtrl window', id, 'is already opened');
+    //   }
+    //   vm.w[id].focus();
+    // }
 
 
     // Logout link handler

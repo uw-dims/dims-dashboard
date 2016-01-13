@@ -46,18 +46,24 @@ module.exports = function UserSettings(client) {
     // var deferred = q.defer();
     // var multi = client.multi();
     return q.all([
-      client.hmsetAsync(keyGen.userSettingsKey(user), settings),
+      client.setAsync(keyGen.userSettingsKey(user), JSON.stringify(settings)),
       client.saddAsync(keyGen.userSettingsSetKey(), keyGen.userSettingsKey(user))
     ]);
   };
 
   var save = function save(user, settings) {
-    return client.hmsetAsync(keyGen.userSettingsKey(user), settings);
+    return client.setAsync(keyGen.userSettingsKey(user), JSON.stringify(settings));
   };
 
   // Wrap the redis function for get, return promise
   var get = function get(user) {
-    return client.hgetallAsync(keyGen.userSettingsKey(user));
+    return client.getAsync(keyGen.userSettingsKey(user))
+    .then(function (reply) {
+      return JSON.parse(reply);
+    })
+    .catch(function (err) {
+      throw err;
+    });
   };
 
   var exists = function (user) {

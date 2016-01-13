@@ -29,8 +29,6 @@
         $log.debug('mitigationseries.directive init triggered');
         vm.graphOptions = angular.copy($scope.options);
         vm.input = angular.copy($scope.data);
-        // vm.dataKnown = angular.copy($scope.data.data);
-        // vm.dataAll = angular.copy($scope.data.data);
         vm.initialNum = vm.input.metadata.initialNum;
         vm.knownNum = vm.input.metadata.knownNum;
         vm.trendPoints = vm.input.trendPoints;

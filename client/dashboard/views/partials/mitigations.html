@@ -1,6 +1,7 @@
 <div class="row" ng-if="vm.resultsFound">
 <div class="panel panel-default"><div class="panel-body">
-<h2>Remediations</h2>
+<div style="float:left;"><h2>Remediations</h2></div>
+<div style="float:right; cursor:pointer;" tooltip="Create new ticket for remediating IPs" tooltip-append-to-body="true" tooltip-placement="right"><i class="fa fa-plus fa-lg icon-style" ng-click="vm.addMitigation()"></i></div>
 
 <div class="row">
 <div class="col-sm-12">
