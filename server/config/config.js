@@ -143,7 +143,8 @@ config.defaultUserSettings = {
   'anonymize': false,
   'rpcDebug': true,
   'rpcVerbose': true,
-  'cifbulkQueue': 'cifbulk_v1'
+  'cifbulkQueue': 'cifbulk_v1',
+  'userExternals': []
 };
 
 // The attributes we are tracking
