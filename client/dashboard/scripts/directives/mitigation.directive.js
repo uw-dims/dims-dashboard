@@ -94,7 +94,7 @@
             init();
           });
         }, function () {
-          $log.debug('modal dismissed at: ', new Date());
+          $log.debug('mitigation modal dismissed at: ', new Date());
         });
       };
 

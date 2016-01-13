@@ -9,6 +9,9 @@
     var vm = this;
 
     // Setup form
+    // TODO: need to put this data in config and update with
+    // current values (no demo queue). Maybe just specify
+    // whether or not a test queue is to be used for all queues
     vm.cifbulkQueueValues = [{
         value: 'cifbulk_v1',
         label: 'cifbulk_v1 - default'
@@ -26,14 +29,17 @@
     vm.message = '';
 
     // Get the current settings - save in scope and in formData
-    vm.settings = SettingsService.get();
+    // vm.settings = SettingsService.get();
     vm.settingsFormData = SettingsService.get();
 
 
     // Save user settings currently selected by User
     vm.setUserSettings = function () {
-      // Construct the config
-      var settings = {};
+      // Construct the config. First copy the original
+      // settings. There are other settings that exist that are not
+      // changed by this controller - don't want to lose them.
+      var settings = _.extend({}, SettingsService.get());
+      // Apply formData
       settings.anonymize = vm.settingsFormData.anonymize;
       settings.cifbulkQueue = vm.settingsFormData.cifbulkQueue;
       settings.rpcDebug = vm.settingsFormData.rpcDebug;
@@ -47,16 +53,6 @@
         $log.debug('setUserSettings error', err);
       });
     };
-
-    // // OK button handler
-    // $scope.ok = function () {
-    //   $modalInstance.close('close');
-    // };
-
-    // // Cancel button handler
-    // $scope.cancel = function () {
-    //   $modalInstance.dismiss('cancel');
-    // };
 
   }
 
