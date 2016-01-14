@@ -101,7 +101,7 @@
           type: 'mitigation'
         },
           function (resource) {
-            var result = parseList(resource.data);
+            var result = parseList(resource.data.mitigations);
             // Return the result
             deferred.resolve(result);
           },
@@ -120,7 +120,7 @@
         },
         function (resource) {
           $log.debug('MitigationService.getMitigation success ', resource);
-          deferred.resolve(parseTicket(resource.data));
+          deferred.resolve(parseTicket(resource.data.mitigation));
         },
         function (err) {
           $log.debug('MitigationService.getMitigation error callback', err);

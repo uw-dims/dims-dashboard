@@ -11,36 +11,63 @@ module.exports = function (ticketService, mitigationService) {
 
   var ticketRoute = {};
 
+  var formatTicketResponse = function formatTicketResponse(key, data) {
+    var result = {};
+    result[key] = data;
+    return result;
+  };
+
+
+
   ticketRoute.list = function (req, res) {
     var user = null,
+        trustgroup =  null,
         config = [],
         errMsg = '';
 
-    if (!req.user) {
-      return res.status(500).send('Error: user is not defined in request');
+    if (req.hasOwnProperty('user')) {
+      user = req.user.username;
     }
-    user = req.user.username;
 
+    // if (!req.user) {
+    //   return res.status(500).send('Error: user is not defined in request');
+    // }
+    // user = req.user.username;
+
+    // If type is mitigation, use mitigation service
     if (req.query.type === 'mitigation') {
+      // Get user from request if it exists
+      // This won't fail if user isn't supplied, just will return ips property
+      // with an empty array.
+
       mitigationService.listMitigations(user)
       .then(function (reply) {
-        res.status(200).send(resUtils.getSuccessReply(reply));
+        res.status(200).send(resUtils.getSuccessReply(formatTicketResponse('mitigations', reply)));
       })
       .catch(function (err) {
         res.status(400).send(resUtils.getErrorReply(err.toString()));
       });
-    } else {
 
+    // not a mitigation ticket
+    // TODO: we are ignoring trust group currently
+    } else {
+      // no params supplied
       if (_.size(req.query) === 0) {
         config.push({
           type: 'activity',
           private: false
         });
-        config.push({
-          type: 'activity',
-          private: true,
-          ownedBy: user
-        });
+        // If user is in request, then can get private tickets as well
+        if (req.hasOwnProperty('user')) {
+          user = req.user.username;
+          config.push({
+            type: 'activity',
+            private: true,
+            ownedBy: user
+          });
+        }
+
+      // params supplied, so let's validate them
       } else {
 
         var options = {};
@@ -70,7 +97,7 @@ module.exports = function (ticketService, mitigationService) {
       ticketService.listTickets(config)
       .then(function (reply) {
         reply = _.flatten(reply);
-        res.status(200).send(resUtils.getSuccessReply(reply));
+        res.status(200).send(resUtils.getSuccessReply(formatTicketResponse('tickets', reply)));
       })
       .catch(function (err) {
         res.status(400).send(resUtils.getErrorReply(err.toString()));
@@ -79,28 +106,35 @@ module.exports = function (ticketService, mitigationService) {
   };
 
   ticketRoute.show = function (req, res) {
-    logger.debug('SHOW, id: ', req.params.id);
-    console.log('routes/ticket SHOW query', req.query);
-    if (!req.user) {
-      return res.status(500).send('Error: user is not defined in request');
+    var user = null;
+    if (req.hasOwnProperty('user')) {
+      user = req.user.username;
     }
-    var user = req.user.username;
-    // var ticket = new Ticket();
-    var ticket;
+    logger.debug('SHOW, id: ', req.params.id);
+    logger.debug('SHOW query', req.query);
+
+    // ok so this currently circumvents some privacy!!
+    // TODO: fix it - will need to know trust group user is
+
     // check for mitigation ticket request
     if (KeyExtract.isMitigation(req.params.id)) {
-      // mitigationService.getMitigated(req.params.id)
       mitigationService.getMitigation(req.params.id, user)
       .then(function (reply) {
-        res.status(200).send(resUtils.getSuccessReply(reply));
+        res.status(200).send(resUtils.getSuccessReply(formatTicketResponse('mitigation', reply)));
       })
       .catch(function (err) {
         res.status(400).send(resUtils.getErrorReply(err));
       });
+
+    // logged into
     } else {
       ticketService.getTicket(req.params.id)
       .then(function (reply) {
-        res.status(200).send(resUtils.getSuccessReply(reply));
+        if (reply.metadata.private && user !== reply.metadata.creator) {
+          res.status(400).send(resUtils.getErrorReply('You do not have permission to view this ticket'));
+        } else {
+          res.status(200).send(resUtils.getSuccessReply(formatTicketResponse('tickets', reply)));
+        }
       })
       .catch(function (err) {
         res.status(400).send(resUtils.getErrorReply(err.toString()));
