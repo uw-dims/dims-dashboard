@@ -336,6 +336,9 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
     return result;
   };
 
+  // If user is not supplied or is null, this will return an empty array
+  // Maybe should re-work promises so that null or undefined user is not
+  // even submitted and an empty array is returned
   var getUserIps = function getUserIps(ticketKey, user) {
     console.log('getUserIps ', ticketKey, user);
     return mapTopicKeys(ticketKey)

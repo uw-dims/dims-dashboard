@@ -14,13 +14,13 @@
         var deferred = $q.defer();
         TicketApi.get({},
           function (resource) {
-            $log.debug('TicketService.getTicket success callback data', resource.data);
-            console.log(resource.data);
-            var result = resource.data.reverse();
+            $log.debug('TicketService.getTickets success callback data', resource.data);
+            console.log(resource.data.tickets);
+            var result = resource.data.tickets.reverse();
             deferred.resolve(result);
           },
           function (err) {
-            $log.debug('TicketService.geTticket error callback', err);
+            $log.debug('TicketService.getTickets error callback', err);
             deferred.reject(err);
           });
         return deferred.promise;

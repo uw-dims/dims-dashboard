@@ -59,6 +59,138 @@ HTTP Verbs
 
 ..
 
+Responses
+---------
+
+The API returns JSON. JSON responses follow the unofficial JSEND spec. See
+http://labs.omniti.com/labs/jsend/wiki for more information.
+
+Successful requests will return JSON with
+a status of ``success`` and a ``data`` property with the
+JSON result.
+
+.. code-block:: none
+
+    {
+       "data": <json>
+       "status": "success"
+    }
+
+..
+
+The ``data`` property will generally be in the following form for one ticket:
+
+.. code-block:: none
+
+    "data": {
+      "ticket": {
+        <json describing ticket>
+      }
+    }
+
+..
+
+or for multiple tickets:
+
+.. code-block:: none
+
+    "data": {
+      "tickets": [ <array of json where each one describes a ticket>]
+    }
+
+..
+
+Since mitigations are a *special* form of ticket, we use
+the terms ``mitigation`` and ``mitigations`` as keys to their response:
+
+.. code-block:: none
+
+    "data": {
+      "mitigation": {
+        <json describing mitigation ticket>
+      }
+    }
+
+..
+
+Requests that do not send back data (such as delete) will return with
+``data`` set to ``null``:
+
+.. code-block:: none
+
+    {
+      "status": "success",
+      "data": null
+    }
+
+..
+
+Unsuccessful requests will return JSON with an error message
+and a status of ``error``:
+
+.. code-block:: none
+
+    {
+        "message": "You do not have permission to access this ticket",
+        "status": "error"
+    }
+
+..
+
+Requests that failed due to invalid data or parameters submitted may
+generate a ``fail`` response:
+
+.. code-block:: none
+
+    {
+      "status": "fail",
+      "data": <wrapper for reason request failed>
+    }
+
+..
+
+For example:
+
+.. code-block:: none
+
+    {
+      "status": "fail",
+      "data": {
+        "name": "A name for the new ticket is required"
+      }
+    }
+
+..
+
+.. note::
+
+    Currently most errors are reported as ``error`` rather than ``fail``. We are working
+    on refactoring so that errors that should be reported as ``fail`` are done so.
+
+..
+
+
+
+An HTTP status code is included in the response headers. For example, the
+following request returns with 400:
+
+.. code-block:: none
+
+    $ curl -k -I http://192.168.56.103/api/ticket
+    HTTP/1.1 400 Bad Request
+    Server: nginx/1.8.0
+    Date: Wed, 13 Jan 2016 16:44:48 GMT
+    Content-Type: text/plain; charset=utf-8
+    Content-Length: 96
+    Connection: keep-alive
+    X-Powered-By: Express
+    ETag: W/"60-kIP4LSNmFtWUQFvEw0Zo/g"
+    set-cookie: connect.sid=s%3Ah6h88KJrXfxT4Ycabe1dk5aTFY26SRx8.o7d2T9y03YrbbR8ssnmF0tFEpfV9VNI6F7l9oJQEgAg; Path=/; HttpOnly
+
+..
+
+
+
 
 Retrieve a list of tickets
 --------------------------
@@ -67,6 +199,16 @@ Returns list of tickets
 
 No parameters
 ~~~~~~~~~~~~~
+
+When no parameters are provided, the system defaults to the following parameters:
+
+.. code-block:: none
+
+    type: 'activity',
+
+..
+
+
 
 This will return all public activities plus any private activities belonging
 to the calling user.
@@ -79,7 +221,7 @@ Using curl:
 
 Sample response:
 
-.. code_block:: none
+.. code-block:: none
 
     { "data": [
        "ticket:1",
@@ -88,6 +230,77 @@ Sample response:
     }
 
 ..
+
+With query parameters
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: none
+
+    private: boolean
+    type: string
+    ownedBy: string
+    open: boolean
+
+..
+
+``type`` can be ``mitigation`` or ``activity``. For mitigation tickets, no
+other parameters are needed, and any extra provided are ignored.
+
+.. code-block:: none
+
+    $ curl -k http://192.168.56.103/api/ticket?type=mitigation | python -m json.tool
+      % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                     Dload  Upload   Total   Spent    Left  Speed
+    100  1177  100  1177    0     0  34609      0 --:--:-- --:--:-- --:--:-- 35666
+    {
+        "data": [
+            {
+                "data": [
+                    [
+                        1450004398760,
+                        0
+                    ],
+                    [
+                        1450068277926,
+                        6
+                    ],
+                    [
+                        1450085780836,
+                        13
+                    ],
+                    [
+                        1452404888722,
+                        329
+                    ],
+                    [
+                        1452478109289,
+                        343
+                    ]
+                ],
+                "ips": {
+                    "data": [],
+                    "user": null
+                },
+                "key": "dims:ticket:mitigation:1",
+                "metadata": {
+                    "createdTime": 1452682798841,
+                    "creator": "lparsons",
+                    "description": "IPs needing mitigation. As you mitigate IPs, submit them here.",
+                    "initialNum": 1408,
+                    "mitigatedNum": 343,
+                    "modifiedTime": 1452682798841,
+                    "name": "Action Needed: 12/12/2015 Compromised IPs",
+                    "num": 1,
+                    "open": true,
+                    "private": false,
+                    "type": "mitigation",
+                    "unknownNum": 864
+                }
+            }
+        ],
+        "status": "success"
+    }
+
 
 Creating an activity
 --------------------
