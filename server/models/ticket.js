@@ -11,7 +11,7 @@ var config = require('../config/config'),
     q = require('q'),
     _ = require('lodash-compat');
 
-module.exports = function Ticket(store, Topic) {
+module.exports = function Ticket(store) {
 
   var timestamp = function () {
     var now = new Date().getTime();
@@ -216,7 +216,7 @@ module.exports = function Ticket(store, Topic) {
       });
     },
 
-    // TODO: need to delete topics as well
+    // This deletes the ticket only not topics
     deleteTicket: function deleteTicket() {
       var self = this;
       var privKey, openKey;

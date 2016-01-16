@@ -108,9 +108,8 @@ module.exports = function Topic(store) {
   var saveMetadata = function saveMetadata(metadata) {
     // console.log('saveMetadata metadata', metadata);
     var parent = _.create({}, metadata.parent);
-    // stringify this since it is nested json
-    // console.log('saveMetadata parent', parent);
     var hash = _.create({}, metadata);
+    // stringify this since it is nested json
     hash.parent = JSON.stringify(parent);
     // console.log('saveMetadata hash ', hash);
     // console.log('saveMetadata metadata is now', metadata);
@@ -121,6 +120,7 @@ module.exports = function Topic(store) {
     return store.removeItem(keyGen.topicKey(metadata), setKey);
   };
 
+  // Retrieve metadata from store and parse
   var getMetadata = function getMetadata(key) {
     return store.getMetadata(key)
     .then(function (reply) {
@@ -140,30 +140,35 @@ module.exports = function Topic(store) {
     });
   };
 
-  // Data should be JSON?
+  // Save data for a topic
   var saveData = function saveData(metadata, data) {
     console.log('saveData metadata is ', metadata);
     // console.log('saveData data is ', data);
     return store.setData(keyGen.topicKey(metadata), data);
   };
 
+  // Get data (string) from store for a topic
   var getData = function getData(metadata) {
     return store.getData(keyGen.topicKey(metadata));
   };
 
+  // Create topic object and save metadata
   var createTopic = function createTopic(ticket, options) {
     var topic = topicFactory(ticket, options);
     return topic.create();
   };
 
+  // add items to topic data. Stored as sorted set if score included.
   var addItems = function addItems(metadata, items, score) {
     return store.addItem(items, keyGen.topicKey(metadata), score);
   };
 
+  // Get items (set or sorted set) from topic
   var getItems = function getItems(metadata) {
     return store.listItems(keyGen.topicKey(metadata));
   };
 
+  // Remove items from set or sorted set topic data
   var removeItems = function removeItems(metadata, items) {
     return store.removeItem(items, keyGen.topicKey(metadata));
   };
@@ -197,6 +202,8 @@ module.exports = function Topic(store) {
   // };
 
   // Get data and metadata for a topic from a topic key
+  // Returns metadata and data - not a complete topic object
+  // with functions
   var getTopic = function getTopic(key) {
     // console.log('getTopic key', key);
     var topic = {};
@@ -224,7 +231,7 @@ module.exports = function Topic(store) {
     });
   };
 
-  // Get array of topics - just metadata and data
+  // Get array of topics for a ticket - just metadata and data
   // Input is ticket key
   var getTopics = function getTopics(key) {
     // console.log(key);
@@ -269,6 +276,22 @@ module.exports = function Topic(store) {
       topic.metadata = reply;
       topic.key = key;
       return topic;
+    })
+    .catch(function (err) {
+      throw err;
+    });
+  };
+
+  // Given a topic key, delete the topic from the store
+  var deleteTopic = function deleteTopic(key) {
+    // Get metadata from topic key so we can get all keys needed
+    return getTopicMetadata(key)
+    .then (function (metadata) {
+      var promises = [];
+      promises.push(store.deleteKey(keyGen.topicMetaKey(metadata)));
+      promises.push(store.deleteKey(keyGen.topicKey(metadata)));
+      promises.push(removeKey(self.metadata, keyGen.topicSetKey(metadata)));
+      return q.all(promises);
     })
     .catch(function (err) {
       throw err;
@@ -320,7 +343,8 @@ module.exports = function Topic(store) {
     getTopics: getTopics,
     getTopicMetadata: getTopicMetadata,
     getTopicsMetadata: getTopicsMetadata,
-    extendFactory: extendFactory
+    extendFactory: extendFactory,
+    deleteTopic: deleteTopic
   };
 
   // if (process.env.NODE_ENV === 'test') {

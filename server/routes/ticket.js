@@ -270,10 +270,18 @@ module.exports = function (ticketService, mitigationService, access) {
     //   });
   };
 
-  // TODO: Not implemented
   ticketRoute.delete = function (req, res) {
-    logger.debug('routes/ticket DELETE, not implemented');
-    res.status(405).send('Ticket delete not yet implemented.');
+    logger.debug('routes/ticket DELETE');
+    // user is the authorizations object contained in the request. It must be present
+    if (!req.user) {
+      return res.status(500).send(resUtils.getErrorReply('Authentication error: User is not defined in request'));
+    }
+
+    // Get the access object
+    userAccess = req.user;
+    // Get the user from the access object
+    user = access.username(userAccess);
+    logger.debug('LIST userAccess', userAccess);
   };
 
   /**
