@@ -19,22 +19,25 @@ var store = require('../../../models/store')(client);
 var Ticket = require('../../../models/ticket')(store);
 var Topic = require('../../../models/topic')(store);
 
-var createOptions = function (creator, type, name, privacy, description) {
+var createOptions = function (creator, type, name, tg, privacy, description) {
   return {
     creator: creator,
     type: type,
     description: description,
     private: privacy,
-    name: name
+    name: name,
+    tg: tg
   };
 };
 
+var tg1 = 'dims1';
+
 var createTickets = function createTickets() {
   console.log('start createTickets');
-  var activityConfig1 = createOptions('testuser1', 'activity', 'Activity 1');
-  var mitigationConfig1 = createOptions('testuser2', 'mitigation', 'Mitigation 1', false);
-  var privateConfig1 = createOptions('testuser2', 'activity', 'Activity2', true);
-  var activityConfig2 = createOptions('testuser2', 'activity', 'Activity 3', false);
+  var activityConfig1 = createOptions('testuser1', 'activity', 'Activity 1', tg1);
+  var mitigationConfig1 = createOptions('testuser2', 'mitigation', 'Mitigation 1', tg1, false);
+  var privateConfig1 = createOptions('testuser2', 'activity', 'Activity2', tg1, true);
+  var activityConfig2 = createOptions('testuser2', 'activity', 'Activity 3', tg1, false);
   var ticket1 = Ticket.ticketFactory(activityConfig1);
   var ticket2 = Ticket.ticketFactory(mitigationConfig1);
   var ticket3 = Ticket.ticketFactory(privateConfig1);

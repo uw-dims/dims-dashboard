@@ -192,6 +192,10 @@ angular.module('dimsDashboard.services', []);
 angular.module('dimsDashboard.directives', []);
 angular.module('dimsDashboard.filters', []);
 
+dimsDashboard.config(function ($httpProvider) {
+    $httpProvider.interceptors.push('authInterceptor');
+  });
+
  _.mixin(_.string.exports());
 
 dimsDashboard.run(function ($rootScope, $location, $log, AuthService) {

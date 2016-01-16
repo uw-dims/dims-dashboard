@@ -26,17 +26,20 @@ var Ticket = require('../../../models/ticket')(store);
 // Bootstrap some data
 var user = 'testUser'; // Simulates logged in user
 
-var createOptions = function (creator, type, name, privacy, description) {
+var createOptions = function (creator, type, name, tg, privacy, description) {
   return {
     creator: creator,
     type: type,
     description: description,
     private: privacy,
-    name: name
+    name: name,
+    tg: tg
   };
 };
 
 var user1 = 'testuser';
+var tg1 = 'dims1';
+var tg2 = 'dims2';
 var activityKey1 = 'dims:ticket:activity:1';
 var mitigationKey1 = 'dims:ticket:activity:1';
 var userKey1 = 'dims:ticket:' + user1 + ':1';
@@ -44,21 +47,23 @@ var ownerSetKey1 = 'dims:ticket.__owner.__' + user1;
 var openSetKey = 'dims:ticket.__open';
 var typeSetKey1 = 'dims:ticket.__type.__activity';
 var ticketSetKey = 'dims:ticket.__keys';
+var tg1Key = 'dims:ticket.__tg.__' + tg1;
+var tg2Key = 'dims:ticket.__tg.__' + tg2;
 
-var validOption1 = createOptions(user1, 'activity', 'Activity 1', false);
-var expectedOption1 = createOptions(user1, 'activity', 'Activity 1', false);
+var validOption1 = createOptions(user1, 'activity', 'Activity 1', tg1, false);
+var expectedOption1 = createOptions(user1, 'activity', 'Activity 1', tg1, false);
 _.extend(expectedOption1, {description: ''});
-var validOption2 = createOptions(user1, 'activity', 'Activity 2');
-var expectedOption2 = createOptions(user1, 'activity', 'Activity 2', false, '');
-var extraOptions1 = createOptions(user1, 'activity', 'Activity3', true, 'An activity');
+var validOption2 = createOptions(user1, 'activity', 'Activity 2', tg1);
+var expectedOption2 = createOptions(user1, 'activity', 'Activity 2', tg1, false, '');
+var extraOptions1 = createOptions(user1, 'activity', 'Activity3', tg1, true, 'An activity');
 _.extend(extraOptions1, {'nancy': 'girl'});
-var expectedOption3 = createOptions(user1, 'activity', 'Activity3', true, 'An activity');
+var expectedOption3 = createOptions(user1, 'activity', 'Activity3', tg1, true, 'An activity');
 
 var createTickets = function createTickets() {
-  var activityConfig1 = createOptions('testuser1', 'activity', 'Activity 1');
-  var mitigationConfig1 = createOptions('testuser2', 'mitigation', 'Mitigation 1', false);
-  var privateConfig1 = createOptions('testuser2', 'activity', 'Activity2', true);
-  var activityConfig2 = createOptions('testuser2', 'activity', 'Activity 3', false);
+  var activityConfig1 = createOptions('testuser1', 'activity', 'Activity 1', tg1);
+  var mitigationConfig1 = createOptions('testuser2', 'mitigation', 'Mitigation 1', tg1, false);
+  var privateConfig1 = createOptions('testuser2', 'activity', 'Activity2', tg1, true);
+  var activityConfig2 = createOptions('testuser2', 'activity', 'Activity 3', tg1, false);
   var ticket1 = Ticket.ticketFactory(activityConfig1);
   var ticket2 = Ticket.ticketFactory(mitigationConfig1);
   var ticket3 = Ticket.ticketFactory(privateConfig1);

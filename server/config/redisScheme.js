@@ -56,6 +56,12 @@ var makeSuffix = function (suffixType, param) {
       }
       return '.__owner.__' + param;
     },
+    'tg': function (param) {
+      if (param === undefined || param === null) {
+        throw new Error('Tg was not defined for: ', suffixType);
+      }
+      return '.__tg.__' + param;
+    },
     'subscriptions': function (param) {
       if (param === undefined || param === null) {
         throw new Error('User was not defined for: ', suffixType);

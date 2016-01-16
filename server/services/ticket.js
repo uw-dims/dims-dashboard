@@ -5,10 +5,7 @@
 'use strict';
 
 // Includes
-var diContainer = require('./diContainer');
-var config = require('../config/config');
 var logger = require('../utils/logger')(module);
-var KeyGen = require('../models/keyGen');
 var q = require('q');
 var _ = require('lodash-compat');
 
@@ -23,7 +20,7 @@ module.exports = function (Ticket, Topic) {
     });
     return q.all(promises)
     .catch(function (err) {
-      logger.debug('listTickets error', err);
+      logger.debug('listTickets error', err.toString());
       throw err;
     });
   };

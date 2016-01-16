@@ -48,6 +48,10 @@ var keyGen = {
     return c.addSuffix(c.makeRoot('ticket'), 'owner', owner);
   },
 
+  ticketTgKey: function ticketTgKey(tg) {
+    return c.addSuffix(c.makeRoot('ticket'), 'tg', tg);
+  },
+
   ticketSubscriptionsKey: function ticketSubscriptionsKey(user) {
     return c.addSuffix(c.makeRoot('ticket'), 'subscriptions', user);
   },

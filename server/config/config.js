@@ -6,6 +6,8 @@ var config = {};
 
 config.appName = 'dims-dashboard';
 
+config.publicHost = process.env.DASHBOARD_PUBLIC_HOST || 'localhost';
+
 config.uuid = uuid.v4();
 
 config.sslOn = process.env.SSL_ON || false;
@@ -43,37 +45,22 @@ config.userDBHost = process.env.USER_DB_HOST || 'localhost';
 config.userDBUser = process.env.USER_DB_USER || 'dims';
 config.userDatabase = process.env.USER_DATABASE || 'ops-trust';
 
-// During development - specify user backend.
-// Possible values:
-//   'postgresql' - use postgresql database
-//   'static'  - use static config variable with users/passwords - only for
-//       development/testing
-//   others... tba
-config.POSTGRESQL = 'postgresql';
-config.STATIC = 'static';
+// Passport vars and configs
+config.tokenSecret = process.env.TOKEN_SECRET || 'djf83UhNH35CDjfjEFM3B9e01viY8fNqz3YXpb25wc0U';
+config.tokenAlgorithm = 'HS256';
+// Result is seconds
+config.tokenExpiresInMinutes = 1 * 60 * 60;
+config.tokenIssuer = process.env.DASHBOARD_PUBLIC_HOST || require('os').hostname();
+config.localStrategyConfig = {
+  usernameField: 'username',
+  passwordField: 'password',
+  passReqToCallback: false
+};
 
-// Set environment USER_BACKEND to 'static' to use test users for testing
-// rather than a postgres instance
-// Default is Postgresqll
-config.userSource = process.env.USER_BACKEND || config.POSTGRESQL;
-
-// Put this here for now - only for testing without database
-config.testUsers =
-  [
-    {
-      'ident': 'testuser1',
-      'descr': 'Test User 1',
-      'password': 'testuser1'
-    }, {
-      'ident': 'testuser2',
-      'descr': 'Test User 2',
-      'password': 'testuser2'
-    }, {
-      'ident': 'testuser3',
-      'descr': 'Test User 3',
-      'password': 'testuser3'
-    }
-  ];
+config.jwtStrategyConfig = {
+  secretOrKey: config.tokenSecret,
+  passReqToCallback: false
+};
 
 config.sessionTTL = 7200; //Redis session expiration. 2 hours, in seconds
 

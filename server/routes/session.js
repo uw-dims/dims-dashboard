@@ -7,8 +7,15 @@ var validator = require('validator');
 
 var logger = require('../utils/logger')(module);
 var resUtils = require('../utils/responseUtils');
+var config = require('../config/config');
 
-module.exports = function (UserSettings, userService) {
+var formatResponse = function formatResponse(key, data) {
+  var result = {};
+  result[key] = data;
+  return result;
+};
+
+module.exports = function (UserSettings, userService, auth) {
 
   var session = {};
 
@@ -51,7 +58,7 @@ module.exports = function (UserSettings, userService) {
   };
 
   // Get the settings and return in session object
-  var getSessionObject = function getSessionObject(user) {
+  function getSessionObject(user) {
     var settings = {};
     return UserSettings.getUserSettings(user.username)
     .then(function (reply) {
@@ -70,9 +77,44 @@ module.exports = function (UserSettings, userService) {
     .catch(function (err) {
       throw err;
     });
+  }
+
+  function onLoginAuthenticate(req, res, error, user, info) {
+    if (error) {
+      res.status(500).send(resUtils.getErrorReply(error));
+    }
+    if (!user) {
+      // info should contain message
+      res.status(400).send(resUtils.getFailReply(info));
+    }
+    var authUserData,
+        username = user.username,
+        tgs = user.loginTgs;
+    // Get data to send to caller
+    userService.getUserSession(user.username)
+    .then(function (reply) {
+      authUserData = reply;
+      return getSessionObject(authUserData);
+    })
+    .then(function (reply) {
+      res.status(200).send(resUtils.getSuccessReply(formatResponse('login',
+      {
+        token: auth.createToken(username, tgs),
+        sessionObject: reply
+      })));
+    })
+    .catch(function (err) {
+      logger.error('onLoginAuthenticate error', err);
+      res.status(400).send(resUtils.getErrorReply(err.toString()));
+    });
+  }
+
+  // Login user and return object and token
+  session.tokenLogin = function (req, res, next) {
+    passport.authenticate('local', onLoginAuthenticate.bind(this, req, res))(req, res);
   };
 
-  // Login user
+  // Login user and save session (if not using token)
   session.login = function (req, res, next) {
     passport.authenticate('local', function (err, user, info) {
       // Check response from authenticate

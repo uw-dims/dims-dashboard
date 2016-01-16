@@ -68,9 +68,25 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
   // every time a user's attributes change
   var mapPath = config.dashboardDataPath + 'dashboard_user_attributes.yml';
 
-  var listMitigations = function listMitigations(user) {
+  var listMitigations = function listMitigations(user, query) {
+    console.log('query in listMitigations', query);
     var promises = [];
-    return store.listItems(keyGen.ticketTypeKey('mitigation'))
+    var keyArray = [];
+
+    // TODO: break this out into its own module or function - used in ticket service as well. Or call it
+    // from there
+    keyArray.push(keyGen.ticketTypeKey('mitigation'));
+    if (query.hasOwnProperty('open') ) {
+      if (query.open) {
+        keyArray.push(keyGen.ticketOpenKey());
+      } else {
+        keyArray.push(keyGen.ticketClosedKey());
+      }
+    }
+    if (query.hasOwnProperty('tg')) {
+      keyArray.push(keyGen.ticketTgKey(query.tg));
+    }
+    return store.intersectItems(keyArray)
     .then(function (reply) {
       // Array of keys to mitigations
       // console.log('listMitigations', reply);
@@ -143,15 +159,16 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
 
   // var create = function create()
 
-  var initiateMitigation = function initiateMitigation(ipData, user, ticketName, description, startTime) {
-    console.log('Initiating mitigation: user %s, ticketName %s, description %s, startTime %s',
-      user, ticketName, description, startTime);
+  var initiateMitigation = function initiateMitigation(ipData, user, tg, ticketName, description, startTime) {
+    console.log('Initiating mitigation: user %s, tg %s, ticketName %s, description %s, startTime %s',
+      user, tg, ticketName, description, startTime);
     // var ipData = fs.readFileSync(ipPath, {encoding: 'utf-8'});
     var ticketConfig = {
       creator: user,
       type: 'mitigation',
       name: ticketName,
-      description: description
+      description: description,
+      tg: tg
     };
     var ticket = Ticket.ticketFactory(ticketConfig);
     var binnedIps;

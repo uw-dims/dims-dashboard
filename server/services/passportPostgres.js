@@ -62,5 +62,14 @@ module.exports = function (userService) {
     });
   };
 
+  passportPostgres.onJwtAuth = function onJwtAuth(payload, done) {
+    logger.debug('Starting onJwtAuth');
+    // Actually need to check database here..
+    console.log('payload is ', payload);
+    var user = payload.user;
+    console.log('onJwtAuth user ', user);
+    return done(null, user, {});
+  };
+
   return passportPostgres;
 };

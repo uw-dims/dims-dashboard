@@ -11,7 +11,7 @@ var config = require('../config/config'),
     q = require('q'),
     _ = require('lodash-compat');
 
-module.exports = function Ticket(store) {
+module.exports = function Ticket(store, Topic) {
 
   var timestamp = function () {
     var now = new Date().getTime();
@@ -32,7 +32,8 @@ module.exports = function Ticket(store) {
     type: 'type',
     description: 'description',
     private: 'private',
-    name: 'name'
+    name: 'name',
+    tg: 'tg'
   };
 
   var isValidType = function (type) {
@@ -43,6 +44,8 @@ module.exports = function Ticket(store) {
     }
   };
 
+
+  // Validate config used to create a ticket objcet
   var validateConfig = function (config) {
     var defaultConfig = {
       description: '',
@@ -50,8 +53,8 @@ module.exports = function Ticket(store) {
     };
     // var newConfig = _.extend({}, defaultConfig, config);
     _.defaults(config, defaultConfig);
-    // Must contain creator and type
-    if (!config[validOptions.creator] || !config[validOptions.type] || !config[validOptions.name]) {
+    // Must contain creator, type, name, trustgroup (tg)
+    if (!config[validOptions.creator] || !config[validOptions.type] || !config[validOptions.name] || !config[validOptions.tg]) {
       return null;
     }
     // Type must be valid
@@ -66,7 +69,8 @@ module.exports = function Ticket(store) {
       description: config.description,
       type: config.type,
       private: config.private,
-      name: config.name
+      name: config.name,
+      tg: config.tg
     };
   };
 
@@ -212,6 +216,7 @@ module.exports = function Ticket(store) {
       });
     },
 
+    // TODO: need to delete topics as well
     deleteTicket: function deleteTicket() {
       var self = this;
       var privKey, openKey;
@@ -228,6 +233,7 @@ module.exports = function Ticket(store) {
       return q.all([
         store.deleteKey(keyGen.ticketKey(self.metadata)),
         removeKey(self.metadata, keyGen.ticketSetKey()),
+        removeKey(self.metadata, keyGen.ticketTgKey(self.metadata.tg)),
         removeKey(self.metadata, keyGen.ticketOwnerKey(self.metadata.creator)),
         removeKey(self.metadata, openKey),
         removeKey(self.metadata, keyGen.ticketTypeKey(self.metadata.type)),
@@ -264,6 +270,7 @@ module.exports = function Ticket(store) {
           saveKey(self.metadata, keyGen.ticketOwnerKey(self.metadata.creator)),
           saveKey(self.metadata, keyGen.ticketOpenKey()),
           saveKey(self.metadata, keyGen.ticketTypeKey(self.metadata.type)),
+          saveKey(self.metadata, keyGen.ticketTgKey(self.metadata.tg)),
           saveKey(self.metadata, privKey)
         ]);
       })
@@ -330,77 +337,84 @@ module.exports = function Ticket(store) {
     return newOptions;
   };
 
-  var validateQuery = function validateQuery(options) {
+  // Validate a query
+  var validateQuery = function validateQuery(options, done) {
     var result = {};
     options = convertBoolean(options);
-    if (!options['type']) {
-      return null;
-    }
-    // Type must be valid
-    if (!isValidType(options.type) && options.type !== 'all') {
-      return null;
+    if (options.hasOwnProperty('type') && !isValidType(options.type)) {
+      return done('Invalid query: type ' + options.type + ' is not a valid type', false);
     }
     if (options.hasOwnProperty('private')) {
       if (typeof options.private !== 'boolean') {
-        return null;
+        return done('Invalid query: private must be boolean', false);
       }
     }
-    if (options.private && !options['ownedBy']) {
-      return null;
+    // If private, ownedBy must also be supplied
+    if (options.private && !options.hasOwnProperty('ownedBy')) {
+      return done('Invalid query: When ticket is private, ownedBy must be supplied', false);
     }
     if (options.hasOwnProperty('open')) {
       if (typeof options.open !== 'boolean') {
-        return null;
+        return done('Invalid query: open must be boolean', false);
       }
     }
-    result.type = options.type;
-    if (options['private']) {
+    if (options.hasOwnProperty('type')) {
+      result.type = options.type;
+    }
+    if (options.hasOwnProperty('private')) {
       result.private = options.private;
     }
-    if (options['ownedBy']) {
+    if (options.hasOwnProperty('ownedBy')) {
       result.ownedBy = options.ownedBy;
     }
     if (options.hasOwnProperty('open')) {
       result.open = options.open;
     }
-    return result;
+    if (options.hasOwnProperty('tg')) {
+      result.tg = options.tg;
+    }
+    return done(null, result, {});
   };
 
   var getTicketKeys = function getTicketKeys(options) {
     // console.log('getTicketKeys options', options);
     var keyArray = [];
-    var query = validateQuery(options);
-    if (query === null) {
-      console.log('throw error for invalid query');
-      return q.fcall(function () {
-        throw new Error('Invalid query supplied to retrieve tickets');
-      });
-    }
-    if (query.type === 'all') {
-      keyArray.push(keyGen.ticketSetKey());
-    }
-    if (query.type === 'activity' || query.type === 'mitigation') {
-      keyArray.push(keyGen.ticketTypeKey(query.type));
-    }
-    if (query.hasOwnProperty('private')) {
-      if (query.private) {
-        keyArray.push(keyGen.ticketPrivateKey());
+    var deferred = q.defer();
+    validateQuery(options, function (err, query, info) {
+      if (err) {
+        console.log('throw error for invalid query');
+        deferred.reject(new Error(err));
       } else {
-        keyArray.push(keyGen.ticketPublicKey());
+        if (!query.hasOwnProperty('type')) {
+          keyArray.push(keyGen.ticketSetKey());
+        } else {
+          keyArray.push(keyGen.ticketTypeKey(query.type));
+        }
+        if (query.hasOwnProperty('private')) {
+          if (query.private) {
+            keyArray.push(keyGen.ticketPrivateKey());
+          } else {
+            keyArray.push(keyGen.ticketPublicKey());
+          }
+        }
+        if (query.hasOwnProperty('open') ) {
+          if (query.open) {
+            keyArray.push(keyGen.ticketOpenKey());
+          } else {
+            keyArray.push(keyGen.ticketClosedKey());
+          }
+        }
+        if (query.hasOwnProperty('ownedBy')) {
+          keyArray.push(keyGen.ticketOwnerKey(query.ownedBy));
+        }
+        if (query.hasOwnProperty('tg')) {
+          keyArray.push(keyGen.ticketTgKey(query.tg));
+        }
+        console.log('getTicketKeys. keyArray is ', keyArray);
+        deferred.resolve(store.intersectItems(keyArray));
       }
-    }
-    if (query.hasOwnProperty('open') ) {
-      if (query.open) {
-        keyArray.push(keyGen.ticketOpenKey());
-      } else {
-        keyArray.push(keyGen.ticketClosedKey());
-      }
-    }
-    if (query.hasOwnProperty('ownedBy')) {
-      keyArray.push(keyGen.ticketOwnerKey(query.ownedBy));
-    }
-    // console.log('getTicketKeys. keyArray is ', keyArray);
-    return store.intersectItems(keyArray);
+    });
+    return deferred.promise;
   };
 
   // var completeTicket = function completeTicket(config) {
