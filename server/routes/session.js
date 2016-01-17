@@ -87,21 +87,9 @@ module.exports = function (UserSettings, userService, auth) {
       // info should contain message
       res.status(400).send(resUtils.getFailReply(info));
     }
-    var authUserData,
-        username = user.username,
-        tgs = user.loginTgs;
-    // Get data to send to caller
-    userService.getUserSession(user.username)
+    return getSessionAndToken(user.username)
     .then(function (reply) {
-      authUserData = reply;
-      return getSessionObject(authUserData);
-    })
-    .then(function (reply) {
-      res.status(200).send(resUtils.getSuccessReply(formatResponse('login',
-      {
-        token: auth.createToken(username, tgs),
-        sessionObject: reply
-      })));
+      res.status(200).send(resUtils.getSuccessReply(formatResponse('login', reply)));
     })
     .catch(function (err) {
       logger.error('onLoginAuthenticate error', err);
@@ -109,9 +97,42 @@ module.exports = function (UserSettings, userService, auth) {
     });
   }
 
+  function getSessionAndToken(username) {
+    var authUserData,
+        tgs,
+        token;
+    // Get data to send to caller
+    userService.getUserSession(username)
+    .then(function (reply) {
+      authUserData = reply;
+      tgs = reply.loginTgs;
+      token = auth.createToken(username, tgs);
+      return getSessionObject(authUserData);
+    })
+    .then(function (reply) {
+      return {
+        token: token,
+        sessionObject: reply
+      };
+    })
+    .catch(function (err) {
+      throw err;
+    });
+  }
+
   // Login user and return object and token
   session.tokenLogin = function (req, res, next) {
     passport.authenticate('local', onLoginAuthenticate.bind(this, req, res))(req, res);
+  };
+
+  session.onGoogleSuccess = function (req, res, error, user, info) {
+    if (error) {
+      res.status(500).send(resUtils.getErrorReply(error));
+    }
+    if (!user) {
+      // info should contain message
+      res.status(400).send(resUtils.getFailReply(info));
+    }
   };
 
   // Login user and save session (if not using token)

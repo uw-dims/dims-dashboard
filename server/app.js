@@ -23,6 +23,7 @@ var express = require('express')
   , passport = require('passport')
   , LocalStrategy = require('passport-local').Strategy
   , JwtStrategy = require('passport-jwt').Strategy
+  , GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
   // , GoogleStrategy = require('passport-google-oauth-jwt').GoogleOauthJWTStrategy
   , resUtils = require('./utils/responseUtils');
 
@@ -183,6 +184,9 @@ passport.use(
 passport.use(
   new JwtStrategy(config.jwtStrategyConfig, auth.onJwtAuth));
 
+passport.use(
+  new GoogleStrategy(config.googleStrategyConfig, auth.onGoogleAuth));
+
 app.use(passport.initialize());
 // app.use(passport.session());
 
@@ -262,8 +266,14 @@ router.get('/auth/session', auth.ensureAuthenticated, sessionRoute.session);
 router.post('/auth/session', sessionRoute.tokenLogin);
 router.delete('/auth/session', auth.ensureAuthenticated, sessionRoute.logout);
 
-// user session - will delete
-// router.get('/session', auth.ensureAuthenticated, require('./routes/usersession').session);
+// Redirect user to Google for authentication. When complete, Google will redirect
+// user back to this application at config.googleCallback
+router.get('/auth/google', passport.authenticate('google', {scope: ['https://www.googleapis.com/auth/plus.login']}));
+
+// Google redirects to this URL after authentication.
+router.get(config.googleCallback,
+  passport.authenticate('google', { failureRedirect: '/login' }), sessionRoute.onGoogleSuccess);
+
 router.get('/*', auth.ensureAuthenticated, routes.index);
 
 app.use('/', router);

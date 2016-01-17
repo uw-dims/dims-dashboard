@@ -53,6 +53,18 @@ module.exports = function (userService, access) {
 
   };
 
+  auth.onGoogleAuth = function onGoogleAuth(accessToken, refreshToken, profile, done) {
+    logger.debug('auth.onGoogleAuth accessToken', accessToken);
+    logger.debug('auth.onGoogleAuth refreshToken', refreshToken);
+    logger.debug('auth.onGoogleAuth profile', profile);
+    process.nextTick(function () {
+
+      // lookup user via token
+      return done(null, user, {});
+      // put catch on promise chain here
+    });
+  };
+
   auth.createToken = function createToken(username, scope) {
     logger.debug('createToken issuer is ', config.tokenIssuer);
     return jwt.sign(

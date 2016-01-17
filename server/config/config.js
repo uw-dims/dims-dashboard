@@ -8,9 +8,13 @@ config.appName = 'dims-dashboard';
 
 config.publicHost = process.env.DASHBOARD_PUBLIC_HOST || 'localhost';
 
+config.publicPort = process.env.DASHBOARD_PUBLIC_PORT || '80';
+
 config.uuid = uuid.v4();
 
 config.sslOn = process.env.SSL_ON || false;
+
+config.publicProtocol = config.sslOn ? 'https' : 'http';
 
 config.port = process.env.PORT || 3000;
 
@@ -60,6 +64,17 @@ config.localStrategyConfig = {
 config.jwtStrategyConfig = {
   secretOrKey: config.tokenSecret,
   passReqToCallback: false
+};
+
+config.googleClientId = process.env.GOOGLE_CLIENT_ID;
+config.googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
+config.googleCallback = '/auth/google/callback';
+config.googleCallbackURL = config.publicProtocol + '://' + config.publicHost + config.googleCallback;
+
+config.googleStrategyConfig = {
+  clientID: config.googleClientId,
+  clientSecret: config.googleClientSecret,
+  callbackURL: config.googleReturnURL
 };
 
 config.sessionTTL = 7200; //Redis session expiration. 2 hours, in seconds
