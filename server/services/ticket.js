@@ -30,7 +30,7 @@
  * services/ticket.js
  *
  * This module provides the basic functions used by other modules to work with
- * tickets. 
+ * tickets.
  */
 
 'use strict';
@@ -40,25 +40,81 @@ var logger = require('../utils/logger')(module);
 var q = require('q');
 var _ = require('lodash-compat');
 
+// ticketService.listTickets = listTickets;
+// ticketService.getTicket = getTicket;
+// ticketService.createTicket = createTicket;
+// ticketService.updateTicket = updateTicket;
+// ticketService.deleteTicket = deleteTicket;
+// ticketService.addTopic = addTopic;
+// ticketService.updateTopic = updateTopic;
+// ticketService.deleteTopic = deleteTopic;
+
 module.exports = function (Ticket, Topic) {
   var ticketService = {};
 
-  // Returns ticket metadata and array of topic metadata
-  var listTickets = function listTickets(config) {
+  // Create a ticket described by the config parameter
+  // Returns a promise with the
+  // config properties:
+  //   creator: (required) username of ticket creator
+  //   type: (required) type of ticket - 'activity', 'mitigation'
+  //   description: (optional - default is '') string description of ticket
+  //   private: (optional - default is false) boolean
+  //   name: (required) - name of ticket
+  //   tg: (required) - trust group ticket belongs to
+  //
+  var createTicket = function createTicket(config) {
+    var ticket = Ticket.ticketFactory(config);
+    return ticket.create();
+  };
+
+  // Returns a promise with an array of tickets and their associated topics (metadata only)
+  // queries is an array of query objects, so this method can
+  // return results for multiple queries
+  //
+  // Query object properties:
+  //   type: (optional) type of ticket: 'activity', 'mitigation'
+  //   ownedBy: (optional) username of the ticket owner (creator)
+  //   private: (optional) true if private, false if public
+  //   open: (optional) true if open, false if closed
+  //   tg: (optional) trust group
+  var listTickets = function listTickets(queries) {
     var promises = [];
-    _.forEach(config, function (value, index) {
-      promises.push(listTicket(value));
+    _.forEach(queries, function (value, index) {
+      promises.push(ticketQuery(value));
     });
     return q.all(promises)
+  };
+
+  // Returns a promise with a ticket and its associated topics (metadata only)
+  // id: key of the ticket
+  var getTicket = function getTicket(id) {
+    return Ticket.getTicket(id)
+    .then(function (reply) {
+      return addTopics(reply);
+    })
     .catch(function (err) {
-      logger.debug('listTickets error', err.toString());
+      logger.debug('getTicket error', err);
       throw err;
     });
   };
 
-  var listTicket = function listTicket(config) {
+  // Returns a promise
+  // Updates a ticket's metadata
+  var updateTicket = function updateTicket(id, description) {
+    return Ticket.getTicket(id)
+    .then(function (reply) {
+
+    })
+    .catch(function (err) {
+      throw err;
+    });
+  };
+
+  // Returns a promise with an array of tickets and associated
+  // topics (metadata only)
+  function ticketQuery(query) {
     var promises = [];
-    return Ticket.getTickets(config)
+    return Ticket.getTickets(query)
     .then(function (reply) {
       _.forEach(reply, function (value, key) {
         var ticket = value;
@@ -70,7 +126,7 @@ module.exports = function (Ticket, Topic) {
       logger.debug('listTicket error', err);
       throw err;
     });
-  };
+  }
 
   var addTopics = function addTopics(ticket) {
     var result = ticket;
@@ -85,37 +141,15 @@ module.exports = function (Ticket, Topic) {
     });
   };
 
-  var getTicket = function getTicket(id) {
-    return Ticket.getTicket(id)
-    .then(function (reply) {
-      return addTopics(reply);
-    })
-    .catch(function (err) {
-      logger.debug('getTicket error', err);
-      throw err;
-    });
-  };
+
 
   var getTicketMetadata = function getTicketMetadata(id) {
     return Ticket.getTicket(id);
   };
 
-  var createTicket = function createTicket(config) {
-    var ticket = Ticket.ticketFactory(config);
-    console.log('createTicket', ticket);
-    return ticket.create();
-  };
 
-  // TODO: Finish this method
-  var updateTicket = function updateTicket(id, description) {
-    return Ticket.getTicket(id)
-    .then(function (reply) {
 
-    })
-    .catch(function (err) {
-      throw err;
-    });
-  };
+
 
   // TODO: Finish this method
   var deleteTicket = function deleteTicket(id) {
@@ -158,7 +192,10 @@ module.exports = function (Ticket, Topic) {
   ticketService.createTicket = createTicket;
   ticketService.updateTicket = updateTicket;
   ticketService.deleteTicket = deleteTicket;
-  // ticketService.addTopic = addTopic;
+  ticketService.getTopic = getTopic;
+  ticketService.addTopic = addTopic;
+  ticketService.updateTopic = updateTopic;
+  ticketService.deleteTopic = deleteTopic;
 
   // If testing, export some private functions so we can test them
   if (process.env.NODE_ENV === 'test') {
