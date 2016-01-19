@@ -2,7 +2,7 @@
 
 angular.module('dimsDashboard.services')
 
-    .factory('AuthService', function ($location, $rootScope, SessionService, $cookieStore, $log, $window, SettingsService, ChatService) {
+    .factory('AuthService', function ($location, $rootScope, SessionService, GoogleService, $cookieStore, $log, $window, SettingsService, ChatService) {
 
       $rootScope.currentUser = $cookieStore.get('user') || null;
       $log.debug('AuthService: rootScope.currentUser from cookieStore is ', $rootScope.currentUser);
@@ -36,6 +36,29 @@ angular.module('dimsDashboard.services')
             delete $window.sessionStorage.token;
             return cb(err.data.message);
           });
+        },
+
+        googleLogin: function (callback) {
+          var cb = callback || angular.noop;
+          $log.debug('AuthService.googleLogin');
+          GoogleService.get({},
+            function (resource) {
+              $log.debug('googleLogin sucess callback data ', resource.data);
+              var userData = resource.data.login.sessionObject;
+              // $rootScope.currentUser = resource.data.user;
+              // $rootScope.currentUser.currentTg = resource.data.settings.currentTg;
+              // SettingsService.data = resource.data.settings;
+              $rootScope.currentUser = userData.user;
+              $rootScope.currentUser.currentTg = userData.settings.currentTg;
+              SettingsService.set(userData.settings);
+              $window.sessionStorage.token = resource.data.login.token;
+              return cb();
+            },
+            function (err) {
+              $log.debug('AuthService:login failure callback. err is ', err);
+              delete $window.sessionStorage.token;
+              return cb(err.data.message);
+            });
         },
 
         logout: function (callback) {

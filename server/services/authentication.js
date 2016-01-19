@@ -30,9 +30,8 @@ module.exports = function (userService, access) {
     });
   };
 
-  // Callback for local strategy
+  // Callback for local strategy - username and password
   auth.onLocalAuth = function onLocalAuth(username, password, done) {
-
     logger.debug('Starting strategy for ', username);
     // Look up the user corresponding to the supplied username
     userService.getUserLogin(username)
@@ -50,17 +49,16 @@ module.exports = function (userService, access) {
       }
       return done(err.toString(), false, {});
     });
-
   };
 
+  // Callback for GoogleStrategy
   auth.onGoogleAuth = function onGoogleAuth(accessToken, refreshToken, profile, done) {
     logger.debug('auth.onGoogleAuth accessToken', accessToken);
     logger.debug('auth.onGoogleAuth refreshToken', refreshToken);
     logger.debug('auth.onGoogleAuth profile', profile);
     process.nextTick(function () {
-
       // lookup user via token
-      return done(null, user, {});
+      return done(null, profile, {});
       // put catch on promise chain here
     });
   };

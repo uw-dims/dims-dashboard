@@ -74,7 +74,7 @@ config.googleCallbackURL = config.publicProtocol + '://' + config.publicHost + c
 config.googleStrategyConfig = {
   clientID: config.googleClientId,
   clientSecret: config.googleClientSecret,
-  callbackURL: config.googleReturnURL
+  callbackURL: config.googleCallbackURL
 };
 
 config.sessionTTL = 7200; //Redis session expiration. 2 hours, in seconds

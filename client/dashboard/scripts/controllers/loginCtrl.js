@@ -41,9 +41,24 @@ angular.module('dimsDashboard.controllers').
             $log.debug('LoginCtrl login error', err);
           }
         });
-
       }
+    };
 
+    $scope.googleLogin = function () {
+      $log.debug('googleLogin start');
+      AuthService.googleLogin(function (err) {
+        $log.debug('googleLogin err', err);
+         if (!err) {
+          $location.path('/');
+          // Emit event so socket can resolve
+          $log.debug('LoginCtrl.login: Broadcast authenticated');
+          $rootScope.$broadcast('authenticated');
+          $rootScope.$broadcast('currentUser-ready');
+        } else {
+          $scope.error = err;
+          $log.debug('LoginCtrl login error', err);
+        }
+      });
     };
 
   }]);

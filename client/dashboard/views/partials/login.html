@@ -1,7 +1,7 @@
 <div class="container">
     <div class="row">
         <div class="col-md-4 col-md-offset-4">
-            
+
             <div class="account-wall">
             <h1 class="text-center login-title">
                 Sign in to continue to DIMS Dashboard
@@ -32,18 +32,19 @@
                                name="password"
                                ng-model="user.password"
                                required
-                                >  
+                                >
                     </div>
                     <div class="form-group has-error">
                         <p class="help-block">{{ error }}</p>
                     </div>
 
-                    <button class="btn btn-lg btn-primary btn-block" type="submit" ng-disabled="isUnchanged(user)"> Sign in </button>
+                    <button class="btn btn-lg btn-default btn-block" type="submit" ng-disabled="isUnchanged(user)"> Sign in </button>
 
                     <span class="clearfix"></span>
                 </form>
+                <button class="btn btn-lg btn-primary btn-block" ng-click="googleLogin()">Sign in with Google</button>
             </div>
-            
+
         </div>
     </div>
 </div>

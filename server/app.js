@@ -174,7 +174,6 @@ if (config.env === 'production') {
   });
 }
 
-
 // passport.serializeUser(passportPostgres.serialize);
 // passport.deserializeUser(passportPostgres.deserialize);
 
@@ -272,7 +271,7 @@ router.get('/auth/google', passport.authenticate('google', {scope: ['https://www
 
 // Google redirects to this URL after authentication.
 router.get(config.googleCallback,
-  passport.authenticate('google', { failureRedirect: '/login' }), sessionRoute.onGoogleSuccess);
+  passport.authenticate('google', { failureRedirect: '/login' }), sessionRoute.googleLogin);
 
 router.get('/*', auth.ensureAuthenticated, routes.index);
 

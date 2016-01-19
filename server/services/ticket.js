@@ -187,6 +187,18 @@ module.exports = function (Ticket, Topic) {
     });
   };
 
+  var getTopic = function getTopic() {
+
+  };
+
+  var updateTopic = function updateTopic() {
+
+  };
+
+  var deleteTopic = function deleteTopic() {
+
+  };
+
   ticketService.listTickets = listTickets;
   ticketService.getTicket = getTicket;
   ticketService.createTicket = createTicket;

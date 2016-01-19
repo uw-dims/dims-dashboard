@@ -2,9 +2,8 @@
 
 var _ = require('lodash-compat');
 var logger = require('../utils/logger')(module);
-var config = require('../config/config');
 
-module.exports = function (userService, UserSettings) {
+module.exports = function (userService) {
 
   var access = {};
 
@@ -17,8 +16,8 @@ module.exports = function (userService, UserSettings) {
     return true;
   };
 
-  // Is the user, according to the supplied authorizations object, have
-  // admin access to the trustgroup
+  // Does the user, according to the supplied authorizations object, have
+  // admin access to the trustgroup?
   access.isAdmin = function isAdmin(authorizations, trustgroup) {
     if (!authorizations.tgs.hasOwnProperty(trustgroup)) {
       return false;
@@ -37,6 +36,17 @@ module.exports = function (userService, UserSettings) {
   };
 
   // Get the authorizations object for a user
+  //
+  // { isSysAdmin: true or false,
+  //    username: username of user,
+  //    tgs: {
+  //       TG_ID: true if user has admin rights in tg, false if not,
+  //       ... additional tgs ...
+  //    }
+  //
+  // tgs is an object with a property for each tg that a user
+  // has current access to. Value of each property is boolean - is the
+  // user an admin in this tg.
   access.authorizations = function authorizations(username) {
     return getAuthorizations(username);
   };
