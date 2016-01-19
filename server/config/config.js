@@ -16,6 +16,9 @@ config.sslOn = process.env.SSL_ON || false;
 
 config.publicProtocol = config.sslOn ? 'https' : 'http';
 
+config.publicOrigin = (config.publicPort === '80') ? config.publicProtocol + '://' + config.publicHost
+  : config.publicProtocol + '://' + config.publicHost + ':' + config.publicPort;
+
 config.port = process.env.PORT || 3000;
 
 config.sslport = process.env.SSL_PORT || 3030;
@@ -69,13 +72,18 @@ config.jwtStrategyConfig = {
 config.googleClientId = process.env.GOOGLE_CLIENT_ID;
 config.googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
 config.googleCallback = '/auth/google/callback';
-config.googleCallbackURL = config.publicProtocol + '://' + config.publicHost + config.googleCallback;
+config.googleCallbackURL = config.publicOrigin + config.googleCallback;
 
 config.googleStrategyConfig = {
   clientID: config.googleClientId,
   clientSecret: config.googleClientSecret,
   callbackURL: config.googleCallbackURL
 };
+
+// config.googleJwtConfig = {
+//   clientID: config.googleClientId,
+//   clientSecret: config.googleClientSecret
+// };
 
 config.sessionTTL = 7200; //Redis session expiration. 2 hours, in seconds
 

@@ -64,6 +64,7 @@ module.exports = function (UserSettings, userService, auth) {
 
   // Login user via google - callback
   session.googleLogin = function (req, res, error, user, info) {
+    console.log('session.googleLogin error , user , info', error, user, info);
     onLoginAuthenticate(req, res, error, user, info);
   };
 
@@ -91,6 +92,7 @@ module.exports = function (UserSettings, userService, auth) {
 
   // Result of login authentication - local or google
   function onLoginAuthenticate(req, res, error, user, info) {
+    console.log('onLoginAuthenticate error, user, info', error, user, info);
     if (error) {
       res.status(500).send(resUtils.getErrorReply(error));
     }
@@ -131,6 +133,8 @@ module.exports = function (UserSettings, userService, auth) {
       throw err;
     });
   }
+
+  session.getSessionAndToken = getSessionAndToken;
 
   return session;
 };

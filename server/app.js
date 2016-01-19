@@ -24,7 +24,9 @@ var express = require('express')
   , LocalStrategy = require('passport-local').Strategy
   , JwtStrategy = require('passport-jwt').Strategy
   , GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
+  // , GoogleJwtStrategy = require('passport-google-oauth-jwt').GoogleOauthJWTStrategy
   // , GoogleStrategy = require('passport-google-oauth-jwt').GoogleOauthJWTStrategy
+  // , cors = require('cors')
   , resUtils = require('./utils/responseUtils');
 
 // routes
@@ -88,6 +90,13 @@ var attributeRoute = diContainer.get('attributeRoute');
 var lmsearchRoute = diContainer.get('lmsearchRoute');
 
 var app = module.exports = express();
+
+// var corsOptions = {
+//   origin: true,
+//   credentials: true
+// };
+// console.log('corsOptions', corsOptions);
+// app.use(cors(corsOptions));
 
 app.engine('html', require('ejs').renderFile);
 
@@ -183,8 +192,22 @@ passport.use(
 passport.use(
   new JwtStrategy(config.jwtStrategyConfig, auth.onJwtAuth));
 
+// passport.use(
+//   new GoogleStrategy(config.googleStrategyConfig, auth.onGoogleAuth));
+
 passport.use(
-  new GoogleStrategy(config.googleStrategyConfig, auth.onGoogleAuth));
+  new GoogleStrategy({
+    clientID: config.googleClientId,
+    clientSecret: config.googleClientSecret,
+    callbackURL: config.googleCallbackURL
+  },
+  function (accessToken, refreshToken, profile, done) {
+    console.log('in strategy callback ', profile.id);
+    return done (null, profile.id);
+  }));
+
+// passport.use(
+//   new GoogleJwtStrategy(config.googleJwtConfig, auth.onGoogleAuth));
 
 app.use(passport.initialize());
 // app.use(passport.session());
@@ -267,11 +290,68 @@ router.delete('/auth/session', auth.ensureAuthenticated, sessionRoute.logout);
 
 // Redirect user to Google for authentication. When complete, Google will redirect
 // user back to this application at config.googleCallback
-router.get('/auth/google', passport.authenticate('google', {scope: ['https://www.googleapis.com/auth/plus.login']}));
+router.get('/auth/google', passport.authenticate(
+  'google',
+  {scope: ['https://www.googleapis.com/auth/userinfo.profile',
+           'https://www.googleapis.com/auth/userinfo.email']
+  }));
+
+// router.get('/auth/google', passport.authenticate(
+//   'google-oauth-jwt',
+//   { callbackURL: config.googleCallbackURL,
+//     scope: 'email'
+//   }));
 
 // Google redirects to this URL after authentication.
-router.get(config.googleCallback,
-  passport.authenticate('google', { failureRedirect: '/login' }), sessionRoute.googleLogin);
+// router.get(config.googleCallback,
+//   passport.authenticate('google', { session: false }
+//      // ), sessionRoute.googleLogin);
+//     ), function (res, req, error, user, info) {
+//     console.log('in googleCallback callback ', user);
+//   });
+
+// router.get(config.googleCallback,
+//   passport.authenticate('google',
+//     { failureRedirect: '/login',
+//       session: false }),
+//   function (req, res) {
+//     console.log('will redirect');
+
+//     res.redirect('/');
+//   }
+//   );
+
+var formatResponse = function formatResponse(key, data) {
+  var result = {};
+  result[key] = data;
+  return result;
+};
+
+  router.get(config.googleCallback, function (req, res, next) {
+    passport.authenticate('google', function (err, user, info) {
+      if (err) { return next(err) }
+      if (!user) { return res.redirect('/login') }
+        console.log('user is ', user);
+        console.log('will send back info');
+      // res.redirect('/');
+      // res.status(200).send(resUtils.getSuccessReply(formatResponse('login', user)));
+      res.render('index.html', formatResponse('login', user));
+    })(req, res, next);
+  });
+
+// router.get(config.googleCallback, function (req, res, next) {
+//   passport.authenticate('google', function (err, user, info) {
+//     console.log('in callback user ', user);
+//     if (err) {
+//       return next(err);
+//     }
+//     if (!user) {
+//       return res.redirect('/login');
+//     }
+//     res.redirect('/');
+//   });
+// });
+
 
 router.get('/*', auth.ensureAuthenticated, routes.index);
 

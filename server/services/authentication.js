@@ -51,16 +51,35 @@ module.exports = function (userService, access) {
     });
   };
 
+  // auth.onGoogleAuth = function onGoogleAuth(accessToken, loginInfo, refreshToken, done) {
+  //   logger.debug('auth.onGoogleAuth accessToken', accessToken);
+  //   logger.debug('auth.onGoogleAuth refreshToken', refreshToken);
+  //   logger.debug('auth.onGoogleAuth loginInfo', loginInfo);
+  //   session.getSessionAndToken('lparsons')
+  //   .then(function (reply) {
+  //     return done(null, reply);
+  //   })
+  //   .catch(function (err) {
+  //     return done (err, false);
+  //   });
+  // };
+
   // Callback for GoogleStrategy
   auth.onGoogleAuth = function onGoogleAuth(accessToken, refreshToken, profile, done) {
     logger.debug('auth.onGoogleAuth accessToken', accessToken);
     logger.debug('auth.onGoogleAuth refreshToken', refreshToken);
-    logger.debug('auth.onGoogleAuth profile', profile);
-    process.nextTick(function () {
-      // lookup user via token
-      return done(null, profile, {});
-      // put catch on promise chain here
-    });
+    // process.nextTick(function () {
+    // lookup user via token
+    logger.debug('auth.onGoogleAuth profile.id', profile.id);
+    return done(null, profile.id);
+
+    // getSessionAndToken('lparsons')
+    // .then(function (reply) {
+    //   return done(null, reply);
+    // })
+    // .catch(function (err) {
+    //   return done(err, false);
+    // });
   };
 
   auth.createToken = function createToken(username, scope) {
@@ -97,6 +116,27 @@ module.exports = function (userService, access) {
       return done('Error deserializing user.');
     });
   };
+
+  // Given a username, return a session object and token
+  function getSessionAndToken(username) {
+    var authUserData,
+        tgs,
+        token;
+    // Get data to send to caller
+    return userService.getUserSession(username)
+    .then(function (reply) {
+      authUserData = reply;
+      tgs = reply.loginTgs;
+      token = auth.createToken(username, tgs);
+      return {
+        token: token,
+        sessionObject: authUserData
+      };
+    })
+    .catch(function (err) {
+      throw err;
+    });
+  }
 
   function checkLogin(username, password, user, cb) {
     var decrypted = CryptoJS.AES.decrypt(password, config.passSecret).toString(CryptoJS.enc.Utf8);

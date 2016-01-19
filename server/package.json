@@ -61,6 +61,7 @@
     "node-uuid": "^1.4.3",
     "passport": "^0.2.2",
     "passport-google-oauth": "^0.2.0",
+    "passport-google-oauth-jwt": "^0.2.2",
     "passport-jwt": "^1.2.1",
     "passport-local": "^1.0.0",
     "pg": "^4.4.0",
