@@ -34,7 +34,8 @@ angular.module('dimsDashboard.services')
           function (err) {
             $log.debug('AuthService:login failure callback. err is ', err);
             delete $window.sessionStorage.token;
-            return cb(err.data.message);
+            var errorMessage = err.data.status === 'fail' ? err.data.data.message : err.data.message;
+            return cb(errorMessage);
           });
         },
 

@@ -97,8 +97,30 @@ module.exports = function (userService, access) {
 
   // middleware for protecting routes
   auth.ensureAuthenticated = function ensureAuthenticated(req, res, next) {
+    console.log('authenticating route');
     return passport.authenticate('jwt', {session: false})(req, res, next);
   };
+
+  // auth.ensureAuthenticated = function ensureAuthenticated(req, res, next) {
+  //   console.log('authenticating route');
+  //   return passport.authenticate('jwt', function (err, user, info) {
+  //     console.log('err, user ', err, user, info);
+  //     if (err || !user) {
+  //        res.set('Content-Type', 'text/html');
+  //        res.status(401).send('<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=/"></head></html>');
+  //     } else {
+  //       return next();
+  //     }
+  //   });
+  // };
+
+  // if (!req.isAuthenticated()) {
+//     res.set('Content-Type', 'text/html');
+//     res.status(401).send('<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=/"></head></html>');
+//     // res.status(401).send(resUtils.getErrorReply('Not Logged In'));
+//   } else {
+//     return next();
+//   }
 
   // Serialize function when using sessions with passport
   auth.serialize = function (user, done) {

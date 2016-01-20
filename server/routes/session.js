@@ -29,14 +29,18 @@ module.exports = function (UserSettings, userService, auth) {
   // Return login session data - user plus settings
   session.session = function (req, res) {
     if (req.user) {
-      var user = req.user;
+      var user = req.user,
+          authUserData;
       logger.debug('session: starting session for ', user.username);
-      // Get associated settings
-      var userSettings = UserSettings.userSettingsFactory(user.username);
-      userSettings.retrieveSettings()
-      .then(function (data) {
-        logger.debug('session:  sessionObject is ', sessionObject(user, data));
-        res.status(200).send(resUtils.getSuccessReply(sessionObject(user, data)));
+      console.log('user is ', user);
+      return userService.getUserSession(user.username)
+      .then(function (reply) {
+        authUserData = reply;
+        return getSessionObject(authUserData);
+      })
+      .then(function (reply) {
+        logger.debug('session:  sessionObject is ', reply);
+        res.status(200).send(resUtils.getSuccessReply(reply));
       })
       .catch(function (err) {
         res.status(400).send(resUtils.getErrorReply(err.toString()));
@@ -83,7 +87,7 @@ module.exports = function (UserSettings, userService, auth) {
       return settings.saveSettings();
     })
     .then(function () {
-      return sessionObject(user, settings.settings);
+      return sessionObject(authUserData, settings.settings);
     })
     .catch(function (err) {
       throw err;
@@ -94,11 +98,13 @@ module.exports = function (UserSettings, userService, auth) {
   function onLoginAuthenticate(req, res, error, user, info) {
     console.log('onLoginAuthenticate error, user, info', error, user, info);
     if (error) {
-      res.status(500).send(resUtils.getErrorReply(error));
+      console.log('onLoginAuthenticate error', error);
+      return res.status(500).send(resUtils.getErrorReply(error));
     }
     if (!user) {
       // info should contain message
-      res.status(400).send(resUtils.getFailReply(info));
+      console.log('onLoginAuthenticate !user', info);
+      return res.status(400).send(resUtils.getFailReply(info));
     }
     return getSessionAndToken(user.username)
     .then(function (reply) {
@@ -116,7 +122,7 @@ module.exports = function (UserSettings, userService, auth) {
         tgs,
         token;
     // Get data to send to caller
-    userService.getUserSession(username)
+    return userService.getUserSession(username)
     .then(function (reply) {
       authUserData = reply;
       tgs = reply.loginTgs;

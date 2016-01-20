@@ -24,6 +24,7 @@
       var staticExternals = [];
       vm.boxColors = ['#53a07f', '#86b3bb', '#716F84', '#1D6285', '#3d765d', '#424557'];
       var maxSites = 6;
+      // TODO Add this info to system configuration database
       staticExternals.push({
         externalKey: 'consul',
         siteName: 'SYSTEM STATUS',
@@ -31,9 +32,9 @@
         canDelete: false
       });
       staticExternals.push({
-        externalKey: 'opstrust',
-        siteName: 'OPS-TRUST',
-        siteURL: 'https://portal.uw.ops-trust.net',
+        externalKey: 'trident',
+        siteName: 'Trident',
+        siteURL: 'https://demo.trident.li/',
         canDelete: false
       });
       vm.allSites = getAllSites(staticExternals);

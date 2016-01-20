@@ -56,7 +56,7 @@ module.exports = function (ticketService, mitigationService, access) {
 
   ticketRoute.list = function (req, res) {
 
-    console.log('in ticketroute list');
+    console.log('in ticketroute list. query is ', req.query);
     var userAccess,
         user,
         config = [];

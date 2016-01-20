@@ -89,6 +89,8 @@ var userRoute = diContainer.get('userRoute');
 var attributeRoute = diContainer.get('attributeRoute');
 var lmsearchRoute = diContainer.get('lmsearchRoute');
 
+var userService = diContainer.get('userService');
+
 var app = module.exports = express();
 
 // var corsOptions = {
@@ -203,7 +205,8 @@ passport.use(
   },
   function (accessToken, refreshToken, profile, done) {
     console.log('in strategy callback ', profile.id);
-    return done (null, profile.id);
+    // Find user by the profile.id. Return error if user not found
+    return done (null, profile);
   }));
 
 // passport.use(
@@ -329,13 +332,43 @@ var formatResponse = function formatResponse(key, data) {
 
   router.get(config.googleCallback, function (req, res, next) {
     passport.authenticate('google', function (err, user, info) {
-      if (err) { return next(err) }
-      if (!user) { return res.redirect('/login') }
-        console.log('user is ', user);
-        console.log('will send back info');
+      if (err) {
+        console.log('error in google callback', err);
+        return next(err)
+      }
+      if (!user) {
+        console.log('!user ', err, user, info);
+        return res.redirect('/login') ;
+      }
+      console.log('user is ', user);
+      console.log('will send back info');
+      var authUserData,
+          tgs,
+          token,
+          result;
+      var username = 'lparsons';
+      userService.getUserSession(username)
+      .then(function (reply) {
+        authUserData = reply;
+        tgs = reply.loginTgs;
+        token = auth.createToken(username, tgs);
+        result = {
+          token: token,
+          sessionObject: authUserData
+        };
+        res.writeHead(302, {
+          // 'Location': config.publicOrigin + '/socialauth?token=' + result.token + '&user=' + result.sessionObject
+          'Location': config.publicOrigin + '/socialauth?token=' + result.token
+        });
+        res.end();
+        // res.status(200).send(resUtils.getSuccessReply(formatResponse('login', reply)));
+      })
+      .catch(function (err) {
+        console.error('onLoginAuthenticate error', err);
+        res.status(400).send(resUtils.getErrorReply(err.toString()));
+      });
       // res.redirect('/');
       // res.status(200).send(resUtils.getSuccessReply(formatResponse('login', user)));
-      res.render('index.html', formatResponse('login', user));
     })(req, res, next);
   });
 
@@ -352,7 +385,7 @@ var formatResponse = function formatResponse(key, data) {
 //   });
 // });
 
-
+router.get('/socialauth', routes.index);
 router.get('/*', auth.ensureAuthenticated, routes.index);
 
 app.use('/', router);

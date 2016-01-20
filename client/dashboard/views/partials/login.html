@@ -6,7 +6,7 @@
             <h1 class="text-center login-title">
                 Sign in to continue to DIMS Dashboard
             </h1>
-            <p class="text-center text-info">Use your ops-trust username and password</p>
+            <p class="text-center text-info">Use your Trident username and password</p>
                 <form class="form-signin"
                       name="form"
                       ng-submit="login(form)"
@@ -38,11 +38,11 @@
                         <p class="help-block">{{ error }}</p>
                     </div>
 
-                    <button class="btn btn-lg btn-default btn-block" type="submit" ng-disabled="isUnchanged(user)"> Sign in </button>
+                    <button class="btn btn-lg btn-primary btn-block" type="submit" ng-disabled="isUnchanged(user)"> Sign in </button>
 
                     <span class="clearfix"></span>
                 </form>
-                <button class="btn btn-lg btn-primary btn-block"><a href="/auth/google" target="_self">Sign in with Google</a></button>
+                <!-- <button class="btn btn-lg btn-primary btn-block"><a href="/auth/google" target="_self">Sign in with Google</a></button> -->
             </div>
 
         </div>

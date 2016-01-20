@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  function mitigations(MitigationService, $log) {
+  function mitigations(MitigationService, $log, $rootScope) {
     var directive = {
       restrict: 'AEC',
       templateUrl: 'views/partials/mitigations.html',
@@ -21,8 +21,8 @@
     function controllerFunc($scope) {
       var vm = this;
       vm.resultsFound = false;
-      var getMitigations = function getMitigations() {
-        MitigationService.getMitigations()
+      var getMitigations = function getMitigations(tg) {
+        MitigationService.getMitigations(tg)
         .then(function (reply) {
           console.log('mitigations.directive getMitigations reply, vm.mitigationsData', reply);
           vm.mitigationsData = reply;
@@ -39,10 +39,19 @@
       };
 
       var init = function init() {
-        getMitigations();
+        $log.debug('mitigations.directive init');
+        if ($rootScope.currentUser) {
+          vm.trustgroup = angular.copy($rootScope.currentUser.currentTg);
+          getMitigations(vm.trustgroup);
+        }
       };
 
       init();
+
+      $scope.$on('switch-tg', function () {
+        $log.debug('mitigations.directive received switch-tg');
+        init();
+      });
 
       vm.addMitigation = function addMitigation() {
         $log.debug('add mitigation called');
@@ -55,6 +64,6 @@
     .module('dimsDashboard.directives')
     .directive('mitigations', mitigations);
 
-  mitigations.$inject = ['MitigationService', '$log'];
+  mitigations.$inject = ['MitigationService', '$log', '$rootScope'];
 
 }());

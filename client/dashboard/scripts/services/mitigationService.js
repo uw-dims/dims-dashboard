@@ -94,11 +94,12 @@
     };
 
     var mitigationService = {
-      getMitigations: function () {
+      getMitigations: function (tg) {
         $log.debug('MitigationService.getMitigation');
         var deferred = $q.defer();
         MitigationApi.get({
-          type: 'mitigation'
+          type: 'mitigation',
+          tg: tg
         },
           function (resource) {
             var result = parseList(resource.data.mitigations);

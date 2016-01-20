@@ -3,16 +3,26 @@
 (function () {
 
   var TicketApi = function ($resource) {
-    return $resource('api/ticket/:id');
+    return $resource('api/ticket/:id', {
+      id: '@id'
+    }, {
+      update: {
+        method: 'PUT',
+        url: 'api/ticket/:id'
+      }
+    });
   };
 
   var TicketService = function (TicketApi, $log, $q) {
 
     var ticketService = {
-      getTickets: function () {
-        $log.debug('TicketService.getTickets');
+      getTickets: function (tg) {
+        $log.debug('TicketService.getTickets tg is ', tg);
         var deferred = $q.defer();
-        TicketApi.get({},
+        TicketApi.get({
+          type: 'activity',
+          tg: tg
+        },
           function (resource) {
             $log.debug('TicketService.getTickets success callback data', resource.data);
             console.log(resource.data.tickets);

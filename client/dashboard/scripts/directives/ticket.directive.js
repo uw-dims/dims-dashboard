@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  function ticket(TicketService, $log) {
+  function ticket(TicketService, $log, $rootScope) {
     var directive = {
       restrict: 'AEC',
       templateUrl: 'views/partials/ticket.html',
@@ -22,10 +22,24 @@
     function controllerFunc($scope) {
       var vm = this;
 
-      TicketService.getTickets()
-      .then(function (reply) {
-        console.log('reply from getTickets');
-        vm.result = reply;
+      var init = function init() {
+        $log.debug('ticket.directive init. $rootScope.currentUser', $rootScope.currentUser);
+        if ($rootScope.currentUser) {
+          vm.trustgroup = angular.copy($rootScope.currentUser.currentTg);
+          $log.debug('ticket.directive init tg is ', vm.trustgroup);
+          TicketService.getTickets(vm.trustgroup)
+          .then(function (reply) {
+            console.log('reply from getTickets');
+            vm.result = reply;
+          });
+        }
+      };
+
+      init();
+
+      $scope.$on('switch-tg', function () {
+        $log.debug('ticket.directive received switch-tg');
+        init();
       });
 
     }
@@ -36,6 +50,6 @@
     .module('dimsDashboard.directives')
     .directive('ticket', ticket);
 
-  ticket.$inject = ['TicketService', '$log'];
+  ticket.$inject = ['TicketService', '$log', '$rootScope'];
 
 }());
