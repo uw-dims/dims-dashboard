@@ -74,9 +74,11 @@ module.exports = function (UserSettings, userService, auth) {
 
   // Construct a session object from authUserData and user settings
   function getSessionObject(authUserData) {
+    console.log('getSessionObject authUserData is ', authUserData);
     var settings = {};
     return UserSettings.getUserSettings(authUserData.username)
     .then(function (reply) {
+      console.log('getSessionObject reply', reply);
       settings = reply;
       // Make sure trust group to login to is set
       if (!settings.getSettings().hasOwnProperty('currentTg')) {
@@ -118,12 +120,14 @@ module.exports = function (UserSettings, userService, auth) {
 
   // Given a username, return a session object and token
   function getSessionAndToken(username) {
+    logger.debug('getSessionAndToken username', username);
     var authUserData,
         tgs,
         token;
     // Get data to send to caller
     return userService.getUserSession(username)
     .then(function (reply) {
+      console.log('getSessionAndToken reply from getUserSession', reply);
       authUserData = reply;
       tgs = reply.loginTgs;
       token = auth.createToken(username, tgs);

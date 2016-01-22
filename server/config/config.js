@@ -73,11 +73,19 @@ config.googleClientId = process.env.GOOGLE_CLIENT_ID;
 config.googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
 config.googleCallback = '/auth/google/callback';
 config.googleCallbackURL = config.publicOrigin + config.googleCallback;
+config.googleConnectCallback = '/auth/google/connect';
+config.googleConnectCallbackURL = config.publicOrigin + config.googleConnectCallback;
 
 config.googleStrategyConfig = {
   clientID: config.googleClientId,
   clientSecret: config.googleClientSecret,
   callbackURL: config.googleCallbackURL
+};
+
+config.googleAuthzStrategyConfig = {
+  clientID: config.googleClientId,
+  clientSecret: config.googleClientSecret,
+  callbackURL: config.googleConnectURL
 };
 
 // config.googleJwtConfig = {
@@ -110,11 +118,6 @@ config.rpcPass = process.env.RABBITMQ_DEFAULT_PASS || 'rpcm3pwd';
 config.rpcPort = process.env.RABBITMQ_PORT  || '5672';
 
 config.mapfile = '/etc/ipgrep_networks.txt';
-
-// not used
-//config.inputdir = '/opt/dims/srv/input';
-// not used
-//config.outputdir = '/opt/dims/srv/output';
 
 config.data = '/opt/dims/data/dims-sample-data/';
 
@@ -166,10 +169,6 @@ config.defaultRedisTypes = {
   'set': 'set',
   'sortedSet': 'zset'
 };
-
-// config.keyPrefixes = {
-//   'userSettings': 'userSetting'
-// };
 
 config.maxUploadFileNum = 10;
 config.maxUploadFileSize = 39273942;

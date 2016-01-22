@@ -102,6 +102,9 @@ var makeRoot = function makeRoot(type) {
     'attribute': function () {
       return config.namespace + getDelimiter() + config.attribute.prefix;
     },
+    'authAccount': function () {
+      return config.namespace + getDelimiter() + config.authAccount.prefix;
+    },
     'notification': function () {
       return config.namespace + getDelimiter() + config.notification.prefix;
     },
@@ -167,6 +170,9 @@ var config =
     },
     'attribute': {
       'prefix': 'attribute'
+    },
+    'authaccount': {
+      'prefix': 'authaccount'
     },
     'notification': {
       'prefix': 'notification'

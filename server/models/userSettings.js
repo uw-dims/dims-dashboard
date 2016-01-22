@@ -67,6 +67,8 @@ module.exports = function UserSettings(client) {
   };
 
   var exists = function (user) {
+    logger.debug('exists - userSettings set key is ', keyGen.userSettingsSetKey());
+    logger.debug('exists - userSettings key is ', keyGen.userSettingsKey(user));
     return client.sismemberAsync(keyGen.userSettingsSetKey(), keyGen.userSettingsKey(user));
   };
 
@@ -92,6 +94,7 @@ module.exports = function UserSettings(client) {
       }
     })
     .catch(function (err) {
+      logger.error('getUserSettings error', err.toString());
       return new Error(err.toString());
     });
   };

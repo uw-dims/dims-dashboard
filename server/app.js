@@ -69,6 +69,7 @@ diContainer.factory('attributeService', require('./services/attributes'));
 diContainer.factory('userService', require('./services/user'));
 diContainer.factory('auth', require('./services/authentication'));
 diContainer.factory('access', require('./services/authorization'));
+diContainer.factory('authAccount', require('./models/authAccount'));
 
 // diContainer.factory('ticketService', require('./services/ticket'));
 
@@ -90,6 +91,7 @@ var attributeRoute = diContainer.get('attributeRoute');
 var lmsearchRoute = diContainer.get('lmsearchRoute');
 
 var userService = diContainer.get('userService');
+var authAccount = diContainer.get('authAccount');
 
 var app = module.exports = express();
 
@@ -194,28 +196,45 @@ passport.use(
 passport.use(
   new JwtStrategy(config.jwtStrategyConfig, auth.onJwtAuth));
 
-// passport.use(
-//   new GoogleStrategy(config.googleStrategyConfig, auth.onGoogleAuth));
-
 passport.use(
   new GoogleStrategy({
     clientID: config.googleClientId,
     clientSecret: config.googleClientSecret,
     callbackURL: config.googleCallbackURL
   },
+  // This is the verify callback for the 'google' strategy
+  // Should lookup the user having the profile.id (TODO);
   function (accessToken, refreshToken, profile, done) {
-    console.log('in strategy callback ', profile.id);
+    logger.debug('in GoogleStrategy verify callback ', profile.id);
     // Find user by the profile.id. Return error if user not found
-    return done (null, profile);
+    return authAccount.getUser(profile.id, 'google')
+    .then(function (reply) {
+      if (reply === null) {
+        return done(null, false, 'No user connected to this Google account');
+      } else {
+        return done(null, {
+          username: reply
+        });
+      }
+    });
   }));
 
+// Override default strategy name to use for authorization (connect);
 passport.use('google-authz', new GoogleStrategy({
     clientID: config.googleClientId,
     clientSecret: config.googleClientSecret,
-    callbackURL: config.googleCallbackURL
-  },)
-// passport.use(
-//   new GoogleJwtStrategy(config.googleJwtConfig, auth.onGoogleAuth));
+    callbackURL: config.googleConnectCallbackURL
+  },
+  // Verify callback for 'google-authz' function.
+  // Return object with profile.id and service to be used by route
+  function (accessToken, refreshToken, profile, done) {
+    logger.debug('google-auth verify callback ', profile);
+    // Return id and service
+    return done(null, {
+      id: profile.id,
+      service: 'google'
+    });
+  }));
 
 app.use(passport.initialize());
 // app.use(passport.session());
@@ -305,36 +324,11 @@ router.get('/auth/google', passport.authenticate(
   }));
 
 router.get('/connect/google', passport.authorize(
-  'google',
-  {failureRedirect: '/account',
+  'google-authz',
+  {failureRedirect: '/',
   scope: ['https://www.googleapis.com/auth/userinfo.profile',
            'https://www.googleapis.com/auth/userinfo.email']}
   ));
-
-// router.get('/auth/google', passport.authenticate(
-//   'google-oauth-jwt',
-//   { callbackURL: config.googleCallbackURL,
-//     scope: 'email'
-//   }));
-
-// Google redirects to this URL after authentication.
-// router.get(config.googleCallback,
-//   passport.authenticate('google', { session: false }
-//      // ), sessionRoute.googleLogin);
-//     ), function (res, req, error, user, info) {
-//     console.log('in googleCallback callback ', user);
-//   });
-
-// router.get(config.googleCallback,
-//   passport.authenticate('google',
-//     { failureRedirect: '/login',
-//       session: false }),
-//   function (req, res) {
-//     console.log('will redirect');
-
-//     res.redirect('/');
-//   }
-//   );
 
 var formatResponse = function formatResponse(key, data) {
   var result = {};
@@ -358,7 +352,7 @@ var formatResponse = function formatResponse(key, data) {
           tgs,
           token,
           result;
-      var username = 'lparsons';
+      var username = user.username;
       userService.getUserSession(username)
       .then(function (reply) {
         authUserData = reply;
@@ -387,16 +381,22 @@ var formatResponse = function formatResponse(key, data) {
 router.get('/socialauth', routes.index);
 
 router.get('/connect/google/callback',
-  passport.authorize('google', {
-    failureRedirect: '/account'
+  passport.authorize('google-authz', {
+    failureRedirect: '/'
   }),
   function (req, res) {
     var user = req.user;
     var account = req.account;
+    var promises = [];
     console.log('connect user is ', user);
     console.log('connect account is ', account);
     // Save google id of user
-    self.redirect('/');
+    promises.push(authAccount.setUser(account.id, account.service, user.username));
+    promises.push(authAccount.setUserId(user.username, account.service, account.id));
+    return q.all(promises)
+    .then(function (reply) {
+      self.redirect('/');
+    });
   }
 );
 

@@ -148,6 +148,17 @@ var keyGen = {
   },
   attributeSetKey: function () {
     return c.addSuffix(c.makeRoot('attribute'), 'all');
+  },
+
+  // Keys to social auth accounts
+  accountIdKey: function (id, type) {
+    return c.makeBase('authaccount', type, id);
+  },
+  accountUserKey: function (user, type) {
+    return c.makeBase('authaccount', type, user);
+  },
+  accountUserSetKey: function (user) {
+    return c.addSuffix(c.makeBase('authaccount', user), 'all');
   }
 };
 
