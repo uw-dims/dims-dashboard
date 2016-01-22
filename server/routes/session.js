@@ -99,7 +99,7 @@ module.exports = function (UserSettings, userService, auth) {
     console.log('onLoginAuthenticate error, user, info', error, user, info);
     if (error) {
       console.log('onLoginAuthenticate error', error);
-      return res.status(500).send(resUtils.getErrorReply(error));
+      return res.status(400).send(resUtils.getErrorReply(error));
     }
     if (!user) {
       // info should contain message

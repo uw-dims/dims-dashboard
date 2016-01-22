@@ -209,6 +209,11 @@ passport.use(
     return done (null, profile);
   }));
 
+passport.use('google-authz', new GoogleStrategy({
+    clientID: config.googleClientId,
+    clientSecret: config.googleClientSecret,
+    callbackURL: config.googleCallbackURL
+  },)
 // passport.use(
 //   new GoogleJwtStrategy(config.googleJwtConfig, auth.onGoogleAuth));
 
@@ -299,6 +304,13 @@ router.get('/auth/google', passport.authenticate(
            'https://www.googleapis.com/auth/userinfo.email']
   }));
 
+router.get('/connect/google', passport.authorize(
+  'google',
+  {failureRedirect: '/account',
+  scope: ['https://www.googleapis.com/auth/userinfo.profile',
+           'https://www.googleapis.com/auth/userinfo.email']}
+  ));
+
 // router.get('/auth/google', passport.authenticate(
 //   'google-oauth-jwt',
 //   { callbackURL: config.googleCallbackURL,
@@ -358,7 +370,7 @@ var formatResponse = function formatResponse(key, data) {
         };
         res.writeHead(302, {
           // 'Location': config.publicOrigin + '/socialauth?token=' + result.token + '&user=' + result.sessionObject
-          'Location': config.publicOrigin + '/socialauth?token=' + result.token
+          'Location': config.publicOrigin + '/socialauth?token=' + result.token + '&username=' + username
         });
         res.end();
         // res.status(200).send(resUtils.getSuccessReply(formatResponse('login', reply)));
@@ -372,21 +384,23 @@ var formatResponse = function formatResponse(key, data) {
     })(req, res, next);
   });
 
-// router.get(config.googleCallback, function (req, res, next) {
-//   passport.authenticate('google', function (err, user, info) {
-//     console.log('in callback user ', user);
-//     if (err) {
-//       return next(err);
-//     }
-//     if (!user) {
-//       return res.redirect('/login');
-//     }
-//     res.redirect('/');
-//   });
-// });
-
 router.get('/socialauth', routes.index);
-router.get('/*', auth.ensureAuthenticated, routes.index);
+
+router.get('/connect/google/callback',
+  passport.authorize('google', {
+    failureRedirect: '/account'
+  }),
+  function (req, res) {
+    var user = req.user;
+    var account = req.account;
+    console.log('connect user is ', user);
+    console.log('connect account is ', account);
+    // Save google id of user
+    self.redirect('/');
+  }
+);
+
+router.get('/*', routes.index);
 
 app.use('/', router);
 

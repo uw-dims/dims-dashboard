@@ -86,7 +86,7 @@
     return clientSockets;
   };
 
-  var ChatService = function ($log, ClientSockets) {
+  var ChatService = function ($log, ClientSockets, $rootScope) {
     var chatService = {
       // True if chat running ($scope is listening on socket) or false if it is not
       running: false,
@@ -135,6 +135,7 @@
             });
       }
     };
+    $rootScope.$on('logout', chatService.stop.bind(this));
     return chatService;
   };
 
@@ -173,11 +174,12 @@
 
     var stop = function stop(name) {
       logs[name].running = false;
-      //$log.debug('LogService stop. LogService running - ', logService.running);
+      $log.debug('LogService stop. LogService running - ', logService.running);
       notifyObservers[name]('stop');
     };
 
     var stopAll = function stopAll() {
+      $log.debug('Stopping all log fanouts');
       _.forEach(constants.fanoutExchanges, function (value, key) {
         stop(value.name);
       });
@@ -217,7 +219,7 @@
   // Plug factory function into AngularJS
   angular.module('dimsDashboard.services')
       .factory('ClientSockets', ['$q', '$rootScope', 'socketFactory', '$timeout', '$log', 'ENV', ClientSockets])
-      .factory('ChatService', ['$log', 'ClientSockets', ChatService]);
+      .factory('ChatService', ['$log', 'ClientSockets', '$rootScope', ChatService]);
 
   angular.module('dimsDashboard.services')
       .factory('LogService', ['ClientSockets', '$rootScope', '$log', LogService]);
