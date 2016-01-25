@@ -127,7 +127,8 @@ var constants = {
       'name': 'dimstr',
       'event': 'dimstr:data'
     }
-  }
+  },
+  'logoURL': 'images/default/UW-logo.png'
 };
 
 var rpcClientOptions = {
