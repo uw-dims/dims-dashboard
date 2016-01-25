@@ -1,9 +1,19 @@
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller('LoginCtrl', ['$scope', 'AuthService', '$location', '$log', '$rootScope',
-      function ($scope, AuthService, $location, $log, $rootScope) {
+  controller('LoginCtrl', ['$scope', 'AuthService', '$location', '$log', '$rootScope', '$routeParams',
+      function ($scope, AuthService, $location, $log, $rootScope, $routeParams) {
     $scope.error = '';
     $scope.user = {};
+
+    $log.debug('loginCtrl routeParams', $routeParams);
+
+    if ($routeParams.error) {
+      $scope.errorHtml = $routeParams.error;
+      $scope.showErrorHtml = true;
+    } else {
+      $scope.errorHtml ='';
+      $scope.showErrorHtml = false;
+    }
 
     $scope.login = function (form) {
       if ($scope.user.password === '' || $scope.user.username === '') {

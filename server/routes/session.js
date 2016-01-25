@@ -139,21 +139,31 @@ module.exports = function (UserSettings, userService, auth, authAccount) {
     });
   }
 
+  function loginErrorRedirect(err, res) {
+    res.writeHead(302, {
+      'Location': config.publicOrigin + '/login?error=' + err.toString()
+    });
+    return res.end();
+  }
+
   function onSocialAuthenticate(req, res, err, user, info) {
     if (err) {
       logger.error('onSocialAuthenticate error', err);
-      return res.redirect('/login');
+      // return res.redirect('/login');
+      return loginErrorRedirect('There was an error getting your social account. Login via username and password.', res);
     }
     if (!user) {
       logger.error('onSocialAuthenticate no user found', info);
-      return res.redirect('/login');
+      // return res.redirect('/login');
+      return loginErrorRedirect(info + ' Login with your username and password first, then connect your account', res);
     }
     return getSessionAndToken(user.username)
     .then(function (reply) {
       req.login(reply.sessionObject.user, function (err) {
         if (err) {
           logger.error('onSocialAuthenticate error in req.login', err.toString());
-          return res.redirect('/login');
+          // return res.redirect('/login');
+          return loginErrorRedirect('There was a login session error. Login via username and password.', res);
         } else {
           res.writeHead(302, {
             'Location': config.publicOrigin + '/socialauth?token=' + reply.token + '&username=' + user.username
@@ -164,7 +174,8 @@ module.exports = function (UserSettings, userService, auth, authAccount) {
     })
     .catch(function (err) {
       logger.error('onSocialAuthenticate error', err.toString());
-      return res.redirect('/login');
+      // return res.redirect('/login');
+      return loginErrorRedirect('There was an error getting your user info. Login via username and password.', res);
     });
   }
 

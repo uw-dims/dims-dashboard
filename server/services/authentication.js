@@ -59,7 +59,7 @@ module.exports = function (userService, access, authAccount) {
     return authAccount.getUser(profile.id, 'google')
     .then(function (reply) {
       if (reply === null) {
-        return done(null, false, 'No user connected to this Google account');
+        return done(null, false, 'The Google account not connected to a DIMS user. ');
       } else {
         return done(null, {
           username: reply
