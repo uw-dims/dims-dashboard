@@ -34,7 +34,7 @@ module.exports = function (ticketService, mitigationService, access) {
   };
 
   var getDefaultConfig = function getDefaultConfig(userAccess) {
-    console.log(userAccess);
+    console.log('ticket route getDefaultConfig, userAccess is ', userAccess);
     var config = [];
     var user = access.username(userAccess);
     _.forEach(userAccess.tgs, function (value, key) {
@@ -70,7 +70,7 @@ module.exports = function (ticketService, mitigationService, access) {
     userAccess = req.user;
     // Get the user from the access object
     user = access.username(userAccess);
-    logger.debug('LIST userAccess', userAccess);
+    // logger.debug('LIST userAccess', userAccess);
     // Validate trust group
 
     if (!validateTrustgroup(req, userAccess)) {
@@ -95,7 +95,7 @@ module.exports = function (ticketService, mitigationService, access) {
       }
       mitigationService.listMitigations(user, query)
       .then(function (reply) {
-        console.log('reply from listMitigations', reply);
+        // console.log('reply from listMitigations', reply);
         return res.status(200).send(resUtils.getSuccessReply(formatTicketResponse('mitigations', reply)));
       })
       .catch(function (err) {
@@ -161,7 +161,7 @@ module.exports = function (ticketService, mitigationService, access) {
     userAccess = req.user;
     // Get the user from the access object
     user = access.username(userAccess);
-    logger.debug('SHOW userAccess', userAccess);
+    // logger.debug('SHOW userAccess', userAccess);
     logger.debug('SHOW, id: ', req.params.id);
     logger.debug('SHOW query', req.query);
 

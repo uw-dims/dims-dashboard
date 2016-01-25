@@ -52,11 +52,14 @@ config.userDBHost = process.env.USER_DB_HOST || 'localhost';
 config.userDBUser = process.env.USER_DB_USER || 'dims';
 config.userDatabase = process.env.USER_DATABASE || 'ops-trust';
 
+config.sessionTTL = 2 * 60 * 60; //Redis session expiration. 2 hours, in seconds
+
+config.tokenTTL = config.sessionTTL;
+
 // Passport vars and configs
 config.tokenSecret = process.env.TOKEN_SECRET || 'djf83UhNH35CDjfjEFM3B9e01viY8fNqz3YXpb25wc0U';
 config.tokenAlgorithm = 'HS256';
 // Result is seconds
-config.tokenExpiresInMinutes = 1 * 60 * 60;
 config.tokenIssuer = process.env.DASHBOARD_PUBLIC_HOST || require('os').hostname();
 config.localStrategyConfig = {
   usernameField: 'username',
@@ -71,21 +74,25 @@ config.jwtStrategyConfig = {
 
 config.googleClientId = process.env.GOOGLE_CLIENT_ID;
 config.googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
+config.googleURL = '/auth/google';
 config.googleCallback = '/auth/google/callback';
 config.googleCallbackURL = config.publicOrigin + config.googleCallback;
-config.googleConnectCallback = '/auth/google/connect';
+config.googleConnectURL = '/connect/google';
+config.googleConnectCallback = '/connect/google/callback';
 config.googleConnectCallbackURL = config.publicOrigin + config.googleConnectCallback;
 
 config.googleStrategyConfig = {
   clientID: config.googleClientId,
   clientSecret: config.googleClientSecret,
-  callbackURL: config.googleCallbackURL
+  callbackURL: config.googleCallbackURL,
+  passReqToCallback: true
 };
 
 config.googleAuthzStrategyConfig = {
   clientID: config.googleClientId,
   clientSecret: config.googleClientSecret,
-  callbackURL: config.googleConnectURL
+  callbackURL: config.googleConnectCallbackURL,
+  passReqToCallback: true
 };
 
 // config.googleJwtConfig = {
@@ -93,7 +100,7 @@ config.googleAuthzStrategyConfig = {
 //   clientSecret: config.googleClientSecret
 // };
 
-config.sessionTTL = 7200; //Redis session expiration. 2 hours, in seconds
+
 
 config.sessionSecret = '3xueis763$%STID47373deC!!QUsT8J4$';
 

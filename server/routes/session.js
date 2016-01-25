@@ -2,12 +2,12 @@
 
 var passport = require('passport');
 var _ = require('lodash-compat');
-var util = require('util');
 var validator = require('validator');
 
 var logger = require('../utils/logger')(module);
 var resUtils = require('../utils/responseUtils');
 var config = require('../config/config');
+var q = require('q');
 
 var formatResponse = function formatResponse(key, data) {
   var result = {};
@@ -15,31 +15,47 @@ var formatResponse = function formatResponse(key, data) {
   return result;
 };
 
-module.exports = function (UserSettings, userService, auth) {
+module.exports = function (UserSettings, userService, auth, authAccount) {
 
   var session = {};
 
-  var sessionObject = function (user, settings) {
-    var object = {};
-    object.user = user;
-    object.settings = settings;
-    return object;
+  // Login user via login form and return object and token to user
+  session.tokenLogin = function (req, res, next) {
+    passport.authenticate('local', onLoginAuthenticate.bind(this, req, res))(req, res, next);
   };
 
-  // Return login session data - user plus settings
+  session.googleLogin = function (req, res, next) {
+    passport.authenticate('google', onSocialAuthenticate.bind(this, req, res))(req, res, next);
+  };
+
+  session.googleConnect = function (req, res, next) {
+    var user = req.user;
+    var account = req.account;
+    var promises = [];
+    console.log('connect user is ', user);
+    console.log('connect account is ', account);
+    // Save google id of user
+    promises.push(authAccount.setUser(account.id, account.service, user.username));
+    promises.push(authAccount.setUserId(user.username, account.service, account.id));
+    return q.all(promises)
+    .then(function (reply) {
+      res.redirect('/userinfo/account');
+    });
+  };
+
+  // Return session for logged in user - user plus settings
   session.session = function (req, res) {
     if (req.user) {
-      var user = req.user,
-          authUserData;
-      logger.debug('session: starting session for ', user.username);
-      console.log('user is ', user);
+      var user = req.user;
+      logger.debug('session: retrieving session for ', user.username);
+      console.log('session: req.user is ', user);
       return userService.getUserSession(user.username)
       .then(function (reply) {
-        authUserData = reply;
-        return getSessionObject(authUserData);
+        console.log('session: getUserSession reply is ', reply);
+        return getSessionObject(reply);
       })
       .then(function (reply) {
-        logger.debug('session:  sessionObject is ', reply);
+        console.log('session:  sessionObject is ', reply);
         res.status(200).send(resUtils.getSuccessReply(reply));
       })
       .catch(function (err) {
@@ -51,6 +67,7 @@ module.exports = function (UserSettings, userService, auth) {
   };
 
   // Logout user
+  // TODO: invalidate token
   session.logout = function (req, res) {
     if (req.user) {
       logger.debug('logout:', req.user.username);
@@ -61,16 +78,6 @@ module.exports = function (UserSettings, userService, auth) {
     }
   };
 
-  // Login user via login form and return object and token to user
-  session.tokenLogin = function (req, res, next) {
-    passport.authenticate('local', onLoginAuthenticate.bind(this, req, res))(req, res);
-  };
-
-  // Login user via google - callback
-  session.googleLogin = function (req, res, error, user, info) {
-    console.log('session.googleLogin error , user , info', error, user, info);
-    onLoginAuthenticate(req, res, error, user, info);
-  };
 
   // Construct a session object from authUserData and user settings
   function getSessionObject(authUserData) {
@@ -96,25 +103,65 @@ module.exports = function (UserSettings, userService, auth) {
     });
   }
 
-  // Result of login authentication - local or google
-  function onLoginAuthenticate(req, res, error, user, info) {
-    console.log('onLoginAuthenticate error, user, info', error, user, info);
-    if (error) {
-      console.log('onLoginAuthenticate error', error);
-      return res.status(400).send(resUtils.getErrorReply(error));
+  function sessionObject(user, settings) {
+    var object = {};
+    object.user = user;
+    object.settings = settings;
+    return object;
+  }
+
+  // Result of local login authentication
+  function onLoginAuthenticate(req, res, err, user, info) {
+    if (err) {
+      logger.error('onLoginAuthenticate error', err);
+      return res.status(400).send(resUtils.getErrorReply(err));
     }
     if (!user) {
       // info should contain message
-      console.log('onLoginAuthenticate !user', info);
       return res.status(400).send(resUtils.getFailReply(info));
     }
     return getSessionAndToken(user.username)
     .then(function (reply) {
-      res.status(200).send(resUtils.getSuccessReply(formatResponse('login', reply)));
+      req.login(reply.sessionObject.user, function (err) {
+        if (err) {
+          res.status(400).send(resUtils.getErrorReply(err.toString()));
+        } else {
+          res.status(200).send(resUtils.getSuccessReply(formatResponse('login', reply)));
+        }
+      });
     })
     .catch(function (err) {
       logger.error('onLoginAuthenticate error', err);
       res.status(400).send(resUtils.getErrorReply(err.toString()));
+    });
+  }
+
+  function onSocialAuthenticate(req, res, err, user, info) {
+    if (err) {
+      logger.error('onSocialAuthenticate error', err);
+      return res.redirect('/login');
+    }
+    if (!user) {
+      logger.error('onSocialAuthenticate no user found', info);
+      return res.redirect('/login');
+    }
+    return getSessionAndToken(user.username)
+    .then(function (reply) {
+      req.login(reply.sessionObject.user, function (err) {
+        if (err) {
+          logger.error('onSocialAuthenticate error in req.login', err.toString());
+          return res.redirect('/login');
+        } else {
+          res.writeHead(302, {
+            'Location': config.publicOrigin + '/socialauth?token=' + reply.token + '&username=' + user.username
+          });
+          return res.end();
+        }
+      });
+    })
+    .catch(function (err) {
+      logger.error('onSocialAuthenticate error', err.toString());
+      return res.redirect('/login');
     });
   }
 

@@ -96,7 +96,7 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
       return q.all(promises);
     })
     .catch(function (err) {
-      console.log('caught error in listMitigations', err.toString(), '- will return empty array');
+      console.error('caught error in listMitigations', err.toString(), '- will return empty array');
       // return no items found - empty array
       return q.fcall(function () {
         return [];
@@ -129,7 +129,7 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
       result.metadata.initialNum = reply[3];
       result.metadata.unknownNum = reply[4];
       result.metadata.mitigatedNum = reply[5];
-      console.log(result.data);
+      // console.log(result.data);
       return result;
     })
     .catch(function (err) {
@@ -357,12 +357,12 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
   // Maybe should re-work promises so that null or undefined user is not
   // even submitted and an empty array is returned
   var getUserIps = function getUserIps(ticketKey, user) {
-    console.log('getUserIps ', ticketKey, user);
+    // console.log('getUserIps ', ticketKey, user);
     return mapTopicKeys(ticketKey)
     .then(function (reply) {
       var mappedKeys = reply;
       // console.log('getUserIps ', mappedKeys);
-      console.log('getUserIps key is ', mappedKeys[user]);
+      // console.log('getUserIps key is ', mappedKeys[user]);
       return store.listItems(mappedKeys[user]);
     })
     .then(function (reply) {

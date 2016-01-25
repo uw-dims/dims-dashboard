@@ -9,7 +9,7 @@ var express = require('express')
  // , cookieSession = require('cookie-session')
   , json = require('express-json')
   , cookieParser = require('cookie-parser')
- // , favicon = require('serve-favicon')
+  , favicon = require('serve-favicon')
   , errorHandler = require('errorhandler')
   , methodOverride = require('method-override')
   , http = require('http')
@@ -23,11 +23,11 @@ var express = require('express')
   , passport = require('passport')
   , LocalStrategy = require('passport-local').Strategy
   , JwtStrategy = require('passport-jwt').Strategy
-  , GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
+  , GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
   // , GoogleJwtStrategy = require('passport-google-oauth-jwt').GoogleOauthJWTStrategy
   // , GoogleStrategy = require('passport-google-oauth-jwt').GoogleOauthJWTStrategy
   // , cors = require('cors')
-  , resUtils = require('./utils/responseUtils');
+  // , q = require('q');
 
 // routes
 var routes = require('./routes');
@@ -90,8 +90,8 @@ var userRoute = diContainer.get('userRoute');
 var attributeRoute = diContainer.get('attributeRoute');
 var lmsearchRoute = diContainer.get('lmsearchRoute');
 
-var userService = diContainer.get('userService');
-var authAccount = diContainer.get('authAccount');
+// var userService = diContainer.get('userService');
+// var authAccount = diContainer.get('authAccount');
 
 var app = module.exports = express();
 
@@ -160,6 +160,7 @@ app.use(session({
 if (config.env === 'development' || config.env === 'test') {
   app.set('views', path.join(__dirname, '../client/dashboard'));
   app.use(errorHandler());
+  app.use(favicon(path.join(__dirname, '../client/dashboard/images/default/UW-logo-16x16.ico')));
   app.use(express.static(path.join(__dirname, '../client')));
   app.use(express.static(path.join(__dirname, '.tmp')));
   app.use(express.static(path.join(__dirname, '../client/dashboard')));
@@ -187,69 +188,26 @@ if (config.env === 'production') {
   });
 }
 
-// passport.serializeUser(passportPostgres.serialize);
-// passport.deserializeUser(passportPostgres.deserialize);
-
+// Set up passport
 passport.use(
-  new LocalStrategy(config.localStrategyConfig, auth.onLocalAuth));
-
+  new LocalStrategy(config.localStrategyConfig, auth.localStrategyVerify));
 passport.use(
-  new JwtStrategy(config.jwtStrategyConfig, auth.onJwtAuth));
-
+  new JwtStrategy(config.jwtStrategyConfig, auth.jwtStrategyVerify));
 passport.use(
-  new GoogleStrategy({
-    clientID: config.googleClientId,
-    clientSecret: config.googleClientSecret,
-    callbackURL: config.googleCallbackURL
-  },
-  // This is the verify callback for the 'google' strategy
-  // Should lookup the user having the profile.id (TODO);
-  function (accessToken, refreshToken, profile, done) {
-    logger.debug('in GoogleStrategy verify callback ', profile.id);
-    // Find user by the profile.id. Return error if user not found
-    return authAccount.getUser(profile.id, 'google')
-    .then(function (reply) {
-      if (reply === null) {
-        return done(null, false, 'No user connected to this Google account');
-      } else {
-        return done(null, {
-          username: reply
-        });
-      }
-    });
-  }));
-
+  new GoogleStrategy(config.googleStrategyConfig, auth.googleStrategyVerify));
 // Override default strategy name to use for authorization (connect);
-passport.use('google-authz', new GoogleStrategy({
-    clientID: config.googleClientId,
-    clientSecret: config.googleClientSecret,
-    callbackURL: config.googleConnectCallbackURL
-  },
-  // Verify callback for 'google-authz' function.
-  // Return object with profile.id and service to be used by route
-  function (accessToken, refreshToken, profile, done) {
-    logger.debug('google-auth verify callback ', profile);
-    // Return id and service
-    return done(null, {
-      id: profile.id,
-      service: 'google'
-    });
-  }));
+passport.use('google-authz',
+  new GoogleStrategy(config.googleAuthzStrategyConfig, auth.googleConnectVerify));
+
+// We're using sessions as well as token. Need session so we have logged in
+// user when connecting to a social auth account like Google
+passport.serializeUser(auth.serialize);
+passport.deserializeUser(auth.deserialize);
 
 app.use(passport.initialize());
-// app.use(passport.session());
+app.use(passport.session());
 
-// Middleware to be used for secured routes - sessions
-// var auth.ensureAuthenticated = function (req, res, next) {
-//   if (!req.isAuthenticated()) {
-//     res.set('Content-Type', 'text/html');
-//     res.status(401).send('<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=/"></head></html>');
-//     // res.status(401).send(resUtils.getErrorReply('Not Logged In'));
-//   } else {
-//     return next();
-//   }
-// };
-
+// Set up routes
 var router = express.Router();
 router.post('/upload', auth.ensureAuthenticated, filesRoute.upload);
 router.get('/files', auth.ensureAuthenticated, filesRoute.files);
@@ -309,96 +267,102 @@ router.put('/api/fileData/:path', auth.ensureAuthenticated, fileDataRoute.update
 // Delete a file
 router.delete('/api/fileData/:path', auth.ensureAuthenticated, fileDataRoute.delete);
 
-// authorization
+// Get session info for user making request
 router.get('/auth/session', auth.ensureAuthenticated, sessionRoute.session);
 // router.post('/auth/session', sessionRoute.login);
+// Handle user login with user/pass and send token
 router.post('/auth/session', sessionRoute.tokenLogin);
+// Handle user logout
 router.delete('/auth/session', auth.ensureAuthenticated, sessionRoute.logout);
 
 // Redirect user to Google for authentication. When complete, Google will redirect
 // user back to this application at config.googleCallback
-router.get('/auth/google', passport.authenticate(
+router.get(config.googleURL, passport.authenticate(
   'google',
   {scope: ['https://www.googleapis.com/auth/userinfo.profile',
            'https://www.googleapis.com/auth/userinfo.email']
   }));
 
-router.get('/connect/google', passport.authorize(
+// Route for google connect. Will redirect to Google for authentication
+router.get(config.googleConnectURL, passport.authorize(
   'google-authz',
-  {failureRedirect: '/',
+  {
   scope: ['https://www.googleapis.com/auth/userinfo.profile',
            'https://www.googleapis.com/auth/userinfo.email']}
   ));
 
-var formatResponse = function formatResponse(key, data) {
-  var result = {};
-  result[key] = data;
-  return result;
-};
-
-  router.get(config.googleCallback, function (req, res, next) {
-    passport.authenticate('google', function (err, user, info) {
-      if (err) {
-        console.log('error in google callback', err);
-        return next(err)
-      }
-      if (!user) {
-        console.log('!user ', err, user, info);
-        return res.redirect('/login') ;
-      }
-      console.log('user is ', user);
-      console.log('will send back info');
-      var authUserData,
-          tgs,
-          token,
-          result;
-      var username = user.username;
-      userService.getUserSession(username)
-      .then(function (reply) {
-        authUserData = reply;
-        tgs = reply.loginTgs;
-        token = auth.createToken(username, tgs);
-        result = {
-          token: token,
-          sessionObject: authUserData
-        };
-        res.writeHead(302, {
-          // 'Location': config.publicOrigin + '/socialauth?token=' + result.token + '&user=' + result.sessionObject
-          'Location': config.publicOrigin + '/socialauth?token=' + result.token + '&username=' + username
-        });
-        res.end();
-        // res.status(200).send(resUtils.getSuccessReply(formatResponse('login', reply)));
-      })
-      .catch(function (err) {
-        console.error('onLoginAuthenticate error', err);
-        res.status(400).send(resUtils.getErrorReply(err.toString()));
-      });
-      // res.redirect('/');
-      // res.status(200).send(resUtils.getSuccessReply(formatResponse('login', user)));
-    })(req, res, next);
-  });
-
+// Route that handles google login callback
+router.get(config.googleCallback, sessionRoute.googleLogin);
+// Route that handles successful google login redirect
 router.get('/socialauth', routes.index);
+// Route that handles google connect callback
+router.get(config.googleConnectCallback,
+    passport.authorize('google-authz', {
+    failureRedirect: '/userinfo/settings'}), sessionRoute.googleConnect);
 
-router.get('/connect/google/callback',
-  passport.authorize('google-authz', {
-    failureRedirect: '/'
-  }),
-  function (req, res) {
-    var user = req.user;
-    var account = req.account;
-    var promises = [];
-    console.log('connect user is ', user);
-    console.log('connect account is ', account);
-    // Save google id of user
-    promises.push(authAccount.setUser(account.id, account.service, user.username));
-    promises.push(authAccount.setUserId(user.username, account.service, account.id));
-    return q.all(promises)
-    .then(function (reply) {
-      self.redirect('/');
-    });
-  }
-);
+  // router.get(config.googleCallback, function (req, res, next) {
+  //   passport.authenticate('google', function (err, user, info) {
+  //     if (err) {
+  //       console.log('error in google callback', err);
+  //       return next(err)
+  //     }
+  //     if (!user) {
+  //       console.log('!user ', err, user, info);
+  //       return res.redirect('/login') ;
+  //     }
+  //     console.log('user is ', user);
+  //     console.log('will send back info');
+  //     var authUserData,
+  //         tgs,
+  //         token,
+  //         result;
+  //     var username = user.username;
+  //     userService.getUserSession(username)
+  //     .then(function (reply) {
+  //       authUserData = reply;
+  //       tgs = reply.loginTgs;
+  //       token = auth.createToken(username, tgs);
+  //       result = {
+  //         token: token,
+  //         sessionObject: authUserData
+  //       };
+  //       res.writeHead(302, {
+  //         // 'Location': config.publicOrigin + '/socialauth?token=' + result.token + '&user=' + result.sessionObject
+  //         'Location': config.publicOrigin + '/socialauth?token=' + result.token + '&username=' + username
+  //       });
+  //       res.end();
+  //       // res.status(200).send(resUtils.getSuccessReply(formatResponse('login', reply)));
+  //     })
+  //     .catch(function (err) {
+  //       console.error('onLoginAuthenticate error', err);
+  //       res.status(400).send(resUtils.getErrorReply(err.toString()));
+  //     });
+  //     // res.redirect('/');
+  //     // res.status(200).send(resUtils.getSuccessReply(formatResponse('login', user)));
+  //   })(req, res, next);
+  // });
+
+
+
+// router.get(config.googleConnectCallback,
+//   passport.authorize('google-authz', {
+//     failureRedirect: '/userinfo/settings'
+//   }),
+//   function (req, res) {
+//     var user = req.user;
+//     var account = req.account;
+//     var promises = [];
+//     console.log('connect user is ', user);
+//     console.log('connect account is ', account);
+//     // Save google id of user
+//     promises.push(authAccount.setUser(account.id, account.service, user.username));
+//     promises.push(authAccount.setUserId(user.username, account.service, account.id));
+//     return q.all(promises)
+//     .then(function (reply) {
+//       self.redirect('/');
+//     });
+//   }
+// );
 
 router.get('/*', routes.index);
 

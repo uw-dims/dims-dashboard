@@ -7,19 +7,19 @@ var jwt = require('jsonwebtoken');
 var logger = require('../utils/logger')(module);
 var config = require('../config/config');
 
-module.exports = function (userService, access) {
+module.exports = function (userService, access, authAccount) {
 
   var auth = {};
 
-  // Callback for jwt strategy
-  auth.onJwtAuth = function onJwtAuth(payload, next) {
-    logger.debug('onJwtAuth payload', payload);
+  // Verify callback for jwt strategy
+  auth.jwtStrategyVerify = function jwtStrategyVerify(payload, next) {
+    logger.debug('auth.jwtStrategyVerify. payload is', payload);
     // get access object for the user
     // will provide username, trustgroups and whether or not the
     // user is an admin in each trustgroup
     access.authorizations(payload.sub)
     .then(function (reply) {
-      logger.debug('onJwtAuth reply from authorizations', reply);
+      logger.debug('auth.jwtStrategyVerify reply from authorizations', reply);
       // this puts access object in request - so routes will know
       // the access of the requesting user
       return next(null, reply, {});
@@ -30,8 +30,8 @@ module.exports = function (userService, access) {
     });
   };
 
-  // Callback for local strategy - username and password
-  auth.onLocalAuth = function onLocalAuth(username, password, done) {
+  // Verify callback for local strategy
+  auth.localStrategyVerify = function localStrategyVerify(username, password, done) {
     logger.debug('Starting strategy for ', username);
     // Look up the user corresponding to the supplied username
     userService.getUserLogin(username)
@@ -51,86 +51,79 @@ module.exports = function (userService, access) {
     });
   };
 
-  // auth.onGoogleAuth = function onGoogleAuth(accessToken, loginInfo, refreshToken, done) {
-  //   logger.debug('auth.onGoogleAuth accessToken', accessToken);
-  //   logger.debug('auth.onGoogleAuth refreshToken', refreshToken);
-  //   logger.debug('auth.onGoogleAuth loginInfo', loginInfo);
-  //   session.getSessionAndToken('lparsons')
-  //   .then(function (reply) {
-  //     return done(null, reply);
-  //   })
-  //   .catch(function (err) {
-  //     return done (err, false);
-  //   });
-  // };
-
-  // Callback for GoogleStrategy
-  auth.onGoogleAuth = function onGoogleAuth(accessToken, refreshToken, profile, done) {
-    logger.debug('auth.onGoogleAuth accessToken', accessToken);
-    logger.debug('auth.onGoogleAuth refreshToken', refreshToken);
-    // process.nextTick(function () {
-    // lookup user via token
-    logger.debug('auth.onGoogleAuth profile.id', profile.id);
-    return done(null, profile.id);
-
-    // getSessionAndToken('lparsons')
-    // .then(function (reply) {
-    //   return done(null, reply);
-    // })
-    // .catch(function (err) {
-    //   return done(err, false);
-    // });
+  // Verify callback for GoogleStrategy
+  auth.googleStrategyVerify = function googleStrategyVerify(req, accessToken, refreshToken, profile, done) {
+    logger.debug('auth.googleStrategyVerify profile.id', profile.id);
+    logger.debug('auth.googleStrategyVerify jwt ', req.headers.authorization);
+    logger.debug('auth.googleStrategyVerify url ', req.url);
+    return authAccount.getUser(profile.id, 'google')
+    .then(function (reply) {
+      if (reply === null) {
+        return done(null, false, 'No user connected to this Google account');
+      } else {
+        return done(null, {
+          username: reply
+        });
+      }
+    });
   };
 
+  auth.googleConnectVerify = function googleConnectVerify(req, accessToken, refreshToken, profile, done) {
+    logger.debug('google-authz verify callback ', profile.id, profile.displayName, profile.email);
+    console.log('google-authz verify callback req.user', req.user);
+    logger.debug('google-authz verify callback authorizations ', req.headers.authorization);
+    logger.debug('auth.googleStrategyVerify url ', req.url);
+    // Return id and service
+    return done(null, {
+      id: profile.id,
+      service: 'google'
+    });
+  };
+
+  // Create a JWT
   auth.createToken = function createToken(username, scope) {
-    logger.debug('createToken issuer is ', config.tokenIssuer);
+    logger.debug('Creating token for user and scope', username, scope);
     return jwt.sign(
       { scope: scope },
       config.tokenSecret,
       {
-        expiresIn: config.tokenExpiresInMinutes,
+        expiresIn: config.tokenTTL,
         algorithm: config.tokenAlgorithm,
         issuer: config.tokenIssuer,
         subject: username
       });
   };
 
-  // middleware for protecting routes
+  // Middleware for protecting routes with JWT
   auth.ensureAuthenticated = function ensureAuthenticated(req, res, next) {
-    console.log('authenticating route');
+    logger.debug('authenticating jwt route, url is ', req.url);
+    // console.log(req);
     return passport.authenticate('jwt', {session: false})(req, res, next);
   };
 
-  // auth.ensureAuthenticated = function ensureAuthenticated(req, res, next) {
-  //   console.log('authenticating route');
-  //   return passport.authenticate('jwt', function (err, user, info) {
-  //     console.log('err, user ', err, user, info);
-  //     if (err || !user) {
-  //        res.set('Content-Type', 'text/html');
-  //        res.status(401).send('<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=/"></head></html>');
-  //     } else {
-  //       return next();
-  //     }
-  //   });
-  // };
-
-  // if (!req.isAuthenticated()) {
-//     res.set('Content-Type', 'text/html');
-//     res.status(401).send('<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=/"></head></html>');
-//     // res.status(401).send(resUtils.getErrorReply('Not Logged In'));
-//   } else {
-//     return next();
-//   }
+  // Middleware for protecting routes via session
+  auth.ensureAuthenticatedSession = function (req, res, next) {
+    logger.debug('authenticating session route, url is ', req.url);
+    if (!req.isAuthenticated()) {
+      res.set('Content-Type', 'text/html');
+      res.status(401).send('<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=/"></head></html>');
+    } else {
+      return next();
+    }
+  };
 
   // Serialize function when using sessions with passport
   auth.serialize = function (user, done) {
+    console.log('serialize user', user);
     done(null, user.username);
   };
 
   // Deserialize function when using sessions with passport
   auth.deserialize = function (username, done) {
+    console.log('deserialize username', username);
     userService.getUserSession(username)
     .then(function (reply) {
+      console.log('deserialize user ', reply);
       return done(null, reply);
     })
     .catch(function (err) {
@@ -160,6 +153,7 @@ module.exports = function (userService, access) {
     });
   }
 
+  // Check supplied login credentials
   function checkLogin(username, password, user, cb) {
     var decrypted = CryptoJS.AES.decrypt(password, config.passSecret).toString(CryptoJS.enc.Utf8);
     // Get the user's hashed password from the datastore

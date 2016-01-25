@@ -1,6 +1,7 @@
 'use strict';
 
 var q = require('q');
+var keyGen = require('./keyGen');
 
 module.exports = function (client) {
 
