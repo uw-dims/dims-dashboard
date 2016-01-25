@@ -273,7 +273,7 @@ router.get('/auth/session', auth.ensureAuthenticated, sessionRoute.session);
 // Handle user login with user/pass and send token
 router.post('/auth/session', sessionRoute.tokenLogin);
 // Handle user logout
-router.delete('/auth/session', auth.ensureAuthenticated, sessionRoute.logout);
+router.delete('/auth/session', sessionRoute.logout);
 
 // Redirect user to Google for authentication. When complete, Google will redirect
 // user back to this application at config.googleCallback

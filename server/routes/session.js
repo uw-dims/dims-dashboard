@@ -69,10 +69,13 @@ module.exports = function (UserSettings, userService, auth, authAccount) {
   // Logout user
   // TODO: invalidate token
   session.logout = function (req, res) {
+    console.log('logout req.user', req.user);
     if (req.user) {
       logger.debug('logout:', req.user.username);
-      req.logout();
-      res.status(200).send(resUtils.getSuccessReply('Successfully logged out'));
+      req.logOut();
+      req.session.destroy(function (err) {
+        res.status(200).send(resUtils.getSuccessReply('Successfully logged out'));
+      });
     } else {
       res.status(401).send(resUtils.getErrorReply('User not logged in'));
     }
