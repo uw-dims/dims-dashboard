@@ -69,13 +69,16 @@ module.exports = function (userService, access, authAccount) {
   };
 
   auth.googleConnectVerify = function googleConnectVerify(req, accessToken, refreshToken, profile, done) {
-    logger.debug('google-authz verify callback ', profile.id, profile.displayName, profile.email);
+    logger.debug('google-authz verify callback ', accessToken, profile.id, profile.displayName, profile.email);
     console.log('google-authz verify callback req.user', req.user);
+    console.log('google-authz verify callback profile', profile);
     logger.debug('google-authz verify callback authorizations ', req.headers.authorization);
     logger.debug('auth.googleStrategyVerify url ', req.url);
-    // Return id and service
+    // Return account object
     return done(null, {
       id: profile.id,
+      displayName: profile.displayName,
+      email: profile.emails[0].value,
       service: 'google'
     });
   };
@@ -114,16 +117,16 @@ module.exports = function (userService, access, authAccount) {
 
   // Serialize function when using sessions with passport
   auth.serialize = function (user, done) {
-    console.log('serialize user', user);
+    logger.debug('serialize user', user.username);
     done(null, user.username);
   };
 
   // Deserialize function when using sessions with passport
   auth.deserialize = function (username, done) {
-    console.log('deserialize username', username);
+    logger.debug('deserialize username', username);
     userService.getUserSession(username)
     .then(function (reply) {
-      console.log('deserialize user ', reply);
+      // console.log('deserialize user ', reply);
       return done(null, reply);
     })
     .catch(function (err) {

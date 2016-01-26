@@ -151,12 +151,15 @@ var keyGen = {
   },
 
   // Keys to social auth accounts
+  // Key to lookup username for service (type) and id
   accountIdKey: function (id, type) {
     return c.makeBase('authaccount', type, id);
   },
+  // Key to lookup a social account for a service (type) and username (user)
   accountUserKey: function (user, type) {
     return c.makeBase('authaccount', type, user);
   },
+  // Set key to retrieve all social accounts for a user
   accountUserSetKey: function (user) {
     return c.addSuffix(c.makeBase('authaccount', user), 'all');
   }

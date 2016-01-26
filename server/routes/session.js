@@ -9,12 +9,6 @@ var resUtils = require('../utils/responseUtils');
 var config = require('../config/config');
 var q = require('q');
 
-var formatResponse = function formatResponse(key, data) {
-  var result = {};
-  result[key] = data;
-  return result;
-};
-
 module.exports = function (UserSettings, userService, auth, authAccount) {
 
   var session = {};
@@ -36,7 +30,7 @@ module.exports = function (UserSettings, userService, auth, authAccount) {
     console.log('connect account is ', account);
     // Save google id of user
     promises.push(authAccount.setUser(account.id, account.service, user.username));
-    promises.push(authAccount.setUserId(user.username, account.service, account.id));
+    promises.push(authAccount.setAccount(user.username, account.service, account));
     return q.all(promises)
     .then(function (reply) {
       res.redirect('/userinfo/account');
@@ -69,7 +63,6 @@ module.exports = function (UserSettings, userService, auth, authAccount) {
   // Logout user
   // TODO: invalidate token
   session.logout = function (req, res) {
-    console.log('logout req.user', req.user);
     if (req.user) {
       logger.debug('logout:', req.user.username);
       req.logOut();
@@ -77,6 +70,7 @@ module.exports = function (UserSettings, userService, auth, authAccount) {
         res.status(200).send(resUtils.getSuccessReply('Successfully logged out'));
       });
     } else {
+      logger.debug('User not logged in requested logout');
       res.status(401).send(resUtils.getErrorReply('User not logged in'));
     }
   };
@@ -129,7 +123,7 @@ module.exports = function (UserSettings, userService, auth, authAccount) {
         if (err) {
           res.status(400).send(resUtils.getErrorReply(err.toString()));
         } else {
-          res.status(200).send(resUtils.getSuccessReply(formatResponse('login', reply)));
+          res.status(200).send(resUtils.getSuccessReply(resUtils.formatResponse('login', reply)));
         }
       });
     })

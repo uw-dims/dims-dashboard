@@ -11,7 +11,7 @@ angular.module('dimsDashboard.controllers').
       $scope.errorHtml = $routeParams.error;
       $scope.showErrorHtml = true;
     } else {
-      $scope.errorHtml ='';
+      $scope.errorHtml = '';
       $scope.showErrorHtml = false;
     }
 
