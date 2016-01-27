@@ -25,13 +25,9 @@ module.exports = function (UserSettings, userService, auth, authAccount) {
   session.googleConnect = function (req, res, next) {
     var user = req.user;
     var account = req.account;
-    var promises = [];
     console.log('connect user is ', user);
     console.log('connect account is ', account);
-    // Save google id of user
-    promises.push(authAccount.setUser(account.id, account.service, user.username));
-    promises.push(authAccount.setAccount(user.username, account.service, account));
-    return q.all(promises)
+    return authAccount.createAccount(user.username, account.service, account)
     .then(function (reply) {
       res.redirect('/userinfo/account');
     });
