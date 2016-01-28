@@ -350,7 +350,8 @@ test('models/ticket.js: getTicket returns ticket object for retrieved ticket', f
   });
 });
 
-test('models/ticket.js: validateQuery validates query options', function (assert) {
+// This needs to be rewritten as validateQuery now requires a callback
+test.skip('models/ticket.js: validateQuery validates query options', function (assert) {
   var options = {
     type: 'all'
   };
@@ -426,53 +427,78 @@ test('models/ticket.js: validateQuery validates query options', function (assert
 test('models/ticket.js: getTicketKeys returns array of keys', function (assert) {
   createTickets()
   .then(function (reply) {
-    return Ticket._private.getTicketKeys({
-      type: 'all'
-    });
+    console.log(reply);
+    return client.keysAsync('*ticket*');
   })
   .then(function (reply) {
-    // console.log('test ', reply);
-    assert.equals(reply.length, 4);
-    return Ticket._private.getTicketKeys({
-      type: 'all',
-      ownedBy: 'testuser1'
-    });
+    console.log(reply);
+    return client.zrangeAsync('dims:ticket.__type.__activity', 0, -1);
   })
   .then(function (reply) {
-    // console.log('test ', reply);
-    assert.equals(reply.length, 1);
-    return Ticket._private.getTicketKeys({
-      type: 'all',
-      ownedBy: 'testuser1',
-      open: false
-    });
+    console.log(reply);
+    return client.zrangeAsync('dims:ticket.__public', 0, -1);
   })
   .then(function (reply) {
-    // console.log('test ', reply);
-    assert.equals(reply.length, 0);
-    return Ticket._private.getTicketKeys({
-      type: 'all',
-      open: true
-    });
+    console.log(reply);
+    return client.zrangeAsync('dims:ticket.__open', 0, -1);
   })
   .then(function (reply) {
-    // console.log('test ', reply);
-    assert.equals(reply.length, 3);
-    return Ticket._private.getTicketKeys({
-      type: 'all',
-      open: true,
-      private: true,
-      ownedBy: 'testuser2'
-    });
+    console.log(reply);
+
+    return client.zrangeAsync('dims:ticket.__owner.__testuser1', 0, -1);
   })
   .then(function (reply) {
-    // console.log('test ', reply);
-    assert.equals(reply.length, 1);
+    console.log(reply);
+ 
+    // These need to be rewritten or discarded. 'all' is no longer a valid type
+
+  //   return Ticket._private.getTicketKeys({
+  //     type: 'all'
+  //   });
+  // })
+  // .then(function (reply) {
+  //   // console.log('test ', reply);
+  //   assert.equals(reply.length, 4);
+  //   return Ticket._private.getTicketKeys({
+  //     type: 'all',
+  //     ownedBy: 'testuser1'
+  //   });
+  // })
+  // .then(function (reply) {
+  //   // console.log('test ', reply);
+  //   assert.equals(reply.length, 1);
+  //   return Ticket._private.getTicketKeys({
+  //     type: 'all',
+  //     ownedBy: 'testuser1',
+  //     open: false
+  //   });
+  // })
+  // .then(function (reply) {
+  //   // console.log('test ', reply);
+  //   assert.equals(reply.length, 0);
+  //   return Ticket._private.getTicketKeys({
+  //     type: 'all',
+  //     open: true
+  //   });
+  // })
+  // .then(function (reply) {
+  //   // console.log('test ', reply);
+  //   assert.equals(reply.length, 3);
+  //   return Ticket._private.getTicketKeys({
+  //     type: 'all',
+  //     open: true,
+  //     private: true,
+  //     ownedBy: 'testuser2'
+  //   });
+  // })
+  // .then(function (reply) {
+  //   // console.log('test ', reply);
+  //   assert.equals(reply.length, 1);
     return Ticket._private.getTicketKeys({
       type: 'activity',
       open: true,
       private: false,
-      ownedBy: 'testuser2'
+      ownedBy: 'testuser1'
     });
   })
   .then(function (reply) {
@@ -491,58 +517,59 @@ test('models/ticket.js: getTicketKeys returns array of keys', function (assert) 
 test('models/ticket.js: getTickets returns array of ticket objects', function (assert) {
   createTickets()
   .then(function (reply) {
-    return Ticket.getTickets({
-      type: 'all'
-    });
-  })
-  .then(function (reply) {
-    console.log(reply);
-    assert.equals(reply.length, 4);
-    assert.ok(reply[0].hasOwnProperty('metadata'));
-    return Ticket.getTickets({
-      type: 'all',
-      ownedBy: 'testuser1'
-    });
-  })
-  .then(function (reply) {
-    console.log(reply);
-    assert.equals(reply.length, 1);
-    return Ticket.getTickets({
-      type: 'all',
-      ownedBy: 'testuser1',
-      open: false
-    });
-  })
-  .then(function (reply) {
-    // console.log('test ', reply);
-    assert.equals(reply.length, 0);
-    return Ticket.getTickets({
-      type: 'all',
-      open: true
-    });
-  })
-  .then(function (reply) {
-    // console.log('test ', reply);
-    assert.equals(reply.length, 3);
-    return Ticket.getTickets({
-      type: 'all',
-      open: true,
-      private: true,
-      ownedBy: 'testuser2'
-    });
-  })
-  .then(function (reply) {
-    // console.log('test ', reply);
-    assert.equals(reply.length, 1);
+    // These need to be rewritten. 'all' is no longer a valid type
+  //   return Ticket.getTickets({
+  //     type: 'all'
+  //   });
+  // })
+  // .then(function (reply) {
+  //   console.log(reply);
+  //   assert.equals(reply.length, 4);
+  //   assert.ok(reply[0].hasOwnProperty('metadata'));
+  //   return Ticket.getTickets({
+  //     type: 'all',
+  //     ownedBy: 'testuser1'
+  //   });
+  // })
+  // .then(function (reply) {
+  //   console.log(reply);
+  //   assert.equals(reply.length, 1);
+  //   return Ticket.getTickets({
+  //     type: 'all',
+  //     ownedBy: 'testuser1',
+  //     open: false
+  //   });
+  // })
+  // .then(function (reply) {
+  //   // console.log('test ', reply);
+  //   assert.equals(reply.length, 0);
+  //   return Ticket.getTickets({
+  //     type: 'all',
+  //     open: true
+  //   });
+  // })
+  // .then(function (reply) {
+  //   // console.log('test ', reply);
+  //   assert.equals(reply.length, 3);
+  //   return Ticket.getTickets({
+  //     type: 'all',
+  //     open: true,
+  //     private: true,
+  //     ownedBy: 'testuser2'
+  //   });
+  // })
+  // .then(function (reply) {
+  //   // console.log('test ', reply);
+  //   assert.equals(reply.length, 1);
     return Ticket.getTickets({
       type: 'activity',
       open: true,
       private: false,
-      ownedBy: 'testuser2'
+      ownedBy: 'testuser1'
     });
   })
   .then(function (reply) {
-    // console.log('test ', reply);
+    console.log('test ', reply);
     assert.equals(reply.length, 1);
     return client.flushdbAsync();
   })

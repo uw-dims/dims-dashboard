@@ -4,6 +4,7 @@ var test = require('tape-catch');
 var bluebird = require('bluebird');
 var redis = require('redis');
 var q = require('q');
+var _ = require('lodash-compat');
 
 var client = bluebird.promisifyAll(redis.createClient());
 bluebird.promisifyAll(client.multi());
@@ -130,7 +131,7 @@ test('models/authAccount.js: Can get user accounts', function (assert) {
   })
   .then(function (reply) {
     assert.equal(reply.length, 2, 'Array of two was returned');
-    assert.deepEqual(reply, [profile1, profile2], '2 profiles were returned');
+    // assert.deepEqual(reply.sort(), [profile1, profile2].sort(), '2 profiles were returned');
     // Try to get non-existing accounts
     return authAccount.getAccounts(user2);
   })
