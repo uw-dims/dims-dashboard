@@ -1,5 +1,5 @@
 #! /bin/bash
-VERSION=1.0.6
+VERSION=1.0.7
 
 # Run the server unit/integration tests during the development cycle
 # Run as user that owns the dashboard files - your user if you are

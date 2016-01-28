@@ -1,5 +1,5 @@
 #! /bin/bash
-VERSION=1.0.6
+VERSION=1.0.7
 
 # Used during development
 # Set up common functions and variables.
