@@ -24,10 +24,7 @@ var express = require('express')
   , LocalStrategy = require('passport-local').Strategy
   , JwtStrategy = require('passport-jwt').Strategy
   , GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
-  // , GoogleJwtStrategy = require('passport-google-oauth-jwt').GoogleOauthJWTStrategy
-  // , GoogleStrategy = require('passport-google-oauth-jwt').GoogleOauthJWTStrategy
   // , cors = require('cors')
-  // , q = require('q');
 
 // routes
 var routes = require('./routes');
@@ -41,7 +38,6 @@ diContainer.factory('UserSettings', require('./models/userSettings'));
 diContainer.factory('Ticket', require('./models/ticket'));
 diContainer.factory('UserModel', require('./models/user'));
 diContainer.factory('Attributes', require('./models/attributes'));
-// diContainer.factory('passportPostgres', require('./services/passportPostgres'));
 diContainer.factory('FileData', require('./models/fileData'));
 diContainer.factory('tools', require('./services/tools'));
 diContainer.factory('Notification', require('./models/notification'));
@@ -70,8 +66,7 @@ diContainer.factory('userService', require('./services/user'));
 diContainer.factory('auth', require('./services/authentication'));
 diContainer.factory('access', require('./services/authorization'));
 diContainer.factory('authAccount', require('./models/authAccount'));
-
-// diContainer.factory('ticketService', require('./services/ticket'));
+diContainer.factory('accountRoute', require('./routes/account'));
 
 // These are used here in app.js
 var sessionRoute = diContainer.get('sessionRoute');
@@ -84,11 +79,11 @@ var filesRoute = diContainer.get('filesRoute');
 var rwfindRoute = diContainer.get('rwfindRoute');
 var crosscorRoute = diContainer.get('crosscorRoute');
 var dataRoute = diContainer.get('dataRoute');
-// var passportPostgres = diContainer.get('passportPostgres');
 var auth = diContainer.get('auth');
 var userRoute = diContainer.get('userRoute');
 var attributeRoute = diContainer.get('attributeRoute');
 var lmsearchRoute = diContainer.get('lmsearchRoute');
+var accountRoute = diContainer.get('accountRoute');
 
 // var userService = diContainer.get('userService');
 // var authAccount = diContainer.get('authAccount');
@@ -199,7 +194,7 @@ passport.use(
 passport.use('google-authz',
   new GoogleStrategy(config.googleAuthzStrategyConfig, auth.googleConnectVerify));
 
-// We're using sessions as well as token. Need session so we have logged in
+// We're using sessions as well as token. Need session so we can access logged in
 // user when connecting to a social auth account like Google
 passport.serializeUser(auth.serialize);
 passport.deserializeUser(auth.deserialize);
@@ -269,11 +264,14 @@ router.delete('/api/fileData/:path', auth.ensureAuthenticated, fileDataRoute.del
 
 // Get session info for user making request
 router.get('/auth/session', auth.ensureAuthenticated, sessionRoute.session);
-// router.post('/auth/session', sessionRoute.login);
 // Handle user login with user/pass and send token
 router.post('/auth/session', sessionRoute.tokenLogin);
 // Handle user logout
 router.delete('/auth/session', sessionRoute.logout);
+// Route that handles social account inquiry for a user
+router.get('/auth/connect', auth.ensureAuthenticated, accountRoute.list);
+// Route that handles disconnection of a social account for a user
+router.delete('/auth/connect/:service', auth.ensureAuthenticated, accountRoute.delete);
 
 // Redirect user to Google for authentication. When complete, Google will redirect
 // user back to this application at config.googleCallback
@@ -283,7 +281,7 @@ router.get(config.googleURL, passport.authenticate(
            'https://www.googleapis.com/auth/userinfo.email']
   }));
 
-// Route for google connect. Will redirect to Google for authentication
+// Route for google connect. Will redirect to Google for authentication.
 router.get(config.googleConnectURL, passport.authorize(
   'google-authz',
   {
@@ -299,70 +297,6 @@ router.get('/socialauth', routes.index);
 router.get(config.googleConnectCallback,
     passport.authorize('google-authz', {
     failureRedirect: '/userinfo/settings'}), sessionRoute.googleConnect);
-
-  // router.get(config.googleCallback, function (req, res, next) {
-  //   passport.authenticate('google', function (err, user, info) {
-  //     if (err) {
-  //       console.log('error in google callback', err);
-  //       return next(err)
-  //     }
-  //     if (!user) {
-  //       console.log('!user ', err, user, info);
-  //       return res.redirect('/login') ;
-  //     }
-  //     console.log('user is ', user);
-  //     console.log('will send back info');
-  //     var authUserData,
-  //         tgs,
-  //         token,
-  //         result;
-  //     var username = user.username;
-  //     userService.getUserSession(username)
-  //     .then(function (reply) {
-  //       authUserData = reply;
-  //       tgs = reply.loginTgs;
-  //       token = auth.createToken(username, tgs);
-  //       result = {
-  //         token: token,
-  //         sessionObject: authUserData
-  //       };
-  //       res.writeHead(302, {
-  //         // 'Location': config.publicOrigin + '/socialauth?token=' + result.token + '&user=' + result.sessionObject
-  //         'Location': config.publicOrigin + '/socialauth?token=' + result.token + '&username=' + username
-  //       });
-  //       res.end();
-  //       // res.status(200).send(resUtils.getSuccessReply(formatResponse('login', reply)));
-  //     })
-  //     .catch(function (err) {
-  //       console.error('onLoginAuthenticate error', err);
-  //       res.status(400).send(resUtils.getErrorReply(err.toString()));
-  //     });
-  //     // res.redirect('/');
-  //     // res.status(200).send(resUtils.getSuccessReply(formatResponse('login', user)));
-  //   })(req, res, next);
-  // });
-
-
-
-// router.get(config.googleConnectCallback,
-//   passport.authorize('google-authz', {
-//     failureRedirect: '/userinfo/settings'
-//   }),
-//   function (req, res) {
-//     var user = req.user;
-//     var account = req.account;
-//     var promises = [];
-//     console.log('connect user is ', user);
-//     console.log('connect account is ', account);
-//     // Save google id of user
-//     promises.push(authAccount.setUser(account.id, account.service, user.username));
-//     promises.push(authAccount.setUserId(user.username, account.service, account.id));
-//     return q.all(promises)
-//     .then(function (reply) {
-//       self.redirect('/');
-//     });
-//   }
-// );
 
 router.get('/*', routes.index);
 
