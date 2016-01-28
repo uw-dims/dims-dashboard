@@ -85,13 +85,13 @@ module.exports = function Topic(store) {
   // Save topic metadata
   // Param: metadata - metadata to save
   var saveMetadata = function saveMetadata(metadata) {
-    // console.log('saveMetadata metadata', metadata);
-    // var parent = _.create({}, metadata.parent);
+    console.log('saveMetadata metadata', metadata);
+    var parent = _.create({}, metadata.parent);
     var hash = _.create({}, metadata);
     // stringify this since it is nested json
-    // hash.parent = JSON.stringify(parent);
-    // console.log('saveMetadata hash ', hash);
-    // console.log('saveMetadata metadata is now', metadata);
+    hash.parent = JSON.stringify(parent);
+    console.log('saveMetadata hash ', hash);
+    console.log('saveMetadata metadata is now', metadata);
     return store.setMetadata(keyGen.topicMetaKey(metadata), hash);
   };
 
@@ -105,7 +105,7 @@ module.exports = function Topic(store) {
         // reply = castMetadata(reply);
         // var parent = reply.parent;
         var metadata = castMetadata(reply);
-        // metadata.parent = JSON.parse(reply.parent);
+        metadata.parent = JSON.parse(reply.parent);
         return metadata;
       } else {
         return null;
@@ -184,7 +184,9 @@ module.exports = function Topic(store) {
         metadata = {
           metadata: validateOptions(options)
         };
-        metadata.metadata.parent = ticket.metadata;
+        metadata.metadata.parent = {};
+        metadata.metadata.parent.num = ticket.metadata.num;
+        metadata.metadata.parent.type = ticket.metadata.type;
       } else {
         throw new Error ('Invalid options supplied to topicFactory');
       }
@@ -224,7 +226,7 @@ module.exports = function Topic(store) {
     .then(function (reply) {
       // console.log(reply);
       topic.metadata = reply;
-      topic.key = key;
+      topic.key = topicKey;
       // console.log(topic);
       if (topic.metadata.datatype === 'string') {
         return getData(topic.metadata);
@@ -324,6 +326,7 @@ module.exports = function Topic(store) {
       .then(function (reply) {
         // Save counter value
         self.metadata.num = reply;
+        console.log('topic create metadata is ', self.metadata);
         // Save metadats
         promises.push(saveMetadata(self.metadata));
         // Save topic key in set of topic keys
@@ -357,7 +360,7 @@ module.exports = function Topic(store) {
     deleteTopic: deleteTopic
   };
 
-  // if (process.env.NODE_ENV === 'test') {
+  // if (config.env === 'test') {
   //   topic._private = {
   //     getTopicObject: getTopicObject
   //   };

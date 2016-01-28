@@ -29,7 +29,7 @@ module.exports = function (UserSettings, userService, auth, authAccount) {
     console.log('connect account is ', account);
     return authAccount.createAccount(user.username, account.service, account)
     .then(function (reply) {
-      res.redirect('/userinfo/account');
+      res.redirect('/userinfo/accounts');
     });
   };
 

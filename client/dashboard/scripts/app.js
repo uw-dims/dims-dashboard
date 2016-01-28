@@ -58,6 +58,14 @@ var dimsDashboardConfig = function ($routeProvider, $locationProvider, datepicke
     controller: 'LoginCtrl',
     templateUrl: 'views/partials/login.html'
   }).
+  when('/viewstatus', {
+    controller: 'SystemStatusCtrl',
+    templateUrl: 'views/partials/systemstatus.html'
+  }).
+  when('/updatesystem', {
+    controller: 'SytemUpdateCtrl',
+    templateUrl: 'views/partials/systemupdate.html'
+  }).
 
   // when('/socialauth', {
   //   controller: 'SocialAuthCtrl',

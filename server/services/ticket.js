@@ -39,6 +39,7 @@
 var logger = require('../utils/logger')(module);
 var q = require('q');
 var _ = require('lodash-compat');
+var config = require('../config/config');
 
 // ticketService.listTickets = listTickets;
 // ticketService.getTicket = getTicket;
@@ -210,7 +211,7 @@ module.exports = function (Ticket, Topic) {
   ticketService.deleteTopic = deleteTopic;
 
   // If testing, export some private functions so we can test them
-  if (process.env.NODE_ENV === 'test') {
+  if (config.env === 'test') {
     ticketService._private = {
       // validateConfig: validateConfig,
       // validateQuery: validateQuery,

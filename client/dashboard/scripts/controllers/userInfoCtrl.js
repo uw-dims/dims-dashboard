@@ -12,12 +12,16 @@
       active: false
     }, {
       active: false
+    },
+    {
+      active: false
     }];
 
     $scope.active = {
       settings: false,
       profile: true,
-      attributes: false
+      attributes: false,
+      accounts: false
     };
 
     var activateTab = function activateTab(type) {

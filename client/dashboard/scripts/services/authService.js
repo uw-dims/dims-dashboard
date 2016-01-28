@@ -1,24 +1,22 @@
 'use strict';
 
 (function () {
+
   var AuthApi = function ($resource) {
     return $resource('/auth/session');
   };
 
-  // Not used due to cross domain issues when callback is called from google.
-  // We just use an href link in the client to call this route, not $http
-  var GoogleApi = function ($resource) {
-    return $resource('/auth/google');
-  };
-
+  // Get information about connected social accounts
   var ConnectApi = function ($resource) {
-    return $resource('/auth/connect');
+    return $resource('/auth/connect/:service');
   };
 
-  var AuthService = function (AuthApi, GoogleApi, ConnectApi, SettingsService,
+  var AuthService = function (AuthApi, ConnectApi, SettingsService,
       CryptoService, $log, $q, $rootScope, $window, $location) {
 
     var authService = {};
+
+    authService.socialAccounts = [];
 
     // Handle username/password logins
     authService.login = function (provider, user, callback) {
@@ -45,7 +43,6 @@
 
     // Handle return from social login callback
     // query.token = token returned from server
-    // query.username = username returned from server. Are we using this?
     authService.onSocialLogin = function (query) {
       saveToken(query.token);
       // Get session data for user encoded in token since token is
@@ -61,13 +58,32 @@
       });
     };
 
-    authService.socialConnect = function (callback) {
+    authService.getSocialAccounts = function (callback) {
       var cb = callback || angular.noop;
       ConnectApi.get(function (resource) {
         $log.debug('successful return from ConnectApi', resource);
+        authService.socialAccounts = angular.copy(resource.data.accounts);
+        return cb();
       },
       function (err) {
         $log.debug('error return from ConnectApi', err);
+        return cb(getErrorMessage(err));
+      });
+    };
+
+    authService.showToken  = function () {
+      return $window.sessionStorage.token;
+    };
+
+    authService.disconnectSocialAccount = function (service, callback) {
+      var cb = callback || angular.noop;
+      ConnectApi.delete({service: service }, function (resource) {
+        $log.debug('authService.disconnectSocialAccount returned success from api', resource);
+        return cb();
+      },
+      function (err) {
+        $log.debug('error return from ConnectApi.delete', err);
+        return cb(getErrorMessage(err));
       });
     };
 
@@ -136,7 +152,11 @@
     }
 
     function getErrorMessage(err) {
-      return err.data.status === 'fail' ? err.data.data.message : err.data.message;
+      if (typeof err.data === 'string') {
+        return err.data;
+      } else {
+        return err.data.status === 'fail' ? err.data.data.message : err.data.message;
+      }
     }
 
     function saveSettings(data) {
@@ -156,14 +176,12 @@
 
   angular.module('dimsDashboard.services')
   .factory('AuthApi', AuthApi)
-  .factory('GoogleApi', GoogleApi)
   .factory('ConnectApi', ConnectApi)
   .factory('AuthService', AuthService);
 
   AuthApi.$inject = ['$resource'];
-  GoogleApi.$inject = ['$resource'];
   ConnectApi.$inject = ['$resource'];
-  AuthService.$inject = ['AuthApi', 'GoogleApi', 'ConnectApi', 'SettingsService',
+  AuthService.$inject = ['AuthApi', 'ConnectApi', 'SettingsService',
       'CryptoService', '$log', '$q', '$rootScope', '$window', '$location'];
 
 }());

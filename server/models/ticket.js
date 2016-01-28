@@ -433,6 +433,7 @@ module.exports = function Ticket(store) {
   // Returns ticket metadata and key
   // Does not create full ticket object with functions
   var getTicket = function getTicket(key) {
+    console.log('getTicket key is ', key);
     return getMetadata(key)
     .then(function (reply) {
       if (reply !== null) {
@@ -453,6 +454,7 @@ module.exports = function Ticket(store) {
     var promises = [];
     return getTicketKeys(options)
     .then(function (reply) {
+      console.log('getTickets reply', reply);
       _.forEach(reply, function (value, index) {
         promises.push(getTicket(value));
       });
@@ -492,7 +494,7 @@ module.exports = function Ticket(store) {
   };
 
   // If testing, export some private functions so we can test them
-  if (process.env.NODE_ENV === 'test') {
+  if (config.env === 'test') {
     ticket._private = {
       castMetadata: castMetadata,
       validateConfig: validateConfig,

@@ -11,12 +11,6 @@ module.exports = function (ticketService, mitigationService, access) {
 
   var ticketRoute = {};
 
-  var formatTicketResponse = function formatTicketResponse(key, data) {
-    var result = {};
-    result[key] = data;
-    return result;
-  };
-
   var validateTrustgroup = function validateTrustgroup(req, userAccess) {
     var validated = false;
     // Does user have access to this trust group?
@@ -96,7 +90,7 @@ module.exports = function (ticketService, mitigationService, access) {
       mitigationService.listMitigations(user, query)
       .then(function (reply) {
         // console.log('reply from listMitigations', reply);
-        return res.status(200).send(resUtils.getSuccessReply(formatTicketResponse('mitigations', reply)));
+        return res.status(200).send(resUtils.getSuccessReply(resUtils.formatResponse('mitigations', reply)));
       })
       .catch(function (err) {
         return res.status(400).send(resUtils.getErrorReply(err.toString()));
@@ -140,7 +134,7 @@ module.exports = function (ticketService, mitigationService, access) {
       ticketService.listTickets(config)
       .then(function (reply) {
         reply = _.flatten(reply);
-        res.status(200).send(resUtils.getSuccessReply(formatTicketResponse('tickets', reply)));
+        res.status(200).send(resUtils.getSuccessReply(resUtils.formatResponse('tickets', reply)));
       })
       .catch(function (err) {
         res.status(400).send(resUtils.getErrorReply(err.toString()));
@@ -172,7 +166,7 @@ module.exports = function (ticketService, mitigationService, access) {
     if (KeyExtract.isMitigation(req.params.id)) {
       mitigationService.getMitigation(req.params.id, user)
       .then(function (reply) {
-        res.status(200).send(resUtils.getSuccessReply(formatTicketResponse('mitigation', reply)));
+        res.status(200).send(resUtils.getSuccessReply(resUtils.formatResponse('mitigation', reply)));
       })
       .catch(function (err) {
         res.status(400).send(resUtils.getErrorReply(err));
@@ -185,7 +179,7 @@ module.exports = function (ticketService, mitigationService, access) {
         if (reply.metadata.private && user !== reply.metadata.creator) {
           res.status(400).send(resUtils.getErrorReply('You do not have permission to view this ticket'));
         } else {
-          res.status(200).send(resUtils.getSuccessReply(formatTicketResponse('tickets', reply)));
+          res.status(200).send(resUtils.getSuccessReply(resUtils.formatResponse('tickets', reply)));
         }
       })
       .catch(function (err) {
