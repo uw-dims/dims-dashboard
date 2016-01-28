@@ -31,6 +31,7 @@ module.exports = function Topic(store) {
     description: 'description'
   };
 
+  // Return true if type is valid
   var isValidType = function (type) {
     if (!topicTypes[type]) {
       return false;
@@ -39,6 +40,8 @@ module.exports = function Topic(store) {
     }
   };
 
+  // Validate an options config and return config when valid
+  // otherwise return null
   //options:
   // dataType: set or string
   // name: required
@@ -67,7 +70,8 @@ module.exports = function Topic(store) {
     };
   };
 
-  // Coerce types returned from redis
+  // Coerce types returned from store
+  // Param: metadata - metadata JSON object
   var castMetadata = function castMetadata(metadata) {
     metadata.createdTime = _.parseInt(metadata.createdTime);
     metadata.modifiedTime = _.parseInt(metadata.modifiedTime);
@@ -75,6 +79,102 @@ module.exports = function Topic(store) {
     return metadata;
   };
 
+  // TODO - no longer can get key simply from metadata
+  // since we're not storing the parent info in the metadata
+  // need to derive key from topic key
+  // Save topic metadata
+  // Param: metadata - metadata to save
+  var saveMetadata = function saveMetadata(metadata) {
+    console.log('saveMetadata metadata', metadata);
+    var parent = _.create({}, metadata.parent);
+    var hash = _.create({}, metadata);
+    // stringify this since it is nested json
+    hash.parent = JSON.stringify(parent);
+    console.log('saveMetadata hash ', hash);
+    console.log('saveMetadata metadata is now', metadata);
+    return store.setMetadata(keyGen.topicMetaKey(metadata), hash);
+  };
+
+  // Retrieve metadata from store
+  // Param: metadata key
+  var getMetadata = function getMetadata(key) {
+    return store.getMetadata(key)
+    .then(function (reply) {
+      // console.log(reply);
+      if (reply !== null) {
+        // reply = castMetadata(reply);
+        // var parent = reply.parent;
+        var metadata = castMetadata(reply);
+        metadata.parent = JSON.parse(reply.parent);
+        return metadata;
+      } else {
+        return null;
+      }
+    })
+    .catch(function (err) {
+      throw err;
+    });
+  };
+
+  // Add setkey to a set with current time as score
+  var saveKey = function addToSet(metadata, setKey) {
+    return store.addItem(keyGen.topicKey(metadata), setKey, timestamp());
+  };
+
+  // Remove a key from a set
+  // Params: metadata - topic metadata for the key
+  //         setKey - key to remove
+  var removeKey = function removeKey(metadata, setKey) {
+    return store.removeItem(keyGen.topicKey(metadata), setKey);
+  };
+
+  // Save topic data
+  // Params: metadata - metadata describing topic
+  //         data - data to be saved
+  var saveData = function saveData(metadata, data) {
+    console.log('saveData metadata is ', metadata);
+    // console.log('saveData data is ', data);
+    return store.setData(keyGen.topicKey(metadata), data);
+  };
+
+  // Get data (string) from store for a topic
+  var getData = function getData(metadata) {
+    return store.getData(keyGen.topicKey(metadata));
+  };
+
+  // Create topic object and save metadata
+  var createTopic = function createTopic(ticket, options) {
+    var topic = topicFactory(ticket, options);
+    return topic.create();
+  };
+
+  // add items to topic data. Stored as sorted set if score included.
+  var addItems = function addItems(metadata, items, score) {
+    return store.addItem(items, keyGen.topicKey(metadata), score);
+  };
+
+  // Get items (set or sorted set) from topic
+  var getItems = function getItems(metadata) {
+    return store.listItems(keyGen.topicKey(metadata));
+  };
+
+  // Remove items from set or sorted set topic data
+  var removeItems = function removeItems(metadata, items) {
+    return store.removeItem(items, keyGen.topicKey(metadata));
+  };
+
+  var updateMetdata = function updateMetadata(config) {
+    var result = {};
+    if (config.hasOwnProperty(description)) {
+      result.description = config.description;
+    }
+    if (config.hasOwnProperty(name)) {
+      result.name = config.name;
+    }
+    return result;
+  };
+
+  // Create a topic object with methods from ticket and options
   var topicFactory = function topicFactory(ticket, options) {
     var metadata = {};
     if (options === null || options === undefined) {
@@ -84,7 +184,9 @@ module.exports = function Topic(store) {
         metadata = {
           metadata: validateOptions(options)
         };
-        metadata.metadata.parent = ticket.metadata;
+        metadata.metadata.parent = {};
+        metadata.metadata.parent.num = ticket.metadata.num;
+        metadata.metadata.parent.type = ticket.metadata.type;
       } else {
         throw new Error ('Invalid options supplied to topicFactory');
       }
@@ -100,74 +202,6 @@ module.exports = function Topic(store) {
     }
   };
 
-  // Add key to a set with current time as score
-  var saveKey = function addToSet(metadata, setKey) {
-    return store.addItem(keyGen.topicKey(metadata), setKey, timestamp());
-  };
-
-  var saveMetadata = function saveMetadata(metadata) {
-    // console.log('saveMetadata metadata', metadata);
-    var parent = _.create({}, metadata.parent);
-    // stringify this since it is nested json
-    // console.log('saveMetadata parent', parent);
-    var hash = _.create({}, metadata);
-    hash.parent = JSON.stringify(parent);
-    // console.log('saveMetadata hash ', hash);
-    // console.log('saveMetadata metadata is now', metadata);
-    return store.setMetadata(keyGen.topicMetaKey(metadata), hash);
-  };
-
-  var removeKey = function removeKey(metadata, setKey) {
-    return store.removeItem(keyGen.topicKey(metadata), setKey);
-  };
-
-  var getMetadata = function getMetadata(key) {
-    return store.getMetadata(key)
-    .then(function (reply) {
-      // console.log(reply);
-      if (reply !== null) {
-        reply = castMetadata(reply);
-        var parent = reply.parent;
-        var metadata = reply;
-        metadata.parent = JSON.parse(reply.parent);
-        return metadata;
-      } else {
-        return null;
-      }
-    })
-    .catch(function (err) {
-      throw err;
-    });
-  };
-
-  // Data should be JSON?
-  var saveData = function saveData(metadata, data) {
-    console.log('saveData metadata is ', metadata);
-    // console.log('saveData data is ', data);
-    return store.setData(keyGen.topicKey(metadata), data);
-  };
-
-  var getData = function getData(metadata) {
-    return store.getData(keyGen.topicKey(metadata));
-  };
-
-  var createTopic = function createTopic(ticket, options) {
-    var topic = topicFactory(ticket, options);
-    return topic.create();
-  };
-
-  var addItems = function addItems(metadata, items, score) {
-    return store.addItem(items, keyGen.topicKey(metadata), score);
-  };
-
-  var getItems = function getItems(metadata) {
-    return store.listItems(keyGen.topicKey(metadata));
-  };
-
-  var removeItems = function removeItems(metadata, items) {
-    return store.removeItem(items, keyGen.topicKey(metadata));
-  };
-
   var extendFactory = function extendFactory(config) {
     // config = castMetadata(config);
     // console.log('completeTopic config after cast ', config);
@@ -181,32 +215,18 @@ module.exports = function Topic(store) {
     return topicObject;
   };
 
-  // var getTopicObject = function getTopicObject(metaKey) {
-  //   return getMetadata(metaKey)
-  //   .then(function (reply) {
-  //     if (reply !== null) {
-  //       // console.log('getTopicObject reply', reply);
-  //       return completeTopic(reply);
-  //     } else {
-  //       return null;
-  //     }
-  //   })
-  //   .catch(function (err) {
-  //     throw err;
-  //   });
-  // };
-
   // Get data and metadata for a topic from a topic key
-  var getTopic = function getTopic(key) {
-    // console.log('getTopic key', key);
+  // Returns metadata and data - not a complete topic object
+  // with functions
+  var getTopic = function getTopic(topicKey) {
     var topic = {};
-    var metaKey = keyGen.metaKeyFromKey(key);
+    var metaKey = keyGen.metaKeyFromKey(topicKey);
     // console.log('getTopicMetaKey ', metaKey);
     return getMetadata(metaKey)
     .then(function (reply) {
       // console.log(reply);
       topic.metadata = reply;
-      topic.key = key;
+      topic.key = topicKey;
       // console.log(topic);
       if (topic.metadata.datatype === 'string') {
         return getData(topic.metadata);
@@ -224,17 +244,19 @@ module.exports = function Topic(store) {
     });
   };
 
-  // Get array of topics - just metadata and data
+  // Get array of topics for a ticket - just metadata and data
   // Input is ticket key
-  var getTopics = function getTopics(key) {
+  var getTopics = function getTopics(ticketKey) {
     // console.log(key);
     var promises = [];
-    return store.listItems(keyGen.topicSetKeyFromTicketKey(key))
+    // Return promise with array of topic keys
+    return store.listItems(keyGen.topicSetKeyFromTicketKey(ticketKey))
     .then(function (reply) {
       // console.log(reply);
       _.forEach(reply, function (value, index) {
         promises.push(getTopic(value));
       });
+      // Return array of topics
       return q.all(promises);
     })
     .catch(function (err) {
@@ -275,18 +297,41 @@ module.exports = function Topic(store) {
     });
   };
 
-  // score is optional
+  // Given a topic key, delete the topic from the store
+  var deleteTopic = function deleteTopic(key) {
+    // Get metadata from topic key so we can get all keys needed
+    return getTopicMetadata(key)
+    .then (function (metadata) {
+      var promises = [];
+      promises.push(store.deleteKey(keyGen.topicMetaKey(metadata)));
+      promises.push(store.deleteKey(keyGen.topicKey(metadata)));
+      promises.push(removeKey(self.metadata, keyGen.topicSetKey(metadata)));
+      return q.all(promises);
+    })
+    .catch(function (err) {
+      throw err;
+    });
+  };
+
+
   var topicPrototype = {
+    // score is optional
     create: function (data, score) {
       var self = this;
       var promises = [];
       self.metadata.createdTime = timestamp();
       self.metadata.modifiedTime = self.metadata.createdTime;
+      // increment counter
       return store.incrCounter(keyGen.topicCounterKey())
       .then(function (reply) {
+        // Save counter value
         self.metadata.num = reply;
+        console.log('topic create metadata is ', self.metadata);
+        // Save metadats
         promises.push(saveMetadata(self.metadata));
+        // Save topic key in set of topic keys
         promises.push(saveKey(self.metadata, keyGen.topicSetKey(self.metadata)));
+        // Save data
         if (self.metadata.datatype === 'string') {
           promises.push(saveData(self.metadata, data));
         } else {
@@ -298,15 +343,6 @@ module.exports = function Topic(store) {
         logger.error('create error: ', err.toString());
         return new Error(err.toString());
       });
-    },
-    delete: function () {
-      var self = this;
-      var promises = [];
-      promises.push(store.deleteKey(keyGen.topicMetaKey(self.metadata)));
-      promises.push(store.deleteKey(keyGen.topicKey(self.metadata)));
-      promises.push(removeKey(self.metadata, keyGen.topicSetKey(self.metadata)));
-      self.metadata = {};
-      return q.all(promises);
     },
     exists: function exists() {
       var self = this;
@@ -320,10 +356,11 @@ module.exports = function Topic(store) {
     getTopics: getTopics,
     getTopicMetadata: getTopicMetadata,
     getTopicsMetadata: getTopicsMetadata,
-    extendFactory: extendFactory
+    extendFactory: extendFactory,
+    deleteTopic: deleteTopic
   };
 
-  // if (process.env.NODE_ENV === 'test') {
+  // if (config.env === 'test') {
   //   topic._private = {
   //     getTopicObject: getTopicObject
   //   };

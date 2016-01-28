@@ -1,0 +1,39 @@
+<div class="spacer10">
+<div class="panel panel-default">
+<div class="panel-body">
+<h3>Connected Social Accounts</h3>
+<p style="padding-bottom: 10px" ng-if="vm.showMessage">{{vm.message}}</p>
+  <div class="row" ng-repeat="n in vm.accounts track by $index" style="margin-left: 10px;">
+    <div class="row" style="margin-top:5px;">
+      <div class="col-sm-2" style="font-weight: bold">Service</div>
+      <div class="col-sm-6">{{n.service | uppercase}}</div>
+      <div class="col-sm-4"><button type="button" class="btn btn-primary btn-sm" ng-click="vm.disconnect($index)">Disconnect service</button> </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2" style="font-weight: bold">Email Address</div>
+      <div class="col-sm-10">{{n.email}}</div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2" style="font-weight: bold">Display Name</div>
+      <div class="col-sm-10">{{n.displayName}}</div>
+    </div>
+  </div>
+  <div class="spacer10" ng-if="vm.showConnect">
+    <a href="/connect/google" target="_self">Connect your Google account to use for sign-in</a>
+  </div>
+
+</div>
+</div>
+</div>
+
+<div class="spacer10">
+<div class="panel panel-default">
+<div class="panel-body">
+<h3>Login session token</h3>
+<p>This token is required for accessing DIMS APIs via command line or other programs. It is intended for your use while logged into the Dashboard. To use in an API call,
+the token text must be in the <strong>authorization</strong> field of the request header. Login session tokens are short-lived and are for your use only. </p>
+<button type="button" class="btn btn-primary btn-sm" ng-click="vm.getToken()">{{vm.tokenMessage}}</button>
+<pre ng-if="vm.showToken" style="margin-top:15px;">JWT {{vm.token}}</pre>
+</div>
+</div>
+</div>

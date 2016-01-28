@@ -58,6 +58,20 @@ var dimsDashboardConfig = function ($routeProvider, $locationProvider, datepicke
     controller: 'LoginCtrl',
     templateUrl: 'views/partials/login.html'
   }).
+  when('/viewstatus', {
+    controller: 'SystemStatusCtrl',
+    templateUrl: 'views/partials/systemstatus.html'
+  }).
+  when('/updatesystem', {
+    controller: 'SytemUpdateCtrl',
+    templateUrl: 'views/partials/systemupdate.html'
+  }).
+
+  // when('/socialauth', {
+  //   controller: 'SocialAuthCtrl',
+  //   controllerAs: 'vm',
+  //   templateUrl: 'views/partials/socialauth.html'
+  // }).
   // when('/mainnew', {
   //   controller: 'MainnewCtrl',
   //   templateUrl: 'views/partials/mainnew.html'
@@ -121,7 +135,8 @@ var constants = {
       'name': 'dimstr',
       'event': 'dimstr:data'
     }
-  }
+  },
+  'logoURL': 'images/default/UW-logo.png'
 };
 
 var rpcClientOptions = {
@@ -178,19 +193,24 @@ var rpcClientOptions = {
 };
 
 var dimsDashboard = angular.module('dimsDashboard',
-  ['ngRoute','angularFileUpload','ui.bootstrap','ui.bootstrap.showErrors','ngGrid', 'ngAnimate', 'ngResource','http-auth-interceptor', 'btford.socket-io',
-    'ngCookies','anguFixedHeaderTable', 'truncate', 'msieurtoph.ngCheckboxes', 'dimsDashboard.controllers', 'dimsDashboard.directives', 'dimsDashboard.services','dimsDashboard.config'])
+  ['ngRoute', 'angularFileUpload', 'ui.bootstrap', 'ui.bootstrap.showErrors', 'ngGrid', 'ngAnimate', 'ngResource', 'http-auth-interceptor', 'btford.socket-io',
+    'ngSanitize',
+    'ngCookies', 'anguFixedHeaderTable', 'truncate', 'msieurtoph.ngCheckboxes', 'dimsDashboard.controllers', 'dimsDashboard.directives', 'dimsDashboard.services', 'dimsDashboard.config'])
   .config(dimsDashboardConfig);
 
 dimsDashboard.constant(constants);
 dimsDashboard.constant(rpcClientOptions);
 
 // This is populated by Grunt
-angular.module('dimsDashboard.config',[]);
+angular.module('dimsDashboard.config', []);
 angular.module('dimsDashboard.controllers', []);
 angular.module('dimsDashboard.services', []);
 angular.module('dimsDashboard.directives', []);
 angular.module('dimsDashboard.filters', []);
+
+dimsDashboard.config(function ($httpProvider) {
+    $httpProvider.interceptors.push('authInterceptor');
+  });
 
  _.mixin(_.string.exports());
 
@@ -199,15 +219,21 @@ dimsDashboard.run(function ($rootScope, $location, $log, AuthService) {
   $rootScope.$watch('currentUser', function (currentUser) {
     // if no currentUser and on a page that requires authorization then try to update it
     // will trigger 401s if user does not have a valid session
-    $log.debug('Run: watch currentUser handler. currentUser is ', currentUser);
-    $log.debug('Run: watch currentUser handler. path is ', $location.path());
-    if (!currentUser && (['/login'].indexOf($location.path()) === -1)) {
+    // socialauth path - returned from social login
+    if (!currentUser && (['/socialauth'].indexOf($location.path()) === 0)) {
+      $log.debug('Run: watch currentUser handler. path is socialauth');
+      AuthService.onSocialLogin($location.$$search);
+    // No currentUser and  not on login page
+    // Try to get the currentUser since might be a reload
+    } else if (!currentUser && (['/login'].indexOf($location.path()) === -1)) {
       $log.debug('Run: watch currentUser handler. First if. No currentUser and not on login page. Call AuthService.currentUser()');
       AuthService.currentUser();
+    // Login page
     } else if (['/login'].indexOf($location.path()) === 0) {
       $log.debug('Run: watch currentUser handler. 2nd if. currentUser is ', currentUser);
       $log.debug('Run: watch currentUser handler. 2nd if. location ', $location.path());
       $location.path('/login');
+    // Not on login, have currentUser
     } else {
       $log.debug('Run: watch currentUser handler. else. currentUser is ', currentUser);
       $log.debug('Run: watch currentUser handler. else. location ', $location.path());

@@ -7,66 +7,102 @@ var KeyExtract = require('../models/keyExtract');
 var resUtils = require('../utils/responseUtils');
 var _ = require('lodash-compat');
 
-module.exports = function (ticketService, mitigationService) {
+module.exports = function (ticketService, mitigationService, access) {
 
   var ticketRoute = {};
 
-  var formatTicketResponse = function formatTicketResponse(key, data) {
-    var result = {};
-    result[key] = data;
-    return result;
+  var validateTrustgroup = function validateTrustgroup(req, userAccess) {
+    var validated = false;
+    // Does user have access to this trust group?
+    if (req.query.hasOwnProperty('tg')) {
+      if (access.isAuthorized(userAccess, req.query.tg)) {
+        validated = true;
+      }
+    // If trust group not supplied, is user a superuser?
+    } else {
+      if (access.isSysAdmin(userAccess)) {
+        validated = true;
+      }
+    }
+    return validated;
   };
 
-
+  var getDefaultConfig = function getDefaultConfig(userAccess) {
+    console.log('ticket route getDefaultConfig, userAccess is ', userAccess);
+    var config = [];
+    var user = access.username(userAccess);
+    _.forEach(userAccess.tgs, function (value, key) {
+      logger.debug('getDefaultConfig value ', value, 'key', key);
+      config.push({
+        // type: 'activity',
+        private: false,
+        tg: key
+      });
+      config.push({
+        // type: 'activity',
+        private: true,
+        ownedBy: user,
+        tg: key
+      });
+    });
+    return config;
+  };
 
   ticketRoute.list = function (req, res) {
-    var user = null,
-        trustgroup =  null,
-        config = [],
-        errMsg = '';
 
-    if (req.hasOwnProperty('user')) {
-      user = req.user.username;
+    console.log('in ticketroute list. query is ', req.query);
+    var userAccess,
+        user,
+        config = [];
+
+    // user is the authorizations object contained in the request. It must be present
+    if (!req.user) {
+      return res.status(500).send(resUtils.getErrorReply('Authentication error: User is not defined in request'));
     }
 
-    // if (!req.user) {
-    //   return res.status(500).send('Error: user is not defined in request');
-    // }
-    // user = req.user.username;
+    // Get the access object
+    userAccess = req.user;
+    // Get the user from the access object
+    user = access.username(userAccess);
+    // logger.debug('LIST userAccess', userAccess);
+    // Validate trust group
+
+    if (!validateTrustgroup(req, userAccess)) {
+      return res.status(400).send(resUtils.getErrorReply('Requesting tickets in trustgroup that user is not authorized for'));
+    }
 
     // If type is mitigation, use mitigation service
+    // Mitigations are always public but may be open or closed and will be in a trust group
     if (req.query.type === 'mitigation') {
-      // Get user from request if it exists
-      // This won't fail if user isn't supplied, just will return ips property
-      // with an empty array.
-
-      mitigationService.listMitigations(user)
+      var query = {};
+      if (req.query.hasOwnProperty('open')) {
+        if (req.query.open === 'true') {
+          query.open = true;
+        } else if (req.query.open === 'false') {
+          query.open = false;
+        } else {
+          return res.status(400).send(resUtils.getFailReply({open: 'Must be boolean'}));
+        }
+      }
+      if (req.query.hasOwnProperty('tg')) {
+        query.tg = req.query.tg;
+      }
+      mitigationService.listMitigations(user, query)
       .then(function (reply) {
-        res.status(200).send(resUtils.getSuccessReply(formatTicketResponse('mitigations', reply)));
+        // console.log('reply from listMitigations', reply);
+        return res.status(200).send(resUtils.getSuccessReply(resUtils.formatResponse('mitigations', reply)));
       })
       .catch(function (err) {
-        res.status(400).send(resUtils.getErrorReply(err.toString()));
+        return res.status(400).send(resUtils.getErrorReply(err.toString()));
       });
 
     // not a mitigation ticket
-    // TODO: we are ignoring trust group currently
     } else {
-      // no params supplied
+      // no params supplied. Will return all activity tickets that are public
+      // and all private tickets for the user,
+      // for all trustgroups the user is authorized for
       if (_.size(req.query) === 0) {
-        config.push({
-          type: 'activity',
-          private: false
-        });
-        // If user is in request, then can get private tickets as well
-        if (req.hasOwnProperty('user')) {
-          user = req.user.username;
-          config.push({
-            type: 'activity',
-            private: true,
-            ownedBy: user
-          });
-        }
-
+        config = getDefaultConfig(userAccess);
       // params supplied, so let's validate them
       } else {
 
@@ -81,6 +117,7 @@ module.exports = function (ticketService, mitigationService) {
             private: false,
             type: 'activity'
           }, req.query));
+
         } else if (req.query.private === 'true') {
           if (req.query.hasOwnProperty('ownedBy') && user !== req.query.ownedBy) {
             res.status(400).send(resUtils.getErrorReply('Cannot get private tickets from another user'));
@@ -97,7 +134,7 @@ module.exports = function (ticketService, mitigationService) {
       ticketService.listTickets(config)
       .then(function (reply) {
         reply = _.flatten(reply);
-        res.status(200).send(resUtils.getSuccessReply(formatTicketResponse('tickets', reply)));
+        res.status(200).send(resUtils.getSuccessReply(resUtils.formatResponse('tickets', reply)));
       })
       .catch(function (err) {
         res.status(400).send(resUtils.getErrorReply(err.toString()));
@@ -106,10 +143,19 @@ module.exports = function (ticketService, mitigationService) {
   };
 
   ticketRoute.show = function (req, res) {
-    var user = null;
-    if (req.hasOwnProperty('user')) {
-      user = req.user.username;
+    var userAccess,
+        user,
+        trustgroup =  null;
+
+    // user is the authorizations object contained in the request
+    if (!req.user) {
+      return res.status(500).send(resUtils.getErrorReply('Authentication error: User is not defined in request'));
     }
+    // Get the access object
+    userAccess = req.user;
+    // Get the user from the access object
+    user = access.username(userAccess);
+    // logger.debug('SHOW userAccess', userAccess);
     logger.debug('SHOW, id: ', req.params.id);
     logger.debug('SHOW query', req.query);
 
@@ -120,7 +166,7 @@ module.exports = function (ticketService, mitigationService) {
     if (KeyExtract.isMitigation(req.params.id)) {
       mitigationService.getMitigation(req.params.id, user)
       .then(function (reply) {
-        res.status(200).send(resUtils.getSuccessReply(formatTicketResponse('mitigation', reply)));
+        res.status(200).send(resUtils.getSuccessReply(resUtils.formatResponse('mitigation', reply)));
       })
       .catch(function (err) {
         res.status(400).send(resUtils.getErrorReply(err));
@@ -133,7 +179,7 @@ module.exports = function (ticketService, mitigationService) {
         if (reply.metadata.private && user !== reply.metadata.creator) {
           res.status(400).send(resUtils.getErrorReply('You do not have permission to view this ticket'));
         } else {
-          res.status(200).send(resUtils.getSuccessReply(formatTicketResponse('tickets', reply)));
+          res.status(200).send(resUtils.getSuccessReply(resUtils.formatResponse('tickets', reply)));
         }
       })
       .catch(function (err) {
@@ -218,10 +264,18 @@ module.exports = function (ticketService, mitigationService) {
     //   });
   };
 
-  // TODO: Not implemented
   ticketRoute.delete = function (req, res) {
-    logger.debug('routes/ticket DELETE, not implemented');
-    res.status(405).send('Ticket delete not yet implemented.');
+    logger.debug('routes/ticket DELETE');
+    // user is the authorizations object contained in the request. It must be present
+    if (!req.user) {
+      return res.status(500).send(resUtils.getErrorReply('Authentication error: User is not defined in request'));
+    }
+
+    // Get the access object
+    userAccess = req.user;
+    // Get the user from the access object
+    user = access.username(userAccess);
+    logger.debug('LIST userAccess', userAccess);
   };
 
   /**

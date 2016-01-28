@@ -45,14 +45,17 @@ var Bookshelf = diContainer.get('Bookshelf');
 
     var ticketKey;
     var ipPath = __dirname + '/demo_mitigation_ips.txt';
-    var user1Ips, user2Ips, user1Chunk, user2Chunk;
+    // var user1Ips, user2Ips, user1Chunk, user2Chunk;
     var k = 30;
     var i = 0;
     var submitTime = moment().subtract(k + 1, 'days').format('x');
     var submitDisplayTime = moment().subtract(k + 2, 'days').format('L');
-    var user1 = options[0];
-    var user2 = options[1];
     var description = 'IPs needing mitigation. As you mitigate IPs, submit them here.';
+
+    var tg = options[0];
+    options = _.drop(options, 1);
+    var user1 = options[1];
+    var user2 = options[2];
 
     var getRandom = function getRandom(min, max) {
       // Note we multiply by 1 to make sure min is interpreted as number
@@ -61,7 +64,7 @@ var Bookshelf = diContainer.get('Bookshelf');
 
     var ipData = fs.readFileSync(ipPath, {encoding: 'utf-8'});
 
-    mitigationService.initiateMitigation(ipData, user1, 'Action Needed: ' + submitDisplayTime + ' Compromised IPs', description, submitTime)
+    mitigationService.initiateMitigation(ipData, user1, tg, 'Action Needed: ' + submitDisplayTime + ' Compromised IPs', description, submitTime)
     .then(function (reply) {
       ticketKey = reply;
       console.log('bootstrapMitigation ticketKey', ticketKey);

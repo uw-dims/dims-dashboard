@@ -86,7 +86,25 @@
     return clientSockets;
   };
 
-  var ChatService = function ($log, ClientSockets) {
+  var ChatService = function ($log, ClientSockets, $rootScope) {
+
+    var stop = function stop(name) {
+      chatService.running = false;
+      $log.debug('ChatService stop. ChatService running - ', chatService.running);
+      notifyObservers('stop');
+    };
+
+    var observerCallbacks = [];
+
+    var notifyObservers = function (args) {
+      // $log.debug('ChatService notifyObservers args:', args);
+      args = args || '';
+      angular.forEach(observerCallbacks, function (callback) {
+        // $log.debug('ChatService notifyObservers in forEach', callback);
+        callback(args);
+      });
+    };
+
     var chatService = {
       // True if chat running ($scope is listening on socket) or false if it is not
       running: false,
@@ -99,32 +117,24 @@
         this.running = running;
       },
       // Observers and functions
-      observerCallbacks: [],
       registerObserverCallback: function (callback) {
-        this.observerCallbacks.push(callback);
+        observerCallbacks.push(callback);
         // $log.debug('ChatService registerObserverCallback observerCallbacks: ', this.observerCallbacks);
       },
-      notifyObservers: function (args) {
-        // $log.debug('ChatService notifyObservers args:', args);
-        args = args || '';
-        angular.forEach(this.observerCallbacks, function (callback) {
-          // $log.debug('ChatService notifyObservers in forEach', callback);
-          callback(args);
-        });
-      },
-
+      
       // Start the chat. Notify observers
       start: function () {
         chatService.running = true;
         $log.debug('ChatService start. ChatService running - ', chatService.running);
-        this.notifyObservers('start');
+        notifyObservers('start');
       },
       // Stop the chat. Notify observers
-      stop: function () {
-        chatService.running = false;
-        $log.debug('ChatService stop. ChatService running - ', chatService.running);
-        this.notifyObservers('stop');
-      },
+      stop: stop,
+      // stop: function () {
+      //   chatService.running = false;
+      //   $log.debug('ChatService stop. ChatService running - ', chatService.running);
+      //   this.notifyObservers('stop');
+      // },
       // Send a message
       send: function (message) {
         // $log.debug('ChatService sending message', message);
@@ -135,6 +145,7 @@
             });
       }
     };
+    $rootScope.$on('logout', chatService.stop.bind(this));
     return chatService;
   };
 
@@ -173,11 +184,12 @@
 
     var stop = function stop(name) {
       logs[name].running = false;
-      //$log.debug('LogService stop. LogService running - ', logService.running);
+      $log.debug('LogService stop. LogService running - ', logService.running);
       notifyObservers[name]('stop');
     };
 
     var stopAll = function stopAll() {
+      $log.debug('Stopping all log fanouts');
       _.forEach(constants.fanoutExchanges, function (value, key) {
         stop(value.name);
       });
@@ -217,7 +229,7 @@
   // Plug factory function into AngularJS
   angular.module('dimsDashboard.services')
       .factory('ClientSockets', ['$q', '$rootScope', 'socketFactory', '$timeout', '$log', 'ENV', ClientSockets])
-      .factory('ChatService', ['$log', 'ClientSockets', ChatService]);
+      .factory('ChatService', ['$log', 'ClientSockets', '$rootScope', ChatService]);
 
   angular.module('dimsDashboard.services')
       .factory('LogService', ['ClientSockets', '$rootScope', '$log', LogService]);

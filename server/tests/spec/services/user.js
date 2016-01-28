@@ -68,41 +68,41 @@
 //   });
 // });
 
-// // test('services/user.js: get info for all trust groups', function (assert) {
-// //   userService.getAllTrustgroups()
-// //   .then(function (reply) {
-// //     console.log(reply);
-// //     assert.end();
-// //   })
-// //   .catch(function (err) {
-// //     console.log(err);
-// //     assert.end();
-// //   });
-// // });
+// test('services/user.js: get info for all trust groups', function (assert) {
+//   userService.getAllTrustgroups()
+//   .then(function (reply) {
+//     console.log(reply);
+//     assert.end();
+//   })
+//   .catch(function (err) {
+//     console.log(err);
+//     assert.end();
+//   });
+// });
 
-// // test('services/user.js: get info for one trust groups', function (assert) {
-// //   userService.getOneTrustgroup('dims')
-// //   .then(function (reply) {
-// //     console.log(reply);
-// //     assert.end();
-// //   })
-// //   .catch(function (err) {
-// //     console.log(err);
-// //     assert.end();
-// //   });
-// // });
+// test('services/user.js: get info for one trust groups', function (assert) {
+//   userService.getOneTrustgroup('dims')
+//   .then(function (reply) {
+//     console.log(reply);
+//     assert.end();
+//   })
+//   .catch(function (err) {
+//     console.log(err);
+//     assert.end();
+//   });
+// });
 
-// // test('services/user.js: get all members in one trust groups', function (assert) {
-// //   userService.getUsersByTrustgroup('dims')
-// //   .then(function (reply) {
-// //     console.log(reply);
-// //     assert.end();
-// //   })
-// //   .catch(function (err) {
-// //     console.log(err);
-// //     assert.end();
-// //   });
-// // });
+// test('services/user.js: get all members in one trust groups', function (assert) {
+//   userService.getUsersByTrustgroup('dims')
+//   .then(function (reply) {
+//     console.log(reply);
+//     assert.end();
+//   })
+//   .catch(function (err) {
+//     console.log(err);
+//     assert.end();
+//   });
+// });
 
 // test('services/user.js: get all trustgroups a user is in', function (assert) {
 //   userService.getTrustgroupByUser('lparsons')
@@ -128,41 +128,41 @@
 //   });
 // });
 
-// // test('services/user.js: get info for all users in a trust group', function (assert) {
-// //   userService.getUsersInfo('dims')
-// //   .then(function (reply) {
-// //     console.log(reply);
-// //     assert.end();
-// //   })
-// //   .catch(function (err) {
-// //     console.log(err);
-// //     assert.end();
-// //   });
-// // });
+// test('services/user.js: get info for all users in a trust group', function (assert) {
+//   userService.getUsersInfo('dims')
+//   .then(function (reply) {
+//     console.log(reply);
+//     assert.end();
+//   })
+//   .catch(function (err) {
+//     console.log(err);
+//     assert.end();
+//   });
+// });
 
-// // test('services/user.js: get info for all users in tg', function (assert) {
-// //   userService.getUsersInfo('dims')
-// //   .then(function (reply) {
-// //     console.log(reply);
-// //     assert.end();
-// //   })
-// //   .catch(function (err) {
-// //     console.log(err);
-// //     assert.end();
-// //   });
-// // });
+// test('services/user.js: get info for all users in tg', function (assert) {
+//   userService.getUsersInfo('dims')
+//   .then(function (reply) {
+//     console.log(reply);
+//     assert.end();
+//   })
+//   .catch(function (err) {
+//     console.log(err);
+//     assert.end();
+//   });
+// });
 
-// // test('services/user.js: get info for all users', function (assert) {
-// //   userService.getUsersInitialInfo('dims', 'lparsons')
-// //   .then(function (reply) {
-// //     console.log(reply);
-// //     assert.end();
-// //   })
-// //   .catch(function (err) {
-// //     console.log(err);
-// //     assert.end();
-// //   });
-// // });
+// test('services/user.js: get info for all users', function (assert) {
+//   userService.getUsersInitialInfo('dims', 'lparsons')
+//   .then(function (reply) {
+//     console.log(reply);
+//     assert.end();
+//   })
+//   .catch(function (err) {
+//     console.log(err);
+//     assert.end();
+//   });
+// });
 
 // test('finish', function (assert) {
 //   knex.destroy(function (err, reply) {

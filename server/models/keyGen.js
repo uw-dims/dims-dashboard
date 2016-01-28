@@ -48,6 +48,10 @@ var keyGen = {
     return c.addSuffix(c.makeRoot('ticket'), 'owner', owner);
   },
 
+  ticketTgKey: function ticketTgKey(tg) {
+    return c.addSuffix(c.makeRoot('ticket'), 'tg', tg);
+  },
+
   ticketSubscriptionsKey: function ticketSubscriptionsKey(user) {
     return c.addSuffix(c.makeRoot('ticket'), 'subscriptions', user);
   },
@@ -144,6 +148,20 @@ var keyGen = {
   },
   attributeSetKey: function () {
     return c.addSuffix(c.makeRoot('attribute'), 'all');
+  },
+
+  // Keys to social auth accounts
+  // Key to lookup username for service (type) and id
+  accountIdKey: function (id, type) {
+    return c.makeBase('authaccount', type, id);
+  },
+  // Key to lookup a social account for a service (type) and username (user)
+  accountUserKey: function (user, type) {
+    return c.makeBase('authaccount', type, user);
+  },
+  // Set key to retrieve all social accounts for a user
+  accountUserSetKey: function (user) {
+    return c.addSuffix(c.makeBase('authaccount', user), 'all');
   }
 };
 

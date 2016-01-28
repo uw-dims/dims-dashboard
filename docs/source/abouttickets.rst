@@ -24,3 +24,54 @@ A *ticket* is described
 
 * A Redis key/value pair where the value is a 1-level hash
 * Zero or more associated "topi"
+
+
+Topics
+------
+
+A topic is always associated with a parent ticket. The parent key can be derived from
+the topic key. 
+
+When a topic is added to a ticket, its key is added to the set of topic keys owned by
+the ticket (parent).
+
+Topics are stored in redis as follows:
+
+    .. list-table:: Topic storage
+       :header-rows: 1
+
+       * - Data
+         - Key
+         - Value
+       * - Metadata
+         - Topic metadata key
+         - (hash) JSON metadata
+
+    ..
+
+
+We currently restrict the metadata saved for a topic. We do not allow user-defined metadata.
+Should we change this behavior?
+
+Metadata provided by calling method
+
+.. code-block:: none
+
+    {
+      datatype: (required) 'set' or 'string'
+      name: (required) name of topic
+      description: (optional) description of topic (default - '')
+    }
+
+..
+
+.. code-block:: none
+
+    {
+      createdTime: Unix epoch time when topic is created
+      modifiedTime: Unix epoch time when topic modified
+      num: Topic counter: (via topicCounterKey) - used to ensure uniqueness
+    }
+
+..
+

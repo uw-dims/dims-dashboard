@@ -34,15 +34,19 @@ var Topic = diContainer.get('Topic');
   var bootstrapTickets = {};
 
   exports.runBootstrap = bootstrapTickets.runBootstrap = function (options) {
+    var tg = options[0];
+    options = _.drop(options, 1);
     console.log('input users', options);
+    console.log('input tg', tg);
 
-    var createOptions = function (creator, type, name, privacy, description) {
+    var createOptions = function createOptions (creator, type, name, tg, privacy, description) {
       return {
         creator: creator,
         type: type,
         description: description,
         private: privacy,
-        name: name
+        name: name,
+        tg: tg
       };
     };
 
@@ -57,6 +61,7 @@ var Topic = diContainer.get('Topic');
             users.push(value.ident);
           }
         });
+        console.log('bootstrap tickets getUsers ', users);
         return users;
       })
       .catch(function (err) {
@@ -69,7 +74,7 @@ var Topic = diContainer.get('Topic');
           'Suspicious CIDR',
           'Search APT1 intrusion',
           'Flow Analysis 3-2014',
-          'Flow Analysis 1-2014',
+          'Flow Analysis one indicator 1-2014',
           'Flow Analysis 1-2014',
           'Flow Analysis 9-2014 95',
           'Flow Analysis 9-2014 65'
@@ -195,17 +200,18 @@ var Topic = diContainer.get('Topic');
     getUsers(options)
     .then(function (reply) {
       users = reply;
-      config.push(createOptions(users[0], 'activity', name[0],
+      var numUsers = users.length;
+      if (numUsers >= 1) config.push(createOptions(users[0], 'activity', name[0], tg,
         false, '65% confidence indicators'));
-      config.push(createOptions(users[1], 'activity', name[1],
+      if (numUsers >= 2) config.push(createOptions(users[1], 'activity', name[1], tg,
         false, '95% confidence indicators'));
-      config.push(createOptions(users[2], 'activity', name[2],
+      if (numUsers >= 3) config.push(createOptions(users[2], 'activity', name[2], tg,
         false, 'Indicator 89.248.172.58'));
-      config.push(createOptions(users[3], 'activity', name[3],
+      if (numUsers >= 4) config.push(createOptions(users[3], 'activity', name[3], tg,
         false, '95% confidence indicators'));
-      config.push(createOptions(users[0], 'activity', name[4],
+      if (numUsers >= 1) config.push(createOptions(users[0], 'activity', name[4], tg,
         false, 'Search for records associated with APT1 intrusion set'));
-      config.push(createOptions(users[2], 'activity', name[5],
+      if (numUsers >= 2) config.push(createOptions(users[1], 'activity', name[5], tg,
         false, 'Search for records associated with suspicious CIDR block'));
       console.log('config array', config);
       _.forEach(config, function (value, index) {
