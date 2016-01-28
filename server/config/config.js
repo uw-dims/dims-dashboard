@@ -12,24 +12,21 @@ config.publicPort = process.env.DASHBOARD_PUBLIC_PORT || '80';
 
 config.uuid = uuid.v4();
 
-config.sslOn = process.env.SSL_ON || false;
+config.publicProtocol = process.env.DASHBOARD_PUBLIC_PROTOCOL || 'http';
 
-config.publicProtocol = config.sslOn ? 'https' : 'http';
+config.sslOn = config.publicProtocol === 'https' ? true : false;
 
 config.publicOrigin = (config.publicPort === '80') ? config.publicProtocol + '://' + config.publicHost
   : config.publicProtocol + '://' + config.publicHost + ':' + config.publicPort;
 
-config.port = process.env.PORT || 3000;
+config.port = process.env.DASHBOARD_PORT || 3000;
 
-config.sslport = process.env.SSL_PORT || 3030;
+config.env = process.env.DASHBOARD_NODE_ENV || 'development';
 
-config.env = process.env.NODE_ENV || 'development';
+config.envLogLevel = config.env === 'development' ? 'debug' : 'info';
 
-config.logLevel = process.env.LOG_LEVEL || 'debug';
-
-config.logDir = process.env.LOG_PATH || '/data/dashboard/logs/';
-
-config.logFile = config.logDir + 'dashboard.log';
+// Can use this to override log level defined by environment
+config.logLevel = process.env.DASHBOARD_LOG_LEVEL || config.envLogLevel;
 
 config.healthInterval = 1;
 
