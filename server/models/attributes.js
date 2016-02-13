@@ -31,10 +31,18 @@ module.exports = function Attributes(client) {
   // Since we're using sets and sorted sets, can use same function for save and create
   var save = function save(user, type, value) {
     logger.debug('save: user=%s type=%s value=%s', user, type, value);
-    return q.all([
-      client.saddAsync(keyGen.attributeKey(user, type), value),
-      client.zaddAsync(keyGen.attributeSetKey(type), dimsUtils.createTimestamp(), keyGen.attributeKey(user, type))
-    ]);
+    var promises = [];
+    if (type === 'tlp') {
+      // Always have one value for tlp
+      // TODO: generalize this so more than one type can be restricted to one value
+      // Delete the key if it exists - serves to delete any existing value of tlp
+      promises.push(client.del(keyGen.attributeKey(user, type)));
+    }
+    // Add the value to the set
+    promises.push(client.saddAsync(keyGen.attributeKey(user, type), value));
+    // Add/update the list of keys with this key (will update score if key already exists);
+    promises.push(client.zaddAsync(keyGen.attributeSetKey(type), dimsUtils.createTimestamp(), keyGen.attributeKey(user, type)));
+    return q.all(promises);
   };
 
   var remove = function remove(user, type, value) {

@@ -165,7 +165,12 @@ config.defaultUserSettings = {
 };
 
 // The attributes we are tracking
-config.defaultAttributes = ['cidr', 'domain'];
+config.defaultAttributes = ['cidr', 'domain', 'tlp'];
+config.tlpValues = {
+  'red': 'red',
+  'green': 'green',
+  'amber': 'amber'
+};
 
 config.defaultRedisTypes = {
   'hash': 'hash',
