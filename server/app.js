@@ -302,16 +302,6 @@ router.get('/*', routes.index);
 
 app.use('/', router);
 
-// Handle cross-domain requests
-// NOTE: Uncomment this function to enable cross-domain request.
-/*
-  app.options('/upload', function (req, res){
-  console.log('OPTIONS');
-  res.send(true, {
-  'Access-Control-Allow-Origin': '*'
-  }, 200);
-  });
-*/
 var io,
     server,
     port,
@@ -349,14 +339,14 @@ if (require.main === module) {
     healthService.run();
     console.log('[+++] Finished running healthService');
     healthLogger.publish('dashboard initialized DIMS Dashboard running on port ' + server.address().port, config.healthID);
-      if (config.sslOn) {
-        healthLogger.publish('dashboard initialized SSL is on', config.healthID);
-      } else {
-        healthLogger.publish('dashboard initialized SSL is off', config.healthID);
-      }
-      healthLogger.publish('dashboard initialized Node environment: ' + config.env, config.healthID);
-      healthLogger.publish('dashboard initialized Log level: ' + config.logLevel, config.healthID);
-      healthLogger.publish('dashboard initialized userDB source: ' + config.userSource, config.healthID);
+    if (config.sslOn) {
+      healthLogger.publish('dashboard initialized SSL is on', config.healthID);
+    } else {
+      healthLogger.publish('dashboard initialized SSL is off', config.healthID);
+    }
+    healthLogger.publish('dashboard initialized Node environment: ' + config.env, config.healthID);
+    healthLogger.publish('dashboard initialized Log level: ' + config.logLevel, config.healthID);
+    healthLogger.publish('dashboard initialized userDB source: ' + config.userSource, config.healthID);
   });
 
   setTimeout(function () {
