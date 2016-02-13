@@ -25,18 +25,19 @@
       var colors = ['#53a07f', '#86b3bb', '#716F84', '#1D6285', '#3d765d', '#424557'];
       var maxSites = 12;
       // TODO Add this info to system configuration database
-      staticExternals.push({
-        externalKey: 'consul',
-        siteName: 'SYSTEM STATUS',
-        siteURL: 'http://10.142.29.117:8500/ui/#/dc1/nodes',
-        canDelete: false
-      });
-      staticExternals.push({
-        externalKey: 'trident',
-        siteName: 'Trident',
-        siteURL: 'https://demo.trident.li/',
-        canDelete: false
-      });
+      // staticExternals.push({
+      //   externalKey: 'consul',
+      //   siteName: 'CONSUL',
+      //   siteURL: 'http://10.142.29.117:8500/ui/#/dc1/nodes',
+      //   canDelete: false
+      // });
+      // staticExternals.push({
+      //   externalKey: 'trident',
+      //   siteName: 'Trident',
+      //   siteURL: 'https://demo.trident.li/',
+      //   canDelete: false
+      // });
+      staticExternals = angular.copy(constExternalSites);
       vm.allSites = getAllSites(staticExternals);
       var associatedSites = sitesConfig(vm.allSites);
       vm.showAdd = vm.allSites.length < maxSites ? true : false;
