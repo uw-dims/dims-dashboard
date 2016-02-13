@@ -33,36 +33,45 @@
       var getGraphOptions = function getGraphOptions() {
         var options = {
           xLabel: 'Time',
-          yLabelKnown: 'Total Mitigated out of known',
-          yLabelAll: 'Total Mitigated out of all',
-          keyKnown: 'Mitigated Known',
-          keyAll: 'Mitigated All',
-          graphTitle: 'IP Remediation Progress'
+          yLabelKnown: 'Number remaining out of known',
+          yLabelAll: 'Number remaining out of all',
+          keyKnown: 'Known remaining',
+          keyAll: 'All remaining',
+          graphTitle: 'Remediation Progress'
         };
         return options;
       };
 
       var getTrendX = function getTrendX(trendline, y) {
+        $log.debug('getTrendX', trendline, y);
         return Math.floor((y - trendline.intercept) / trendline.slope);
       };
 
       var init = function init() {
         vm.data.metadata.userRemaining = vm.data.ips.data.length;
-        vm.data.metadata.knownNum = vm.data.metadata.initialNum - vm.data.metadata.unknownNum;
         vm.showUserIps = (vm.data.metadata.userRemaining !== 0);
-        vm.userMessage = vm.showUserIps ?  'You have ' + vm.data.metadata.userRemaining + ' IPs left to mitigate. ' :
+        vm.userMessage = vm.showUserIps ?  'You have ' + vm.data.metadata.userRemaining + ' items left to mitigate. ' :
         'You have no IPs to mitigate. ';
         vm.graphOptions = getGraphOptions();
-        vm.anticipatedFinish = getTrendX(vm.data.trendline, vm.data.metadata.knownNum);
-        vm.displayAnticipated = moment(vm.anticipatedFinish).format('M/D/YYYY');
+        $log.debug('in init. vm.data is ', vm.data);
+        vm.anticipatedFinishKnown = getTrendX(vm.data.data.trendKnown, 0);
+        vm.displayAnticipated = moment(vm.anticipatedFinishKnown).format('M/D/YYYY');
         vm.statusMessage = vm.data.metadata.mitigatedNum < vm.data.metadata.knownNum ?
-          'Current trend anticipates remediation of all known IPs will finish on ' + vm.displayAnticipated + '. ' : '';
-        vm.data.trendPoints = [{
-          x: vm.data.data[0].x,
-          y: 0
-        }, {
-          x: vm.anticipatedFinish,
+          'Current trend anticipates remediation of all known items will finish on ' + vm.displayAnticipated + '. ' : '';
+        vm.data.trendPointsKnown = [{
+          x: vm.data.data.known[0].x,
           y: vm.data.metadata.knownNum
+        }, {
+          x: vm.anticipatedFinishKnown,
+          y: 0
+        }];
+        $log.debug('going to call getTrendX. trendAll is ', 0);
+        vm.data.trendPointsAll = [{
+          x: vm.data.data.all[0].x,
+          y: vm.data.metadata.initialNum
+        }, {
+          x: getTrendX(vm.data.data.trendAll, 0),
+          y: 0
         }];
       };
 

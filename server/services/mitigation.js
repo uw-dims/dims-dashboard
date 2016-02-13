@@ -129,7 +129,8 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
       result.metadata.initialNum = reply[3];
       result.metadata.unknownNum = reply[4];
       result.metadata.mitigatedNum = reply[5];
-      // console.log(result.data);
+      result.metadata.knownNum = reply[3] - reply[4];
+      console.log(result.metadata);
       return result;
     })
     .catch(function (err) {
@@ -177,7 +178,7 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
     var users = [];
 
     if (startTime === undefined) {
-      starTime = dimsUtils.createTimestamp();
+      startTime = dimsUtils.createTimestamp();
       console.log('initiateMitigation: time is undefined - using current time: ', startTime);
     }
 
