@@ -4,7 +4,14 @@
 angular.module('dimsDashboard.services')
 
   .factory('AttributeApi', function ($resource) {
-    return $resource('/api/attributes/:id');
+    return $resource('/api/attributes/:id', {
+      id: '@id'
+    }, {
+      update: {
+        method: 'PUT',
+        url: 'api/attributes/:id'
+      }
+    });
   })
 
   .factory('UserAttributesService', function (AttributeApi, $log, $q) {
@@ -62,6 +69,26 @@ angular.module('dimsDashboard.services')
           deferred.reject(err);
         });
       return deferred.promise;
+    };
+
+    UserAttributesService.updateAttribute = function updateAttribute(user, type, action, values) {
+      var deferred = $q.defer();
+      AttributeApi.update({
+        id: user
+      }, {
+        action: action,
+        type: type,
+        items: values
+      },
+        function (resource) {
+          $log.debug('UserAttributesService.updateAttribute success ', resource);
+          deferred.resolve(resource);
+        },
+        function (err) {
+          $log.debug('UserAttributesService.updateAttribute callback', err);
+          deferred.reject(err);
+        });
+        return deferred.promise;
     };
 
     return UserAttributesService;

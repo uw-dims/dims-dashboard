@@ -7,7 +7,7 @@
 <p>You are responsible for taking mitigating action against the following IP addresses. Check off the IPs you are submitting as remediated and click <strong>Submit</strong></p>
 </div></div>
 <form>
-<div mt-to="ipResults">
+<div mt-to="vm.ipResults">
 <div class="row" ng-repeat="ipRow in ipRows track by $index">
   <div class="col-md-3" ng-repeat="cell in ipRow track by $index">
    <input type="checkbox" mt-checkbox="cell" />&nbsp;{{cell}}

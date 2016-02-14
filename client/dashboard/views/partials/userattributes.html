@@ -5,21 +5,71 @@
   <tabset type="pills">
     <tab heading="CIDR Blocks">
     <div class="spacer20">
-      <div class="row" ng-repeat="cidrRow in vm.cidrRows track by $index">
-        <div class="col-md-3" ng-repeat="cell in cidrRow track by $index"> {{ cell }}</div>
+      <div class="row" style="margin-left: 10px;">
+        <form>
+        <div class="col-sm-10" mt-to="vm.items.cidr.removeItems">
+        <p ng-if="vm.edit.cidr">Click checkboxes for any items you wish to remove.</p>
+          <div class="row" ng-repeat="cidrRow in vm.cidrRows track by $index">
+            <div class="col-md-3" ng-repeat="cell in cidrRow track by $index"> 
+              <div ng-if="!vm.edit.cidr">{{ cell }}</div>
+              <div ng-if="vm.edit.cidr"><input type="checkbox" mt-checkbox="cell" />&nbsp;{{cell}}</div>
+            </div>
+          </div>
+        </div> <!-- end col 10 -->
+        <div class="col-sm-2" ng-if="!vm.edit.cidr">
+          <button class="btn btn-sm btn-primary" ng-click="vm.editOn(vm.types.cidr)">EDIT</button>
+          
+        </div>
+        <div class="col-sm-2" ng-if="vm.edit.cidr">
+        <p>To add items, list them here.</p>
+        <textarea class="form-control" rows="5" ng-model="vm.items.cidr.addItems" style="margin-bottom: 10px;"></textarea>
+        <button type="submit" class="btn btn-sm btn-primary" ng-click="vm.update(vm.types.cidr, vm.items.cidr.addItems, vm.items.cidr.removeItems)" style="margin-bottom: 10px;">SUBMIT CHANGES</button>
+        <p style="margin-bottom: 10px;">OR</p>
+        <button class="btn btn-sm btn-default" ng-click="vm.cancel(vm.types.cidr)">CANCEL CHANGES</button>
+        </div>
+        </form>
       </div>
-      </div>
+    </div>
     </tab>
 
     <tab heading="Domains">
+    <div class="spacer20">
+      <div class="row" style="margin-left: 10px;">
+        <form>
+        <div class="col-sm-10" mt-to="vm.items.domain.removeItems">
+        <p ng-if="vm.edit.domain">Click checkboxes for any items you wish to remove.</p>
+          <div class="row" ng-repeat="domainRow in vm.domainRows track by $index">
+            <div class="col-md-3" ng-repeat="cell in domainRow track by $index">
+              <div ng-if="!vm.edit.domain">{{ cell }}</div>
+              <div ng-if="vm.edit.domain"><input type="checkbox" mt-checkbox="cell" />&nbsp;{{cell}}</div>
+            </div>
+          </div>
+        </div> <!-- end col 10 -->
+        <div class="col-sm-2" ng-if="!vm.edit.domain">
+          <button class="btn btn-sm btn-primary" ng-click="vm.editOn(vm.types.domain)">EDIT</button>
+          
+        </div>
+        <div class="col-sm-2" ng-if="vm.edit.domain">
+        <p>To add items, list them here.</p>
+        <textarea class="form-control" rows="5" ng-model="vm.items.domain.addItems" style="margin-bottom: 10px;"></textarea>
+        <button type="submit" class="btn btn-sm btn-primary" ng-click="vm.update(vm.types.domain, vm.items.domain.addItems, vm.items.domain.removeItems)" style="margin-bottom: 10px;">SUBMIT CHANGES</button>
+        <p style="margin-bottom: 10px;">OR</p>
+        <button class="btn btn-sm btn-default" ng-click="vm.cancel(vm.types.domain)">CANCEL CHANGES</button>
+        </div>
+        </form>
+      </div>
+    </div>
+    </tab>
+
+   <!--  <tab heading="Domains">
       <div class="spacer20">
         <div class="row" ng-repeat="domainRow in vm.domainRows track by $index">
         <div class="col-md-3" ng-repeat="cell in domainRow track by $index"> {{ cell }}</div>
         </div>
       </div>
-    </tab>
+    </tab> -->
     <tab heading="TLP">
-      <div class="spacer20">
+      <div class="spacer20" style="margin-left: 15px;">
         <div class="row" ng-repeat="tlpRow in vm.tlpRows track by $index">
         <div class="col-md-3" ng-repeat="cell in tlpRow track by $index"> {{ cell }}</div>
         </div>

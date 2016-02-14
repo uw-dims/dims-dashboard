@@ -28,9 +28,19 @@
       var raw = {
         known: [],
         all: []
-      }
+      };
       var trendlineKnown,
           trendlineAll;
+
+      // Since trends are based on last time mitigations were made, 
+      // which could be in the past, add a point for the time at
+      // which this graph is being displayed - so we have the total
+      // for today
+
+      // knownX.push(new Date().getTime());
+      // knownY.push(data[data.length - 1][1]);
+
+      ticketData.data.push([new Date().getTime(), ticketData.data[ticketData.data.length - 1][1]]);
 
       _.forEach(ticketData.data, function (value, index) {
         var x = value[0];
@@ -47,6 +57,7 @@
         raw.known.push([x, yKnown]);
         raw.all.push([x, yAll]);
       });
+
       result.trendKnown = getTrendline(raw.known);
       result.trendAll = getTrendline(raw.all);
       return result;
