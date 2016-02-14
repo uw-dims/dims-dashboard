@@ -218,11 +218,9 @@ router.get('/api/lmsearch', auth.ensureAuthenticated, lmsearchRoute.list);
 router.get('/settings', auth.ensureAuthenticated, settingsRoute.get);
 router.post('/settings', auth.ensureAuthenticated, settingsRoute.update);
 
-// Get all attributes of all users - not implemented - do we need this?
-// router.get('/api/attributes', attributeRoute.list);
 router.get('/api/attributes', auth.ensureAuthenticated, attributeRoute.list);
 router.get('/api/attributes/:id', auth.ensureAuthenticated, attributeRoute.show);
-router.post('/api/attributes/:id', auth.ensureAuthenticated, attributeRoute.update);
+router.put('/api/attributes/:id', auth.ensureAuthenticated, attributeRoute.update);
 
 // Get all users
 router.get('/api/user', auth.ensureAuthenticated, userRoute.list);

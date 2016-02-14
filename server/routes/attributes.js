@@ -70,22 +70,33 @@ module.exports = function (Attributes, attributeService, access) {
       return;
     }
 
+    // Only sysadmin can modify tlp
     if (!access.isSysAdmin(userAccess) && req.body.type === 'tlp') {
       logger.error('user ', user, ' attempted to modify tlp without sysadmin access');
       res.status(400).send(resUtils.getErrorReply('User does not have authorization to modify tlp'));
       return;
     }
 
-    // Perhaps should put this validation in model
+    // TLP value is restricted
     if (req.body.type === 'tlp' && req.body.items.length !== 1 || 
       req.body.type === 'tlp' && !config.tlpValues.hasOwnProperty(req.body.items[0])) {
-      logger.error('user ', user, ' attempted to modify tlp without sysadmin access');
+      logger.error('user ', user, ' attempted to update TLP with invalid value');
       res.status(400).send(resUtils.getErrorReply('Invalid TLP value supplied'));
       return;
     }
 
+    // TLP cannot be removed - add will replace current value if it exists
     if (req.body.type === 'tlp' && req.body.action === 'remove') {
+      logger.error('user ', user, ' attempted to remove TLP value');
       res.status(400).send(resUtils.getErrorReply('Cannot remove a TLP entry. Use add to replace'));
+      return;
+    }
+
+    // User can only modify own attributes. Must have sysadmin access to modify other
+    // users' attributes
+    if (req.params.id !== user && !access.isSysAdmin(userAccess)) {
+      logger.error('user ', user, ' attempted to modify attribute for ', req.params.id, ' without authorization');
+      res.status(400).send(resUtils.getErrorReply('Can only modify your own attributes'));
       return;
     }
 
