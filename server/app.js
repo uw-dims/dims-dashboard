@@ -67,6 +67,8 @@ diContainer.factory('auth', require('./services/authentication'));
 diContainer.factory('access', require('./services/authorization'));
 diContainer.factory('authAccount', require('./models/authAccount'));
 diContainer.factory('accountRoute', require('./routes/account'));
+diContainer.factory('stixRoute', require('./routes/stix'));
+diContainer.factory('stixService', require('./services/stix'));
 
 // These are used here in app.js
 var sessionRoute = diContainer.get('sessionRoute');
@@ -84,6 +86,7 @@ var userRoute = diContainer.get('userRoute');
 var attributeRoute = diContainer.get('attributeRoute');
 var lmsearchRoute = diContainer.get('lmsearchRoute');
 var accountRoute = diContainer.get('accountRoute');
+var stixRoute = diContainer.get('stixRoute');
 
 // var userService = diContainer.get('userService');
 // var authAccount = diContainer.get('authAccount');
@@ -246,6 +249,11 @@ router.get('/api/ticket/topic/:id', auth.ensureAuthenticated, ticketRoute.showTo
 router.put('/api/ticket/topic/:id', auth.ensureAuthenticated, ticketRoute.updateTopic);
 // Delete a topic
 router.delete('/api/ticket/topic/:id', auth.ensureAuthenticated, ticketRoute.deleteTopic);
+
+// Process stix
+router.post('/api/stix', auth.ensureAuthenticated, stixRoute.post);
+
+
 
 // Get list of all files (global)
 router.get('/api/fileData', auth.ensureAuthenticated, fileDataRoute.list);

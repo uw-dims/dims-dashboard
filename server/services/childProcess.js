@@ -19,10 +19,17 @@ ChildProcess.prototype.startProcess = function (commandProgram, inputArray) {
 
   // Put in try-catch block
 
-  self.childProcess = spawn(
+  try {
+    self.childProcess = spawn(
       commandProgram,
       inputArray
     );
+  } catch (err) {
+    logger.error('Error in try-catch block', err);
+    throw err;
+  }
+
+  
 
   self.output = '';
   self.error = '';

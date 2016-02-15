@@ -117,7 +117,7 @@ config.rpcServer = process.env.RABBITMQ_HOST || 'rabbitmq.prisem.washington.edu'
 
 config.rpcUser = process.env.RABBITMQ_DEFAULT_USER || 'rpc_user';
 
-config.rpcPass = process.env.RABBITMQ_DEFAULT_PASS || 'rpcm3pwd';
+config.rpcPass = process.env.RABBITMQ_DEFAULT_USER_PASS || 'rpcm3pwd';
 
 config.rpcPort = process.env.RABBITMQ_PORT  || '5672';
 
