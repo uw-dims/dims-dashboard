@@ -39,6 +39,13 @@ module.exports = function amqpClient() {
     return props.corrId;
   };
 
+  var getConnection = function getConnection() {
+    return props.connection;
+  };
+  var setConnection = function setConnection(conn) {
+    props.connections = conn;
+  };
+
   var getChannel = function getChannel() {
     return props.channel;
   };
@@ -55,41 +62,41 @@ module.exports = function amqpClient() {
   var clientPrototype = {
     getChannel: getChannel,
     setChannel: setChannel,
+    getConnection: getConnection,
+    setConnection: setConnection,
     getQueue: getQueue,
     setQueue: setQueue,
     setCorrelationId: setCorrelationId,
     getCorrelationId: getCorrelationId,
     request: function request(message, rpcQueue) {
       var self = this;
-      logger.debug('services/ampqClient.js request connectString', connectString);
+      logger.debug('request connectString', connectString);
+      logger.debug('request message', message);
       amqp.connect(connectString)
       .then(function (conn) {
-        props.conn = conn;
+        setConnection(conn);
         // return when(conn.createChannel().then(function (ch) {
         return conn.createChannel().then(function (ch) {
           props.deferred = q.defer();
-          logger.debug('services/amqpclient.js createChannel return ch');
+          logger.debug('request createChannel return ch');
           props.channel = ch;
           // var answer = defer();
-          logger.debug('services/amqpclient.js corrId is ', getCorrelationId());
-          logger.debug('services/amqpclient.js corrId is ', props.corrId);
+          logger.debug('request corrId is', getCorrelationId());
           return props.channel.assertQueue('', {exclusive: true})
           .then(function (qok) {
-            logger.debug('services/amqpClient.js return from assertQueue');
             return qok.queue;
           })
           .then(function (queue) {
             props.queue = queue;
-            logger.debug('services/ampqClient.js request return from qok.queue queue', queue);
-            logger.debug('services/ampqClient.js request return from qok.queue props.queue', props.queue);
-            logger.debug('services/ampqClient.js request return from qok.queue getQueue()', getQueue());
+            logger.debug('request return from qok.queue queue', queue);
+            logger.debug('request return from qok.queue getQueue()', getQueue());
             return ch.consume(queue, maybeAnswer, {noAck: true});
           })
           .then(function (tag) {
-            logger.debug('services/amqpClient.js request return from consume: consumer tag: ', tag);
+            logger.debug('request return from consume: consumer tag: ', tag);
             props.tag = tag;
             // return props.queue;
-            logger.debug('service/amqpClient.js request ready to send. queue is ', props.queue);
+            logger.debug('request ready to send. queue is ', getQueue());
             props.channel.sendToQueue(rpcQueue, new Buffer(message), {
               correlationId: props.corrId, replyTo: props.queue});
             return props.deferred.promise;

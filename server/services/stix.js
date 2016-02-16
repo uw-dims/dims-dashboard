@@ -4,7 +4,7 @@ var logger = require('../utils/logger')(module);
 var q = require('q');
 var ChildProcess = require('../services/childProcess');
 
-module.exports = function (tools) {
+module.exports = function () {
 
   var stix = {};
 
@@ -35,12 +35,8 @@ module.exports = function (tools) {
     inputArray.push('-maxTlp');
     inputArray.push(tlpLevel);
     inputArray.push(stixPath);
-    // inputArray.push('2>/dev/null');
 
     console.log('inputArray is ', inputArray);
-    console.log('command is ', stixActions[action]);
-
-    // inputArray = ['-l', stixPath];
 
     child.startProcess('bash', inputArray)
     // child.startProcess('ls', inputArray)

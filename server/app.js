@@ -70,6 +70,7 @@ diContainer.factory('accountRoute', require('./routes/account'));
 diContainer.factory('stixRoute', require('./routes/stix'));
 diContainer.factory('stixService', require('./services/stix'));
 diContainer.factory('tupeloRoute', require('./routes/tupelo'));
+diContainer.factory('tupeloService', require('./services/tupelo'));
 diContainer.factory('amqpClient', require('./services/amqpClient'));
 
 // These are used here in app.js
