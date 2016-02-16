@@ -40,7 +40,7 @@
       // knownX.push(new Date().getTime());
       // knownY.push(data[data.length - 1][1]);
 
-      ticketData.data.push([new Date().getTime(), ticketData.data[ticketData.data.length - 1][1]]);
+      // ticketData.data.push([new Date().getTime(), ticketData.data[ticketData.data.length - 1][1]]);
 
       _.forEach(ticketData.data, function (value, index) {
         var x = value[0];
@@ -73,8 +73,8 @@
       });
       // Get point for current time or our results will be skewed for
       // data that hasn't changed
-      // knownX.push(new Date().getTime());
-      // knownY.push(data[data.length - 1][1]);
+      knownX.push(new Date().getTime());
+      knownY.push(data[data.length - 1][1]);
       console.log('knownX', knownX);
       console.log('knownY', knownY);
       return linearRegression(knownY, knownX);

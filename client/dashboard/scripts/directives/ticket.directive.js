@@ -9,6 +9,7 @@
       controllerAs: 'vm',
       link: linkFunc,
       scope: {
+        data: '='
       }
     };
 
@@ -16,31 +17,25 @@
 
     function linkFunc(scope, el, attr, ctrl) {
       // Don't need this yet
-      $log.debug('ticket.directive link function');
     }
 
     function controllerFunc($scope) {
       var vm = this;
+      vm.data = angular.copy($scope.data);
 
-      var init = function init() {
-        $log.debug('ticket.directive init. $rootScope.currentUser', $rootScope.currentUser);
-        if ($rootScope.currentUser) {
-          vm.trustgroup = angular.copy($rootScope.currentUser.currentTg);
-          $log.debug('ticket.directive init tg is ', vm.trustgroup);
-          TicketService.getTickets(vm.trustgroup)
-          .then(function (reply) {
-            console.log('reply from getTickets');
-            vm.result = reply;
-          });
-        }
+      $log.debug('ticket directive controller data is ', vm.data);
+
+      vm.addTopic = function addTopic(ticketKey) {
+        $log.debug('addTopic key is ', ticketKey);
       };
 
-      init();
+      vm.viewTopic = function viewTopic(topicKey) {
+        $log.debug('viewTopic key is ', topicKey);
+      };
 
-      $scope.$on('switch-tg', function () {
-        $log.debug('ticket.directive received switch-tg');
-        init();
-      });
+      vm.showDelete = function showDelete() {
+        return $rootScope.currentUser.isSysadmin;
+      };
 
     }
 

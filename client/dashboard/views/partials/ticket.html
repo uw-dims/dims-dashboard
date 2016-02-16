@@ -1,21 +1,50 @@
-<div class="row">
+<div class="row ticket-item">
 <div class="col-sm-12">
 
-<div class="row" ng-repeat="n in vm.result | orderBy" style="background-color: #EEE;margin:10px 0px;padding:4px">
+<!-- <div class="row" ng-repeat="n in vm.result | orderBy" style="background-color: #EEE;margin:10px 0px;padding:4px">
 
-<div class="row" style="margin:3px;padding:5px">
+<div class="row" style="margin:3px;padding:5px"> -->
 
-<div><h3 style="color:#2e78b8; margin-bottom:4px">{{ n.metadata.name }}</h3>
-<p style="color:#222; font-size:10px;">
-  Created by {{ n.metadata.creator }} &nbsp; &nbsp; Last updated: {{ n.metadata.modifiedTime | date : 'medium' }}</p>
-  <p>{{ n.metadata.description }}</p>
+<div class="row">
+  <div class="col-sm-11">
+
+    <h3 style="color:#2e78b8; margin-bottom:4px">DIMS-{{vm.data.metadata.num}} {{ vm.data.metadata.name }}</h3> 
+    <p style="color:#222; font-size:10px;"> Created by {{ vm.data.metadata.creator }} &nbsp; &nbsp; Last updated: {{ vm.data.metadata.modifiedTime | date : 'medium' }}</p>
+  </div>
+  <div class="col-sm-1">
+    <div style="float:right; cursor:pointer;" tooltip="Delete activity" tooltip-append-to-body="true" tooltip-placement="right" ng-if="vm.showDelete()"><i class="fa fa-trash fa-lg icon-style" ng-click="vm.deleteTicket(vm.data.key)"></i></div>
+  </div>
+</div>
+<div class="row">
+<div class="col-sm-12">
+  <hr />
+  <p><strong>Description:</strong> {{ vm.data.metadata.description }}</p>
+</div>
+</div>
+  <div class="row">
+  <div class="col-sm-1">
+  <strong>Topics</strong>
+  <!-- <i class="fa fa-plus fa-lg icon-style" style="text-align:center;" ng-click="vm.addTopic(vm.data.key)"></i> -->
+  </div>
+  <div class="col-sm-11">
+  <ul class="list-group">
+  <li class="list-group-item" ng-repeat="topic in vm.data.topics | orderBy:'-metadata.num'">
+      <span style="color: #444;">{{topic.metadata.name }}</span> | <span style="color:#888;">{{ topic.metadata.description }}</span>
+   <span class="badge" style="background-color: white; color: white; cursor:pointer;" tooltip="View topic" tooltip-append-to-body="true" tooltip-placement="right">
+      <i class="fa fa-eye fa-lg icon-style" ng-click="vm.viewTopic(topic.key)"></i>
+   </span>
+
+  </li>
+  </ul>
+   <i class="fa fa-plus icon-style"></i><a style="cursor:pointer;" ng-click="vm.addTopic(vm.data.key)">Add new topic</a>
+
+  </div>
+  </div>
+
+
+</div>
 </div>
 </div> <!-- end row -->
 
-<div class="row" style="margin:3px;padding:5px" ng-repeat="m in n.topics">
-{{ m.metadata.description }}
 
-</div>
 
-</div> <!-- end repeat -->
-</div>

@@ -21,7 +21,7 @@
 
     function controllerFunc($scope) {
       var vm = this;
-
+      vm.resultsFound = false;
       var init = function init() {
         $log.debug('ticketlist.directive init. $rootScope.currentUser', $rootScope.currentUser);
         if ($rootScope.currentUser) {
@@ -30,13 +30,19 @@
           TicketService.getTickets(vm.trustgroup)
           .then(function (reply) {
             vm.result = reply;
+            if (vm.result.length === 0) {
+              // No results
+              vm.resultsFound = false;
+            } else {
+              vm.resultsFound = true;
+            }
             $log.debug('ticketlist reply from getTickets');
           })
           .catch(function (err) {
             $log.error('ticketlist getTickets: ', err);
           });
         }
-      }
+      };
 
       init();
 

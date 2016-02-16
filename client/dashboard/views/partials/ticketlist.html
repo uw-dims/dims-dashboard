@@ -1,21 +1,26 @@
 <div class="row">
+<div class="panel panel-default">
+<div class="panel-body" style="max-height: 700px; overflow-y:scroll;">
+<div tooltip="Activities you created or are subscribed to" tooltip-append-to-body="true" tooltip-placement="right" style="float:left;">
+
+    <h2>Activities</h2></div>
+    <div style="float:right; cursor:pointer;" tooltip="Create new activity" tooltip-append-to-body="true" tooltip-placement="right"><i class="fa fa-plus fa-lg icon-style" ng-click="vm.createActivity()"></i></div>
+
+<div class="row" ng-if="vm.resultsFound">
 <div class="col-sm-12">
 
-<div class="row" ng-repeat="n in vm.result | orderBy" style="background-color: #EEE;margin:10px 0px;padding:4px">
-
-<div class="row" style="margin:3px;padding:5px">
-
-<div><h3 style="color:#2e78b8; margin-bottom:4px">DIMS-{{n.metadata.num}} {{ n.metadata.name }}</h3>
-<p style="color:#222; font-size:10px;">
-  Created by {{ n.metadata.creator }} &nbsp; &nbsp; Last updated: {{ n.metadata.modifiedTime | date : 'medium' }}</p>
-  <p>{{ n.metadata.description }}</p>
+<div class="row ticket-list" ng-repeat="ticketData in vm.result | orderBy" >
+  <ticket data="ticketData"></ticket>
 </div>
-</div> <!-- end row -->
 
-<!-- <div class="row" style="margin:3px;padding:5px" ng-repeat="m in n.topics">
-{{ m.metadata.description }}
+</div>
+</div> 
 
-</div> -->
+<div class="row" ng-if="!vm.resultsFound">
+<div class="col-sm-12">
+No activities found.
+</div></div>
 
-</div> <!-- end repeat -->
+</div>
+</div>
 </div>
