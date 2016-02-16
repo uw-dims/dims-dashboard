@@ -69,6 +69,9 @@ diContainer.factory('authAccount', require('./models/authAccount'));
 diContainer.factory('accountRoute', require('./routes/account'));
 diContainer.factory('stixRoute', require('./routes/stix'));
 diContainer.factory('stixService', require('./services/stix'));
+diContainer.factory('tupeloRoute', require('./routes/tupelo'));
+diContainer.factory('tupeloService', require('./services/tupelo'));
+diContainer.factory('amqpClient', require('./services/amqpClient'));
 
 // These are used here in app.js
 var sessionRoute = diContainer.get('sessionRoute');
@@ -87,6 +90,7 @@ var attributeRoute = diContainer.get('attributeRoute');
 var lmsearchRoute = diContainer.get('lmsearchRoute');
 var accountRoute = diContainer.get('accountRoute');
 var stixRoute = diContainer.get('stixRoute');
+var tupeloRoute = diContainer.get('tupeloRoute');
 
 // var userService = diContainer.get('userService');
 // var authAccount = diContainer.get('authAccount');
@@ -253,6 +257,7 @@ router.delete('/api/ticket/topic/:id', auth.ensureAuthenticated, ticketRoute.del
 // Process stix
 router.post('/api/stix', auth.ensureAuthenticated, stixRoute.post);
 
+router.post('/api/tupelo', auth.ensureAuthenticated, tupeloRoute.post);
 
 
 // Get list of all files (global)

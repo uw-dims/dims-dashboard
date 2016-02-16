@@ -21,8 +21,8 @@ module.exports = function (stixService, access) {
     logger.debug('params are ', req.params);
     // body: 
     // {
-    //    action: md5, ip, file, or json
-    //    file: path to file
+    //    action: md5, ip, fileinfo, hostname, or json
+    //    file: path to file OR
     //    data: data included
     //    tlp: max tlp level
     // }
