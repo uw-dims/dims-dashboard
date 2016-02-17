@@ -30,15 +30,27 @@
             transformRequest: angular.identity
           })
           .success(function (reply) {
+            var result;
             console.log('data is ', reply);
-            var result = JSON.parse(reply.data[data.action]);
+            if (data.action !== '') {
+              if (data.action === 'fileinfo' || data.action == 'json') {
+                result = JSON.parse(reply.data[data.action]);
+              } else {
+                result = reply.data[data.action].split(/\n/);
+              }
+            } else {
+              result = [];
+            }
+            _.remove(result, function (n) {
+              return n === "";
+            });
             console.log(result);
             return deferred.resolve(result);
 
           })
           .error(function (err) {
             console.log('error is ', err);
-            return deferred.resolve(err)
+            return deferred.resolve(err);
           });
 
           return deferred.promise;

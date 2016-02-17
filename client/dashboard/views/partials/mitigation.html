@@ -18,7 +18,7 @@
 </div>
 
 <div class="row ticket-item-footer">
-<div class="col-sm-2">
+<div class="col-sm-2" ng-if="vm.showGraph">
 <i class="fa fa-line-chart icon-style"></i><a style="cursor:pointer;" ng-click="vm.toggleProgress()">{{vm.progressText}}</a>
 </div>
 

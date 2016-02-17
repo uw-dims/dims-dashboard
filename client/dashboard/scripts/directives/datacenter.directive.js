@@ -49,23 +49,47 @@
           return;
         }
         _.forEach(stixResult, function (value) {
-          if (value.hashes.hasOwnProperty('MD5')) {
-            hashArray.push(value.hashes.MD5);
+
+          if (value.observableFiles) {
+            _.forEach(value.observableFiles, function (item) {
+              console.log(item);
+              if (item.hashes) {
+                console.log('item has hashes', item.hashes);
+                if (item.hashes.MD5) {
+                  console.log('item has md5', item.hashes.MD5);
+                  hashArray.push(item.hashes.MD5);
+                }
+              }
+            });
+          } else {
+            if (value.hashes) {
+              if (value.hashes.hasOwnProperty('MD5')) {
+                hashArray.push(value.hashes.MD5);
+              }
+            } else {
+              hashArray.push(value);
+            }
           }
+          
         });
         $log.debug('hashes are ', hashArray);
-        TupeloService.lookupHashes(hashArray) 
-        .then(function (reply) {
-          vm.tupeloData = reply;
-          vm.showHashResult = true;
-          vm.hashWaiting = '';
-          console.log(reply);
-        })
-        .catch(function (err) {
-          $log.error('error in lookupHashes', err.toString());
-          vm.hashWaiting = '';
-          vm.tupeloData = '';
-        });
+        if (hashArray.length > 0) {
+          TupeloService.lookupHashes(hashArray)
+          .then(function (reply) {
+            vm.tupeloData = reply;
+            vm.showHashResult = true;
+            vm.hashWaiting = '';
+            console.log(reply);
+          })
+          .catch(function (err) {
+            $log.error('error in lookupHashes', err.toString());
+            vm.hashWaiting = '';
+            vm.tupeloData = '';
+          });
+        } else {
+          console.log('no data');
+        }
+        
       };
 
       vm.clear = function clear() {
@@ -76,6 +100,7 @@
         vm.waiting = '';
         vm.hashWaiting = '';
         vm.showHashResult = false;
+        vm.showZeroResult = false;
       };
 
       vm.stix = function stix() {
@@ -85,6 +110,8 @@
         vm.waiting = '';
         vm.hashWaiting = '';
         vm.showHashResult = false;
+        vm.showZeroResult = false;
+        vm.action = 'fileinfo';
       };
 
       $scope.uploadedFile = function (element) {
@@ -99,7 +126,7 @@
       $scope.addFile = function () {
         $log.debug('in addFile');
         $log.debug('action', vm.action);
-        if (vm.action === 'fileinfo') {
+        if (vm.action === 'fileinfo' || vm.action === 'md5' || vm.action === 'json') {
           vm.showHashButton = true;
         } else {
           vm.showHashButton = false;
@@ -112,6 +139,11 @@
           vm.showSourceForm = false;
           vm.stixResult = reply;
           vm.waiting = '';
+          if (vm.stixResult.length === 0) {
+            vm.showSourceResult = false;
+            vm.showZeroResult = true;
+            vm.showHashButton = false;
+          }
         })
         .catch(function (err) {
           vm.stixResult = 'There was an error';

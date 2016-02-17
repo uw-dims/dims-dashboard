@@ -3,6 +3,7 @@
 var logger = require('../utils/logger')(module);
 var q = require('q');
 var ChildProcess = require('../services/childProcess');
+var fs = require('fs');
 
 module.exports = function () {
 

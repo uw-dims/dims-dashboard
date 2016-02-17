@@ -66,30 +66,37 @@
 
       var init = function init() {
         vm.data.metadata.userRemaining = vm.data.ips.data.length;
+        vm.showGraph = false;
         vm.showUserIps = (vm.data.metadata.userRemaining !== 0);
         vm.userMessage = vm.showUserIps ?  'You have ' + vm.data.metadata.userRemaining + ' items left to mitigate. ' :
         'You have no IPs to mitigate. ';
         vm.graphOptions = getGraphOptions();
         $log.debug('in init. vm.data is ', vm.data);
-        vm.anticipatedFinishKnown = getTrendX(vm.data.data.trendKnown, 0);
-        vm.displayAnticipated = moment(vm.anticipatedFinishKnown).format('M/D/YYYY');
-        vm.statusMessage = vm.data.metadata.mitigatedNum < vm.data.metadata.knownNum ?
-          'Current trend anticipates remediation of all known items will finish on ' + vm.displayAnticipated + '. ' : '';
-        vm.data.trendPointsKnown = [{
-          x: vm.data.data.known[0].x,
-          y: vm.data.metadata.knownNum
-        }, {
-          x: vm.anticipatedFinishKnown,
-          y: 0
-        }];
-        $log.debug('going to call getTrendX. trendAll is ', 0);
-        vm.data.trendPointsAll = [{
-          x: vm.data.data.all[0].x,
-          y: vm.data.metadata.initialNum
-        }, {
-          x: getTrendX(vm.data.data.trendAll, 0),
-          y: 0
-        }];
+
+        if (vm.data.metadata.mitigatedNum > 0) {
+          vm.showGraph = true;
+          vm.anticipatedFinishKnown = getTrendX(vm.data.data.trendKnown, 0);
+          vm.displayAnticipated = moment(vm.anticipatedFinishKnown).format('M/D/YYYY');
+          vm.statusMessage = vm.data.metadata.mitigatedNum < vm.data.metadata.knownNum ?
+            'Current trend anticipates remediation of all known items will finish on ' + vm.displayAnticipated + '. ' : '';
+          vm.data.trendPointsKnown = [{
+            x: vm.data.data.known[0].x,
+            y: vm.data.metadata.knownNum
+          }, {
+            x: vm.anticipatedFinishKnown,
+            y: 0
+          }];
+          $log.debug('going to call getTrendX. trendAll is ', 0);
+          vm.data.trendPointsAll = [{
+            x: vm.data.data.all[0].x,
+            y: vm.data.metadata.initialNum
+          }, {
+            x: getTrendX(vm.data.data.trendAll, 0),
+            y: 0
+          }];
+        } else {
+          vm.statusMessage = 'No IPs have been mitigated';
+        }
       };
 
       init();

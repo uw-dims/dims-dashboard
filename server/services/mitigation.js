@@ -165,13 +165,15 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
   var initiateMitigation = function initiateMitigation(ipData, user, tg, ticketName, description, startTime) {
     console.log('Initiating mitigation: user %s, tg %s, ticketName %s, description %s, startTime %s',
       user, tg, ticketName, description, startTime);
-    console.log('ipData', ipData);
+    // console.log('ipData', ipData);
     // var ipData = fs.readFileSync(ipPath, {encoding: 'utf-8'});
     var ticketConfig = {
       creator: user,
       type: 'mitigation',
       name: ticketName,
       description: description,
+      open: true,
+      private: false,
       tg: tg
     };
     var ticket = Ticket.ticketFactory(ticketConfig);

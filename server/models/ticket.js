@@ -52,7 +52,7 @@ module.exports = function Ticket(store) {
       private: false,
       open: true
     };
-    // var newConfig = _.extend({}, defaultConfig, config);
+    // var newConfig = _.extend({}, defaul;tConfig, config);
     _.defaults(config, defaultConfig);
     // Must contain creator, type, name, trustgroup (tg)
     if (!config[validOptions.creator] || !config[validOptions.type] || !config[validOptions.name] || !config[validOptions.tg]) {
@@ -68,15 +68,16 @@ module.exports = function Ticket(store) {
     if (typeof config.open !== 'boolean') {
       return null;
     }
-    return {
-      creator: config.creator,
-      description: config.description,
-      type: config.type,
-      private: config.private,
-      name: config.name,
-      tg: config.tg,
-      open: config.open
-    };
+    return config;
+    // return {
+    //   creator: config.creator,
+    //   description: config.description,
+    //   type: config.type,
+    //   private: config.private,
+    //   name: config.name,
+    //   tg: config.tg,
+    //   open: config.open
+    // };
   };
 
   // Coerce types returned from redis

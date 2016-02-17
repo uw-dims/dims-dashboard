@@ -104,10 +104,10 @@ module.exports = function (Attributes, attributeService, access) {
         Attributes.save(req.params.id, req.body.type, req.body.items) : 
         Attributes.remove(req.params.id, req.body.type, req.body.items);
     promise
-    .then(function (reply) {
-      // Save the current attributes to file so ipgrep can access
-      return attributeService.attributesToFile();
-    })
+    // .then(function (reply) {
+    //   // Save the current attributes to file so ipgrep can access
+    //   return attributeService.attributesToFile();
+    // })
     .then(function (reply) {
       logger.debug('update reply ', reply);
       res.status(200).send(resUtils.getSuccessReply(null));

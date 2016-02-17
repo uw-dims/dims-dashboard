@@ -45,7 +45,14 @@ module.exports = function (stixService, access) {
     stixService.extract(stixMeta.action, req.files[0].path, tlpLevel)
     .then(function (reply) {
       logger.debug('stix route show reply', reply);
-      return res.status(200).send(resUtils.getSuccessReply(resUtils.formatResponse(stixMeta.action, reply)));
+      var stixData = reply;
+      fs.unlink(req.files[0].path, function (err) {
+        if (err) {
+          return res.status(400).send(resUtils.getErrorReply('Error deleting file - ' + err.toString()));
+        }
+        return res.status(200).send(resUtils.getSuccessReply(resUtils.formatResponse(stixMeta.action, stixData)));
+      })
+      
     })
     .catch(function (err) {
         return res.status(400).send(resUtils.getErrorReply(err.toString()));

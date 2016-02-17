@@ -23,7 +23,14 @@
   </div>
   <div class="form-group">
     <label>Processing action</label>
-    <input type="text" class="form-control" placeholder="fileinfo" ng-model="vm.action">
+    <!-- <input type="text" class="form-control" placeholder="fileinfo" ng-model="vm.action"> -->
+    <select name="action" id="action" ng-model="vm.action">
+      <option value="fileinfo" selected>Files</option>
+      <option value="md5">MD5 hashes</option>
+      <option value="json">Summary</option>
+      <option value="hostname">Hostnames</option>
+      <option value="ip">IPs</option>
+    </select>
   </div>
     <button class="btn btn-sm btn-primary" type="submit">Upload</button> {{vm.waiting}}
 
@@ -31,7 +38,7 @@
   </form>
 
 </div></div></div>
-
+<div ng-if="vm.showZeroResult" style="margin-top: 15px;"><p>No results were found</p></div>
 <div ng-if="vm.showSourceResult" class="spacer10">
 <!-- <pre>{{ vm.stixResult }}</pre>
  -->
@@ -41,15 +48,76 @@
 
 <div ng-if="vm.showHashResult" class="spacer10">
 <h5>Hashes found in tupelo store</h5>
-  <div class="row" ng-repeat="t in vm.tupeloData.hits">
-  <div class="col-sm-12">
-  <pre>{{ t }}</pre>
+<div class="list-group">
 
-  </div></div>
+  <div class="list-group-item" ng-repeat="t in vm.tupeloData.hits">
+  <!-- <div class="col-sm-12"> -->
+    <!-- <pre>{{ t }}</pre> -->
+    <div class="row">
+      <div class="col-sm-2" style="font-weight: bold;">
+        md5
+      </div>
+      <div class="col-sm-10">
+        {{ t.md5 }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2" style="font-weight: bold;">
+        sha1
+      </div>
+      <div class="col-sm-10">
+        {{ t.sha1 }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2" style="font-weight: bold;">
+        sha256
+      </div>
+      <div class="col-sm-10">
+        {{ t.sha256 }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2" style="font-weight: bold;">
+        diskID
+      </div>
+      <div class="col-sm-10">
+        {{ t.descriptor.diskID }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2" style="font-weight: bold;">
+        session
+      </div>
+      <div class="col-sm-10">
+        {{ t.descriptor.session }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2" style="font-weight: bold;">
+        path
+      </div>
+      <div class="col-sm-10">
+        {{ t.path }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2" style="font-weight: bold;">
+        size
+      </div>
+      <div class="col-sm-10">
+        {{ t.size }}
+      </div>
+    </div>
+
+  <!-- </div> -->
+  </div>
+</div>
 
 </div>
 
-<h5>File info from Stix</h5>
+<h5>STIX data</h5>
+
 <div class="row" ng-repeat="info in vm.stixResult">
 <div class="col-sm-12">
 <pre>{{ info }}</pre>
