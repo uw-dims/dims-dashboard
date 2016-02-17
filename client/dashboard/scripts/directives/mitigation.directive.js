@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  function mitigation(MitigationService, $log, $modal) {
+  function mitigation(MitigationService, TicketService, $log, $modal, $rootScope) {
     var directive = {
       restrict: 'AEC',
       templateUrl: 'views/partials/mitigation.html',
@@ -28,6 +28,23 @@
       vm.toggleProgress = function toggleProgress() {
         vm.showProgress = (vm.showProgress) ? false : true;
         vm.progressText = (vm.showProgress) ? 'Hide graph' : 'Show graph';
+      };
+
+      vm.showDelete = function showDelete() {
+        return $rootScope.currentUser.isSysadmin;
+      };
+
+      vm.deleteTicket = function deleteTicket(ticketKey) {
+        $log.debug('deleteTicket key is ', ticketKey);
+        TicketService.deleteTicket(ticketKey) 
+        .then(function (reply) {
+          $log.debug('Mitigation delete reply', reply);
+          // notify other scopes
+          $rootScope.$broadcast('mitigations-changed');
+        })
+        .catch(function (err) {
+          $log.debug(err);
+        });
       };
 
       var getGraphOptions = function getGraphOptions() {
@@ -108,7 +125,7 @@
       };
 
       var ModalInstanceCtrl = function ($scope, $modalInstance, data, key) {
-        $scope.title = 'IPs to Mitigate';
+        $scope.title = 'Items to mitigate';
         $scope.cols = 4;
         $scope.data = data;
         $scope.key = key;
@@ -140,20 +157,28 @@
         $scope.remediate = function (results) {
           $scope.ipResults = angular.copy(results);
           $log.debug('remediated ips', $scope.ipResults);
-          MitigationService.remediate($scope.key, $scope.ipResults)
-          .then(function (reply) {
+          if ($scope.ipResults.length === 0) {
             $scope.ok({
               success: true,
-              data: $scope.ipResults
+              data: 'You did not select any IPs'
             });
-          })
-          .catch(function (err) {
-            $log.debug('modal reply error', err);
-            $scope.ok({
-              success: false,
-              data: 'An error occurred when submitting your IPs'
+          } else {
+            MitigationService.remediate($scope.key, $scope.ipResults)
+            .then(function (reply) {
+              $scope.ok({
+                success: true,
+                data: $scope.ipResults
+              });
+            })
+            .catch(function (err) {
+              $log.debug('modal reply error', err);
+              $scope.ok({
+                success: false,
+                data: 'An error occurred when submitting your IPs'
+              });
             });
-          });
+          }
+          
         };
       };
     }
@@ -163,6 +188,6 @@
     .module('dimsDashboard.directives')
     .directive('mitigation', mitigation);
 
-  mitigation.$inject = ['MitigationService', '$log', '$modal'];
+  mitigation.$inject = ['MitigationService', 'TicketService', '$log', '$modal', '$rootScope'];
 
 }());

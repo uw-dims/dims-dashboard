@@ -36,6 +36,7 @@ module.exports = function (tupeloService, access) {
     tupeloService.findHashes(req.body.hashes)
     .then(function (reply) {
       logger.debug('tupelo route show reply', reply);
+      // reply = JSON.parse(reply);
       return res.status(200).send(resUtils.getSuccessReply(resUtils.formatResponse('tupelo', reply)));
     })
     .catch(function (err) {

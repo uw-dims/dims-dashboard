@@ -87,9 +87,11 @@ module.exports = function (ticketService, mitigationService, access) {
       if (req.query.hasOwnProperty('tg')) {
         query.tg = req.query.tg;
       }
+      logger.debug('listMitigations: user', user);
+      logger.debug('listMitigations: query', query);
       mitigationService.listMitigations(user, query)
       .then(function (reply) {
-        // console.log('reply from listMitigations', reply);
+        console.log('reply from listMitigations', reply);
         return res.status(200).send(resUtils.getSuccessReply(resUtils.formatResponse('mitigations', reply)));
       })
       .catch(function (err) {
@@ -190,45 +192,72 @@ module.exports = function (ticketService, mitigationService, access) {
 
   ticketRoute.create = function (req, res) {
     logger.debug('routes/ticket CREATE');
-    // Check for missing inputs
-    var creator = getCreator(req);
-    if (creator === -1) {
-      res.status(400).send(resUtils.getErrorReply('Error: Creator not supplied.'));
+    var userAccess,
+        user;
+
+    // user is the authorizations object contained in the request. It must be present
+    if (!req.user) {
+      return res.status(500).send(resUtils.getErrorReply('Authentication error: User is not defined in request'));
     }
+
+    // Get the access object
+    userAccess = req.user;
+    // Get the user from the access object
+    user = access.username(userAccess);
+    // logger.debug('LIST userAccess', userAccess);
+    // Validate trust group
+    console.log(req.body);
+    if (!validateTrustgroup(req, userAccess)) {
+      return res.status(400).send(resUtils.getErrorReply('Requesting tickets in trustgroup that user is not authorized for'));
+    }
+    // Check for missing inputs
+    // var creator = getCreator(req);
+    // if (creator === -1) {
+    //   return res.status(400).send(resUtils.getErrorReply('Error: Creator not supplied.'));
+    // }
     var type = getType(req);
     if (type === -1) {
-      res.status(400).send(resUtils.getErrorReply('Error: Type not supplied.'));
+      return res.status(400).send(resUtils.getErrorReply('Error: Type not supplied.'));
     }
+    var content = req.body.content;
     var name = getName(req);
     if (name === -1) {
-      res.status(400).send(resUtils.getErrorReply('Error: Name not supplied.'));
+      return res.status(400).send(resUtils.getErrorReply('Error: Name not supplied.'));
     }
+    if (type === 'mitigation') {
+      if (content === null || content === undefined) {
+        return res.status(400).send(resUtils.getErrorReply('No items to mitigate'));
+      }
+      mitigationService.initiateMitigation(content, user, req.body.tg, name, req.body.description)
+      .then(function (reply) {
+        logger.debug('reply from initiateMitigation', reply);
+        res.status(201).send(resUtils.getSuccessReply(null));
+      })
+      .catch(function (err) {
+        return res.status(400).send(resUtils.getErrorReply(err.toString()));
+      });
+    } else {
+    
     var privateTicket = getPrivate(req);
     if (privateTicket === -1) {
       res.status(400).send(resUtils.getErrorReply('Error: Invalid privacy supplied.'));
     }
-    var content = (req.body.content !== null && typeof req.body.content === undefined) ? req.body.content : null;
+    
     var ticket = Ticket.ticketFactory({
       creator: creator,
       description: getDescription(req),
       type: type,
       private: privateTicket
     });
-    if (type === 'mitigation') {
-      mitigationService.create(ticket, content)
-      .then(function (reply) {
-        res.status(201).send({data: packageTicket(reply)});
-      })
-      .catch(function (err) {
-        res.status(500).send(err.toString());
-      });
-    } else {
+    // console.log('create ticket', ticket);
+    console.log('create ticket body', req.body);
+     
       ticket.create()
       .then(function (reply) {
-        res.status(201).send({data: packageTicket(ticket)});
+        return res.status(201).send({data: packageTicket(ticket)});
       })
       .catch(function (err) {
-        res.status(500).send(err.toString());
+        return res.status(500).send(err.toString());
       });
     }
   };
@@ -272,10 +301,19 @@ module.exports = function (ticketService, mitigationService, access) {
     }
 
     // Get the access object
-    userAccess = req.user;
+    var userAccess = req.user;
     // Get the user from the access object
-    user = access.username(userAccess);
-    logger.debug('LIST userAccess', userAccess);
+    var user = access.username(userAccess);
+    logger.debug('delete userAccess', userAccess);
+    logger.debug('delete id', req.params.id);
+    ticketService.deleteTicket(req.params.id)
+    .then(function (reply) {
+      logger.debug('reply from delete', reply);
+      res.status(201).send(resUtils.getSuccessReply(null));
+    })
+    .catch(function (err) {
+      return res.status(400).send(err.toString());
+    });
   };
 
   /**

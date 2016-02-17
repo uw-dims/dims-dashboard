@@ -25,18 +25,15 @@
 </div>
 <div class="col-sm-8">
 
+<div ng-if="vm.panels.mitigation.active">
   <mitigations></mitigations>
-
-<!-- <div class="row">
-<div class="col-sm-8">
-<button type="button" class="btn btn-default" ng-click="source()">SOURCE</button>
-<button type="button" class="btn btn-default" ng-click="query()">QUERY</button>
-<button type="button" class="btn btn-default" ng-click="reset()">RESET</button>
-<button type="button" class="btn btn-default" ng-click="source()">SAVE</button>
 </div>
-<div class="col-sm-4"></div>
-</div> -->
+<div ng-if="vm.panels.datacenter.active">
+  <datacenter></datacenter>
+</div>
+<div ng-if="vm.panels.activities.active">
   <ticketlist></ticketlist>
+</div>
 </div>
 
 
@@ -45,20 +42,22 @@
 <div class="row"><div class="col-sm-12">
 <h3 style="margin-bottom: 15px;">Display</h3>
 <div class="list-group">
-  <button type="button" class="list-group-item list-group-item-success" ng-click="toggleDisplay('mitigation')"><span class="badge">ON</span>Remediations</button>
-  <button type="button" class="list-group-item list-group-item-success" ng-click="toggleDisplay('activities')"><span class="badge">ON</span>Activities</button>
-  <button type="button" class="list-group-item list-group-item-warning" ng-click="toggleDisplay('datacenter')"><span class="badge">OFF</span>Data center</button>
-  <button type="button" class="list-group-item list-group-item-warning" ng-click="toggleDisplay('notifications')"><span class="badge">OFF</span>Notifications</button>
+  <button type="button" class="list-group-item list-group-item-success" ng-click="vm.toggleDisplay('mitigation')"><span class="badge">{{vm.panels.mitigation.label}}</span>Remediations</button>
+  
+  <button type="button" class="list-group-item list-group-item-warning" ng-click="vm.toggleDisplay('datacenter')"><span class="badge">{{vm.panels.datacenter.label}}</span>Data center</button>
+  <button type="button" class="list-group-item list-group-item-success" ng-click="vm.toggleDisplay('activities')"><span class="badge">{{vm.panels.activities.label}}</span>Activities</button>
+  <button type="button" class="list-group-item list-group-item-warning" ng-click="vm.toggleDisplay('notifications')"><span class="badge">{{vm.panels.notifications.label}}</span>Notifications</button>
 </div>
 </div></div>
 
-
-
-
-<!-- <div class="panel panel-default"><div class="panel-body">
+<div ng-if="vm.panels.notifications.active">
+<div class="panel panel-default"><div class="panel-body">
 <h2 tooltip="Latest notifications will display here" tooltip-append-to-body="true" tooltip-placement="right">Notifications</h2>
 
-</div></div> -->
+</div></div></div>
+
+
+
 </div>
 </div>
 </div>

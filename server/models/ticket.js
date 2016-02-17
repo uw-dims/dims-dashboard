@@ -49,7 +49,8 @@ module.exports = function Ticket(store) {
   var validateConfig = function (config) {
     var defaultConfig = {
       description: '',
-      private: false
+      private: false,
+      open: true
     };
     // var newConfig = _.extend({}, defaultConfig, config);
     _.defaults(config, defaultConfig);
@@ -64,13 +65,17 @@ module.exports = function Ticket(store) {
     if (typeof config.private !== 'boolean') {
       return null;
     }
+    if (typeof config.open !== 'boolean') {
+      return null;
+    }
     return {
       creator: config.creator,
       description: config.description,
       type: config.type,
       private: config.private,
       name: config.name,
-      tg: config.tg
+      tg: config.tg,
+      open: config.open
     };
   };
 
@@ -219,6 +224,7 @@ module.exports = function Ticket(store) {
     // This deletes the ticket only not topics
     deleteTicket: function deleteTicket() {
       var self = this;
+      logger.debug('Ticket.deleteTicket metadata is ', self.metadata);
       var privKey, openKey;
       if (self.metadata.private) {
         privKey = keyGen.ticketPrivateKey();
@@ -230,6 +236,15 @@ module.exports = function Ticket(store) {
       } else {
         openKey = keyGen.ticketClosedKey();
       }
+      console.log('in Ticket.deleteTicket, metadata is ', self.metadata);
+      logger.debug('key is ', keyGen.ticketKey(self.metadata));
+      logger.debug('ticket set key is ', keyGen.ticketSetKey());
+      logger.debug('ticket tg key ', keyGen.ticketTgKey(self.metadata.tg));
+      logger.debug('owner key ', keyGen.ticketOwnerKey(self.metadata.creator));
+      logger.debug('open key ', openKey);
+      logger.debug('type key ', keyGen.ticketTypeKey(self.metadata.type));
+      logger.debug('priv key', privKey);
+
       return q.all([
         store.deleteKey(keyGen.ticketKey(self.metadata)),
         removeKey(self.metadata, keyGen.ticketSetKey()),

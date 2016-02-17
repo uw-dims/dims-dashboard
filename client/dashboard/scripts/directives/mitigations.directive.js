@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  function mitigations(MitigationService, $log, $rootScope) {
+  function mitigations(MitigationService, $log, $rootScope, $modal) {
     var directive = {
       restrict: 'AEC',
       templateUrl: 'views/partials/mitigations.html',
@@ -53,17 +53,62 @@
         init();
       });
 
+      $scope.$on('mitigations-changed', function () {
+        $log.debug('mitigations.directive received mitigations changed');
+        init();
+      });
+
       vm.addMitigation = function addMitigation() {
         $log.debug('add mitigation called');
+        // Define modal instance
+        $scope.modalInstance = $modal.open({
+          templateUrl: '../views/partials/mitigationform.html',
+          controller: modalInstanceCtrl
+        });
+
+        // Define function which updates with new data
+        $scope.modalInstance.result
+        .then(function (reply) {
+          $log.debug('reply from add mitigation modal', reply);
+          getMitigations(vm.trustgroup);
+        }, function () {
+          $log.debug('add mitigation modal dismissed at: ', new Date());
+        });
       };
 
-    }
+      var modalInstanceCtrl = function ($scope, $modalInstance) {
+        $scope.cancel = function () {
+          $modalInstance.dismiss('cancel');
+        };
+        $scope.ok = function (msg) {
+          $modalInstance.close(msg);
+        };
+        $scope.submitMitigation = function (result) {
+          $log.debug('ips from form are ', result);
+          MitigationService.create(result.list, result.name, result.description, $rootScope.currentUser.currentTg)
+          .then(function (reply) {
+            $scope.ok({
+              success: true,
+              data: $scope.ipResults
+            });
+          })
+          .catch(function (err) {
+            $log.debug('modal reply error', err);
+            $scope.ok({
+              success: false,
+              data: 'An error occurred when submitting your IPs'
+            });
+          });
+        };
+      };
+
+    };
   }
 
   angular
     .module('dimsDashboard.directives')
     .directive('mitigations', mitigations);
 
-  mitigations.$inject = ['MitigationService', '$log', '$rootScope'];
+  mitigations.$inject = ['MitigationService', '$log', '$rootScope', '$modal'];
 
 }());

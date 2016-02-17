@@ -156,23 +156,27 @@ module.exports = function (Ticket, Topic) {
   var deleteTicket = function deleteTicket(id) {
     var ticket,
         ticketMetadata,
-        promises;
+        promises = [];
     return Ticket.getTicket(id)
     .then(function (reply) {
+      logger.debug('deleteTicket reply from getTicket', reply);
       ticket = Ticket.ticketFactory(reply.metadata);
       ticketMetadata = reply;
-      return ticket.delete();
+      return ticket.deleteTicket();
     })
     .then(function (reply) {
-      return addTopics(ticketMetadata);
+      console.log('reply from ticket.deleteTicket ', reply);
+      return Topic.getTopicKeys(id);
     })
     .then(function (reply) {
+      console.log('reploy from getTopicKeys', reply);
       _.forEach(reply, function (value) {
-        promises.push(Topic.delete(value.key));
+        promises.push(Topic.deleteTopic(value));
       });
       return q.all(promises);
     })
     .catch(function (err) {
+      logger.error('Error in delete ticket', err);
       throw err;
     });
   };

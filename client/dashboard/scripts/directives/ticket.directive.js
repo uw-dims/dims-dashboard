@@ -37,6 +37,10 @@
         return $rootScope.currentUser.isSysadmin;
       };
 
+      vm.deleteTicket = function deleteTicket(ticketKey) {
+        $log.debug('deleteTicket key is ', ticketKey);
+      };
+
     }
 
   }

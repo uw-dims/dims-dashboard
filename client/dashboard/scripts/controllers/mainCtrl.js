@@ -28,6 +28,52 @@
       $window.alert('Not yet implemented');
     };
 
+    vm.activeCss = {
+      active: 'list-group-item-success',
+      inactive: 'list-group-item-warning'
+    };
+
+    vm.panels = {
+      mitigation: {
+        name: 'mitigation',
+        active: true,
+        css: 'list-group-item-success',
+        label: 'ON'
+      },
+      activities: {
+        name: 'activities',
+        active: true,
+        css: 'list-group-item-success',
+        label: 'ON'
+      },
+      datacenter: {
+        name: 'datacenter',
+        active: false,
+        css: 'list-group-item-success',
+        label: 'OFF'
+      },
+      notifications: {
+        name: 'notifications',
+        active: false,
+        css: 'list-group-item-warning',
+        label: 'OFF'
+      }
+    };
+
+    // $log.debug('vm.panels is ', vm.panels);
+
+    vm.toggleDisplay = function toggleDisplay(name) {
+      $log.debug('togglePanel name', name);
+      // $log.debug(vm.panels);
+      // $log.debug(vm.panels[name])
+      if (!vm.panels.hasOwnProperty(name)) {
+        return;
+      }
+      vm.panels[name].active = !vm.panels[name].active;
+      var cssProp = vm.panels[name].active ? 'active' : 'inactive';
+      vm.panels[name].css = vm.activeCss[cssProp];
+      vm.panels[name].label = vm.panels[name].active ? 'ON' : 'OFF';
+    };
 
   }
 

@@ -1,0 +1,57 @@
+<div class="row">
+<div class="panel panel-default">
+<div class="panel-body" style="max-height: 700px; overflow-y:scroll;">
+
+<div class="row">
+<div class="col-sm-12">
+<h2>Data Center</h2>
+<button type="button" class="btn btn-primary btn-sm" ng-click="vm.stix()">STIX</button>
+<button type="button" class="btn btn-default btn-sm" ng-click="vm.clear()">Clear</button>
+<!-- <button type="button" class="btn btn-default btn-sm" ng-click="vm.query()">QUERY</button>
+<button type="button" class="btn btn-disabled btn-sm" ng-click="vm.save()">SAVE</button> -->
+</div></div>
+
+<div ng-if="vm.showSourceForm">
+<div class="row">
+<div class="col-sm-12">
+
+  <h4 style="margin-top: 10px;">Upload a STIX file</h4>
+  <form name="upload" data-ng-submit="addFile()">
+  <div class="form-group">
+    <input type="file" name="stixfile"
+    onchange="angular.element(this).scope().uploadedFile(this)" />
+  </div>
+  <div class="form-group">
+    <label>Processing action</label>
+    <input type="text" class="form-control" placeholder="fileinfo" ng-model="vm.action">
+  </div>
+    <button class="btn btn-sm btn-primary" type="submit">Upload</button> {{vm.waiting}}
+
+
+  </form>
+
+</div></div></div>
+
+<div ng-if="vm.showSourceResult" class="spacer10">
+<!-- <pre>{{ vm.stixResult }}</pre>
+ -->
+ <div ng-show="vm.showHashButton" style="margin-bottom: 10px;">
+ <button class="btn btn-sm btn-primary" ng-click="vm.lookupHashes(vm.stixResult)">Look up hashes</button> {{vm.hashWaiting }}
+ </div>
+
+<div ng-if="vm.showHashResult" class="spacer10">
+<h5>Hashes found in tupelo store</h5>
+  <div class="row" ng-repeat="t in vm.tupeloData.hits">
+  <div class="col-sm-12">
+  <pre>{{ t }}</pre>
+
+  </div></div>
+
+</div>
+
+<h5>File info from Stix</h5>
+<div class="row" ng-repeat="info in vm.stixResult">
+<div class="col-sm-12">
+<pre>{{ info }}</pre>
+
+</div></div></div>

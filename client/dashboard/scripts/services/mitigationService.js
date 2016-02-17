@@ -162,6 +162,28 @@
         return deferred.promise;
       },
 
+      create: function (ips, name, description, tg) {
+        var deferred = $q.defer();
+        $log.debug('mitigation create ips', ips);
+        MitigationApi.save({},
+          {
+            type: 'mitigation',
+            name: name,
+            description: description,
+            tg: tg,
+            content: ips
+          },
+        function (resource) {
+          $log.debug('MitigationService.create success ', resource);
+          deferred.resolve(resource);
+        },
+        function (err) {
+          $log.debug('MitigationService.create error callback', err);
+          deferred.reject(err);
+        });
+        return deferred.promise;
+      },
+
       remediate: function (id, ips) {
         $log.debug('remediate id is ', id);
         $log.debug('ips are ', ips);

@@ -86,10 +86,11 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
     if (query.hasOwnProperty('tg')) {
       keyArray.push(keyGen.ticketTgKey(query.tg));
     }
+    logger.debug('listMitigations keyArray is ', keyArray);
     return store.intersectItems(keyArray)
     .then(function (reply) {
       // Array of keys to mitigations
-      // console.log('listMitigations', reply);
+      console.log('listMitigations', reply);
       _.forEach(reply, function (value, index) {
         promises.push(getMitigation(value, user));
       });
@@ -105,6 +106,7 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
   };
 
   var getMitigation = function getMitigation(key, user) {
+    logger.debug('getMitigation key, user ', key, user);
     var result = {},
         mappedKeys;
     result.key = key;
@@ -158,11 +160,12 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
   //   });
   // };
 
-  // var create = function create()
+
 
   var initiateMitigation = function initiateMitigation(ipData, user, tg, ticketName, description, startTime) {
     console.log('Initiating mitigation: user %s, tg %s, ticketName %s, description %s, startTime %s',
       user, tg, ticketName, description, startTime);
+    console.log('ipData', ipData);
     // var ipData = fs.readFileSync(ipPath, {encoding: 'utf-8'});
     var ticketConfig = {
       creator: user,

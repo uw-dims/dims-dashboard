@@ -264,6 +264,12 @@ module.exports = function Topic(store) {
     });
   };
 
+  var getTopicKeys = function getTopicKeys(ticketKey) {
+    var promises = [];
+    // Return promise with array of topic keys
+    return store.listItems(keyGen.topicSetKeyFromTicketKey(ticketKey));
+  };
+
   var getTopicsMetadata = function getTopicsMetadata(key) {
     var promises = [];
     return store.listItems(keyGen.topicSetKeyFromTicketKey(key))
@@ -300,15 +306,18 @@ module.exports = function Topic(store) {
   // Given a topic key, delete the topic from the store
   var deleteTopic = function deleteTopic(key) {
     // Get metadata from topic key so we can get all keys needed
+    logger.debug('in deleteTopic key is ', key);
     return getTopicMetadata(key)
-    .then (function (metadata) {
+    .then (function (reply) {
+      console.log('reply from getTopicMetadata', reply.metadata);
       var promises = [];
-      promises.push(store.deleteKey(keyGen.topicMetaKey(metadata)));
-      promises.push(store.deleteKey(keyGen.topicKey(metadata)));
-      promises.push(removeKey(self.metadata, keyGen.topicSetKey(metadata)));
+      promises.push(store.deleteKey(keyGen.topicMetaKey(reply.metadata)));
+      promises.push(store.deleteKey(keyGen.topicKey(reply.metadata)));
+      promises.push(removeKey(reply.metadata, keyGen.topicSetKey(reply.metadata)));
       return q.all(promises);
     })
     .catch(function (err) {
+      logger.error('Error in deleteTopic', err);
       throw err;
     });
   };
@@ -354,6 +363,7 @@ module.exports = function Topic(store) {
     topicFactory: topicFactory,
     getTopic: getTopic,
     getTopics: getTopics,
+    getTopicKeys: getTopicKeys,
     getTopicMetadata: getTopicMetadata,
     getTopicsMetadata: getTopicsMetadata,
     extendFactory: extendFactory,

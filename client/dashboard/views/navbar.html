@@ -88,7 +88,9 @@
 
       <ul class="nav navbar-nav navbar-right">
         <li ng-show="currentUser"><a ng-click="vm.chat()"><i class="fa fa-comments fa-lg"></i></a></li>
-        <li ng-show="currentUser" class="dropdown">
+        <li ng-show="currentUser"><a ng-click=""><i class="fa fa-bell fa-lg"></i></a>
+        </li>
+        <!-- <li ng-show="currentUser" class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-bell fa-lg"></i> <span class="caret"></span></a>
           <ul class="dropdown-menu" role="menu">
             <li><a href="/">New notifications</a></li>
@@ -96,7 +98,7 @@
             <li><a href="/">Notification 1</a></li>
             <li><a href="/">Notification 2</a></li>
           </ul>
-        </li>
+        </li> -->
         <!--<li ng-show="currentUser"><a ng-click="vm.logout()"> Logout</a></li> -->
         <!-- <li ng-show="currentUser" class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{currentUser.trustgroups[currentUser.currentTg].tgDescription}} <span class="caret"></span></a>

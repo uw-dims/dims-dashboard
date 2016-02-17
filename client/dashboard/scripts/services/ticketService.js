@@ -34,6 +34,22 @@
             deferred.reject(err);
           });
         return deferred.promise;
+      },
+      deleteTicket: function (id) {
+        $log.debug('TicketService.deleteTickets id is ', id);
+        var deferred = $q.defer();
+        TicketApi.delete({
+          id: id
+        },
+          function (resource) {
+            $log.debug('TicketService.deleteTicket success callback ', resource);
+            deferred.resolve('ok');
+          },
+          function (err) {
+            $log.debug('TicketService.deleteTicket error callback', err);
+            deferred.reject(err);
+          });
+        return deferred.promise;
       }
     };
 

@@ -12,6 +12,7 @@ var express = require('express')
   , favicon = require('serve-favicon')
   , errorHandler = require('errorhandler')
   , methodOverride = require('method-override')
+  , multer = require('multer')
   , http = require('http')
   , https = require('https')
   , fs = require('fs')
@@ -254,8 +255,9 @@ router.put('/api/ticket/topic/:id', auth.ensureAuthenticated, ticketRoute.update
 // Delete a topic
 router.delete('/api/ticket/topic/:id', auth.ensureAuthenticated, ticketRoute.deleteTopic);
 
+var upload = multer({ dest: config.uploadPath});
 // Process stix
-router.post('/api/stix', auth.ensureAuthenticated, stixRoute.post);
+router.post('/api/stix', auth.ensureAuthenticated, upload.any(), stixRoute.post);
 
 router.post('/api/tupelo', auth.ensureAuthenticated, tupeloRoute.post);
 

@@ -10,7 +10,8 @@
       link: linkFunc,
       scope: {
         options: '=',
-        data: '='
+        data: '=',
+        num: '='
       }
     };
 
@@ -29,6 +30,8 @@
         $log.debug('mitigationseries.directive init triggered');
         vm.graphOptions = angular.copy($scope.options);
         vm.input = angular.copy($scope.data);
+        vm.chartID = 'chart' + angular.copy($scope.num);
+        $log.debug('chartID is ', vm.chartID);
         vm.initialNum = vm.input.metadata.initialNum;
         vm.knownNum = vm.input.metadata.knownNum;
         vm.trendPointsKnown = vm.input.trendPointsKnown;
@@ -139,7 +142,7 @@
           .attr('text-anchor', 'middle')
           .text(vm.graphOptions.graphTitle);
 
-        chartData = d3.select('#chart svg')
+        chartData = d3.select('#' + vm.chartID + ' svg')
           .datum(vm.graphData);
         chartData
           .call(chart);

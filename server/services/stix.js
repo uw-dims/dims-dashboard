@@ -22,10 +22,12 @@ module.exports = function () {
   stix.extract = function extract(action, stixPath, tlpLevel) {
     var deferred = q.defer();
 
+    logger.debug('in stix.extract action, path, level', action, stixPath, tlpLevel);
+
     if (!stixActions[action]) {
       // throw new Error('Invalid action supplied');
       // return;
-      return deferred.reject('Invalid action supplied');
+      throw new Error('Invalid action supplied');
     }
 
     var inputArray = [];

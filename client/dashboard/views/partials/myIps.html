@@ -1,13 +1,13 @@
 <div class="modal-header">
-<h1 class="modal-title">IPs needing remediation</h1>
+<h1 class="modal-title">{{ title }}</h1>
 </div>
 <div class="modal-body">
 <!-- <div class="container"> -->
 <div class="row"><div class="col-sm-12">
-<p>You are responsible for taking mitigating action against the following IP addresses. Check off the IPs you are submitting as remediated and click <strong>Submit</strong></p>
+<p>You are responsible for taking mitigating action against the following items. Check off the items you are submitting as remediated and click <strong>Submit</strong></p>
 </div></div>
 <form>
-<div mt-to="vm.ipResults">
+<div mt-to="ipResults">
 <div class="row" ng-repeat="ipRow in ipRows track by $index">
   <div class="col-md-3" ng-repeat="cell in ipRow track by $index">
    <input type="checkbox" mt-checkbox="cell" />&nbsp;{{cell}}
