@@ -17,6 +17,8 @@ module.exports = function (Attributes) {
       var yamlDoc = yaml.safeDump(reply, {
         flowLevel: 2
       });
+      logger.debug('yamlDoc: ');
+      console.log(yamlDoc);
       fs.writeFile(path.join(config.dashboardDataPath, 'dashboard_user_attributes.yml'), yamlDoc, function (err, reply) {
         if (err) {
           throw err;
