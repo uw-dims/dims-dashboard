@@ -68,19 +68,36 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
   // every time a user's attributes change
   var mapPath = config.dashboardDataPath + 'dashboard_user_attributes.yml';
 
-  var listMitigations = function listMitigations(user) {
+  var listMitigations = function listMitigations(user, query) {
+    console.log('query in listMitigations', query);
     var promises = [];
-    return store.listItems(keyGen.ticketTypeKey('mitigation'))
+    var keyArray = [];
+
+    // TODO: break this out into its own module or function - used in ticket service as well. Or call it
+    // from there
+    keyArray.push(keyGen.ticketTypeKey('mitigation'));
+    if (query.hasOwnProperty('open') ) {
+      if (query.open) {
+        keyArray.push(keyGen.ticketOpenKey());
+      } else {
+        keyArray.push(keyGen.ticketClosedKey());
+      }
+    }
+    if (query.hasOwnProperty('tg')) {
+      keyArray.push(keyGen.ticketTgKey(query.tg));
+    }
+    logger.debug('listMitigations keyArray is ', keyArray);
+    return store.intersectItems(keyArray)
     .then(function (reply) {
       // Array of keys to mitigations
-      // console.log('listMitigations', reply);
+      console.log('listMitigations', reply);
       _.forEach(reply, function (value, index) {
         promises.push(getMitigation(value, user));
       });
       return q.all(promises);
     })
     .catch(function (err) {
-      console.log('caught error in listMitigations', err.toString(), '- will return empty array');
+      console.error('caught error in listMitigations', err.toString(), '- will return empty array');
       // return no items found - empty array
       return q.fcall(function () {
         return [];
@@ -89,6 +106,7 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
   };
 
   var getMitigation = function getMitigation(key, user) {
+    logger.debug('getMitigation key, user ', key, user);
     var result = {},
         mappedKeys;
     result.key = key;
@@ -113,7 +131,8 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
       result.metadata.initialNum = reply[3];
       result.metadata.unknownNum = reply[4];
       result.metadata.mitigatedNum = reply[5];
-      console.log(result.data);
+      result.metadata.knownNum = reply[3] - reply[4];
+      console.log(result.metadata);
       return result;
     })
     .catch(function (err) {
@@ -141,17 +160,21 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
   //   });
   // };
 
-  // var create = function create()
 
-  var initiateMitigation = function initiateMitigation(ipData, user, ticketName, description, startTime) {
-    console.log('Initiating mitigation: user %s, ticketName %s, description %s, startTime %s',
-      user, ticketName, description, startTime);
+
+  var initiateMitigation = function initiateMitigation(ipData, user, tg, ticketName, description, startTime) {
+    console.log('Initiating mitigation: user %s, tg %s, ticketName %s, description %s, startTime %s',
+      user, tg, ticketName, description, startTime);
+    // console.log('ipData', ipData);
     // var ipData = fs.readFileSync(ipPath, {encoding: 'utf-8'});
     var ticketConfig = {
       creator: user,
       type: 'mitigation',
       name: ticketName,
-      description: description
+      description: description,
+      open: true,
+      private: false,
+      tg: tg
     };
     var ticket = Ticket.ticketFactory(ticketConfig);
     var binnedIps;
@@ -160,7 +183,7 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
     var users = [];
 
     if (startTime === undefined) {
-      starTime = dimsUtils.createTimestamp();
+      startTime = dimsUtils.createTimestamp();
       console.log('initiateMitigation: time is undefined - using current time: ', startTime);
     }
 
@@ -340,12 +363,12 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
   // Maybe should re-work promises so that null or undefined user is not
   // even submitted and an empty array is returned
   var getUserIps = function getUserIps(ticketKey, user) {
-    console.log('getUserIps ', ticketKey, user);
+    // console.log('getUserIps ', ticketKey, user);
     return mapTopicKeys(ticketKey)
     .then(function (reply) {
       var mappedKeys = reply;
       // console.log('getUserIps ', mappedKeys);
-      console.log('getUserIps key is ', mappedKeys[user]);
+      // console.log('getUserIps key is ', mappedKeys[user]);
       return store.listItems(mappedKeys[user]);
     })
     .then(function (reply) {

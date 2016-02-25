@@ -31,13 +31,15 @@ var user2 = 'fred';
 var expectedFactory = {
   'bob' : {
     'cidr': [],
-    'domain': []
+    'domain': [],
+    'tlp': []
   }
 };
 var expectedEmpty = {
   'bob': {
     'cidr': [],
-    'domain': []
+    'domain': [],
+    'tlp': []
   }
 };
 var newAttributes1 = {

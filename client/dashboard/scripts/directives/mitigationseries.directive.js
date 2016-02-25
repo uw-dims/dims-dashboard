@@ -10,7 +10,8 @@
       link: linkFunc,
       scope: {
         options: '=',
-        data: '='
+        data: '=',
+        num: '='
       }
     };
 
@@ -29,37 +30,40 @@
         $log.debug('mitigationseries.directive init triggered');
         vm.graphOptions = angular.copy($scope.options);
         vm.input = angular.copy($scope.data);
+        vm.chartID = 'chart' + angular.copy($scope.num);
+        $log.debug('chartID is ', vm.chartID);
         vm.initialNum = vm.input.metadata.initialNum;
         vm.knownNum = vm.input.metadata.knownNum;
-        vm.trendPoints = vm.input.trendPoints;
+        vm.trendPointsKnown = vm.input.trendPointsKnown;
+        vm.trendPointsAll = vm.input.trendPointsAll;
         $log.debug('graphOptions', vm.graphOptions);
 
         vm.graphData = [];
 
         vm.graphData.push({
-          values: vm.input.data,
-          key: vm.graphOptions.keyAll,
-          yAxis: 2,
-          type: 'line'
-        });
-        vm.graphData.push({
-          values: vm.trendPoints,
-          key: 'Trend for ' + vm.graphOptions.keyAll,
-          yAxis: 2,
-          type: 'line'
-        });
-        vm.graphData.push({
-          values: vm.input.data,
+          values: vm.input.data.known,
           key: vm.graphOptions.keyKnown,
-          yAxis: 1,
+          yAxis: 2,
           type: 'line'
         });
         vm.graphData.push({
-          values: vm.trendPoints,
+          values: vm.trendPointsKnown,
           key: 'Trend for ' + vm.graphOptions.keyKnown,
+          yAxis: 2,
+          type: 'line'
+        });
+        vm.graphData.push({
+          values: vm.input.data.all,
+          key: vm.graphOptions.keyAll,
           yAxis: 1,
           type: 'line'
         });
+        // vm.graphData.push({
+        //   values: vm.trendPointsAll,
+        //   key: 'Trend for ' + vm.graphOptions.keyAll,
+        //   yAxis: 1,
+        //   type: 'line'
+        // });
 
         vm.update();
 
@@ -109,9 +113,8 @@
         // chart.yDomain1([0, vm.graphOptions.initialNum]);
         // chart.yDomain2([0, vm.graphOptions.initialNum - vm.graphOptions.unknownNum]);
 
-        // Start with 0
-        chart.yDomain2([vm.initialNum, 0]);
-        chart.yDomain1([vm.knownNum, 0]);
+        chart.yDomain1([0, vm.initialNum]);
+        chart.yDomain2([0, vm.knownNum]);
 
         chart.xAxis
           .tickFormat(vm.xAxisTickFormatFunction())
@@ -125,12 +128,12 @@
         chart.yAxis1
           .tickFormat(vm.yAxisTickFormatFunction())
           .tickPadding(8)
-          .axisLabel(vm.graphOptions.yLabelKnown);
+          .axisLabel(vm.graphOptions.yLabelAll);
 
         chart.yAxis2
           .tickFormat(vm.yAxisTickFormatFunction())
           .tickPadding(8)
-          .axisLabel(vm.graphOptions.yLabelAll);
+          .axisLabel(vm.graphOptions.yLabelKnown);
 
         d3.select('#chart svg')
           .append('text')
@@ -139,7 +142,7 @@
           .attr('text-anchor', 'middle')
           .text(vm.graphOptions.graphTitle);
 
-        chartData = d3.select('#chart svg')
+        chartData = d3.select('#' + vm.chartID + ' svg')
           .datum(vm.graphData);
         chartData
           .call(chart);

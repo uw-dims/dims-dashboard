@@ -1,49 +1,115 @@
-<div class="container">
-    <div class="row">
-        <div class="col-md-4 col-md-offset-4">
-            
-            <div class="account-wall">
-            <h1 class="text-center login-title">
-                Sign in to continue to DIMS Dashboard
-            </h1>
-            <p class="text-center text-info">Use your ops-trust username and password</p>
-                <form class="form-signin"
-                      name="form"
-                      ng-submit="login(form)"
-                      >
-                    <div class="form-group" show-errors >
-                        <input type="text"
-                               class="form-control"
-                               placeholder="Username"
-                               name="username"
-                               ng-model="user.username"
-                               required
-                               autofocus
-                               >
-                    </div>
-                    <!-- <div class="has-error">
-                    <span class="help-block" ng-show="form.username.$error.required && !form.username.$pristine ">
-      Username is required</span></div> -->
+<div class="container" style="background-image: url(images/default/dims-graph.png);
+    background-repeat: no-repeat; background-position: 40% 80%; background-size: 42%">    
+  <div id="loginbox" style="margin-top:40px; margin-bottom:30px;" class="mainbox col-sm-4">                    
+      <div class="panel panel-info" >
+          <div class="panel-heading">
+              <div class="panel-title">Sign In</div>
+          </div>     
 
-                    <div class="form-group" show-errors>
-                        <input type="password"
-                               class="form-control"
-                               placeholder="Password"
-                               name="password"
-                               ng-model="user.password"
-                               required
-                                >  
-                    </div>
-                    <div class="form-group has-error">
+          <div class="panel-body" style="padding:25px;">
+
+          <div class="row">
+          <div class="col-sm-4">
+          <!-- <button class="btn btn-danger btn-block"><a href="/auth/google" target="_self" style="color:white;">Google</a></button> -->
+          <a href="/auth/google" target="_self" class="btn btn-danger btn-block" role="button">Google</a> 
+          </div><div class="col-sm-8" style="color:#999">Sign in with Google
+
+          </div>
+          </div>
+          <div class="row" ng-if="showErrorHtml">
+          <div class="col-sm-12" style="font-size:80%; color:red; margin-top:10px;">
+          <div ng-bind-html="errorHtml"></div>
+          </div>
+          </div>
+          <div class="row">
+          <div class="col-sm-12" style="margin-bottom: 25px;margin-top:30px;">
+          <hr style="background-color:#cdcdcd;
+            height: 1px;
+            margin-top: 0px;
+            margin-bottom: 0px;" >
+          <span style="display: block;
+            position:absolute;
+            left: 50%;
+            top: -0.6em;
+            margin-left: -1.5em;
+            background-color: white;
+            color: #999;
+            width: 3em;
+            text-align: center;">or</span>
+
+          </div>
+          </div>
+                  
+              <form id="loginform" name="form" class="form-horizontal" role="form" ng-submit="login(form)" >
+
+              <div class="form-group">
+                  <div class="col-sm-12 control" style="color:#999; font-size: 90%;">
+                  Use your Trident login credentials
+                  </div>
+                  </div>
+
+
+                  <div class="form-group" style="padding:10px;" show-errors >
+                  <div class="input-group">
+                      <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                      <input type="text" 
+                      class="form-control" 
+                      name="username" 
+                      ng-model="user.username" 
+                      placeholder="Username"
+                      required
+                      >                                        
+                  </div></div>
+
+                  <div class="form-group" style="padding-left:10px; padding-right:10px;" show-errors > 
+                  <div class="input-group" >
+                      <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                      <input id="login-password" type="password"
+                        class="form-control" 
+                        name="password" 
+                        placeholder="Password"
+                        ng-model="user.password"
+                        required >
+                  </div>
+                  </div>
+                          
+                  <div class="form-group has-error" style="padding-left:10px;">
                         <p class="help-block">{{ error }}</p>
                     </div>
+                  
+                    <div class="form-group">
+                      <div class="col-sm-4">
+                          <!-- Button -->
 
-                    <button class="btn btn-lg btn-primary btn-block" type="submit" ng-disabled="isUnchanged(user)"> Sign in </button>
+                          <!-- <div class="col-sm-12 controls">
+                            <a id="btn-login" href="#" class="btn btn-success" ng-disabled="isUnchanged(user)">Login  </a>
+                          </div> -->
+                          <button class="btn btn-success btn-block" type="submit" ng-disabled="isUnchanged(user)"> Sign in </button>
+                      </div>
+                      </div>
 
-                    <span class="clearfix"></span>
-                </form>
-            </div>
-            
-        </div>
-    </div>
-</div>
+                      <div class="form-group">
+                          <div class="col-sm-12 control">
+                              <div style="border-top: 1px solid#ccc; margin-top: 15px; padding-top:10px; font-size:85%; color:#666;" >
+                                  Don't have an account? 
+                              <span style="cursor:pointer;">
+                                  Request one here.
+                              </span>
+                              </div>
+                          </div>
+                      </div>    
+                  </form>     
+
+
+
+              </div>                     
+    </div>  
+
+  </div>
+  <div style="margin-top:50px; margin-bottom:30px;" class="col-sm-8">
+  <div style="margin-left:20px;">
+  <h3>University of Washington</h3>
+  <h1>Distributed Incident Management System</h1>
+  </div>
+  </div>
+  </div>

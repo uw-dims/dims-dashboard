@@ -19,26 +19,47 @@
 
   var MitigationService = function (MitigationApi, $log, $q, $modal) {
 
-    // var parseData = function parseData(data) {
-    //   var newArray = [];
-    //   _.forEach(data, function (value, index) {
-    //     newArray.push(_.parseInt(value));
-    //   });
-    //   return newArray;
-    // };
+    var formatData = function formatData(ticketData) {
+      console.log('formatData data', ticketData);
+      var result = {
+        known: [],
+        all: []
+      };
+      var raw = {
+        known: [],
+        all: []
+      };
+      var trendlineKnown,
+          trendlineAll;
 
-    // Formats data
-    var formatData = function formatData(data) {
-      console.log('formatData data', data);
-      var result = [];
-      // var chunked = _.chunk(data, 2);
-      // _.forEach(chunked, function (value, index) {
-      _.forEach(data, function (value, index) {
-        result.push({
-          x: _.parseInt(value[0]),
-          y: _.parseInt(value[1])
+      // Since trends are based on last time mitigations were made, 
+      // which could be in the past, add a point for the time at
+      // which this graph is being displayed - so we have the total
+      // for today
+
+      // knownX.push(new Date().getTime());
+      // knownY.push(data[data.length - 1][1]);
+
+      // ticketData.data.push([new Date().getTime(), ticketData.data[ticketData.data.length - 1][1]]);
+
+      _.forEach(ticketData.data, function (value, index) {
+        var x = value[0];
+        var yAll = ticketData.metadata.initialNum - value[1];
+        var yKnown = ticketData.metadata.knownNum - value[1];
+        result.known.push({
+          x: x,
+          y: yKnown
         });
+        result.all.push({
+          x: x,
+          y: yAll
+        });
+        raw.known.push([x, yKnown]);
+        raw.all.push([x, yAll]);
       });
+
+      result.trendKnown = getTrendline(raw.known);
+      result.trendAll = getTrendline(raw.all);
       return result;
     };
 
@@ -50,6 +71,10 @@
         knownX.push(value[0]);
         knownY.push(value[1]);
       });
+      // Get point for current time or our results will be skewed for
+      // data that hasn't changed
+      knownX.push(new Date().getTime());
+      knownY.push(data[data.length - 1][1]);
       console.log('knownX', knownX);
       console.log('knownY', knownY);
       return linearRegression(knownY, knownX);
@@ -65,8 +90,15 @@
 
     var parseTicket = function parseTicket(ticketData) {
       var item = _.extend({}, ticketData);
-      item.data = formatData(ticketData.data);
-      item.trendline = getTrendline(ticketData.data);
+      // item.data = formatData(ticketData.data);
+      item.data = formatData(ticketData);
+      // {
+      //     known: [],
+      //     all: [],
+      //     trendKnown: object,
+      //     trendAll: object
+     // }
+      // item.trendline = getTrendline(ticketData.data);
       $log.debug('mitigationService.parseTicket. item is ', item);
       return item;
     };
@@ -94,11 +126,12 @@
     };
 
     var mitigationService = {
-      getMitigations: function () {
+      getMitigations: function (tg) {
         $log.debug('MitigationService.getMitigation');
         var deferred = $q.defer();
         MitigationApi.get({
-          type: 'mitigation'
+          type: 'mitigation',
+          tg: tg
         },
           function (resource) {
             var result = parseList(resource.data.mitigations);
@@ -124,6 +157,28 @@
         },
         function (err) {
           $log.debug('MitigationService.getMitigation error callback', err);
+          deferred.reject(err);
+        });
+        return deferred.promise;
+      },
+
+      create: function (ips, name, description, tg) {
+        var deferred = $q.defer();
+        $log.debug('mitigation create ips', ips);
+        MitigationApi.save({},
+          {
+            type: 'mitigation',
+            name: name,
+            description: description,
+            tg: tg,
+            content: ips
+          },
+        function (resource) {
+          $log.debug('MitigationService.create success ', resource);
+          deferred.resolve(resource);
+        },
+        function (err) {
+          $log.debug('MitigationService.create error callback', err);
           deferred.reject(err);
         });
         return deferred.promise;

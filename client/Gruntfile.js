@@ -36,7 +36,7 @@ module.exports = function (grunt) {
   // Defaults:
 
   var publicHost = process.env.DASHBOARD_PUBLIC_HOST || 'localhost';
-  var publicPort = process.env.DASHBOARD_PUBLIC_PORT || '3000';
+  var publicPort = process.env.DASHBOARD_PUBLIC_PORT || '80';
   var publicProtocol = process.env.DASHBOARD_PUBLIC_PROTOCOL || 'http';
 
   console.log('Grunt build with publicHost=' + publicHost + ', publicPort=' + publicPort + ', publicProtocol=' + publicProtocol);

@@ -19,9 +19,6 @@ module.exports = function (tools) {
 
     var rpcQueuebase = config.rpcQueueNames.crosscor,
         rpcClientApp = 'crosscor_client',
-        // debug = process.env.NODE_ENV === 'development' ? '--debug' : (req.query.debug === 'true' ? '--debug' : ''),
-        // verbose = process.env.NODE_ENV === 'development' ? '--verbose' : (req.query.verbose === 'true' ? '--verbose' : '');
-
         inputArray = [config.rpcbin + rpcClientApp, '--server', config.rpcServer,
             '--queue-base', rpcQueuebase];
     if (req.query.debug === 'true') {

@@ -6,21 +6,27 @@ var config = {};
 
 config.appName = 'dims-dashboard';
 
+config.publicHost = process.env.DASHBOARD_PUBLIC_HOST || 'localhost';
+
+config.publicPort = process.env.DASHBOARD_PUBLIC_PORT || '80';
+
 config.uuid = uuid.v4();
 
-config.sslOn = process.env.SSL_ON || false;
+config.publicProtocol = process.env.DASHBOARD_PUBLIC_PROTOCOL || 'http';
 
-config.port = process.env.PORT || 3000;
+config.sslOn = config.publicProtocol === 'https' ? true : false;
 
-config.sslport = process.env.SSL_PORT || 3030;
+config.publicOrigin = (config.publicPort === '80') ? config.publicProtocol + '://' + config.publicHost
+  : config.publicProtocol + '://' + config.publicHost + ':' + config.publicPort;
 
-config.env = process.env.NODE_ENV || 'development';
+config.port = process.env.DASHBOARD_PORT || 3000;
 
-config.logLevel = process.env.LOG_LEVEL || 'debug';
+config.env = process.env.DASHBOARD_NODE_ENV || 'development';
 
-config.logDir = process.env.LOG_PATH || '/data/dashboard/logs/';
+config.envLogLevel = config.env === 'development' ? 'debug' : 'info';
 
-config.logFile = config.logDir + 'dashboard.log';
+// Can use this to override log level defined by environment
+config.logLevel = process.env.DASHBOARD_LOG_LEVEL || config.envLogLevel;
 
 config.healthInterval = 1;
 
@@ -43,39 +49,55 @@ config.userDBHost = process.env.USER_DB_HOST || 'localhost';
 config.userDBUser = process.env.USER_DB_USER || 'dims';
 config.userDatabase = process.env.USER_DATABASE || 'ops-trust';
 
-// During development - specify user backend.
-// Possible values:
-//   'postgresql' - use postgresql database
-//   'static'  - use static config variable with users/passwords - only for
-//       development/testing
-//   others... tba
-config.POSTGRESQL = 'postgresql';
-config.STATIC = 'static';
+config.sessionTTL = 2 * 60 * 60; //Redis session expiration. 2 hours, in seconds
 
-// Set environment USER_BACKEND to 'static' to use test users for testing
-// rather than a postgres instance
-// Default is Postgresqll
-config.userSource = process.env.USER_BACKEND || config.POSTGRESQL;
+config.tokenTTL = config.sessionTTL;
 
-// Put this here for now - only for testing without database
-config.testUsers =
-  [
-    {
-      'ident': 'testuser1',
-      'descr': 'Test User 1',
-      'password': 'testuser1'
-    }, {
-      'ident': 'testuser2',
-      'descr': 'Test User 2',
-      'password': 'testuser2'
-    }, {
-      'ident': 'testuser3',
-      'descr': 'Test User 3',
-      'password': 'testuser3'
-    }
-  ];
+// Passport vars and configs
+config.tokenSecret = process.env.TOKEN_SECRET || 'djf83UhNH35CDjfjEFM3B9e01viY8fNqz3YXpb25wc0U';
+config.tokenAlgorithm = 'HS256';
+// Result is seconds
+config.tokenIssuer = process.env.DASHBOARD_PUBLIC_HOST || require('os').hostname();
+config.localStrategyConfig = {
+  usernameField: 'username',
+  passwordField: 'password',
+  passReqToCallback: false
+};
 
-config.sessionTTL = 7200; //Redis session expiration. 2 hours, in seconds
+config.jwtStrategyConfig = {
+  secretOrKey: config.tokenSecret,
+  passReqToCallback: false
+};
+
+config.googleClientId = process.env.GOOGLE_CLIENT_ID;
+config.googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
+config.googleURL = '/auth/google';
+config.googleCallback = '/auth/google/callback';
+config.googleCallbackURL = config.publicOrigin + config.googleCallback;
+config.googleConnectURL = '/connect/google';
+config.googleConnectCallback = '/connect/google/callback';
+config.googleConnectCallbackURL = config.publicOrigin + config.googleConnectCallback;
+
+config.googleStrategyConfig = {
+  clientID: config.googleClientId,
+  clientSecret: config.googleClientSecret,
+  callbackURL: config.googleCallbackURL,
+  passReqToCallback: true
+};
+
+config.googleAuthzStrategyConfig = {
+  clientID: config.googleClientId,
+  clientSecret: config.googleClientSecret,
+  callbackURL: config.googleConnectCallbackURL,
+  passReqToCallback: true
+};
+
+// config.googleJwtConfig = {
+//   clientID: config.googleClientId,
+//   clientSecret: config.googleClientSecret
+// };
+
+
 
 config.sessionSecret = '3xueis763$%STID47373deC!!QUsT8J4$';
 
@@ -95,16 +117,11 @@ config.rpcServer = process.env.RABBITMQ_HOST || 'rabbitmq.prisem.washington.edu'
 
 config.rpcUser = process.env.RABBITMQ_DEFAULT_USER || 'rpc_user';
 
-config.rpcPass = process.env.RABBITMQ_DEFAULT_PASS || 'rpcm3pwd';
+config.rpcPass = process.env.RABBITMQ_DEFAULT_USER_PASS || 'rpcm3pwd';
 
 config.rpcPort = process.env.RABBITMQ_PORT  || '5672';
 
 config.mapfile = '/etc/ipgrep_networks.txt';
-
-// not used
-//config.inputdir = '/opt/dims/srv/input';
-// not used
-//config.outputdir = '/opt/dims/srv/output';
 
 config.data = '/opt/dims/data/dims-sample-data/';
 
@@ -148,7 +165,12 @@ config.defaultUserSettings = {
 };
 
 // The attributes we are tracking
-config.defaultAttributes = ['cidr', 'domain'];
+config.defaultAttributes = ['cidr', 'domain', 'tlp'];
+config.tlpValues = {
+  'red': 'red',
+  'green': 'green',
+  'amber': 'amber'
+};
 
 config.defaultRedisTypes = {
   'hash': 'hash',
@@ -156,10 +178,6 @@ config.defaultRedisTypes = {
   'set': 'set',
   'sortedSet': 'zset'
 };
-
-// config.keyPrefixes = {
-//   'userSettings': 'userSetting'
-// };
 
 config.maxUploadFileNum = 10;
 config.maxUploadFileSize = 39273942;

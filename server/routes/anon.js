@@ -77,8 +77,8 @@ module.exports = function (UserSettings, anonService) {
     // var rpcQueuebase = config.rpcQueueNames['anon'],
     //   rpcClientApp = 'anon_client',
     //   ipgrepApp = 'ipgrep';
-      // debug = process.env.NODE_ENV === 'development' ? '--debug' : (req.query.debug === 'true' ? '--debug' : ''),
-      // verbose = process.env.NODE_ENV === 'development' ? '--verbose' : (req.query.verbose === 'true' ? '--verbose' : '');
+      // debug = config.env === 'development' ? '--debug' : (req.query.debug === 'true' ? '--debug' : ''),
+      // verbose = config.env === 'development' ? '--verbose' : (req.query.verbose === 'true' ? '--verbose' : '');
 
 
 

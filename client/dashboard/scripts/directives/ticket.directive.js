@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  function ticket(TicketService, $log) {
+  function ticket(TicketService, $log, $rootScope) {
     var directive = {
       restrict: 'AEC',
       templateUrl: 'views/partials/ticket.html',
@@ -9,6 +9,7 @@
       controllerAs: 'vm',
       link: linkFunc,
       scope: {
+        data: '='
       }
     };
 
@@ -16,17 +17,29 @@
 
     function linkFunc(scope, el, attr, ctrl) {
       // Don't need this yet
-      $log.debug('ticket.directive link function');
     }
 
     function controllerFunc($scope) {
       var vm = this;
+      vm.data = angular.copy($scope.data);
 
-      TicketService.getTickets()
-      .then(function (reply) {
-        console.log('reply from getTickets');
-        vm.result = reply;
-      });
+      $log.debug('ticket directive controller data is ', vm.data);
+
+      vm.addTopic = function addTopic(ticketKey) {
+        $log.debug('addTopic key is ', ticketKey);
+      };
+
+      vm.viewTopic = function viewTopic(topicKey) {
+        $log.debug('viewTopic key is ', topicKey);
+      };
+
+      vm.showDelete = function showDelete() {
+        return $rootScope.currentUser.isSysadmin;
+      };
+
+      vm.deleteTicket = function deleteTicket(ticketKey) {
+        $log.debug('deleteTicket key is ', ticketKey);
+      };
 
     }
 
@@ -36,6 +49,6 @@
     .module('dimsDashboard.directives')
     .directive('ticket', ticket);
 
-  ticket.$inject = ['TicketService', '$log'];
+  ticket.$inject = ['TicketService', '$log', '$rootScope'];
 
 }());

@@ -13,6 +13,7 @@ module.exports = function (Attributes) {
   var attributesToFile = function attributesToFile() {
     return Attributes.getAllAttributes()
     .then(function (reply) {
+      console.log(reply);
       var yamlDoc = yaml.safeDump(reply, {
         flowLevel: 2
       });

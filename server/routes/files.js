@@ -28,7 +28,7 @@ module.exports = function () {
     var filename,
         tempPath,
         data = {},
-        extensionAllowed = ['.txt', '.json', '.log', '.yml'],
+        extensionAllowed = ['.txt', '.json', '.log', '.yml', '.xml'],
         maxSizeOfFile = config.maxUploadFileSize,
         // myDirectory = './mydata/',
         // targetPath = './upload/',

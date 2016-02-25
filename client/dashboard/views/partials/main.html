@@ -8,50 +8,56 @@
 <div class="container main">
 <h1>{{title}}</h1>
 
-<!-- <div class="row">
-<div class="col-sm-8">
-<button type="button" class="btn btn-default" ng-click="source()">SOURCE</button>
-<button type="button" class="btn btn-default" ng-click="query()">QUERY</button>
-<button type="button" class="btn btn-default" ng-click="reset()">RESET</button>
-<button type="button" class="btn btn-default" ng-click="source()">SAVE</button>
-</div>
-<div class="col-sm-4"></div>
-</div> -->
-
 <div class="row">
 <div class="col-sm-2">
+<div class="row">
+<div class="col-sm-12">
+<div class="panel panel-success" style="margin-bottom:10px;">
+  <div class="panel-heading">
+    <p style="margin-bottom: 0px;">Status summary <i class="fa fa-circle" style="color: green; float:right; margin-top:3px;"></i> </p>
+  </div>
+</div>
+
+<h3>External sites</h3>
+</div></div>
 <external-sites></external-sites>
 
-<!-- <div class="panel panel-default"><div class="panel-body">
-<h2>System Status</h2>
-<p><a ng-click="vm.openSite('consul')" style="cursor: pointer;">Open Consul View</a></p>
-<p>Dashboard <i class="fa fa-circle " style="color: green; float: right;"></i> </p>
-<p>DB: Postgresql <i class="fa fa-circle" style="color: green; float: right;"></i> </p>
-<p>DB: Redis <i class="fa fa-circle " style="color: green; float: right;"></i> </p>
-<p>DB: Elasticsearch <i class="fa fa-circle " style="color: red; float: right;"></i> </p>
-<p>Trident <i class="fa fa-circle " style="color: green; float: right;"></i> </p>
-<p>Message Broker<i class="fa fa-circle " style="color: green; float: right;"></i> </p>
-<p>CIF<i class="fa fa-circle " style="color: yellow; float: right;"></i> </p>
-</div>
-</div> -->
-
 </div>
 <div class="col-sm-8">
 
-<mitigations></mitigations>
-
-<div class="row">
-<div class="panel panel-default"><div class="panel-body"><div tooltip="Activities you created or are subscribed to" tooltip-append-to-body="true" tooltip-placement="right">
-<h2 >Watched activities</h2></div>
-<ticketlist></ticketlist>
-</div></div></div>
-
+<div ng-if="vm.panels.mitigation.active">
+  <mitigations></mitigations>
 </div>
+<div ng-if="vm.panels.datacenter.active">
+  <datacenter></datacenter>
+</div>
+<div ng-if="vm.panels.activities.active">
+  <ticketlist></ticketlist>
+</div>
+</div>
+
+
 <div class="col-sm-2">
+
+<div class="row"><div class="col-sm-12">
+<h3 style="margin-bottom: 15px;">Display</h3>
+<div class="list-group">
+  <button type="button" class="list-group-item list-group-item-success" ng-click="vm.toggleDisplay('mitigation')"><span class="badge">{{vm.panels.mitigation.label}}</span>Remediations</button>
+  
+  <button type="button" class="list-group-item list-group-item-warning" ng-click="vm.toggleDisplay('datacenter')"><span class="badge">{{vm.panels.datacenter.label}}</span>Data center</button>
+  <button type="button" class="list-group-item list-group-item-success" ng-click="vm.toggleDisplay('activities')"><span class="badge">{{vm.panels.activities.label}}</span>Activities</button>
+  <button type="button" class="list-group-item list-group-item-warning" ng-click="vm.toggleDisplay('notifications')"><span class="badge">{{vm.panels.notifications.label}}</span>Notifications</button>
+</div>
+</div></div>
+
+<div ng-if="vm.panels.notifications.active">
 <div class="panel panel-default"><div class="panel-body">
 <h2 tooltip="Latest notifications will display here" tooltip-append-to-body="true" tooltip-placement="right">Notifications</h2>
 
-</div></div>
+</div></div></div>
+
+
+
 </div>
 </div>
 </div>

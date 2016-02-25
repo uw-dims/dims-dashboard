@@ -9,9 +9,10 @@ var express = require('express')
  // , cookieSession = require('cookie-session')
   , json = require('express-json')
   , cookieParser = require('cookie-parser')
- // , favicon = require('serve-favicon')
+  , favicon = require('serve-favicon')
   , errorHandler = require('errorhandler')
   , methodOverride = require('method-override')
+  , multer = require('multer')
   , http = require('http')
   , https = require('https')
   , fs = require('fs')
@@ -21,12 +22,15 @@ var express = require('express')
   , socket = require('socket.io')
   //, flash = require('connect-flash')
   , passport = require('passport')
-  , LocalStrategy = require('passport-local').Strategy;
+  , LocalStrategy = require('passport-local').Strategy
+  , JwtStrategy = require('passport-jwt').Strategy
+  , GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+  // , cors = require('cors')
 
 // routes
 var routes = require('./routes');
 
-// Dependency injection container
+// Dependency injection
 var diContainer = require('./services/diContainer')();
 diContainer.register('client', require('./utils/redisDB'));
 diContainer.factory('db', require('./utils/redisProxy'));
@@ -35,8 +39,6 @@ diContainer.factory('UserSettings', require('./models/userSettings'));
 diContainer.factory('Ticket', require('./models/ticket'));
 diContainer.factory('UserModel', require('./models/user'));
 diContainer.factory('Attributes', require('./models/attributes'));
-diContainer.factory('passportPostgres', require('./services/passportPostgres'));
-diContainer.factory('passportStatic', require('./services/passportStatic'));
 diContainer.factory('FileData', require('./models/fileData'));
 diContainer.factory('tools', require('./services/tools'));
 diContainer.factory('Notification', require('./models/notification'));
@@ -62,10 +64,17 @@ diContainer.factory('store', require('./models/store'));
 diContainer.factory('Topic', require('./models/topic'));
 diContainer.factory('attributeService', require('./services/attributes'));
 diContainer.factory('userService', require('./services/user'));
+diContainer.factory('auth', require('./services/authentication'));
+diContainer.factory('access', require('./services/authorization'));
+diContainer.factory('authAccount', require('./models/authAccount'));
+diContainer.factory('accountRoute', require('./routes/account'));
+diContainer.factory('stixRoute', require('./routes/stix'));
+diContainer.factory('stixService', require('./services/stix'));
+diContainer.factory('tupeloRoute', require('./routes/tupelo'));
+diContainer.factory('tupeloService', require('./services/tupelo'));
+diContainer.factory('amqpClient', require('./services/amqpClient'));
 
-// diContainer.factory('ticketService', require('./services/ticket'));
-
-// These are used here
+// These are used here in app.js
 var sessionRoute = diContainer.get('sessionRoute');
 var settingsRoute = diContainer.get('settingsRoute');
 var ticketRoute = diContainer.get('ticketRoute');
@@ -76,13 +85,25 @@ var filesRoute = diContainer.get('filesRoute');
 var rwfindRoute = diContainer.get('rwfindRoute');
 var crosscorRoute = diContainer.get('crosscorRoute');
 var dataRoute = diContainer.get('dataRoute');
-var passportPostgres = diContainer.get('passportPostgres');
-var passportStatic = diContainer.get('passportStatic');
+var auth = diContainer.get('auth');
 var userRoute = diContainer.get('userRoute');
 var attributeRoute = diContainer.get('attributeRoute');
 var lmsearchRoute = diContainer.get('lmsearchRoute');
+var accountRoute = diContainer.get('accountRoute');
+var stixRoute = diContainer.get('stixRoute');
+var tupeloRoute = diContainer.get('tupeloRoute');
+
+// var userService = diContainer.get('userService');
+// var authAccount = diContainer.get('authAccount');
 
 var app = module.exports = express();
+
+// var corsOptions = {
+//   origin: true,
+//   credentials: true
+// };
+// console.log('corsOptions', corsOptions);
+// app.use(cors(corsOptions));
 
 app.engine('html', require('ejs').renderFile);
 
@@ -99,6 +120,7 @@ app.use(bodyParser.urlencoded({
   limit: '50mb'
 }));
 app.use(bodyParser.json());
+
 // Custom validators:
 // isArray - check that the value is an array
 // isValidtype - check that the value is contained in an array
@@ -113,6 +135,7 @@ app.use(expressValidator({
     }
   }
 }));
+// Currently not used
 //app.use(flash());
 
 // Cookies and session
@@ -140,6 +163,7 @@ app.use(session({
 if (config.env === 'development' || config.env === 'test') {
   app.set('views', path.join(__dirname, '../client/dashboard'));
   app.use(errorHandler());
+  app.use(favicon(path.join(__dirname, '../client/dashboard/images/default/UW-logo-16x16.ico')));
   app.use(express.static(path.join(__dirname, '../client')));
   app.use(express.static(path.join(__dirname, '.tmp')));
   app.use(express.static(path.join(__dirname, '../client/dashboard')));
@@ -167,115 +191,130 @@ if (config.env === 'production') {
   });
 }
 
-// Set app to use Passport depending on user backend
-if (config.userSource === config.POSTGRESQL) {
-  passport.serializeUser(passportPostgres.serialize);
-  passport.deserializeUser(passportPostgres.deserialize);
-  passport.use(new LocalStrategy({
-    usernameField: 'username',
-    passwordField: 'password'
-  }, passportPostgres.strategy));
-} else {
-  passport.serializeUser(passportStatic.serialize);
-  passport.deserializeUser(passportStatic.deserialize);
-  passport.use(new LocalStrategy({
-    usernameField: 'username',
-    passwordField: 'password'
-  }, passportStatic.strategy));
-}
+// Set up passport
+passport.use(
+  new LocalStrategy(config.localStrategyConfig, auth.localStrategyVerify));
+passport.use(
+  new JwtStrategy(config.jwtStrategyConfig, auth.jwtStrategyVerify));
+passport.use(
+  new GoogleStrategy(config.googleStrategyConfig, auth.googleStrategyVerify));
+// Override default strategy name to use for authorization (connect);
+passport.use('google-authz',
+  new GoogleStrategy(config.googleAuthzStrategyConfig, auth.googleConnectVerify));
+
+// We're using sessions as well as token. Need session so we can access logged in
+// user when connecting to a social auth account like Google
+passport.serializeUser(auth.serialize);
+passport.deserializeUser(auth.deserialize);
+
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Middleware to be used for every secured route
-var ensureAuthenticated = function (req, res, next) {
-  if (!req.isAuthenticated()) {
-    res.set('Content-Type', 'text/html');
-    res.status(401).send('<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=/"></head></html>');
-  } else {
-    return next();
-  }
-};
-
+// Set up routes
 var router = express.Router();
-router.post('/upload', ensureAuthenticated, filesRoute.upload);
-router.get('/files', ensureAuthenticated, filesRoute.files);
-router.get('/cifbulk', ensureAuthenticated, cifbulkRoute.list);
-router.get('/crosscor', ensureAuthenticated, crosscorRoute.list);
-router.post('/anon', ensureAuthenticated, anonRoute.anonymize);
-router.get('/rwfind', ensureAuthenticated, rwfindRoute.list);
-router.get('/data', ensureAuthenticated, dataRoute.list);
+router.post('/upload', auth.ensureAuthenticated, filesRoute.upload);
+router.get('/files', auth.ensureAuthenticated, filesRoute.files);
+router.get('/cifbulk', auth.ensureAuthenticated, cifbulkRoute.list);
+router.get('/crosscor', auth.ensureAuthenticated, crosscorRoute.list);
+router.post('/anon', auth.ensureAuthenticated, anonRoute.anonymize);
+router.get('/rwfind', auth.ensureAuthenticated, rwfindRoute.list);
+router.get('/data', auth.ensureAuthenticated, dataRoute.list);
 
-router.get('/api/lmsearch', lmsearchRoute.list);
+router.get('/api/lmsearch', auth.ensureAuthenticated, lmsearchRoute.list);
 
 // User Settings api
-router.get('/settings', ensureAuthenticated, settingsRoute.get);
-router.post('/settings', ensureAuthenticated, settingsRoute.update);
+router.get('/settings', auth.ensureAuthenticated, settingsRoute.get);
+router.post('/settings', auth.ensureAuthenticated, settingsRoute.update);
 
-// Get all attributes of all users - not implemented - do we need this?
-// router.get('/api/attributes', attributeRoute.list);
-router.get('/api/attributes', attributeRoute.list);
-router.get('/api/attributes/:id', attributeRoute.show);
-router.post('/api/attributes/:id', attributeRoute.update);
+router.get('/api/attributes', auth.ensureAuthenticated, attributeRoute.list);
+router.get('/api/attributes/:id', auth.ensureAuthenticated, attributeRoute.show);
+router.put('/api/attributes/:id', auth.ensureAuthenticated, attributeRoute.update);
 
 // Get all users
-router.get('/api/user', userRoute.list);
+router.get('/api/user', auth.ensureAuthenticated, userRoute.list);
 // Get one user
-router.get('/api/user/:id', userRoute.show);
+router.get('/api/user/:id', auth.ensureAuthenticated, userRoute.show);
 
 // Tickets
 // Get all tickets (ticket objects)
-router.get('/api/ticket', ticketRoute.list);
+router.get('/api/ticket', auth.ensureAuthenticated, ticketRoute.list);
 // Create a ticket
-router.post('/api/ticket', ticketRoute.create);
+router.post('/api/ticket', auth.ensureAuthenticated, ticketRoute.create);
 // Get one ticket (ticket object, ticket key, array of topic keys)
-router.get('/api/ticket/:id', ticketRoute.show);
+router.get('/api/ticket/:id', auth.ensureAuthenticated, ticketRoute.show);
 // Update one ticket
-router.put('/api/ticket/:id', ticketRoute.update);
+router.put('/api/ticket/:id', auth.ensureAuthenticated, ticketRoute.update);
 // Delete one ticket
-router.delete('/api/ticket/:id', ticketRoute.delete);
+router.delete('/api/ticket/:id', auth.ensureAuthenticated, ticketRoute.delete);
 // Add a new topic to a ticket
-router.post('/api/ticket/:id/topic', ticketRoute.addTopic);
+router.post('/api/ticket/:id/topic', auth.ensureAuthenticated, ticketRoute.addTopic);
 // Get one topic (ticket object, topic object, contents)
-router.get('/api/ticket/topic/:id', ticketRoute.showTopic);
+router.get('/api/ticket/topic/:id', auth.ensureAuthenticated, ticketRoute.showTopic);
 // Update one topic
-router.put('/api/ticket/topic/:id', ticketRoute.updateTopic);
+router.put('/api/ticket/topic/:id', auth.ensureAuthenticated, ticketRoute.updateTopic);
 // Delete a topic
-router.delete('/api/ticket/topic/:id', ticketRoute.deleteTopic);
+router.delete('/api/ticket/topic/:id', auth.ensureAuthenticated, ticketRoute.deleteTopic);
+
+var upload = multer({ dest: config.uploadPath});
+// Process stix
+router.post('/api/stix', auth.ensureAuthenticated, upload.any(), stixRoute.post);
+
+router.post('/api/tupelo', auth.ensureAuthenticated, tupeloRoute.post);
+
 
 // Get list of all files (global)
-router.get('/api/fileData', fileDataRoute.list);
+router.get('/api/fileData', auth.ensureAuthenticated, fileDataRoute.list);
 // Get list of all files for a user
-router.get('/api/fileData/user/:id', fileDataRoute.list);
+router.get('/api/fileData/user/:id', auth.ensureAuthenticated, fileDataRoute.list);
 // Get contents of a file
-router.get('/api/fileData/:path', fileDataRoute.show);
+router.get('/api/fileData/:path', auth.ensureAuthenticated, fileDataRoute.show);
 // Create new file (global)
-router.post('/api/fileData', fileDataRoute.create);
+router.post('/api/fileData', auth.ensureAuthenticated, fileDataRoute.create);
 // Update an existing file
-router.put('/api/fileData/:path', fileDataRoute.update);
+router.put('/api/fileData/:path', auth.ensureAuthenticated, fileDataRoute.update);
 // Delete a file
-router.delete('/api/fileData/:path', fileDataRoute.delete);
+router.delete('/api/fileData/:path', auth.ensureAuthenticated, fileDataRoute.delete);
 
-// authorization
-router.get('/auth/session', ensureAuthenticated, sessionRoute.session);
-router.post('/auth/session', sessionRoute.login);
+// Get session info for user making request
+router.get('/auth/session', auth.ensureAuthenticated, sessionRoute.session);
+// Handle user login with user/pass and send token
+router.post('/auth/session', sessionRoute.tokenLogin);
+// Handle user logout
 router.delete('/auth/session', sessionRoute.logout);
+// Route that handles social account inquiry for a user
+router.get('/auth/connect', auth.ensureAuthenticated, accountRoute.list);
+// Route that handles disconnection of a social account for a user
+router.delete('/auth/connect/:service', auth.ensureAuthenticated, accountRoute.delete);
 
-// user session - will delete
-// router.get('/session', ensureAuthenticated, require('./routes/usersession').session);
-router.get('/*', ensureAuthenticated, routes.index);
+// Redirect user to Google for authentication. When complete, Google will redirect
+// user back to this application at config.googleCallback
+router.get(config.googleURL, passport.authenticate(
+  'google',
+  {scope: ['https://www.googleapis.com/auth/userinfo.profile',
+           'https://www.googleapis.com/auth/userinfo.email']
+  }));
+
+// Route for google connect. Will redirect to Google for authentication.
+router.get(config.googleConnectURL, passport.authorize(
+  'google-authz',
+  {
+  scope: ['https://www.googleapis.com/auth/userinfo.profile',
+           'https://www.googleapis.com/auth/userinfo.email']}
+  ));
+
+// Route that handles google login callback
+router.get(config.googleCallback, sessionRoute.googleLogin);
+// Route that handles successful google login redirect
+router.get('/socialauth', routes.index);
+// Route that handles google connect callback
+router.get(config.googleConnectCallback,
+    passport.authorize('google-authz', {
+    failureRedirect: '/userinfo/settings'}), sessionRoute.googleConnect);
+
+router.get('/*', routes.index);
 
 app.use('/', router);
 
-// Handle cross-domain requests
-// NOTE: Uncomment this function to enable cross-domain request.
-/*
-  app.options('/upload', function (req, res){
-  console.log('OPTIONS');
-  res.send(true, {
-  'Access-Control-Allow-Origin': '*'
-  }, 200);
-  });
-*/
 var io,
     server,
     port,
@@ -313,14 +352,14 @@ if (require.main === module) {
     healthService.run();
     console.log('[+++] Finished running healthService');
     healthLogger.publish('dashboard initialized DIMS Dashboard running on port ' + server.address().port, config.healthID);
-      if (config.sslOn) {
-        healthLogger.publish('dashboard initialized SSL is on', config.healthID);
-      } else {
-        healthLogger.publish('dashboard initialized SSL is off', config.healthID);
-      }
-      healthLogger.publish('dashboard initialized Node environment: ' + config.env, config.healthID);
-      healthLogger.publish('dashboard initialized Log level: ' + config.logLevel, config.healthID);
-      healthLogger.publish('dashboard initialized userDB source: ' + config.userSource, config.healthID);
+    if (config.sslOn) {
+      healthLogger.publish('dashboard initialized SSL is on', config.healthID);
+    } else {
+      healthLogger.publish('dashboard initialized SSL is off', config.healthID);
+    }
+    healthLogger.publish('dashboard initialized Node environment: ' + config.env, config.healthID);
+    healthLogger.publish('dashboard initialized Log level: ' + config.logLevel, config.healthID);
+    healthLogger.publish('dashboard initialized userDB source: ' + config.userSource, config.healthID);
   });
 
   setTimeout(function () {

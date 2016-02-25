@@ -243,7 +243,11 @@ module.exports = function Store(client) {
     return client.typeAsync(key)
     .then(function (reply) {
       if (reply !== setType && reply !== sortedSetType) {
-        throw new Error ('countItems can only be called for sets and sorted sets');
+        // keys don't exist for sets that have 0 members
+        // so return 0;
+        return q.fcall(function () {
+          return 0;
+        });
       }
       if (reply === sortedSetType) {
         return client.zcardAsync(key);
