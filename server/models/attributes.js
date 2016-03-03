@@ -82,39 +82,40 @@ module.exports = function Attributes(client) {
   };
 
   var getAllAttributes = function getAllAttributes() {
-    var promises = [];
-    var users = [];
+    var promises = [],
+        users = [],
+        zipped,
+        result = {};
+    // Get the keys needed
     return client.zrangeAsync(keyGen.attributeSetKey(), 0, -1)
     .then(function (reply) {
+      // Get the individual attributes for each user by key
       _.forEach(reply, function (value, index) {
         // get the user from the key
         users.push(keyExtract.userFromAttribute(value));
-        logger.debug('user in getAttributes is ', keyExtract.userFromAttribute(value));
+        // attributes for this key
         promises.push(get(keyExtract.userFromAttribute(value), keyExtract.typeFromAttribute(value)));
       });
       return q.all(promises)
       .then(function (reply) {
-        var zipped = _.zip(users, reply);
-        var merged = [];
-        var result = {};
-        var k = 0;
-        while (k < zipped.length) {
-          if (k !== zipped.length - 1) {
-            if (zipped[k][0] === zipped[k + 1][0]) {
-              merged.push((_.merge(zipped[k], zipped[k + 1])));
-              k = k + 2;
-            } else {
-              merged.push((_.merge(zipped[k], zipped[k])));
-              k = k + 1;
-            }
-          } else {
-            merged.push((_.merge(zipped[k], zipped[k])));
-            k = k + 1;
-          }
-        }
-        for (var j = 0; j < merged.length; j++) {
-          result[merged[j][0]] = merged[j][1];
-        }
+        zipped = _.zip(users, reply);
+        // Aggregate for each unique user
+        _.forEach(_.uniq(users), function (thisUser) {
+          var thisUserZipped,
+              interResult;
+          // intialize
+          result[thisUser] = {};
+          // Get results from zipped for thisUser
+          thisUserZipped = _.filter(zipped, function (item) {
+            return item[0] === thisUser;
+          });
+          // Drop the user from the array so all we have are attributes
+          interResult = _.drop(_.uniq(_.flatten(thisUserZipped)), 1);
+          // Extend the result object for this user
+          _.forEach(interResult, function (value) {
+            _.assign(result[thisUser], value);
+          });
+        });
         return result;
       });
     });
