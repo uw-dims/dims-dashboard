@@ -11,12 +11,13 @@ module.exports = function (Attributes) {
 
   // Save all attributes to a file so ipgrep can access
   var attributesToFile = function attributesToFile() {
+
     return Attributes.getAllAttributes()
     .then(function (reply) {
-      console.log(reply);
       var yamlDoc = yaml.safeDump(reply, {
         flowLevel: 2
       });
+      console.log('yamlDoc from attributes', yamlDoc);
       fs.writeFile(path.join(config.dashboardDataPath, 'dashboard_user_attributes.yml'), yamlDoc, function (err, reply) {
         if (err) {
           throw err;

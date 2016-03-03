@@ -30,9 +30,12 @@ function AmqpConnection() {
 }
 
 AmqpConnection.prototype.createConnection = function () {
+
   var self = this;
+  logger.info('Creating connection to ', self.server);
   amqp.connect(self.connectionString)
   .then(function (conn) {
+    logger.info('Connection established with ', self.server);
     self.setConnection(conn);
     self.emit(self.connectionCreated);
   })

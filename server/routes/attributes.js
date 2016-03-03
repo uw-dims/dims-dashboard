@@ -78,7 +78,7 @@ module.exports = function (Attributes, attributeService, access) {
     }
 
     // TLP value is restricted
-    if (req.body.type === 'tlp' && req.body.items.length !== 1 || 
+    if (req.body.type === 'tlp' && req.body.items.length !== 1 ||
       req.body.type === 'tlp' && !config.tlpValues.hasOwnProperty(req.body.items[0])) {
       logger.error('user ', user, ' attempted to update TLP with invalid value');
       res.status(400).send(resUtils.getErrorReply('Invalid TLP value supplied'));
@@ -100,14 +100,14 @@ module.exports = function (Attributes, attributeService, access) {
       return;
     }
 
-    var promise = (req.body.action === 'add') ? 
-        Attributes.save(req.params.id, req.body.type, req.body.items) : 
+    var promise = (req.body.action === 'add') ?
+        Attributes.save(req.params.id, req.body.type, req.body.items) :
         Attributes.remove(req.params.id, req.body.type, req.body.items);
     promise
-    // .then(function (reply) {
-    //   // Save the current attributes to file so ipgrep can access
-    //   return attributeService.attributesToFile();
-    // })
+    .then(function (reply) {
+      // Save the current attributes to file so ipgrep can access
+      return attributeService.attributesToFile();
+    })
     .then(function (reply) {
       logger.debug('update reply ', reply);
       res.status(200).send(resUtils.getSuccessReply(null));

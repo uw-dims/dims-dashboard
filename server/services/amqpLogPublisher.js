@@ -32,9 +32,11 @@ function AmqpLogPublisher(name, durable) {
 
 AmqpLogPublisher.prototype.createConnection = function () {
   var self = this;
+  console.log('[+++] amqpLogPublisher creating connection to ', self.server);
   amqp.connect(self.connectionString)
   .then(function (conn) {
     self.setConnection(conn);
+    console.log('[+++] amqpLogPublisher connection created to ', self.server);
     // self.emit(self.connectionCreated);
     return self.connection.createChannel();
   })
@@ -55,6 +57,7 @@ AmqpLogPublisher.prototype.createConnection = function () {
     self.emit('ready');
   })
   .catch(function (err) {
+    console.log('[+++] amqpLogPublisher connection failure to ', self.server);
     self.emit(self.createError, self);
   })
   .done();
