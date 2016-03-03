@@ -1,6 +1,36 @@
+/**
+ * Copyright (C) 2014, 2015, 2016 University of Washington.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ * list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ * may be used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller ('UploadCtrl', ['$scope', '$http', '$timeout', '$upload', 'Utils', 'SettingsService', 
+  controller ('UploadCtrl', ['$scope', '$http', '$timeout', '$upload', 'Utils', 'SettingsService',
     function($scope, $http, $timeout, $upload, Utils, SettingsService) {
 console.log('In UploadController');
 
@@ -17,7 +47,7 @@ console.log('In UploadController');
     return $scope.upload[index] !== undefined;
   };
   $scope.abort = function(index) {
-    $scope.upload[index].abort(); 
+    $scope.upload[index].abort();
     $scope.upload[index] = null;
   };
 
@@ -88,10 +118,10 @@ console.log('In UploadController');
       $timeout(function() {
         $scope.uploadResult[index] = response.data.msg + '. Filename: ' + response.data.filename + '. Location: ' + response.data.path;
       });
-      
-    }, 
+
+    },
       function(response) {
-        if (response.status > 0) { 
+        if (response.status > 0) {
           $scope.progress[index] = 0;
           $scope.uploadResult[index] = 'Error: ' +response.status+ ': '+response.data.msg;
           $scope.progressClass[index] = 'progress-fail';

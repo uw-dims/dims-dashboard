@@ -34,7 +34,8 @@
     "cryptojslib": "3.1.2",
     "angu-fixed-header-table": "*",
     "angular-socket-io": "0.7.0",
-    "moment": "^2.11.1"
+    "moment": "^2.11.1",
+    "angular-truncate": "*"
   },
   "devDependencies": {
     "angular-mocks": "1.2.22",
