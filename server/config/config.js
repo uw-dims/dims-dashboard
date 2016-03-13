@@ -86,7 +86,7 @@ config.sessionTTL = 2 * 60 * 60; //Redis session expiration. 2 hours, in seconds
 config.tokenTTL = config.sessionTTL;
 
 // Passport vars and configs
-config.tokenSecret = process.env.TOKEN_SECRET || 'djf83UhNH35CDjfjEFM3B9e01viY8fNqz3YXpb25wc0U';
+config.tokenSecret = process.env.DASHBOARD_TOKEN_SECRET || 'djf83UhNH35CDjfjEFM3B9e01viY8fNqz3YXpb25wc0U';
 config.tokenAlgorithm = 'HS256';
 // Result is seconds
 config.tokenIssuer = process.env.DASHBOARD_PUBLIC_HOST || require('os').hostname();
@@ -131,11 +131,11 @@ config.googleAuthzStrategyConfig = {
 
 
 
-config.sessionSecret = '3xueis763$%STID47373deC!!QUsT8J4$';
+config.sessionSecret = process.env.DASHBOARD_SESSION_SECRET || '3xueis763$%STID47373deC!!QUsT8J4$';
 
-config.cookieSecret = 'Xu9J35bq!5#kNY*n3v04aSPxoURx98wQZW';
+config.cookieSecret = process.env.DASHBOARD_COOKIE_SECRET || 'Xu9J35bq!5#kNY*n3v04aSPxoURx98wQZW';
 
-config.passSecret = '84jd$#lk903jcy2AUEI2j4nsKLJ!lIY';
+config.passSecret = process.env.DASHBOARD_PASS_SECRET || '84jd$#lk903jcy2AUEI2j4nsKLJ!lIY';
 
 config.bin = '/opt/dims/bin/';
 

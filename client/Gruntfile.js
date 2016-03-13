@@ -38,6 +38,7 @@ module.exports = function (grunt) {
   var publicHost = process.env.DASHBOARD_PUBLIC_HOST || 'localhost';
   var publicPort = process.env.DASHBOARD_PUBLIC_PORT || '80';
   var publicProtocol = process.env.DASHBOARD_PUBLIC_PROTOCOL || 'http';
+  var dashboardNodeEnv = process.env.DASHBOARD_NODE_ENV || 'development';
 
   console.log('Grunt build with publicHost=' + publicHost + ', publicPort=' + publicPort + ', publicProtocol=' + publicProtocol);
   // Define the configuration for all the tasks
@@ -57,7 +58,8 @@ module.exports = function (grunt) {
           ENV: {
             DASHBOARD_PUBLIC_HOST: publicHost,
             DASHBOARD_PUBLIC_PORT: publicPort,
-            DASHBOARD_PUBLIC_PROTOCOL: publicProtocol
+            DASHBOARD_PUBLIC_PROTOCOL: publicProtocol,
+            DASHBOARD_NODE_ENV: dashboardNodeEnv
           }
         }
       },

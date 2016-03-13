@@ -6,33 +6,35 @@ VERSION=1.0.8
 # Set up common functions and variables.
 source $DIMS/bin/test_functions.sh
 
-DATE=$(iso8601dateshort)
-LOGFILE=$BASE-$DATE.log
-
-USAGE="`basename $0` runtype where runtype is optional"
-
-# Types:
-# production: production environment, SSL on
-# development: development environment, SSL off, static user db
-# testclient: For testing minified client. Production environment, log_level=debug
-#    static user db
-# integration: For testing with postgresql user db, development environment, SSL on.
-# demo: SSL off, postgresql db, development environment
-
-if [ "$1x" == "x" ]; then
-  echo "[+++] dashboard.start: You have chosen development runtype"
-  DASHBOARD_RUNTYPE="development"
-else
-  echo "[+++] dashboard.start: You have chosen ${1} runtype"
-  DASHBOARD_RUNTYPE=$1
-fi
 
 # virtual environment needed here since the prisem scripts
 # are only installed in virtual environment now. And pika is only
 # installed in virtual environment, which is used by scripts.
-ACTIVATE=/opt/dims/envs/dimsenv/bin/activate
-RUNDIR=/opt/dims/srv/dims-dashboard/server
+ACTIVATE=${ACTIVATE:="/opt/dims/envs/dimsenv/bin/activate"}
+RUNDIR=${RUNDIR:="/opt/dims/srv/dims-dashboard/server"}
+
+# You can override this to provide your own defaults when developing
+CONF_FILE=${CONF_FILE:="/etc/dashboard/dashboard.conf"}
+SECRETS_FILE=${SECRETS_FILE:="/etc/dashboard/dashboard_secrets.conf"}
+EXTERNAL_SITES_FILE=${EXTERNAL_SITES_FILE:="/etc/dashboard/external_sites_config.json"}
 
 # Need virtualenv since that's where pika is installed
 cd $RUNDIR && . $ACTIVATE
-npm run run-$DASHBOARD_RUNTYPE
+
+# Source configuration files which export env vars
+if [ -f $CONF_FILE ]; then 
+  . $CONF_FILE
+fi
+if [ -f $SECRETS_FILE ]; then 
+  . $SECRETS_FILE
+fi
+printenv
+
+# Configure the environment for the client
+if [ "$DASHBOARD_NODE_ENV" == "production" ]; then
+  cd ../client && grunt build
+else
+  cd ../client && grunt dev-compile
+fi
+cd $RUNDIR
+ianitor --port $DASHBOARD_PORT dashboard -- node app
