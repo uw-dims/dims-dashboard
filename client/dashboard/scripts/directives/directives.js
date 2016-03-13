@@ -35,11 +35,11 @@
 var INTEGER_REGEXP = /^\-?\d+$/;
 
 angular.module('dimsDashboard.directives').
-  directive('appVersion', function (version) {
+  directive('appVersion', ['version', function (version) {
     return function(scope, elm, attrs) {
       elm.text(version);
     };
-  }).
+  }]).
 
   directive('integer', function() {
     return {

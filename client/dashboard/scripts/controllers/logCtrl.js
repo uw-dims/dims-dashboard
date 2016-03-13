@@ -31,7 +31,8 @@
 'use strict';
 
 angular.module('dimsDashboard.controllers').
-  controller('LogCtrl', function ($scope, $location, $log, $rootScope) {
+  controller('LogCtrl', ['$scope', '$location', '$log', '$rootScope',
+    function ($scope, $location, $log, $rootScope) {
 
     $log.debug('logCtrl. scope.currentUser is ', $scope.currentUser);
 
@@ -106,4 +107,4 @@ angular.module('dimsDashboard.controllers').
     //   return message + '\n';
     // };
 
-  });
+  }]);

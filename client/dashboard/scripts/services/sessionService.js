@@ -32,9 +32,9 @@
 
 angular.module('dimsDashboard.services')
 
-  .factory('SessionService', function ($resource) {
+  .factory('SessionService', ['$resource', function ($resource) {
     return $resource('/auth/session');
-  })
-  .factory('GoogleService', function ($resource) {
+  }])
+  .factory('GoogleService', ['$resource', function ($resource) {
     return $resource('/auth/google');
-  });
+  }]);

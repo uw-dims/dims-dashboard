@@ -33,7 +33,7 @@
 
 angular.module('dimsDashboard.services')
 
-  .factory('SettingsService', function ($q, $log, $resource) {
+  .factory('SettingsService', ['$q', '$log', '$resource', function ($q, $log, $resource) {
 
     var SettingsService = {
 
@@ -64,4 +64,4 @@ angular.module('dimsDashboard.services')
 
     return SettingsService;
 
-  });
+  }]);

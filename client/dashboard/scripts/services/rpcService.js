@@ -40,18 +40,18 @@
 
 angular.module('dimsDashboard.services')
 
-  .factory('CifbulkApi', function($resource) {
+  .factory('CifbulkApi', ['$resource', function($resource) {
       return $resource('/cifbulk');
-  })
+  }])
 
-  .factory('AnonApi', function($resource) {
+  .factory('AnonApi', ['$resource', function($resource) {
       return $resource('/anon');
-  })
+  }])
 
-  .factory('RwfindApi', function($resource) {
+  .factory('RwfindApi', ['$resource', function($resource) {
       return $resource('/rwfind');
-  })
+  }])
 
-  .factory('CrosscorApi', function($resource) {
+  .factory('CrosscorApi', ['$resource', function($resource) {
       return $resource('/crosscor');
-  });
+  }]);

@@ -33,7 +33,7 @@
 
 angular.module('dimsDashboard.services')
 
-  .factory('AnonService', function($http, $q, $log) {
+  .factory('AnonService', ['$http', '$q', '$log', function($http, $q, $log) {
 
     var anonymize = function(anonymize, data, pid) {
       var deferred = $q.defer();
@@ -72,4 +72,4 @@ angular.module('dimsDashboard.services')
     return {
       anonymize: anonymize
     };
-  });
+  }]);

@@ -62,6 +62,6 @@
     .module('dimsDashboard.directives')
     .directive('userAccount', userAccount);
 
-  userSettings.$inject = [];
+  userAccount.$inject = [];
 
 }());

@@ -297,7 +297,7 @@ module.exports = function (grunt) {
             steps: {
               // uglifying not working, so disabling it for now
               js: ['concat', 'uglifyjs'],
-              //js: ['concat'],
+              // js: ['concat'],
               css: ['cssmin']
             },
             post: {}
@@ -329,6 +329,9 @@ module.exports = function (grunt) {
       }
     },
     uglify: {
+      options: {
+        mangle: false
+      },
       dist: {
         files: {
           '<%= appConfig.dist %>/scripts/scripts.js': [
@@ -415,7 +418,7 @@ module.exports = function (grunt) {
             '.htaccess',
             '*.html',
             'views/{,*/}*.html',
-            'images/{,*/}*.{webp}',
+            'images/{,*/}*',
             'fonts/*'
           ]
         }, {
@@ -511,6 +514,7 @@ module.exports = function (grunt) {
     'ngAnnotate',
     'copy:dist',
     'cssmin',
+    // Uglify not working on some of our dependencies
     'uglify',
     'filerev',
     'usemin',

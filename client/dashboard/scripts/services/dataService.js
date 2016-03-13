@@ -32,7 +32,7 @@
 'use strict';
 
 angular.module('dimsDashboard.services')
-  .factory('DataService', function ($http, $q, $log) {
+  .factory('DataService', ['$http', '$q', '$log',  function ($http, $q, $log) {
 
   var getData = function(source) {
     console.log('in DataService.getData');
@@ -81,4 +81,4 @@ angular.module('dimsDashboard.services')
     parseTimeSeries: parseTimeSeries
   };
 
-});
+}]);

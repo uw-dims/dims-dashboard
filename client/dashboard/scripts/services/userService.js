@@ -31,11 +31,11 @@
 'use strict';
 angular.module('dimsDashboard.services')
 
-  .factory('UserApi', function ($resource) {
+  .factory('UserApi', ['$resource', function ($resource) {
     return $resource('/api/user/:id');
-  })
+  }])
 
-  .factory('UserService', function (UserApi, $log, $q) {
+  .factory('UserService', ['UserApi', '$log', '$q', function (UserApi, $log, $q) {
 
     var UserService = {};
 
@@ -123,4 +123,4 @@ angular.module('dimsDashboard.services')
     };
 
     return UserService;
-  });
+  }]);

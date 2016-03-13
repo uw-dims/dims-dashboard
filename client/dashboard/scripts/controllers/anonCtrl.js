@@ -30,7 +30,8 @@
  */
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller('AnonCtrl', ['$scope', 'Utils', 'FileService', '$http', 'DateService', '$log','SettingsService', 'AnonService', '$location', '$routeParams',
+  controller('AnonCtrl', ['$scope', 'Utils', 'FileService', '$http', 'DateService', '$log','SettingsService',
+   'AnonService', '$location', '$routeParams',
     function ($scope, Utils, FileService, $http, DateService, $log, SettingsService, AnonService, $location, $routeParams) {
 
     // Set up form data

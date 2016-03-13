@@ -98,7 +98,7 @@ angular.module('dimsDashboard.services')
     return root;
   })
 
-  .factory('FileService', function($http, $q) {
+  .factory('FileService', ['$http', '$q', function($http, $q) {
 
       var getFileList = function(source) {
         var deferred = $q.defer();
@@ -141,6 +141,6 @@ angular.module('dimsDashboard.services')
         getFileList: getFileList,
         getDemoList: getDemoList
       };
-    });
+    }]);
 
 

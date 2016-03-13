@@ -31,7 +31,7 @@
 'use strict';
 angular.module('dimsDashboard.services')
 
-  .factory('AttributeApi', function ($resource) {
+  .factory('AttributeApi', ['$resource', function ($resource) {
     return $resource('/api/attributes/:id', {
       id: '@id'
     }, {
@@ -40,9 +40,9 @@ angular.module('dimsDashboard.services')
         url: 'api/attributes/:id'
       }
     });
-  })
+  }])
 
-  .factory('UserAttributesService', function (AttributeApi, $log, $q) {
+  .factory('UserAttributesService', ['AttributeApi', '$log', '$q', function (AttributeApi, $log, $q) {
     var UserAttributesService = {};
     UserAttributesService.supportedTypes = function () {
       return {
@@ -120,4 +120,4 @@ angular.module('dimsDashboard.services')
     };
 
     return UserAttributesService;
-  });
+  }]);

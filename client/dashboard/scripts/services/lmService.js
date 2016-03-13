@@ -32,11 +32,11 @@
 
 angular.module('dimsDashboard.services')
 
-.factory('LmApi', function ($resource) {
+.factory('LmApi', ['$resource', function ($resource) {
   return $resource('/api/lmsearch');
-})
+}])
 
-.factory('LmService', function (LmApi, $log, $q) {
+.factory('LmService', ['LmApi', '$log', '$q', function (LmApi, $log, $q) {
   var LmService = {};
 
   var get = function get() {
@@ -52,4 +52,4 @@ angular.module('dimsDashboard.services')
 
   LmService.get = get;
   return LmService;
-});
+}]);

@@ -31,7 +31,8 @@
 'use strict';
 
 angular.module('dimsDashboard.controllers').
-  controller('ChatCtrl', function ($scope, $location, $log, ChatService, $rootScope) {
+  controller('ChatCtrl', ['$scope', '$location', '$log', 'ChatService', '$rootScope',
+    function ($scope, $location, $log, ChatService, $rootScope) {
 
     $log.debug('chatCtrl. scope.currentUser is ', $scope.currentUser);
 
@@ -118,4 +119,4 @@ angular.module('dimsDashboard.controllers').
       return $scope.currentUser.name + ': ' + text;
     };
 
-  });
+  }]);

@@ -34,8 +34,8 @@
 /* Filters */
 
 angular.module('dimsNode.filters', []).
-  filter('interpolate', function (version) {
+  filter('interpolate', ['version', function (version) {
     return function (text) {
       return String(text).replace(/\%VERSION\%/mg, version);
     };
-  });
+  }]);
