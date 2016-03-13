@@ -78,7 +78,6 @@ module.exports = function Topic(store) {
   // name: required
   // description: optional
   var validateOptions = function validateOptions(options) {
-    console.log(options);
     var defaultOptions = {
       description: ''
     };
@@ -116,13 +115,10 @@ module.exports = function Topic(store) {
   // Save topic metadata
   // Param: metadata - metadata to save
   var saveMetadata = function saveMetadata(metadata) {
-    console.log('saveMetadata metadata', metadata);
     var parent = _.create({}, metadata.parent);
     var hash = _.create({}, metadata);
     // stringify this since it is nested json
     hash.parent = JSON.stringify(parent);
-    console.log('saveMetadata hash ', hash);
-    console.log('saveMetadata metadata is now', metadata);
     return store.setMetadata(keyGen.topicMetaKey(metadata), hash);
   };
 
@@ -131,7 +127,6 @@ module.exports = function Topic(store) {
   var getMetadata = function getMetadata(key) {
     return store.getMetadata(key)
     .then(function (reply) {
-      // console.log(reply);
       if (reply !== null) {
         // reply = castMetadata(reply);
         // var parent = reply.parent;
@@ -163,8 +158,6 @@ module.exports = function Topic(store) {
   // Params: metadata - metadata describing topic
   //         data - data to be saved
   var saveData = function saveData(metadata, data) {
-    console.log('saveData metadata is ', metadata);
-    // console.log('saveData data is ', data);
     return store.setData(keyGen.topicKey(metadata), data);
   };
 
@@ -228,14 +221,12 @@ module.exports = function Topic(store) {
       } else {
         metadata.metadata.keyname = 'topic';
       }
-      console.log('topicfactory metadata is ', metadata);
       return (_.extend({}, topicPrototype, metadata));
     }
   };
 
   var extendFactory = function extendFactory(config) {
-    // config = castMetadata(config);
-    // console.log('completeTopic config after cast ', config);
+    
     var topicObject = topicFactory(config.metadata.parent, {
       name: config.metadata.name,
       datatype: config.metadata.datatype,
@@ -252,13 +243,10 @@ module.exports = function Topic(store) {
   var getTopic = function getTopic(topicKey) {
     var topic = {};
     var metaKey = keyGen.metaKeyFromKey(topicKey);
-    // console.log('getTopicMetaKey ', metaKey);
     return getMetadata(metaKey)
     .then(function (reply) {
-      // console.log(reply);
       topic.metadata = reply;
       topic.key = topicKey;
-      // console.log(topic);
       if (topic.metadata.datatype === 'string') {
         return getData(topic.metadata);
       } else {
@@ -266,7 +254,6 @@ module.exports = function Topic(store) {
       }
     })
     .then(function (reply) {
-      // console.log(reply);
       topic.data = reply;
       return topic;
     })
@@ -278,12 +265,10 @@ module.exports = function Topic(store) {
   // Get array of topics for a ticket - just metadata and data
   // Input is ticket key
   var getTopics = function getTopics(ticketKey) {
-    // console.log(key);
     var promises = [];
     // Return promise with array of topic keys
     return store.listItems(keyGen.topicSetKeyFromTicketKey(ticketKey))
     .then(function (reply) {
-      // console.log(reply);
       _.forEach(reply, function (value, index) {
         promises.push(getTopic(value));
       });
@@ -305,7 +290,6 @@ module.exports = function Topic(store) {
     var promises = [];
     return store.listItems(keyGen.topicSetKeyFromTicketKey(key))
     .then(function (reply) {
-      // console.log(reply);
       _.forEach(reply, function (value, index) {
         promises.push(getTopicMetadata(value));
       });
@@ -318,13 +302,10 @@ module.exports = function Topic(store) {
 
   // Get metadata for a topic from a topic key
   var getTopicMetadata = function getTopicMetdata(key) {
-    // console.log('getTopic key', key);
     var topic = {};
     var metaKey = keyGen.metaKeyFromKey(key);
-    // console.log('getTopicMetaKey ', metaKey);
     return getMetadata(metaKey)
     .then(function (reply) {
-      // console.log(reply);
       topic.metadata = reply;
       topic.key = key;
       return topic;
@@ -340,7 +321,6 @@ module.exports = function Topic(store) {
     logger.debug('in deleteTopic key is ', key);
     return getTopicMetadata(key)
     .then (function (reply) {
-      console.log('reply from getTopicMetadata', reply.metadata);
       var promises = [];
       promises.push(store.deleteKey(keyGen.topicMetaKey(reply.metadata)));
       promises.push(store.deleteKey(keyGen.topicKey(reply.metadata)));
@@ -366,7 +346,6 @@ module.exports = function Topic(store) {
       .then(function (reply) {
         // Save counter value
         self.metadata.num = reply;
-        console.log('topic create metadata is ', self.metadata);
         // Save metadats
         promises.push(saveMetadata(self.metadata));
         // Save topic key in set of topic keys

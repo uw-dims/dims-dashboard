@@ -59,8 +59,6 @@ var topicConfig = {
 };
 
 var topic1 = _.extend({}, topicConfig);
-console.log('ticket1', ticket1);
-console.log('topic1', topic1);
 var user1 = 'user1';
 var ticketKey1 = 'dims:ticket:analysis:5';
 var ticketCounterKey1 = 'dims:ticket.__counter';

@@ -158,8 +158,8 @@ test('models/fileData.js: FileData create should save file contents and key', fu
   } else {
     return newFile.create(contents1)
     .then(function (reply) {
-      console.log('TEST filedata create newFile config is ', newFile.getConfig());
-      console.log('TEST filedata create reply is ', reply);
+      // console.log('TEST filedata create newFile config is ', newFile.getConfig());
+      // console.log('TEST filedata create reply is ', reply);
       return db.getProxy(keyGen.fileKey(newFile));
     })
     .then(function (reply) {
@@ -167,7 +167,7 @@ test('models/fileData.js: FileData create should save file contents and key', fu
       return db.hgetallProxy(keyGen.fileMetaKey(newFile));
     })
     .then(function (reply) {
-      console.log('TEST filedata create metadata reply is ', reply);
+      // console.log('TEST filedata create metadata reply is ', reply);
       // Convert strings
       var result = reply;
       result.createdTime = _.parseInt(reply.createdTime);
@@ -177,7 +177,7 @@ test('models/fileData.js: FileData create should save file contents and key', fu
       return db.zrankProxy(keyGen.fileSetKey(newFile), keyGen.fileKey(newFile));
     })
     .then(function (reply) {
-      console.log('TEST filedata: create reply from zrank', reply);
+      // console.log('TEST filedata: create reply from zrank', reply);
       assert.ok(reply === 0, 'Key to file saved in set of keys');
       assert.end();
     }).catch(function (err) {
@@ -219,7 +219,7 @@ test('models/fileData.js: Filedata.exists should return true if the key exists i
     return newFile2.exists();
   })
   .then(function (reply) {
-    console.log('TEST reply to exists = false ', reply);
+    // console.log('TEST reply to exists = false ', reply);
     assert.notOk(reply, 'Unsaved key was not found in database');
     assert.end();
   })
@@ -255,11 +255,11 @@ test('models/fileData.js: FileData.getMetadata should return metadata from datab
   return newFile.create(contents2)
   .then(function (reply) {
     // Get the metaData from the database
-    console.log('TEST getMetadata reply from create is ', reply);
+    // console.log('TEST getMetadata reply from create is ', reply);
     return newFile.getMetadata();
   })
   .then(function (reply) {
-    console.log('TEST getMetadata reply from getMetadata is ', reply);
+    // console.log('TEST getMetadata reply from getMetadata is ', reply);
     assert.deepEqual(reply, newFile.getConfig(), 'Saved file config returned successfully');
     assert.end();
   })

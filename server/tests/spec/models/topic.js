@@ -63,7 +63,6 @@ var createOptions = function (creator, type, name, tg, privacy, description) {
 var tg1 = 'dims1';
 
 var createTickets = function createTickets() {
-  console.log('start createTickets');
   var activityConfig1 = createOptions('testuser1', 'activity', 'Activity 1', tg1);
   var mitigationConfig1 = createOptions('testuser2', 'mitigation', 'Mitigation 1', tg1, false);
   var privateConfig1 = createOptions('testuser2', 'activity', 'Activity2', tg1, true);
@@ -80,7 +79,6 @@ var createTickets = function createTickets() {
   ])
   .then(function (reply) {
     return ticket4.close();
-    console.log('end createTickets');
   })
   .catch(function (err) {
     throw err;
@@ -101,14 +99,12 @@ test('models/topic.js: TopicFactory returns topic object with metadata', functio
       return Ticket.getTicket('dims:ticket:activity:1');
     })
     .then(function (reply) {
-      console.log(reply.metadata);
       ticket = reply;
       topic = Topic.topicFactory(ticket, {
         name: 'cif',
         description: 'CIF results',
         datatype: 'string'
       });
-      console.log(topic);
       assert.ok(topic.hasOwnProperty('metadata'));
       assert.ok(topic.metadata.hasOwnProperty('name'));
       assert.ok(topic.metadata.hasOwnProperty('datatype'));
@@ -137,11 +133,9 @@ test('models/topic.js: string topic can be created', function (assert) {
       description: 'CIF results',
       datatype: 'string'
     });
-    console.log('[+++] topicFactory result ', topic);
     return topic.create('string data');
   })
   .then(function (reply) {
-    console.log('test after create', topic.metadata);
     assert.deepEqual(reply, ['OK', 1, 'OK'], 'reply from create is valid');
     return store.getData('dims:ticket:activity:1:topic:1');
   })
@@ -187,7 +181,6 @@ test('models/topic.js: set topic can be created', function(assert) {
     return store.getMetadata('dims:ticket:activity:1:topic:1.__meta');
   })
   .then(function (reply) {
-    console.log(reply);
     assert.equal(reply.name, 'cif', 'name was saved in metadata');
     assert.equal(reply.datatype, 'set', 'datatype was saved in metadata');
     assert.equal(reply.num, '1', 'num was saved in metadata');
@@ -214,7 +207,6 @@ test('models/topic.js: topic object can be retrieved', function (assert) {
       description: 'CIF results',
       datatype: 'string'
     });
-    console.log('[+++] test topic object retrieved ', topic);
     return topic.create('string data');
   })
   .then(function (reply) {
@@ -222,9 +214,6 @@ test('models/topic.js: topic object can be retrieved', function (assert) {
     return Topic.getTopic('dims:ticket:activity:1:topic:1');
   })
   .then(function (reply) {
-    console.log('test reply', reply);
-    console.log('test ', reply.metadata);
-    console.log('test', reply.metadata.parent);
     // assert.equal(reply, 'string data', 'string data was saved');
     return client.flushdbAsync();
   })
@@ -262,17 +251,12 @@ test('models/topic.js: can retrieve topic with data', function (assert) {
     return Topic.getTopic('dims:ticket:activity:1:topic:1');
   })
   .then(function (reply) {
-    console.log('test reply', reply);
-    console.log('test ', reply.metadata);
-    console.log('test', reply.metadata.parent);
     return topic2.create({ data: {'one': 'two'}});
   })
   .then(function (reply) {
-    console.log('reply from creating 2nd topic');
     return Topic.getTopic('dims:ticket:activity:1:topic:2');
   })
   .then(function (reply) {
-    console.log(reply);
     return client.flushdbAsync();
   })
   .then(function () {
@@ -309,11 +293,9 @@ test('models/topic.js: can retrieve topics for a ticket with data', function (as
     return topic2.create([1, 2, 3]);
   })
   .then(function (reply) {
-    console.log(reply);
     return Topic.getTopics('dims:ticket:activity:1');
   })
   .then(function (reply) {
-    console.log('test reply', reply);
     // assert.equal(reply, 'string data', 'string data was saved');
     return client.flushdbAsync();
   })

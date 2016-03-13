@@ -103,11 +103,9 @@ test('models/attributes: updateAttributes should create attributes', function (a
   var attributes = Attributes.attributesFactory(user1);
   attributes.updateAttributes(user1, newAttributes1)
   .then(function (reply) {
-    console.log('reply from updateAttributes', reply);
     return attributes.getAttributes(user1);
   })
   .then(function (reply) {
-    console.log('reply from getAttributes for user1 ', reply);
     assert.deepEqual(Object.keys(reply), [user1], 'Attributes key is user name');
     assert.deepEqual(reply[user1].cidr.sort(), newAttributes1.cidr.sort(), 'CIDR blocks returned');
     assert.deepEqual(reply[user1].domain.sort(), newAttributes1.domain.sort(), 'Domains returned');
@@ -137,7 +135,7 @@ test('models/attributes: getAllAttributes should return all attributes', functio
   });
 });
 
-test('models/topic.js: Finished', function (assert) {
+test('models/attributes.js: Finished', function (assert) {
   client.flushdbAsync()
   .then(function (reply) {
     return client.quitAsync();

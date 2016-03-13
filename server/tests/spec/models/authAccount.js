@@ -190,7 +190,6 @@ test('models/authAccount.js: Can create and delete account', function (assert) {
     return authAccount.deleteAccount(user1, service);
   })
   .then(function (reply) {
-    console.log(reply);
     var promises = [];
     promises.push(client.existsAsync('dims:authaccount:' + service + ':' + id2));
     promises.push(client.existsAsync('dims:authaccount:' + service + ':' + user1));
@@ -198,11 +197,9 @@ test('models/authAccount.js: Can create and delete account', function (assert) {
     return q.all(promises);
   })
   .then(function (reply) {
-    console.log(reply);
     return client.keysAsync('*');
   })
   .then(function (reply) {
-    console.log(reply);
     return client.flushdbAsync();
   })
   .then(function () {

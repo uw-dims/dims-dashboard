@@ -267,7 +267,7 @@ module.exports = function Ticket(store) {
       } else {
         openKey = keyGen.ticketClosedKey();
       }
-      console.log('in Ticket.deleteTicket, metadata is ', self.metadata);
+      // console.log('in Ticket.deleteTicket, metadata is ', self.metadata);
       logger.debug('key is ', keyGen.ticketKey(self.metadata));
       logger.debug('ticket set key is ', keyGen.ticketSetKey());
       logger.debug('ticket tg key ', keyGen.ticketTgKey(self.metadata.tg));
@@ -354,7 +354,6 @@ module.exports = function Ticket(store) {
       } else {
         throw new Error ('Invalid options supplied to ticketFactory');
       }
-      // console.log(metadata);
       return (_.extend({}, ticketPrototype, metadata));
     }
   };
@@ -423,7 +422,6 @@ module.exports = function Ticket(store) {
   };
 
   var getTicketKeys = function getTicketKeys(options) {
-    // console.log('getTicketKeys options', options);
     var keyArray = [];
     var deferred = q.defer();
     validateQuery(options, function (err, query, info) {
@@ -456,7 +454,6 @@ module.exports = function Ticket(store) {
         if (query.hasOwnProperty('tg')) {
           keyArray.push(keyGen.ticketTgKey(query.tg));
         }
-        console.log('getTicketKeys. keyArray is ', keyArray);
         deferred.resolve(store.intersectItems(keyArray));
       }
     });
@@ -479,7 +476,6 @@ module.exports = function Ticket(store) {
   // Returns ticket metadata and key
   // Does not create full ticket object with functions
   var getTicket = function getTicket(key) {
-    console.log('getTicket key is ', key);
     return getMetadata(key)
     .then(function (reply) {
       if (reply !== null) {
@@ -500,7 +496,6 @@ module.exports = function Ticket(store) {
     var promises = [];
     return getTicketKeys(options)
     .then(function (reply) {
-      console.log('getTickets reply', reply);
       _.forEach(reply, function (value, index) {
         promises.push(getTicket(value));
       });

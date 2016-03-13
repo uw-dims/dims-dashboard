@@ -235,7 +235,7 @@ test('models/store.js: Can add items to sorted sets', function (assert) {
     return client.zrangeAsync(sortedSetKey1, 0, -1, 'WITHSCORES');
   })
   .then(function (reply) {
-    console.log(reply);
+    // console.log(reply);
     return client.flushdbAsync();
   })
   .then(function () {
@@ -297,7 +297,7 @@ test('models/store.js: Can remove items from sorted sets', function (assert) {
     return client.zremAsync(sortedSetKey3, dataKey3, dataKey4);
   })
   .then(function (reply) {
-    console.log(reply);
+    // console.log(reply);
     return client.flushdbAsync();
   })
   .then(function () {

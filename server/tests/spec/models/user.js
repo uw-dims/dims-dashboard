@@ -310,7 +310,7 @@ test.skip('models/user.js: Trustgroups by member', function (assert) {
 // });
 
 
-test('finish', function (assert) {
+test.skip('finish', function (assert) {
   knex.destroy(function (err, reply) {
     console.log(err, reply);
     assert.end();

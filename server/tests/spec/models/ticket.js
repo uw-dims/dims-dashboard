@@ -169,7 +169,7 @@ test('models/ticket.js: Creating a ticket saves metadata at ticketKey', function
   })
   .then(function (reply) {
     // Cast types of the reply so we can compare
-    console.log(reply);
+    // console.log(reply);
     assert.deepEqual(Ticket._private.castMetadata(reply), ticket.metadata, 'Metadata is stored in database');
     return client.flushdbAsync();
   })
@@ -364,8 +364,8 @@ test('models/ticket.js: getTicket returns ticket object for retrieved ticket', f
     return Ticket.getTicket(activityKey1);
   })
   .then(function (reply) {
-    console.log(reply.metadata);
-    console.log(ticket.metadata);
+    // console.log(reply.metadata);
+    // console.log(ticket.metadata);
     assert.deepEqual(reply.metadata, ticket.metadata, 'retrieved ticket matches');
     return Ticket.getTicket('bob');
   })
@@ -481,50 +481,7 @@ test('models/ticket.js: getTicketKeys returns array of keys', function (assert) 
   .then(function (reply) {
     console.log(reply);
 
-    // These need to be rewritten or discarded. 'all' is no longer a valid type
-
-  //   return Ticket._private.getTicketKeys({
-  //     type: 'all'
-  //   });
-  // })
-  // .then(function (reply) {
-  //   // console.log('test ', reply);
-  //   assert.equals(reply.length, 4);
-  //   return Ticket._private.getTicketKeys({
-  //     type: 'all',
-  //     ownedBy: 'testuser1'
-  //   });
-  // })
-  // .then(function (reply) {
-  //   // console.log('test ', reply);
-  //   assert.equals(reply.length, 1);
-  //   return Ticket._private.getTicketKeys({
-  //     type: 'all',
-  //     ownedBy: 'testuser1',
-  //     open: false
-  //   });
-  // })
-  // .then(function (reply) {
-  //   // console.log('test ', reply);
-  //   assert.equals(reply.length, 0);
-  //   return Ticket._private.getTicketKeys({
-  //     type: 'all',
-  //     open: true
-  //   });
-  // })
-  // .then(function (reply) {
-  //   // console.log('test ', reply);
-  //   assert.equals(reply.length, 3);
-  //   return Ticket._private.getTicketKeys({
-  //     type: 'all',
-  //     open: true,
-  //     private: true,
-  //     ownedBy: 'testuser2'
-  //   });
-  // })
-  // .then(function (reply) {
-  //   // console.log('test ', reply);
-  //   assert.equals(reply.length, 1);
+   
     return Ticket._private.getTicketKeys({
       type: 'activity',
       open: true,
@@ -548,50 +505,7 @@ test('models/ticket.js: getTicketKeys returns array of keys', function (assert) 
 test('models/ticket.js: getTickets returns array of ticket objects', function (assert) {
   createTickets()
   .then(function (reply) {
-    // These need to be rewritten. 'all' is no longer a valid type
-  //   return Ticket.getTickets({
-  //     type: 'all'
-  //   });
-  // })
-  // .then(function (reply) {
-  //   console.log(reply);
-  //   assert.equals(reply.length, 4);
-  //   assert.ok(reply[0].hasOwnProperty('metadata'));
-  //   return Ticket.getTickets({
-  //     type: 'all',
-  //     ownedBy: 'testuser1'
-  //   });
-  // })
-  // .then(function (reply) {
-  //   console.log(reply);
-  //   assert.equals(reply.length, 1);
-  //   return Ticket.getTickets({
-  //     type: 'all',
-  //     ownedBy: 'testuser1',
-  //     open: false
-  //   });
-  // })
-  // .then(function (reply) {
-  //   // console.log('test ', reply);
-  //   assert.equals(reply.length, 0);
-  //   return Ticket.getTickets({
-  //     type: 'all',
-  //     open: true
-  //   });
-  // })
-  // .then(function (reply) {
-  //   // console.log('test ', reply);
-  //   assert.equals(reply.length, 3);
-  //   return Ticket.getTickets({
-  //     type: 'all',
-  //     open: true,
-  //     private: true,
-  //     ownedBy: 'testuser2'
-  //   });
-  // })
-  // .then(function (reply) {
-  //   // console.log('test ', reply);
-  //   assert.equals(reply.length, 1);
+    
     return Ticket.getTickets({
       type: 'activity',
       open: true,
@@ -600,7 +514,6 @@ test('models/ticket.js: getTickets returns array of ticket objects', function (a
     });
   })
   .then(function (reply) {
-    console.log('test ', reply);
     assert.equals(reply.length, 1);
     return client.flushdbAsync();
   })
