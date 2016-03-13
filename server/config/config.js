@@ -78,6 +78,8 @@ config.redisDatabase = process.env.REDIS_DATABASE || 0;
 config.userDBHost = process.env.USER_DB_HOST || 'localhost';
 config.userDBUser = process.env.USER_DB_USER || 'dims';
 config.userDatabase = process.env.USER_DATABASE || 'ops-trust';
+// Some databases may not require a password
+config.userDBPass = process.env.USER_DB_PASS || null;
 
 config.sessionTTL = 2 * 60 * 60; //Redis session expiration. 2 hours, in seconds
 

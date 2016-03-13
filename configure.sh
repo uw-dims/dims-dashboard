@@ -14,7 +14,11 @@ export DASHBOARD_PUBLIC_PROTOCOL=${DASHBOARD_PUBLIC_PROTOCOL}
 DATE=$(iso8601dateshort)
 LOGFILE=$BASE-$DATE.log
 
+# Location of server files. If you are running this on a local directory
+# override this variable
 DEST=${DEST:="/opt/dims/srv"}
+# Default owner of server directories. Override if running on a local directory
+# with a different owner.
 OWNER=${OWNER:="dims"}
 
 # So user running npm can configure

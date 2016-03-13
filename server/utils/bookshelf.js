@@ -34,16 +34,38 @@
 // Get the app configuration
 var config = require('../config/config');
 var logger = require('./logger')(module);
+var dbConfig;
 logger.info('Setting up Bookshelf');
 // Set up postgresql connection data to user database
-var dbConfig = {
-  client: 'postgresql',
-  connection: {
-    host: config.userDBHost,
-    user: config.userDBUser,
-    database: config.userDatabase
-  }
-};
+console.log('[+++] userdb values');
+console.log('[+++] host', config.userDBHost);
+console.log('[+++] user', config.userDBUser);
+console.log('[+++] pass', config.userDBPass);
+console.log('[+++] database', config.userDatabase);
+
+if (config.userDBPass) {
+  console.log('[+++]', 'Setting User database connection string with password');
+  dbConfig = {
+    client: 'postgresql',
+    connection: {
+      host: config.userDBHost,
+      user: config.userDBUser,
+      database: config.userDatabase,
+      password: config.userDBPass
+    }
+  };
+} else {
+  console.log('[+++]', 'Setting User database connection string without password');
+  dbConfig = {
+    client: 'postgresql',
+    connection: {
+      host: config.userDBHost,
+      user: config.userDBUser,
+      database: config.userDatabase
+    }
+  };
+}
+
 
 // Initialize Bookshelf ORM and connect
 var knex = require('knex')(dbConfig);
