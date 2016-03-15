@@ -124,11 +124,6 @@ config.googleAuthzStrategyConfig = {
   passReqToCallback: true
 };
 
-// config.googleJwtConfig = {
-//   clientID: config.googleClientId,
-//   clientSecret: config.googleClientSecret
-// };
-
 
 
 config.sessionSecret = process.env.DASHBOARD_SESSION_SECRET || '3xueis763$%STID47373deC!!QUsT8J4$';
@@ -188,11 +183,14 @@ config.rpcQueueNames = {
   'crosscor': 'crosscor'
 };
 
+config.defaultTheme = process.env.DASHBOARD_DEFAULT_THEME || 'light';
+
 config.defaultUserSettings = {
   'anonymize': false,
   'rpcDebug': true,
   'rpcVerbose': true,
   'cifbulkQueue': 'cifbulk_v1',
+  'theme': config.defaultTheme,
   'userExternals': []
 };
 

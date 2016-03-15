@@ -39,6 +39,7 @@ module.exports = function (grunt) {
   var publicPort = process.env.DASHBOARD_PUBLIC_PORT || '80';
   var publicProtocol = process.env.DASHBOARD_PUBLIC_PROTOCOL || 'http';
   var dashboardNodeEnv = process.env.DASHBOARD_NODE_ENV || 'development';
+  var defaultTheme = process.env.DASHBOARD_DEFAULT_THEME || 'light';
 
   console.log('Grunt build with publicHost=' + publicHost + ', publicPort=' + publicPort + ', publicProtocol=' + publicProtocol);
   // Define the configuration for all the tasks
@@ -59,7 +60,8 @@ module.exports = function (grunt) {
             DASHBOARD_PUBLIC_HOST: publicHost,
             DASHBOARD_PUBLIC_PORT: publicPort,
             DASHBOARD_PUBLIC_PROTOCOL: publicProtocol,
-            DASHBOARD_NODE_ENV: dashboardNodeEnv
+            DASHBOARD_NODE_ENV: dashboardNodeEnv,
+            DASHBOARD_DEFAULT_THEME: defaultTheme
           }
         }
       },
@@ -214,7 +216,8 @@ module.exports = function (grunt) {
         //ignorePath:  /\.\.\//
       },
       less: {
-        src: ['<%= appConfig.app %>/styles/style.less'],
+        //src: ['<%= appConfig.app %>/styles/style.less'],
+        src: ['<%= appConfig.app %>/styles/themes/*.less'],
         exclude: ['bower_components/bootstrap/dist/css/bootstrap.css']
         //ignorePath:  /\.\.\//
         //ignorePath: /(\.\.\/){1,2}bower_components\//
@@ -232,7 +235,9 @@ module.exports = function (grunt) {
 
         },
         files: {
-          '.tmp/styles/style.css': '<%= appConfig.app %>/styles/style.less'
+          //'.tmp/styles/style.css': '<%= appConfig.app %>/styles/style.less',
+          '.tmp/styles/light.css': '<%= appConfig.app %>/styles/themes/light.less',
+          '.tmp/styles/dark.css': '<%= appConfig.app %>/styles/themes/dark.less'
         }
       },
 
@@ -241,7 +246,9 @@ module.exports = function (grunt) {
           paths: ['<%= appConfig.app %>/styles']
         },
         files: {
-          '<%= appConfig.app %>/styles/style.css': '<%= appConfig.app %>/styles/style.less'
+          //'<%= appConfig.app %>/styles/style.css': '<%= appConfig.app %>/styles/style.less'
+          '<%= appConfig.app %>/styles/light.css': '<%= appConfig.app %>/styles/themes/light.less',
+          '<%= appConfig.app %>/styles/dark.css': '<%= appConfig.app %>/styles/themes/dark.less'
         }
       }
 

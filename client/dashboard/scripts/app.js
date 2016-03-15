@@ -247,7 +247,17 @@ dimsDashboard.config(function ($httpProvider) {
 
  _.mixin(_.string.exports());
 
-dimsDashboard.run(function ($rootScope, $location, $log, AuthService) {
+dimsDashboard.run(function ($rootScope, $location, $log, AuthService, $cookies, ENV) {
+
+  $cookies.currentTheme = $cookies.currentTheme || ENV.DASHBOARD_DEFAULT_THEME;
+  console.log('current theme now', $cookies.currentTheme);
+  var styleLinks = document.getElementsByTagName('link');
+  console.log(styleLinks);
+  _.forEach(styleLinks, function (link) {
+    if (link.href && link.href.indexOf('styles/') !== -1) {
+      link.disabled = (link.href.indexOf($cookies.currentTheme) === -1);
+    }
+  });
   //watching the value of the currentUser variable.
   $rootScope.$watch('currentUser', function (currentUser) {
     // if no currentUser and on a page that requires authorization then try to update it
@@ -279,6 +289,8 @@ dimsDashboard.run(function ($rootScope, $location, $log, AuthService) {
     $location.path('/login');
     return false;
   });
+
+
 });
 
 
