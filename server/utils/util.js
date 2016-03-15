@@ -36,7 +36,6 @@ var logger = require('./logger')(module);
 var createParser = function () {
 
   var parser = new stream.Transform({ objectMode: true });
-  var keys = ['date', 'bytes'];
 
   var getObject = function (line) {
     var values = [],
@@ -55,16 +54,13 @@ var createParser = function () {
     var lines = data.split('\n');
     this._lastLineData = lines.splice(lines.length - 1, 1)[0];
     lines.forEach(function (line) {
-      // this.push(_.object(keys, getObject(line)))
       this.push(getObject(line));
     }, this);
-    // lines.forEach(this.push.bind(this));
     done();
   };
 
   parser._flush = function (done) {
     if (this._lastLineData) {
-      // this.push(_.object(keys, getObject(this._lastLineData)));
       this.push(getObject(this._lastLineData));
     }
     this._lastLineData = null;

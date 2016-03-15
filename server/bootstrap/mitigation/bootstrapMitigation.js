@@ -43,10 +43,7 @@ var fs = require('fs');
 
 var ROOT_DIR = __dirname + '/../../';
 
-var keyGen = require(path.join(ROOT_DIR, '/models/keyGen'));
-
 var diContainer = require(path.join(ROOT_DIR, '/services/diContainer'))();
-// var client = redis.createClient();
 var bluebird = require('bluebird');
 var redis = require('redis');
 
@@ -54,7 +51,6 @@ var client = bluebird.promisifyAll(redis.createClient());
 bluebird.promisifyAll(client.multi());
 
 diContainer.factory('anonService', require(path.join(ROOT_DIR, '/services/anonymize')));
-// diContainer.factory('db', require(path.join(ROOT_DIR, '/utils/redisProxy')));
 diContainer.register('client', client);
 diContainer.factory('Ticket', require(path.join(ROOT_DIR, '/models/ticket')));
 diContainer.factory('Topic', require(path.join(ROOT_DIR, '/models/topic')));

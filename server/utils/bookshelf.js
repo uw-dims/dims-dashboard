@@ -40,7 +40,6 @@ logger.info('Setting up Bookshelf');
 console.log('[+++] userdb values');
 console.log('[+++] host', config.userDBHost);
 console.log('[+++] user', config.userDBUser);
-console.log('[+++] pass', config.userDBPass);
 console.log('[+++] database', config.userDatabase);
 
 if (config.userDBPass) {

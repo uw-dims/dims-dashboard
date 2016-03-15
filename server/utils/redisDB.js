@@ -31,7 +31,6 @@
 
 'use strict';
 
-// File: server/utils/redisDB.js
 // Provides a redis client
 
 var config = require('../config/config');
@@ -57,8 +56,6 @@ client.on('error', function (err) {
 
 client.on('ready', function () {
   healthLogger.publish('redis healthy ' + config.redisHost + ':' + config.redisPort + ', database ' + config.redisDatabase, redisID);
-  // logger.debug('redis client is connected to %s:%s, database %s', config.redisHost, config.redisPort,
-  //       config.redisDatabase);
   client.select(config.redisDatabase, function (err, reply) {
     if (err) {
       healthLogger.publish('redis unhealthy received error when selecting database. Err: ' + err.toString(), redisID);
@@ -72,5 +69,3 @@ client.on('close', function () {
 });
 
 module.exports = client;
-
-// EOF

@@ -31,7 +31,6 @@
 'use strict';
 
 var logger = require('../utils/logger')(module);
-var q = require('q');
 var _ = require('lodash-compat');
 
 module.exports = function (UserModel, Bookshelf) {
@@ -138,10 +137,6 @@ module.exports = function (UserModel, Bookshelf) {
     'approved'
   ];
 
-  // var tgMapping = _.chain(fieldMapping)
-  //   .omit('ident', 'descr')
-  //   .extend(tgFields)
-  //   .value();
 
   // will reduce if key is not in mapping
   var applyMapping = function applyMapping(json, mapping) {

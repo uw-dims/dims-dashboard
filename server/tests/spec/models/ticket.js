@@ -481,7 +481,7 @@ test('models/ticket.js: getTicketKeys returns array of keys', function (assert) 
   .then(function (reply) {
     console.log(reply);
 
-   
+
     return Ticket._private.getTicketKeys({
       type: 'activity',
       open: true,
@@ -505,7 +505,7 @@ test('models/ticket.js: getTicketKeys returns array of keys', function (assert) 
 test('models/ticket.js: getTickets returns array of ticket objects', function (assert) {
   createTickets()
   .then(function (reply) {
-    
+
     return Ticket.getTickets({
       type: 'activity',
       open: true,

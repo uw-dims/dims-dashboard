@@ -59,10 +59,7 @@ module.exports = function () {
       inputArray.push(value + ' ');
     });
 
-    console.log('inputArray is ', inputArray);
-
     child.startProcess('bash', inputArray)
-    // child.startProcess('ls', inputArray)
     .then(function (reply) {
       logger.debug('findHashes reply', reply);
       return deferred.resolve(reply);

@@ -73,7 +73,6 @@ module.exports = function (callingModule) {
     CustomLogger.prototype.log = function (level, msg, meta, callback) {
       var self = this;
       try {
-        // appLogger.channel.publish(this.exchange, '', new Buffer(msg));
         appLogger.publish(msg);
       } catch (err) {
         console.log('[!!!] logger applogger error, cannot publish. error: ' + err);
@@ -82,10 +81,6 @@ module.exports = function (callingModule) {
       }
     };
   }
-
-  // var updateExchange = function updateExchange(exchange) {
-  //   logger.transport.CustomLogger
-  // }
 
   var evChangeLevel = 'change-log-level';
   var evChangeExchange  = 'change-exchange';

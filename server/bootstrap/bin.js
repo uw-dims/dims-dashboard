@@ -35,7 +35,6 @@
 
 var _ = require('lodash-compat');
 var moment = require('moment');
-var redis = require('redis');
 var path = require('path');
 var ROOT_DIR = __dirname + '/../';
 
@@ -43,10 +42,14 @@ var ROOT_DIR = __dirname + '/../';
 var keyGen = require(path.join(ROOT_DIR, '/models/keyGen'));
 
 var diContainer = require(path.join(ROOT_DIR, '/services/diContainer'))();
-var client = redis.createClient();
+var diContainer = require(path.join(ROOT_DIR, '/services/diContainer'))();
+var bluebird = require('bluebird');
+var redis = require('redis');
+
+var client = bluebird.promisifyAll(redis.createClient());
+bluebird.promisifyAll(client.multi());
 
 diContainer.factory('anonService', require(path.join(ROOT_DIR, '/services/anonymize')));
-diContainer.factory('db', require(path.join(ROOT_DIR, '/utils/redisProxy')));
 diContainer.register('client', client);
 diContainer.factory('Ticket', require(path.join(ROOT_DIR, '/models/ticket')));
 diContainer.factory('UserSettings', require(path.join(ROOT_DIR, '/models/userSettings')));
@@ -66,7 +69,6 @@ var mitigationService = diContainer.get('mitigationService');
     .then(function (reply) {
       // will fix this behavior later
       ticketKey = keyGen.ticketKey(reply.parent);
-      // console.log(ticketKey);
       client.quit(function (err, reply) {
         console.log('quit reply ', reply);
       });

@@ -40,35 +40,21 @@ process.env.NODE_ENV = 'test';
 
 // ROOT_DIR is path to server directory
 var ROOT_DIR = __dirname + '/../../../';
-// console.log('dirname is ', __dirname);
-// console.log('ROOT_DIR is ', ROOT_DIR);
-// console.log('Current directory: ' + process.cwd());
 
 var keyGen = require('../../../models/keyGen');
 
-// Enable service discovery for this test
-var diContainer = require('../../../services/diContainer')();
+var bluebird = require('bluebird');
 var redis = require('redis');
 
-var client = redis.createClient();
-// Add the regular proxy to diContainer
-client.select(10, function (err, reply) {
-  if (err) {
-    console.error('test: redis client received error when selecting database ', err);
-  } else {
-    console.log('test: redis has selected db', 10, 'reply is ', reply);
-    client.flushdb();
-  }
+var client = bluebird.promisifyAll(redis.createClient());
+bluebird.promisifyAll(client.multi());
+client.selectAsync(10).then (function (reply) {
+})
+.catch(function (err) {
+  console.error(err.toString());
 });
-/* istanbul ignore next */
-diContainer.factory('db', require('../../../utils/redisProxy'));
 
-diContainer.register('client', client);
-
-diContainer.factory('FileData', require('../../../models/fileData'));
-var FileData = diContainer.get('FileData');
-var db = diContainer.get('db');
-
+var FileData = require('../../../model/fileData')(client);
 // Bootstrap some data
 // Use pathCounter so we will get a different key for each test run
 var pathCounter = 0;
@@ -158,26 +144,21 @@ test('models/fileData.js: FileData create should save file contents and key', fu
   } else {
     return newFile.create(contents1)
     .then(function (reply) {
-      // console.log('TEST filedata create newFile config is ', newFile.getConfig());
-      // console.log('TEST filedata create reply is ', reply);
-      return db.getProxy(keyGen.fileKey(newFile));
+      return client.getAsync(keyGen.fileKey(newFile));
     })
     .then(function (reply) {
       assert.equal(reply, contents1, 'Saved content equals expected.');
-      return db.hgetallProxy(keyGen.fileMetaKey(newFile));
+      return client.hgetallAsync(keyGen.fileMetaKey(newFile));
     })
     .then(function (reply) {
-      // console.log('TEST filedata create metadata reply is ', reply);
-      // Convert strings
       var result = reply;
       result.createdTime = _.parseInt(reply.createdTime);
       result.modifiedTime = _.parseInt(reply.modifiedTime);
       result.global = reply.global === 'true' ? true : false;
       assert.deepEqual(reply, newFile.getConfig(), 'Saved metadata equals expected');
-      return db.zrankProxy(keyGen.fileSetKey(newFile), keyGen.fileKey(newFile));
+      return client.zrankAsync(keyGen.fileSetKey(newFile), keyGen.fileKey(newFile));
     })
     .then(function (reply) {
-      // console.log('TEST filedata: create reply from zrank', reply);
       assert.ok(reply === 0, 'Key to file saved in set of keys');
       assert.end();
     }).catch(function (err) {
@@ -277,7 +258,7 @@ test('models/fileData.js: FileData content should handle stream', function (asse
   // writer emits 'filesave' event when the data has been saved
   // So set a listener on it
   newWriter.on('filesave', function () {
-    return db.getProxy(keyGen.fileKey(newFile)).then(function (reply) {
+    return client.getAsync(keyGen.fileKey(newFile)).then(function (reply) {
       assert.equal(reply, 'first part, second part', 'Stream content should be saved');
       assert.end();
     })
@@ -299,7 +280,7 @@ test('models/fileData.js: FileData should handle content from file via stream', 
   var testFile = fs.readFileSync(testFilePath);
   var newWriter = FileData.writer(newFile, 'create');
   newWriter.on('filesave', function () {
-    return db.getProxy(keyGen.fileKey(newFile)).then(function (reply) {
+    return client.getAsync(keyGen.fileKey(newFile)).then(function (reply) {
       assert.deepEqual(reply, testFile.toString(), 'Stream content should be saved');
       assert.end();
     })
@@ -312,13 +293,16 @@ test('models/fileData.js: FileData should handle content from file via stream', 
 });
 
 test('models/fileData.js: Finished', function (assert) {
-  console.log('Quitting redis');
-  client.flushdb(function (reply) {
-    console.log('flushdb reply ', reply);
-    client.quit(function (err, reply) {
-      console.log('quit reply ', reply);
-      assert.end();
-    });
+  client.flushdbAsync()
+  .then(function (reply) {
+    return client.quitAsync();
+  })
+  .then(function (reply) {
+    assert.end();
+  })
+  .catch(function (err) {
+    console.error(err.toString());
+    assert.end();
   });
 });
 
