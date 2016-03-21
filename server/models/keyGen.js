@@ -172,6 +172,15 @@ var keyGen = {
     return c.addSuffix(c.makeRoot('userSetting'), 'all');
   },
 
+  // TODO: Use to save site settings (not user)
+  siteSettingsKey: function() {
+    return c.makeBase('sitesettings');
+  },
+
+  sitSettingsSetKey: function() {
+    return c.addSuffix(c.makeRoot('sitesettings'), 'all');
+  },
+
   // Keys to attributes
   attributeKey: function (user, type) {
     return c.makeBase('attribute', user, type);

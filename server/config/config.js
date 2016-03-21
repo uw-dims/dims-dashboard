@@ -154,22 +154,21 @@ config.data = '/opt/dims/data/dims-sample-data/';
 
 config.serverPath = __dirname;
 
-//config.userDataPath =  config.serverPath + '/mydata/';
-
-//config.demoDatastorePath = config.serverPath + '/data/';
-
 
 // /opt/dims/data in the Dashboard container will map to host
 // /data/dashboard
-config.userDataPath = '/opt/dims/data/dashboard/';
-config.dashboardDataPath = '/opt/dims/data/dashboard/data/';
+config.userDataPath = '/opt/dims/data/dashboard/data/user/';
+config.dashboardDataPath = '/opt/dims/data/dashboard/data/site/';
 config.uploadPath = '/opt/dims/data/dashboard/upload/';
 config.logmonPath = '/opt/dims/data/logmon/';
+
 
 config.directoryMapping = {
   'ip_lists': config.userDataPath + 'ipFiles/',
   'map_files': config.userDataPath + 'mapFiles/',
-  'data_files': config.userDataPath + 'dataFiles/'
+  'data_files': config.userDataPath + 'dataFiles/',
+  'site_resources': config.dashboardDataPath + 'siteResources/',
+  'site_data': config.dashboardDataPath + 'siteData/'
 };
 
 config.defaultMapping = {
@@ -192,6 +191,13 @@ config.defaultUserSettings = {
   'cifbulkQueue': 'cifbulk_v1',
   'theme': config.defaultTheme,
   'userExternals': []
+};
+
+config.defaultSiteSettings = {
+  'siteHeadline': 'University of Washington DIMS',
+  'homePageText': '',
+  'iconFile': 'UW-logo.png',
+  'siteLogo': 'UW-logo.png'
 };
 
 // The attributes we are tracking

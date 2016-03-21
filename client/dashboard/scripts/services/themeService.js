@@ -28,39 +28,34 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
+'use strict';
+
 (function () {
-  'use strict';
 
-  // Plug controller function into AngularJS
-  angular
-    .module('dimsDashboard.controllers')
-    .controller('SelectFiles', SelectFiles);
+  var ThemeService = function ($cookies, ENV) {
+    var themeService = {};
 
-  SelectFiles.$inject = ['$scope', 'FileService', '$log'];
-
-  // The controller function for the File Select control
-  function SelectFiles($scope, FileService, $log) {
-    var vm = this;
-    vm.fileList = {};
-    vm.fileList.files = [];
-
-    vm.fileSource = $scope.fileSource;
-    vm.fileType = $scope.fileType;
-
-    activate();
-
-    function activate() {
-      return FileService.getFileList(vm.fileSource).then(function (result) {
-        vm.fileList = result;
-        vm.pickerValues = [];
-        // Set up picker
-        angular.forEach(vm.fileList.files, function(value, key) {
-          vm.pickerValues.push({value: vm.fileList.path + value.name, text: value.name});
-        });
+    themeService.setTheme = function (themeName) {
+      $cookies.currentTheme = themeName;
+      _.forEach(document.getElementsByTagName('link'), function (link) {
+        if (link.href && link.href.indexOf('styles/') !== -1) {
+          link.disabled = (link.href.indexOf($cookies.currentTheme) === -1);
+        }
       });
-    }
-  }
+    };
+
+    themeService.initializeTheme = function () {
+      var currentTheme = $cookies.currentTheme || ENV.DASHBOARD_DEFAULT_THEME;
+      themeService.setTheme(currentTheme);
+    };
+
+    return themeService;
+  };
+
+  angular.module('dimsdashboard.services')
+  .factory('ThemeService', ThemeService);
+
+  ThemeService.$inject = ['$cookies', 'ENV'];
 
 }());
-
-// EOF

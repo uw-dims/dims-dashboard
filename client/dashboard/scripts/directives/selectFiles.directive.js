@@ -31,13 +31,6 @@
 (function () {
   'use strict';
 
-  // Plug directive into AngularJS
-  angular
-    .module('dimsDashboard.directives')
-    .directive('dimsSelectFiles', dimsSelectFiles);
-
-  dimsSelectFiles.$inject = ['$timeout', '$log', 'FileService'];
-
   function dimsSelectFiles($timeout, $log, FileService) {
     var directive = {
       restrict: 'AE',
@@ -64,8 +57,14 @@
         // $log.debug('LINK: scope.pickerModel = ', scope.pickerModel);
       });
     }
-
   }
+
+  // Plug directive into AngularJS
+  angular
+    .module('dimsDashboard.directives')
+    .directive('dimsSelectFiles', dimsSelectFiles);
+
+  dimsSelectFiles.$inject = ['$timeout', '$log', 'FileService'];
 
 }());
 

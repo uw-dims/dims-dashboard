@@ -61,14 +61,13 @@ module.exports = function () {
         data = {},
         extensionAllowed = ['.txt', '.json', '.log', '.yml', '.xml'],
         maxSizeOfFile = config.maxUploadFileSize,
-        // myDirectory = './mydata/',
-        // targetPath = './upload/',
         myDirectory = config.userDataPath,
         targetPath = config.uploadPath,
+        // Limit directories to user directories
         directoryMapping = {
-          'ip_lists': 'ipFiles/',
-          'map_files': 'mapFiles/',
-          'data_files': 'dataFiles/'
+          'ip_lists': config.directoryMapping.ip_lists,
+          'map_files': config.directoryMapping.map_files,
+          'data_files': config.directoryMapping.data_files
         },
         form = new multiparty.Form();
 
@@ -120,9 +119,9 @@ module.exports = function () {
             logger.debug('files.upload form.parse - File passed validation');
 
             if ('destination' in fields) {
-              for (var key in directoryMapping) {
+              for (var key in config.directoryMapping) {
                 if (key === fields.destination[0]) {
-                  targetPath = myDirectory + directoryMapping[key] + targetFilename;
+                  targetPath = myDirectory + config.directoryMapping[key] + targetFilename;
                 }
               }
             }

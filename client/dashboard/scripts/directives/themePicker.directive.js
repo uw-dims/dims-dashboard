@@ -32,7 +32,7 @@
 (function () {
   'use strict';
 
-  function themePicker($cookies) {
+  function themePicker(ThemeService) {
     var directive = {
       restrict: 'A',
       link: linkFunc
@@ -40,15 +40,15 @@
 
     return directive;
     function linkFunc(scope, el, attr, ctrl) {
-    
+
       scope.$watch(attr.themePicker, function (value) {
-        console.log('value', value);
-        $cookies.currentTheme = value;
-        _.forEach(document.getElementsByTagName('link'), function (link) {
-          if (link.href && link.href.indexOf('styles/') !== -1) {
-            link.disabled = (link.href.indexOf($cookies.currentTheme) === -1);
-          }
-        });
+        ThemeService.setTheme(value);
+        // $cookies.currentTheme = value;
+        // _.forEach(document.getElementsByTagName('link'), function (link) {
+        //   if (link.href && link.href.indexOf('styles/') !== -1) {
+        //     link.disabled = (link.href.indexOf($cookies.currentTheme) === -1);
+        //   }
+        // });
       }) ;
     }
   }
@@ -57,6 +57,6 @@
     .module('dimsDashboard.directives')
     .directive('themePicker', themePicker);
 
-  themePicker.$inject = ['$cookies'];
+  themePicker.$inject = ['ThemeService'];
 
 }());

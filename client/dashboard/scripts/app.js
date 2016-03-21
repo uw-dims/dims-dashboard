@@ -247,45 +247,39 @@ dimsDashboard.config(function ($httpProvider) {
 
  _.mixin(_.string.exports());
 
-dimsDashboard.run(function ($rootScope, $location, $log, AuthService, $cookies, ENV) {
+dimsDashboard.run(function ($rootScope, $location, $log, AuthService, ThemeService) {
 
-  $cookies.currentTheme = $cookies.currentTheme || ENV.DASHBOARD_DEFAULT_THEME;
-  console.log('current theme now', $cookies.currentTheme);
-  var styleLinks = document.getElementsByTagName('link');
-  console.log(styleLinks);
-  _.forEach(styleLinks, function (link) {
-    if (link.href && link.href.indexOf('styles/') !== -1) {
-      link.disabled = (link.href.indexOf($cookies.currentTheme) === -1);
-    }
-  });
+  // $cookies.currentTheme = $cookies.currentTheme || ENV.DASHBOARD_DEFAULT_THEME;
+  // console.log('current theme now', $cookies.currentTheme);
+  // var styleLinks = document.getElementsByTagName('link');
+  // console.log(styleLinks);
+  // _.forEach(styleLinks, function (link) {
+  //   if (link.href && link.href.indexOf('styles/') !== -1) {
+  //     link.disabled = (link.href.indexOf($cookies.currentTheme) === -1);
+  //   }
+  // });
+
+  ThemeService.initializeTheme();
   //watching the value of the currentUser variable.
   $rootScope.$watch('currentUser', function (currentUser) {
-    // if no currentUser and on a page that requires authorization then try to update it
-    // will trigger 401s if user does not have a valid session
+
     // socialauth path - returned from social login
     if (!currentUser && (['/socialauth'].indexOf($location.path()) === 0)) {
-      $log.debug('Run: watch currentUser handler. path is socialauth');
       AuthService.onSocialLogin($location.$$search);
+
     // No currentUser and  not on login page
     // Try to get the currentUser since might be a reload
     } else if (!currentUser && (['/login'].indexOf($location.path()) === -1)) {
-      $log.debug('Run: watch currentUser handler. First if. No currentUser and not on login page. Call AuthService.currentUser()');
       AuthService.currentUser();
+
     // Login page
     } else if (['/login'].indexOf($location.path()) === 0) {
-      $log.debug('Run: watch currentUser handler. 2nd if. currentUser is ', currentUser);
-      $log.debug('Run: watch currentUser handler. 2nd if. location ', $location.path());
       $location.path('/login');
-    // Not on login, have currentUser
-    } else {
-      $log.debug('Run: watch currentUser handler. else. currentUser is ', currentUser);
-      $log.debug('Run: watch currentUser handler. else. location ', $location.path());
     }
   });
 
   // On catching 401 errors, redirect to the login page.
   $rootScope.$on('event:auth-loginRequired', function () {
-    $log.debug('Run: auth-loginRequired event handler. Caught 401, redirect to login page');
     $location.path('/login');
     return false;
   });
