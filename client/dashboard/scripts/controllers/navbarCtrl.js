@@ -36,16 +36,17 @@
     .module('dimsDashboard.controllers')
     .controller('NavbarCtrl', NavbarCtrl);
 
-  NavbarCtrl.$inject = ['$scope', '$modal', 'AuthService', '$log', '$location', '$rootScope', 'ChatService', '$window'];
+  NavbarCtrl.$inject = ['$scope', '$modal', 'AuthService', '$log', '$location', '$rootScope', 'ChatService', '$window', 'siteVars'];
 
   // The controller function for the Navbar
-  function NavbarCtrl($scope, $modal, AuthService, $log, $location, $rootScope, ChatService,  $window) {
+  function NavbarCtrl($scope, $modal, AuthService, $log, $location, $rootScope, ChatService,  $window, siteVars) {
     var vm = this;
 
     // Bindable members
     vm.logout = logout;
     vm.chat = chat;
     vm.logMonitor = logMonitor;
+    vm.siteOrg = siteVars.siteOrg;
     // vm.openSite = openSite;
     // var associatedSites = {
     //   opstrust: 'https://portal.uw.ops-trust.net',

@@ -33,7 +33,7 @@
 
 (function () {
 
-  var ThemeService = function ($cookies, ENV) {
+  var ThemeService = function ($cookies, siteVars) {
     var themeService = {};
 
     themeService.setTheme = function (themeName) {
@@ -46,14 +46,14 @@
     };
 
     themeService.initializeTheme = function () {
-      var currentTheme = $cookies.currentTheme || ENV.DASHBOARD_DEFAULT_THEME;
+      var currentTheme = $cookies.currentTheme || siteVars.siteDefaultTheme;
       themeService.setTheme(currentTheme);
     };
 
     return themeService;
   };
 
-  angular.module('dimsdashboard.services')
+  angular.module('dimsDashboard.services')
   .factory('ThemeService', ThemeService);
 
   ThemeService.$inject = ['$cookies', 'ENV'];

@@ -1,10 +1,5 @@
 'use strict';
 
-// # Globbing
-// for performance reasons we're only matching one level down:
-// 'test/spec/{,*/}*.js'
-// use this if you want to recursively match all subfolders:
-// 'test/spec/**/*.js'
 
 module.exports = function (grunt) {
 
@@ -60,9 +55,8 @@ module.exports = function (grunt) {
             DASHBOARD_PUBLIC_HOST: publicHost,
             DASHBOARD_PUBLIC_PORT: publicPort,
             DASHBOARD_PUBLIC_PROTOCOL: publicProtocol,
-            DASHBOARD_NODE_ENV: dashboardNodeEnv,
-            DASHBOARD_DEFAULT_THEME: defaultTheme
-          }
+            DASHBOARD_NODE_ENV: dashboardNodeEnv          },
+          siteVars: grunt.file.readJSON('/etc/dashboard/site_specific_config.json')
         }
       },
       build: {

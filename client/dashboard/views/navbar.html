@@ -10,11 +10,15 @@
       </button>
 
       <div ng-if="currentUser">
-      <a href="/" class="pull-left" ><img src='images/default/UW-logo.png' style="height:50px;margin-right:30px;"></a>
+      <a href="/" class="pull-left site-logo" ><img src='images/default/UW-logo.png' style="height:50px;margin-right:30px;"></a>
       <a class="navbar-brand-dims navbar-brand" href="/" style="margin-right:10px"> DIMS</a>
       </div>
 
-      <div class="pull-left" style="margin-bottom:0px;" ng-hide="currentUser" ><img src='images/default/UW-logo.png' style="height:50px;margin-right: 20px;"><span style="font-size:18px; color:#777;">University of Washington DIMS</span></div>
+      <!-- <div class="pull-left" style="margin-bottom:0px;" ng-hide="currentUser" ><img src='images/default/UW-logo.png' style="height:50px;margin-right: 20px;"><span style="font-size:18px; color:#777;">University of Washington DIMS</span></div> -->
+
+       <div class="pull-left" style="margin-bottom:0px;" ng-hide="currentUser" >
+        <span class="site-logo pull-left" ></span>
+        <span class="pull-left site-header" >{{ vm.siteOrg }}</span></div>
 
     </div>
     <div class="navbar-collapse collapse">
