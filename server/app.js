@@ -63,7 +63,6 @@ var routes = require('./routes');
 // Dependency injection
 var diContainer = require('./services/diContainer')();
 diContainer.register('client', require('./utils/redisDB'));
-diContainer.factory('db', require('./utils/redisProxy'));
 diContainer.register('Bookshelf', require('./utils/bookshelf'));
 diContainer.factory('UserSettings', require('./models/userSettings'));
 diContainer.factory('Ticket', require('./models/ticket'));
@@ -193,7 +192,7 @@ app.use(session({
 if (config.env === 'development' || config.env === 'test') {
   app.set('views', path.join(__dirname, '../client/dashboard'));
   app.use(errorHandler());
-  app.use(favicon(path.join(__dirname, '../client/dashboard/images/default/UW-logo-16x16.ico')));
+  app.use(favicon(path.join(__dirname, '../client/dashboard/images/default/favicon.ico')));
   app.use(express.static(path.join(__dirname, '../client')));
   app.use(express.static(path.join(__dirname, '.tmp')));
   app.use(express.static(path.join(__dirname, '../client/dashboard')));
@@ -210,6 +209,7 @@ if (config.env === 'development' || config.env === 'test') {
 // production environment
 if (config.env === 'production') {
   app.set('views', path.join(__dirname, '../public'));
+  app.use(favicon(path.join(__dirname, '../public/images/default/favicon.ico')));
   app.use(express.static(path.join(__dirname, '../public')));
   app.use(function (err, req, res, next) {
     /* jshint unused: false */

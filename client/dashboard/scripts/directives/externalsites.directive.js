@@ -32,7 +32,7 @@
 (function () {
   'use strict';
 
-  function externalSites($log, $window, $modal, SettingsService) {
+  function externalSites($log, $window, $modal, SettingsService, siteVars) {
     var directive = {
       restrict: 'AEC',
       templateUrl: 'views/partials/externalsites.html',
@@ -52,7 +52,7 @@
     function controllerFunc($scope) {
       $log.debug('externalsites directive controller');
       var vm = this;
-      var staticExternals = [];
+      var staticExternals = angular.copy(siteVars.siteExternals);
       var colors = ['#53a07f', '#86b3bb', '#716F84', '#1D6285', '#3d765d', '#424557'];
       var maxSites = 12;
       // TODO Add this info to system configuration database
@@ -68,7 +68,7 @@
       //   siteURL: 'https://demo.trident.li/',
       //   canDelete: false
       // });
-      staticExternals = angular.copy(constExternalSites);
+      // staticExternals = angular.copy(constExternalSites);
       vm.allSites = getAllSites(staticExternals);
       var associatedSites = sitesConfig(vm.allSites);
       vm.showAdd = vm.allSites.length < maxSites ? true : false;
@@ -194,6 +194,6 @@
     .module('dimsDashboard.directives')
     .directive('externalSites', externalSites);
 
-  externalSites.$inject = ['$log', '$window', '$modal', 'SettingsService'];
+  externalSites.$inject = ['$log', '$window', '$modal', 'SettingsService', 'siteVars'];
 
 }());

@@ -163,7 +163,7 @@ a.navbar-brand-dims {
 // }
 
 .site-logo {
-  content:url('../images/default/UW-logo.png');
+  content:url("@{site-logo-path}");
   height: 50px;
   margin-right: 30px;
 }
@@ -172,6 +172,13 @@ a.navbar-brand-dims {
   font-size: 18px;
   color: @site-header-color;
   margin-top: 15px;
+}
+
+.site-login {
+  background-image: url("@{site-image-path}/@{site-login-background-file}");
+  background-repeat: no-repeat; 
+  background-position: 40% 80%; 
+  background-size: 42%;
 }
 
 .saved-query-group, .ticket-group {

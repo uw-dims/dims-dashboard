@@ -43,7 +43,7 @@ var _ = require('lodash-compat'),
     dimsUtils = require('../utils/util');
 
 // module.exports = function FileData(serviceLocator) {
-module.exports = function FileData(db) {
+module.exports = function FileData(client) {
 
   // Prototype with functions for a fileData object
   var filePrototype = {
@@ -54,7 +54,7 @@ module.exports = function FileData(db) {
       self.createdTime = dimsUtils.createTimestamp();
       self.modifiedTime = self.createdTime;
       // Make sure the file does not already exist
-      db.zrankProxy(keyGen.fileSetKey(self), keyGen.fileKey(self))
+      db.zrankAsync(keyGen.fileSetKey(self), keyGen.fileKey(self))
       .then(function (reply) {
         if (reply !== null) {
           deferred.reject(new Error('Key for file already exists'));

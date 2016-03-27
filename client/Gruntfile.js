@@ -1,5 +1,6 @@
 'use strict';
 
+var _ = require('lodash-compat');
 
 module.exports = function (grunt) {
 
@@ -29,12 +30,41 @@ module.exports = function (grunt) {
   // connect to the app which proxies to the Dashboard.
 
   // Defaults:
-
+  // ENV vars are specified for the server in /etc/dashboard/dashboard.conf. These are the
+  // server ENV vars which are needed by the client as well.
   var publicHost = process.env.DASHBOARD_PUBLIC_HOST || 'localhost';
   var publicPort = process.env.DASHBOARD_PUBLIC_PORT || '80';
   var publicProtocol = process.env.DASHBOARD_PUBLIC_PROTOCOL || 'http';
   var dashboardNodeEnv = process.env.DASHBOARD_NODE_ENV || 'development';
-  var defaultTheme = process.env.DASHBOARD_DEFAULT_THEME || 'light';
+  var consulUrl = process.env.CONSUL_URL;
+  var tridentUrl = process.env.TRIDENT_URL;
+
+  // The client configuration json needs to be located at /etc/dashboard/dashboard_client_config.json
+  var clientConfig = grunt.file.readJSON('/etc/dashboard/dashboard_client_config.json');
+
+  // modify the client config to add consul, trident URLs if they are provided and if
+  // the config is set up to contain them
+  function setExternalsConfig(config, type, url) {
+    var index = _.findIndex(config.siteExternals, function (obj) {
+      return obj.externalKey === type;
+    });
+    console.log('index is ', index);
+    if (index !== -1) {
+      if (url) {
+        console.log(config);
+        console.log(config.siteExternals);
+        config.siteExternals[index].siteURL = url;
+      } else {
+        // Delete type from the config since no URL provided
+        _.pullAt(config.siteExternals, index);
+      }
+    }
+    return config;
+  }
+
+  clientConfig = setExternalsConfig(clientConfig, 'consul', consulUrl);
+  clientConfig = setExternalsConfig(clientConfig, 'trident', tridentUrl);
+  clientConfig.siteIntroText = _.escape(clientConfig.siteIntroText);
 
   console.log('Grunt build with publicHost=' + publicHost + ', publicPort=' + publicPort + ', publicProtocol=' + publicProtocol);
   // Define the configuration for all the tasks
@@ -56,7 +86,9 @@ module.exports = function (grunt) {
             DASHBOARD_PUBLIC_PORT: publicPort,
             DASHBOARD_PUBLIC_PROTOCOL: publicProtocol,
             DASHBOARD_NODE_ENV: dashboardNodeEnv          },
-          siteVars: grunt.file.readJSON('/etc/dashboard/site_specific_config.json')
+          siteVars: clientConfig,
+          package: grunt.file.readJSON('package.json'),
+          debug: dashboardNodeEnv === 'development'
         }
       },
       build: {

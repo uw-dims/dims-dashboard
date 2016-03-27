@@ -211,18 +211,18 @@ var rpcClientOptions = {
   }
 };
 
-var constExternalSites = [{
-    externalKey: 'consul',
-    siteName: 'CONSUL',
-    siteURL: constants.consulUrl,
-    canDelete: false
-  }, {
-    externalKey: 'trident',
-    siteName: 'TRIDENT',
-    siteURL: constants.tridentUrl,
-    canDelete: false
-  }
-];
+// var constExternalSites = [{
+//     externalKey: 'consul',
+//     siteName: 'CONSUL',
+//     siteURL: constants.consulUrl,
+//     canDelete: false
+//   }, {
+//     externalKey: 'trident',
+//     siteName: 'TRIDENT',
+//     siteURL: constants.tridentUrl,
+//     canDelete: false
+//   }
+// ];
 
 var dimsDashboard = angular.module('dimsDashboard',
   ['ngRoute', 'angularFileUpload', 'ui.bootstrap', 'ui.bootstrap.showErrors', 'ngGrid', 'ngAnimate', 'ngResource',
