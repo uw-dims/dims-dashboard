@@ -54,16 +54,16 @@ module.exports = function FileData(client) {
       self.createdTime = dimsUtils.createTimestamp();
       self.modifiedTime = self.createdTime;
       // Make sure the file does not already exist
-      db.zrankAsync(keyGen.fileSetKey(self), keyGen.fileKey(self))
+      client.zrankAsync(keyGen.fileSetKey(self), keyGen.fileKey(self))
       .then(function (reply) {
         if (reply !== null) {
           deferred.reject(new Error('Key for file already exists'));
         } else {
-          var multi = db.multi();
+          var multi = client.multi();
           multi.set(keyGen.fileKey(self), content);
           multi.hmset(keyGen.fileMetaKey(self), self.getConfig());
           multi.zadd(keyGen.fileSetKey(self), self.createdTime, keyGen.fileKey(self));
-          multi.exec(function (err, replies) {
+          multi.execAsync(function (err, replies) {
             if (err) {
               deferred.reject(err);
             } else {
@@ -81,10 +81,10 @@ module.exports = function FileData(client) {
       var deferred = q.defer();
       // Update modified time
       self.modifiedTime = dimsUtils.createTimestamp();
-      var multi = db.multi();
+      var multi = client.multi();
       multi.set(keyGen.fileKey(self), content);
       multi.hmset(keyGen.fileMetaKey(self), self.getConfig());
-      multi.exec(function (err, replies) {
+      multi.execAsync(function (err, replies) {
         if (err) {
           deferred.reject(err);
         } else {
@@ -98,13 +98,13 @@ module.exports = function FileData(client) {
     // Retrieves the file content as a string from the database
     getContent: function getContent() {
       var self = this;
-      return db.getProxy(keyGen.fileKey(self));
+      return client.getAsync(keyGen.fileKey(self));
     },
 
     // Returns true if the file has been saved in the database
     exists: function exists() {
       var self = this;
-      return db.zrankProxy(keyGen.fileSetKey(self), keyGen.fileKey(self))
+      return client.zrankAsync(keyGen.fileSetKey(self), keyGen.fileKey(self))
       .then(function (reply) {
         return reply === null ? false : true;
       })
@@ -117,7 +117,7 @@ module.exports = function FileData(client) {
     // Retrieves the file metadata from database and returns it
     getMetadata: function getMetadata() {
       var self = this;
-      return db.hgetallProxy(keyGen.fileMetaKey(self))
+      return client.hgetallAsync(keyGen.fileMetaKey(self))
       .then(function (reply) {
         // Convert to integer, boolean since client returns all as string
         reply.createdTime = _.parseInt(reply.createdTime);
@@ -152,7 +152,7 @@ module.exports = function FileData(client) {
 
   // Return list of keys for a type
   var list = function list(type) {
-    return db.zrangeProxy(keyGen.fileSetKey(type), 0, -1);
+    return client.zrangeAsync(keyGen.fileSetKey(type), 0, -1);
   };
 
   // var getMetadata = function getMetadata(key) {
