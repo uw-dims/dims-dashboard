@@ -9,7 +9,6 @@
 
           <div class="row">
           <div class="col-sm-4">
-          <!-- <button class="btn btn-danger btn-block"><a href="/auth/google" target="_self" style="color:white;">Google</a></button> -->
           <a href="/auth/google" target="_self" class="btn btn-danger btn-block" role="button">Google</a> 
           </div><div class="col-sm-8" style="color:#999">Sign in with Google
 
@@ -109,7 +108,10 @@
   <div style="margin-left:20px;">
   <h3>{{ orgName }}</h3>
   <h1>Distributed Incident Management System</h1>
-  <p>{{ siteIntroText }}
+  <!-- <p>{{ siteIntroText }} -->
+  <span ng-repeat="line in (siteIntroText | newlines) track by $index">
+   <p> {{ line }}</p>
+  </span>
   </div>
   </div>
   </div>

@@ -33,9 +33,14 @@
 
 /* Filters */
 
-angular.module('dimsNode.filters', []).
+angular.module('dimsDashboard.filters', []).
   filter('interpolate', ['version', function (version) {
     return function (text) {
       return String(text).replace(/\%VERSION\%/mg, version);
     };
-  }]);
+  }])
+  .filter('newlines', function () {
+    return function (text) {
+      return text.split(/\n/g);
+    };
+  });

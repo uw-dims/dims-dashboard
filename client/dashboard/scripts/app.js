@@ -227,12 +227,12 @@ var rpcClientOptions = {
 var dimsDashboard = angular.module('dimsDashboard',
   ['ngRoute', 'angularFileUpload', 'ui.bootstrap', 'ui.bootstrap.showErrors', 'ngGrid', 'ngAnimate', 'ngResource',
     'http-auth-interceptor', 'btford.socket-io', 'ngSanitize', 'ngCookies', 'anguFixedHeaderTable', 'truncate',
-    'msieurtoph.ngCheckboxes', 'dimsDashboard.controllers', 'dimsDashboard.directives', 'dimsDashboard.services', 'dimsDashboard.config'])
+    'msieurtoph.ngCheckboxes', 'dimsDashboard.controllers', 'dimsDashboard.directives', 'dimsDashboard.services', 'dimsDashboard.config', 'dimsDashboard.filters'])
   .config(dimsDashboardConfig);
 
 dimsDashboard.constant(constants);
 dimsDashboard.constant(rpcClientOptions);
-dimsDashboard.constant(constExternalSites);
+// dimsDashboard.constant(constExternalSites);
 
 // This is populated by Grunt
 angular.module('dimsDashboard.config', []);

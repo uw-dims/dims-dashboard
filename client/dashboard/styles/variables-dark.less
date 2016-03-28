@@ -16,10 +16,10 @@
 @gray-lighter:           #ADAFAE; // #eee
 
 @brand-primary:         #69c; //#2A9FD6;
-@brand-success:         #77B300;
-@brand-info:            #9933CC;
-@brand-warning:         #FF8800;
-@brand-danger:          #CC0000;
+@brand-success:         @gray; //#77B300;
+@brand-info:            @gray-dark; //#9933CC;
+@brand-warning:         @gray-darker; //#FF8800;
+@brand-danger:          #d9534f;
 
 @headings-color:          #fc3; //#fff;
 
@@ -27,6 +27,16 @@
 @ticket-list-color:           @gray;
 @dims-label-color:            @gray-lighter;
 @site-header-color:           @headings-color;
+
+@icon-color:           @gray-lighter;
+@topic-color: @gray-lighter;
+@metadata-color: @gray-light;
+
+@ng-grid-bg: @gray-dark;
+@ng-grid-border: @gray-base;
+@ng-grid-top-panel-bg: @gray-darker;
+@dropzone-bg: @gray-dark;
+@dropzone-bg-hover: @gray-darker;
 
 @site-login-background-file: "dims-graph-dark.png";
 // @site-login-background-path:  '../images/default/'@site-login-background-file;
@@ -38,7 +48,7 @@
 //** Background color for `<body>`.
 @body-bg:               #060606;
 //** Global text color on `<body>`.
-@text-color:            @gray-light;
+@text-color:            @gray-lighter; //@gray-light;
 
 //** Global textual link color.
 @link-color:            @brand-primary;
@@ -112,7 +122,7 @@
 //##
 
 //** `<input>` background color
-@input-bg:                       #fff;
+@input-bg:                       #111; //#fff;
 //** `<input disabled>` background color
 @input-bg-disabled:              @gray-lighter;
 
@@ -126,7 +136,7 @@
 @input-border-focus:             #66afe9;
 
 //** Placeholder text color
-@input-color-placeholder:        @gray-light;
+@input-color-placeholder:        @gray; //@gray-light;
 
 
 
@@ -190,7 +200,7 @@
 @navbar-default-link-hover-color:          #fff;
 @navbar-default-link-hover-bg:             transparent;
 @navbar-default-link-active-color:         #fff;
-@navbar-default-link-active-bg:            transparent;
+@navbar-default-link-active-bg:            lighten(@navbar-default-bg, 10%);//transparent;
 @navbar-default-link-disabled-color:       @gray-light;
 @navbar-default-link-disabled-bg:          transparent;
 
@@ -200,7 +210,7 @@
 @navbar-default-brand-hover-bg:            transparent;
 
 // Navbar toggle
-@navbar-default-toggle-hover-bg:           @gray-dark;
+@navbar-default-toggle-hover-bg:           @gray-darker;
 @navbar-default-toggle-icon-bar-bg:        #ccc;
 @navbar-default-toggle-border-color:       @gray-dark;
 
@@ -236,7 +246,7 @@
 //##
 
 //=== Shared nav styles
-@nav-link-hover-bg:                         @gray-darker;
+@nav-link-hover-bg:                         @gray-dark;
 
 @nav-disabled-link-color:                   @gray-light;
 @nav-disabled-link-hover-color:             @gray-light;
