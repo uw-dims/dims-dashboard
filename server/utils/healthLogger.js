@@ -31,15 +31,18 @@
 'use strict';
 
 var config = require('../config/config');
+var logger = require('../utils/logger')(module);
 var amqpLogger = require('../services/amqpLogger');
 var moment = require('moment');
 var os = require('os');
 var uuid = require('node-uuid');
 
 var healthLogger = amqpLogger(config.healthExchange);
-console.log('[+++] HealthLogger starting...');
+
 var label = 'utils/healthLogger.js';
 var logLevel = 'INFO';
+
+logger.info('HealthLogger starting...');
 
 // Used for discrete UUIDs for different subsystems
 var uuidSet = function uuidSet() {
@@ -61,11 +64,12 @@ var format = function format(msg, id, level) {
 
 var publish = function (msg, id) {
   // Only publish health on dev or production systems, not when running tests
-  if (config.env !== 'test') {
+  // and wait for healthLogger to be ready (pub exists)
+  if (config.env !== 'test' && healthLogger.pub) {
     try {
       healthLogger.pub(format(msg, id, logLevel));
     } catch (err) {
-      console.log('[!!!] healthLogger publish error: ' + err);
+      logger.info('healthLogger publish error: ' + err);
     }
   }
 };

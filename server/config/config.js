@@ -83,7 +83,7 @@ config.userDBPass = process.env.USER_DB_PASS || null;
 
 config.sessionTTL = 2 * 60 * 60; //Redis session expiration. 2 hours, in seconds
 
-config.tokenTTL = config.sessionTTL;
+config.tokenTTL = process.env.DASHBOARD_TOKEN_TTL || config.sessionTTL;
 
 // Passport vars and configs
 config.tokenSecret = process.env.DASHBOARD_TOKEN_SECRET || 'djf83UhNH35CDjfjEFM3B9e01viY8fNqz3YXpb25wc0U';
@@ -125,7 +125,6 @@ config.googleAuthzStrategyConfig = {
 };
 
 
-
 config.sessionSecret = process.env.DASHBOARD_SESSION_SECRET || '3xueis763$%STID47373deC!!QUsT8J4$';
 
 config.cookieSecret = process.env.DASHBOARD_COOKIE_SECRET || 'Xu9J35bq!5#kNY*n3v04aSPxoURx98wQZW';
@@ -157,8 +156,8 @@ config.serverPath = __dirname;
 
 // /opt/dims/data in the Dashboard container will map to host
 // /data/dashboard
-config.userDataPath = '/opt/dims/data/dashboard/data/user/';
-config.dashboardDataPath = '/opt/dims/data/dashboard/data/site/';
+config.userDataPath = '/opt/dims/data/dashboard/';
+config.dashboardDataPath = '/opt/dims/data/dashboard/data/';
 config.uploadPath = '/opt/dims/data/dashboard/upload/';
 config.logmonPath = '/opt/dims/data/logmon/';
 

@@ -52,6 +52,7 @@ var express = require('express')
   , socket = require('socket.io')
   //, flash = require('connect-flash')
   , passport = require('passport')
+  , logger = require('./utils/logger')(module)
   , LocalStrategy = require('passport-local').Strategy
   , JwtStrategy = require('passport-jwt').Strategy
   , GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
@@ -372,15 +373,15 @@ if (config.sslOn) {
 if (require.main === module) {
   appLogger = require('./utils/appLogger');
   appLogger.on('logger-ready-logs', function () {
-    console.log('[+++] appLogger received logger-ready-logs event');
+    logger.info('appLogger received logger-ready-logs event');
   });
   healthLogger = require('./utils/healthLogger');
   healthLogger.on('logger-ready-health', function () {
-    console.log('[+++] healthLogger received logger-ready-health event');
+    logger.info('healthLogger received logger-ready-health event');
     // Run the healthService
     var healthService = diContainer.get('healthService');
     healthService.run();
-    console.log('[+++] Finished running healthService');
+    logger.info('healthService started');
     healthLogger.publish('dashboard initialized DIMS Dashboard running on port ' + server.address().port, config.healthID);
     if (config.sslOn) {
       healthLogger.publish('dashboard initialized SSL is on', config.healthID);
@@ -398,7 +399,7 @@ if (require.main === module) {
     // Initialize messaging - fanout publish, subscribe, sockets
     require('./services/messaging')(io);
     server.listen(port, function () {
-      console.log('[+++] Server listening');
+      logger.info('Server listening');
     });
   }, 2000);
 

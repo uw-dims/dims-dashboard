@@ -34,6 +34,8 @@ var amqp = require('amqplib');
 var config = require('../config/config');
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
+var logger = require('../utils/logger')(module);
+
 util.inherits(AmqpLogPublisher, EventEmitter);
 
 exports = module.exports = AmqpLogPublisher;
@@ -62,11 +64,11 @@ function AmqpLogPublisher(name, durable) {
 
 AmqpLogPublisher.prototype.createConnection = function () {
   var self = this;
-  console.log('[+++] amqpLogPublisher creating connection to ', self.server);
+  logger.info('amqpLogPublisher creating connection to ', self.server);
   amqp.connect(self.connectionString)
   .then(function (conn) {
     self.setConnection(conn);
-    console.log('[+++] amqpLogPublisher connection created to ', self.server);
+    logger.info('amqpLogPublisher connection created to ', self.server);
     // self.emit(self.connectionCreated);
     return self.connection.createChannel();
   })
@@ -87,7 +89,7 @@ AmqpLogPublisher.prototype.createConnection = function () {
     self.emit('ready');
   })
   .catch(function (err) {
-    console.log('[+++] amqpLogPublisher connection failure to ', self.server);
+    logger.info('amqpLogPublisher connection failure to ', self.server);
     self.emit(self.createError, self);
   })
   .done();
@@ -95,7 +97,7 @@ AmqpLogPublisher.prototype.createConnection = function () {
 
 // Need to pass self (this) so it is propagated through multiple calls
 AmqpLogPublisher.prototype.onFail = function (self) {
-  console.log('[!!!] AmqpLogPublisher Connection failure. Trying again in 5 seconds...');
+  logger.error('AmqpLogPublisher Connection failure. Trying again in 5 seconds...');
   setTimeout(function (self) {
     self.createConnection();
   }, 5000, self);
@@ -105,12 +107,12 @@ AmqpLogPublisher.prototype.setConnection = function (conn) {
   var self = this;
   self.connection = conn;
   self.connection.on('close', function () {
-    console.log('[!!!] AmqpPublisher Connection received close event');
+    logger.info('AmqpPublisher Connection received close event');
     // self.connection =  null;
     self.emit(self.connectionClose);
   });
   self.connection.on('error', function (err) {
-    console.log('[!!!] AmqpPublisher Connection received error event.' + err.toString());
+    logger.info('AmqpPublisher Connection received error event.' + err.toString());
     self.emit(self.connectionError, err.toString());
   });
 };

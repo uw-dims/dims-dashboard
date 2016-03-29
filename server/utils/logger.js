@@ -72,12 +72,15 @@ module.exports = function (callingModule) {
     util.inherits(CustomLogger, winston.Transport);
     CustomLogger.prototype.log = function (level, msg, meta, callback) {
       var self = this;
-      try {
-        appLogger.publish(msg);
-      } catch (err) {
-        console.log('[!!!] logger applogger error, cannot publish. error: ' + err);
-      } finally {
-        callback(null, true);
+      // Dont publish if logger not ready
+      if (appLogger.publish) {
+        try {
+          appLogger.publish(msg);
+        } catch (err) {
+          console.log('[!!!] logger applogger error, cannot publish. error: ' + err);
+        } finally {
+          callback(null, true);
+        }
       }
     };
   }
