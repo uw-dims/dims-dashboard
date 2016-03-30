@@ -56,6 +56,7 @@ module.exports = function (callingModule) {
   };
 
   // Update the log level for a transport
+  // Note this capability is TBD
   var updateLogLevel = function updateLogLevel(transport, level) {
     logger.transports[transport].level = level;
   };
@@ -99,14 +100,14 @@ module.exports = function (callingModule) {
     logger.addFilter(dimsFormat);
   }
 
-  if (config.env === 'development' || config.env === 'test') {
-    logger.add(winston.transports.Console, {
-      level: config.logLevel,
-      handleExceptions: false,
-      json: false,
-      colorize: true
-    });
-  }
+
+  logger.add(winston.transports.Console, {
+    level: config.logLevel,
+    handleExceptions: false,
+    json: false,
+    colorize: true
+  });
+  
 
   logger.on(evChangeLevel, updateLogLevel.bind(this));
   // logger.on(evChangeExchange, updateExchange.bind(this));
