@@ -232,7 +232,6 @@ var dimsDashboard = angular.module('dimsDashboard',
 
 dimsDashboard.constant(constants);
 dimsDashboard.constant(rpcClientOptions);
-// dimsDashboard.constant(constExternalSites);
 
 // This is populated by Grunt
 angular.module('dimsDashboard.config', []);
@@ -241,23 +240,14 @@ angular.module('dimsDashboard.services', []);
 angular.module('dimsDashboard.directives', []);
 angular.module('dimsDashboard.filters', []);
 
-dimsDashboard.config(function ($httpProvider) {
+dimsDashboard.config(function ($httpProvider, $logProvider, ENV) {
     $httpProvider.interceptors.push('authInterceptor');
+    $logProvider.debugEnabled(ENV.DASHBOARD_NODE_ENV === 'development')
   });
 
- _.mixin(_.string.exports());
+_.mixin(_.string.exports());
 
 dimsDashboard.run(function ($rootScope, $location, $log, AuthService, ThemeService) {
-
-  // $cookies.currentTheme = $cookies.currentTheme || ENV.DASHBOARD_DEFAULT_THEME;
-  // console.log('current theme now', $cookies.currentTheme);
-  // var styleLinks = document.getElementsByTagName('link');
-  // console.log(styleLinks);
-  // _.forEach(styleLinks, function (link) {
-  //   if (link.href && link.href.indexOf('styles/') !== -1) {
-  //     link.disabled = (link.href.indexOf($cookies.currentTheme) === -1);
-  //   }
-  // });
 
   ThemeService.initializeTheme();
   //watching the value of the currentUser variable.
