@@ -36,14 +36,11 @@ var config = require('../config/config');
 var logger = require('./logger')(module);
 var dbConfig;
 logger.info('Setting up Bookshelf');
-// Set up postgresql connection data to user database
-console.log('[+++] userdb values');
-console.log('[+++] host', config.userDBHost);
-console.log('[+++] user', config.userDBUser);
-console.log('[+++] database', config.userDatabase);
+logger.info('Connection to user database %s at %s with user %s',
+  config.userDatabase, config.userDBHost, config.userDBUser);
 
 if (config.userDBPass) {
-  console.log('[+++]', 'Setting User database connection string with password');
+  logger.info('Setting User database connection string with password');
   dbConfig = {
     client: 'postgresql',
     connection: {
@@ -54,7 +51,7 @@ if (config.userDBPass) {
     }
   };
 } else {
-  console.log('[+++]', 'Setting User database connection string without password');
+  logger.info('Setting User database connection string without password');
   dbConfig = {
     client: 'postgresql',
     connection: {
