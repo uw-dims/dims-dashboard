@@ -16,22 +16,11 @@ module.exports = function (grunt) {
     dist: '../public'
   };
 
-  // Get variables for deployment from command line
-  // var deployedURL = grunt.option('url') || 'localhost';
-  // var deployedPort = grunt.option('port') || '3000';
-  // Refactoring
-  // We will use the environment vars:
-  // process.env.DASHBOARD_PUBLIC_HOST - host or ip where the socket.io server resides
-  // process.env.DASHBOARD_PUBLIC_PROTOCOL - protocol we're using - http or https
-  // process.env.DASHBOARD_PUBLIC_PORT - port
-  // When container is deployed, these environment variables need to be
-  // defined. Grunt is then run to write these values to the client config file
-  // These values are the protocol, host, and port that a client will use to
-  // connect to the app which proxies to the Dashboard.
-
   // Defaults:
-  // ENV vars are specified for the server in /etc/dashboard/dashboard.conf. These are the
-  // server ENV vars which are needed by the client as well.
+  // ENV vars are specified for the server in /etc/dashboard/dashboard.conf. They can also
+  // be provided on the command line if running manually. 
+  // These are the
+  // server ENV vars which are needed by the client as well as the server
   var publicHost = process.env.DASHBOARD_PUBLIC_HOST || 'localhost';
   var publicPort = process.env.DASHBOARD_PUBLIC_PORT || '80';
   var publicProtocol = process.env.DASHBOARD_PUBLIC_PROTOCOL || 'http';
@@ -48,11 +37,8 @@ module.exports = function (grunt) {
     var index = _.findIndex(config.siteExternals, function (obj) {
       return obj.externalKey === type;
     });
-    console.log('index is ', index);
     if (index !== -1) {
       if (url) {
-        console.log(config);
-        console.log(config.siteExternals);
         config.siteExternals[index].siteURL = url;
       } else {
         // Delete type from the config since no URL provided
@@ -62,9 +48,19 @@ module.exports = function (grunt) {
     return config;
   }
 
+  // Update clientConfig with URL for consul and trident (if they are available on this system)
   clientConfig = setExternalsConfig(clientConfig, 'consul', consulUrl);
   clientConfig = setExternalsConfig(clientConfig, 'trident', tridentUrl);
   clientConfig.siteIntroText = _.escape(clientConfig.siteIntroText);
+
+  // Copy the site logo to images directory before building:
+  if (grunt.file.exists('/etc/dashboard/' + clientConfig.siteLogo)) {
+    grunt.file.copy('/etc/dashboard/' + clientConfig.siteLogo, './dashboard/images/default/' + clientConfig.siteLogo);
+  }
+  // Copy favicon if it exists
+  if (grunt.file.exists('/etc/dashboard/favicon.ico')) {
+    grunt.file.copy('/etc/dashboard/favicon.ico', './dashboard/images/default/favicon.ico');
+  }
 
   console.log('Grunt build with publicHost=' + publicHost + ', publicPort=' + publicPort + ', publicProtocol=' + publicProtocol);
   // Define the configuration for all the tasks
@@ -87,8 +83,8 @@ module.exports = function (grunt) {
             DASHBOARD_PUBLIC_PROTOCOL: publicProtocol,
             DASHBOARD_NODE_ENV: dashboardNodeEnv          },
           siteVars: clientConfig,
-          package: grunt.file.readJSON('package.json'),
-          debug: dashboardNodeEnv === 'development'
+          client_package: grunt.file.readJSON('package.json'),
+          server_package: grunt.file.readJSON('../server/package.json')
         }
       },
       build: {
@@ -130,7 +126,9 @@ module.exports = function (grunt) {
       }
     },
 
-    // The actual grunt server settings
+    // The actual grunt server settings for live reload during development. 
+    // We are not currently using this, so it has
+    // not been tested.
     connect: {
       options: {
         port: 9000,
@@ -251,7 +249,13 @@ module.exports = function (grunt) {
     },
 
     // Compiles LESS to CSS and generates necessary files if requested
+    // Override the variable for the site logo
     less: {
+      options: {
+        modifyVars: {
+          siteLogoFile: clientConfig.siteLogo
+        }
+      },
       development: {
         options: {
           strictMath: true,
@@ -280,33 +284,6 @@ module.exports = function (grunt) {
 
     },
 
-    // compass: {
-    //   options: {
-    //     sassDir: '<%= appConfig.app %>/styles',
-    //     cssDir: '.tmp/styles',
-    //     generatedImagesDir: '.tmp/images/generated',
-    //     imagesDir: '<%= appConfig.app %>/images',
-    //     javascriptsDir: '<%= appConfig.app %>/scripts',
-    //     fontsDir: '<%= appConfig.app %>/styles/fonts',
-    //     importPath: './bower_components',
-    //     httpImagesPath: '/images',
-    //     httpGeneratedImagesPath: '/images/generated',
-    //     httpFontsPath: '/styles/fonts',
-    //     relativeAssets: false,
-    //     assetCacheBuster: false,
-    //     raw: 'Sass::Script::Number.precision = 10\n'
-    //   },
-    //   dist: {
-    //     options: {
-    //       generatedImagesDir: '<%= appConfig.dist %>/images/generated'
-    //     }
-    //   },
-    //   server: {
-    //     options: {
-    //       debugInfo: true
-    //     }
-    //   }
-    // },
 
     // Renames files for browser caching purposes
     filerev: {
@@ -357,7 +334,7 @@ module.exports = function (grunt) {
     cssmin: {
       dist: {
         files: {
-          '<%= appConfig.dist %>/styles/main.css': [
+          '<%= appConfig.dist %>/styles/*.css': [
             '.tmp/styles/{,*/}*.css'
           ]
         }
@@ -548,10 +525,10 @@ module.exports = function (grunt) {
     'concat',
     'ngAnnotate',
     'copy:dist',
-    'cssmin',
+    //'cssmin',
     // Uglify not working on some of our dependencies
     'uglify',
-    'filerev',
+    //'filerev',
     'usemin',
     'htmlmin'
   ]);
