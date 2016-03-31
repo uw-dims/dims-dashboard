@@ -13,7 +13,8 @@ module.exports = function (grunt) {
   // Configurable paths for the application
   var appConfig = {
     app: require('./bower.json').appPath || 'dimswebapp',
-    dist: '../public'
+    dist: '../public',
+    tmp: '../.tmp/'
   };
 
   // Defaults:
@@ -308,8 +309,8 @@ module.exports = function (grunt) {
           html: {
             steps: {
               // uglifying not working, so disabling it for now
-              js: ['concat', 'uglifyjs'],
-              // js: ['concat'],
+              // js: ['concat', 'uglifyjs'],
+              js: ['concat'],
               css: ['cssmin']
             },
             post: {}
@@ -331,15 +332,15 @@ module.exports = function (grunt) {
     // By default, your `index.html`'s <!-- Usemin block --> will take care of
     // minification. These next options are pre-configured if you do not wish
     // to use the Usemin blocks.
-    cssmin: {
-      dist: {
-        files: {
-          '<%= appConfig.dist %>/styles/*.css': [
-            '.tmp/styles/{,*/}*.css'
-          ]
-        }
-      }
-    },
+    // cssmin: {
+    //   dist: {
+    //     files: {
+    //       '<%= appConfig.dist %>/styles/*.css': [
+    //         '.tmp/styles/{,*/}*.css'
+    //       ]
+    //     }
+    //   }
+    // },
     uglify: {
       options: {
         mangle: false
@@ -348,7 +349,9 @@ module.exports = function (grunt) {
         files: {
           '<%= appConfig.dist %>/scripts/scripts.js': [
             '<%= appConfig.dist %>/scripts/scripts.js'
-          ]
+          ],
+          '<%= appConfig.dist %>/scripts/vendor.js': [
+            '<%= appConfig.dist %>/scripts/vendor.js']
         }
       }
     },
@@ -401,11 +404,17 @@ module.exports = function (grunt) {
     // things like resolve or inject so those have to be done manually.
     ngAnnotate: {
       dist: {
+        // files: [{
+        //   expand: true,
+        //   cwd: '<%= appConfig.app %>/scripts',
+        //   src: '{,*/}*.js',
+        //   dest: '.tmp/concat/scripts'
+        // }]
         files: [{
           expand: true,
-          cwd: '<%= appConfig.app %>/scripts',
-          src: '*.js',
-          dest: '.tmp/concat/scripts'
+          // cwd: '<%= appConfig.dist %>',
+          src: '<%= appConfig.dist %>/scripts/scripts.js',
+          dest: 'scripts.js'
         }]
       }
     },
@@ -525,7 +534,7 @@ module.exports = function (grunt) {
     'concat',
     'ngAnnotate',
     'copy:dist',
-    //'cssmin',
+    'cssmin',
     // Uglify not working on some of our dependencies
     'uglify',
     //'filerev',
