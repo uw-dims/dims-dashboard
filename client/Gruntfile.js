@@ -1,6 +1,6 @@
 'use strict';
 
-var _ = require('lodash-compat');
+var _ = require('lodash');
 
 module.exports = function (grunt) {
 
@@ -12,9 +12,13 @@ module.exports = function (grunt) {
 
   // Configurable paths for the application
   var appConfig = {
-    app: require('./bower.json').appPath || 'dimswebapp',
+    app: require('./bower.json').appPath,
     dist: '../public',
-    tmp: '../.tmp/'
+    tmp: '../.tmp/',
+    // Read the commented license file
+    license: grunt.file.read('./license_text'),
+    clientPackage: grunt.file.readJSON('package.json'),
+    serverPackage: grunt.file.readJSON('../server/package.json')
   };
 
   // Defaults:
@@ -67,7 +71,6 @@ module.exports = function (grunt) {
   // Define the configuration for all the tasks
   grunt.initConfig({
     appConfig: appConfig,
-    // Watches files for changes and runs tasks based on the changed files
     ngconstant: {
       options: {
         space: '  ',
@@ -84,95 +87,11 @@ module.exports = function (grunt) {
             DASHBOARD_PUBLIC_PROTOCOL: publicProtocol,
             DASHBOARD_NODE_ENV: dashboardNodeEnv          },
           siteVars: clientConfig,
-          client_package: grunt.file.readJSON('package.json'),
-          server_package: grunt.file.readJSON('../server/package.json')
+          clientPackage: '<%= appConfig.clientPackage %>',
+          serverPackage: '<%= appConfig.serverPackage %>'
         }
       },
       build: {
-      }
-    },
-
-    watch: {
-      bower: {
-        files: ['bower.json'],
-        tasks: ['wiredep']
-      },
-      js: {
-        files: ['<%= appConfig.app %>/scripts/{,*/}*.js'],
-        tasks: ['newer:jshint:all'],
-        options: {
-          livereload: '<%= connect.options.livereload %>'
-        }
-      },
-      jsTest: {
-        files: ['test/spec/{,*/}*.js'],
-        tasks: ['newer:jshint:test', 'karma']
-      },
-      less: {
-        files: ['<%= appConfig.app %>/styles/{,*/}*.less'],
-        tasks: ['less:production', 'less:development', 'autoprefixer']
-      },
-      gruntfile: {
-        files: ['Gruntfile.js']
-      },
-      livereload: {
-        options: {
-          livereload: '<%= connect.options.livereload %>'
-        },
-        files: [
-          '<%= appConfig.app %>/{,*/}*.html',
-          '.tmp/styles/{,*/}*.css',
-          '<%= appConfig.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
-        ]
-      }
-    },
-
-    // The actual grunt server settings for live reload during development. 
-    // We are not currently using this, so it has
-    // not been tested.
-    connect: {
-      options: {
-        port: 9000,
-        // Change this to '0.0.0.0' to access the server from outside.
-        hostname: 'localhost',
-        livereload: 35729
-      },
-      livereload: {
-        options: {
-          open: true,
-          middleware: function (connect) {
-            return [
-              connect.static('.tmp'),
-              connect().use(
-                '/bower_components',
-                connect.static('./bower_components')
-              ),
-              connect.static(appConfig.app)
-            ];
-          }
-        }
-      },
-      test: {
-        options: {
-          port: 9001,
-          middleware: function (connect) {
-            return [
-              connect.static('.tmp'),
-              connect.static('test'),
-              connect().use(
-                '/bower_components',
-                connect.static('./bower_components')
-              ),
-              connect.static(appConfig.app)
-            ];
-          }
-        }
-      },
-      dist: {
-        options: {
-          open: true,
-          base: '<%= appConfig.dist %>'
-        }
       }
     },
 
@@ -205,14 +124,13 @@ module.exports = function (grunt) {
       dist: {
         files: [{
           dot: true,
+          expand: true,
           src: [
-            '.tmp',
-            '<%= appConfig.dist %>/{,*/}*',
-           '!<%= appConfig.dist %>/.git*'
+            '<%= appConfig.dist %>/',
+            '<%= appConfig.tmp %>'
           ]
         }]
-      },
-      server: '.tmp'
+      }
     },
 
     // Add vendor prefixed styles
@@ -233,7 +151,7 @@ module.exports = function (grunt) {
     // Automatically inject Bower components into the app
     wiredep: {
       options: {
-        cwd: '<%= appConfig.app %>'
+      
       },
       app: {
         src: ['<%= appConfig.app %>/index.html'],
@@ -267,12 +185,12 @@ module.exports = function (grunt) {
         },
         files: {
           //'.tmp/styles/style.css': '<%= appConfig.app %>/styles/style.less',
-          '.tmp/styles/light.css': '<%= appConfig.app %>/styles/themes/light.less',
-          '.tmp/styles/dark.css': '<%= appConfig.app %>/styles/themes/dark.less'
+          '<%= appConfig.app %>/styles/light.css': '<%= appConfig.app %>/styles/themes/light.less',
+          '<%= appConfig.app %>/styles/dark.css': '<%= appConfig.app %>/styles/themes/dark.less'
         }
       },
 
-      production: {
+      dist: {
         options: {
           paths: ['<%= appConfig.app %>/styles']
         },
@@ -308,9 +226,8 @@ module.exports = function (grunt) {
         flow: {
           html: {
             steps: {
-              // uglifying not working, so disabling it for now
               // js: ['concat', 'uglifyjs'],
-              js: ['concat'],
+              js: ['concat', 'uglify'],
               css: ['cssmin']
             },
             post: {}
@@ -321,7 +238,8 @@ module.exports = function (grunt) {
 
     // Performs rewrites based on filerev and the useminPrepare configuration
     usemin: {
-      html: ['<%= appConfig.dist %>/{,*/}*.html'],
+      // html: ['<%= appConfig.dist %>/{,*/}*.html'],
+      html: ['<%= appConfig.dist %>/*.html'],
       css: ['<%= appConfig.dist %>/styles/{,*/}*.css'],
       options: {
         assetsDirs: ['<%= appConfig.dist %>', '<%= appConfig.dist %>/images']
@@ -342,21 +260,80 @@ module.exports = function (grunt) {
     //   }
     // },
     uglify: {
-      options: {
-        mangle: false
-      },
-      dist: {
-        files: {
-          '<%= appConfig.dist %>/scripts/scripts.js': [
-            '<%= appConfig.dist %>/scripts/scripts.js'
-          ],
-          '<%= appConfig.dist %>/scripts/vendor.js': [
-            '<%= appConfig.dist %>/scripts/vendor.js']
-        }
+      
+          options: {
+          mangle: false,  
       }
+        // files: {
+          // '<%= appConfig.dist %>/scripts/scripts.js': [
+          //   '<%= appConfig.dist %>/scripts/scripts.js'
+          // ],
+          // '<%= appConfig.dist %>/scripts/vendor.js': [
+          //   // '<%= appConfig.dist %>/scripts/vendor.js']
+          // '../.tmp/scripts/': [
+          //   '<%= appConfig.app %>/scripts/**/*.js'
+          // ]
+      //     files: [{
+      //       expand: true,
+      //       cwd: '<%= appConfig.app %>/scripts/',
+      //       src: ['{,*/}*.js'],
+      //       dest: '<%= appConfig.tmp %>/scripts/'
+      //     }]
+      //   },
+
+      // 'appOnly': {
+      //     options: {
+      //       mangle: false,
+      //       preserveComments: false
+      //     },
+      //     files: [{
+      //       expand: true,
+      //       cwd: '<%= appConfig.app %>/scripts/',
+      //       src: ['app.js'],
+      //       dest: '<%= appConfig.tmp %>/scripts/'
+      //     }]
+       // },
+        // }
+
+      
+      // development: {
+      //   files: [{
+      //     expand: true,
+      //     cwd: '<%= appConfig.app %>/scripts/',
+      //     src: ['{,*/}*.js'],
+      //     dest: '<%= appConfig.tmp %>/scripts/'
+      //   }]
+      // }
     },
+
     concat: {
-      dist: {}
+      options: {
+        separator: ';\n'
+      },
+        dist: {
+          options: {
+            stripBanners: true,
+            banner: '/*! <%= appConfig.clientPackage.name %> - ' +
+            '<%= appConfig.clientPackage.version %>  - ' +
+            '<%= grunt.template.today("yyyy-mm-dd") %> */ ' +
+            '<%= appConfig.license %>'
+          },
+          src: ['./dashboard/scripts/**/*.js'],
+          dest: './.tmp/scripts/scripts.js'
+        }
+      // dist: {
+      
+      //   // files: [{
+      //   //   expand: true,
+      //   //   cwd: '<%= appConfig.tmp %>/scripts/',
+      //   //   src: ['{,*/}*.js'],
+      //   //   dest: '<%= appConfig.dist %>/scripts/scripts.js'
+      //   // }]
+      // },
+      // development: {
+      //     src: ['../.tmp/scripts/**/*.js'],
+      //     dest: '../public/scripts/scripts.js'
+      // }
     },
 
     imagemin: {
@@ -393,7 +370,8 @@ module.exports = function (grunt) {
         files: [{
           expand: true,
           cwd: '<%= appConfig.dist %>',
-          src: ['*.html', 'views/{,*/}*.html'],
+          src: ['*.html', 'views/{,*/}*.html', ],
+          // src: ['*.html', 'views/**/*.html'],
           dest: '<%= appConfig.dist %>'
         }]
       }
@@ -411,10 +389,22 @@ module.exports = function (grunt) {
         //   dest: '.tmp/concat/scripts'
         // }]
         files: [{
+          // expand: true,
+          // // cwd: '<%= appConfig.dist %>',
+          // src: '<%= appConfig.dist %>/scripts/scripts.js',
+          // dest: 'scripts.js'
           expand: true,
-          // cwd: '<%= appConfig.dist %>',
-          src: '<%= appConfig.dist %>/scripts/scripts.js',
-          dest: 'scripts.js'
+          cwd: '<%= appConfig.app %>/scripts/',
+          src: ['{,*/}*.js'],
+          dest: '<%= appConfig.app %>/scripts/'
+        }]
+      },
+      development: {
+        files: [{
+          expand: true,
+          cwd: '<%= appConfig.app %>/scripts/',
+          src: ['{,*/}*.js'],
+          dest: '<%= appConfig.app %>/scripts/'
         }]
       }
     },
@@ -452,6 +442,11 @@ module.exports = function (grunt) {
           cwd: '.',
           src: 'bower_components/bootstrap-sass-official/assets/fonts/bootstrap/*',
           dest: '<%= appConfig.dist %>'
+        }, {
+          expand: true,
+          cwd: '<%= appConfig.tmp %>/scripts/',
+          dest: '../public/scripts/',
+          src: ['**/*.js']
         }]
       },
       styles: {
@@ -461,21 +456,6 @@ module.exports = function (grunt) {
         src: '{,*/}*.css'
       }
     },
-
-    // // Run some tasks in parallel to speed up the build process
-    // concurrent: {
-    //   server: [
-    //     'compass:server'
-    //   ],
-    //   test: [
-    //     'compass'
-    //   ],
-    //   dist: [
-    //     'compass:dist',
-    //     'imagemin',
-    //     'svgmin'
-    //   ]
-    // },
 
     // Test settings
     karma: {
@@ -494,26 +474,19 @@ module.exports = function (grunt) {
 
   grunt.registerTask('dev-compile', 'Create the config file and compile LESS', function (target) {
     grunt.task.run([
+      'clean:dist',
       'ngconstant',
       'wiredep',
-      'less'
+      'less:development',
+      'ngAnnotate:development',
+      'uglify:development',
+      'concat:development'
       ]);
   });
 
-
-  grunt.registerTask('serve', 'Compile then start a connect web server', function (target) {
-    if (target === 'dist') {
-      return grunt.task.run(['build', 'connect:dist:keepalive']);
-    }
-
+  grunt.registerTask('cleanup', 'Clean the destination directories', function(target) {
     grunt.task.run([
-      'clean:server',
-      'ngconstant',
-      'wiredep',
-      'autoprefixer',
-      'connect:livereload',
-      'watch'
-    ]);
+      'clean:dist']);
   });
 
   grunt.registerTask('test', [
@@ -528,16 +501,14 @@ module.exports = function (grunt) {
     'clean:dist',
     'ngconstant',
     'wiredep',
-    'less',
+    'less:dist',
+    'ngAnnotate:dist',
     'useminPrepare',
-    'autoprefixer',
-    'concat',
-    'ngAnnotate',
+    'concat:generated',
+    'concat:dist',
     'copy:dist',
-    'cssmin',
-    // Uglify not working on some of our dependencies
     'uglify',
-    //'filerev',
+    'cssmin',
     'usemin',
     'htmlmin'
   ]);
