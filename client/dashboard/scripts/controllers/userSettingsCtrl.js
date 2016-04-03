@@ -67,7 +67,7 @@
     vm.settingsFormData = SettingsService.get();
 
     vm.changeTheme = function () {
-      console.log('new theme is ', vm.settingsFormData.theme);
+      $log.debug('changing theme:', vm.settingsFormData.theme);
     };
 
 

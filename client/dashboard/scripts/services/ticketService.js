@@ -56,7 +56,6 @@
         },
           function (resource) {
             $log.debug('TicketService.getTickets success callback data', resource.data);
-            console.log(resource.data.tickets);
             var result = resource.data.tickets.reverse();
             deferred.resolve(result);
           },

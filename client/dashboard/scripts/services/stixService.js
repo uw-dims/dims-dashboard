@@ -39,7 +39,6 @@
 
     stixService.uploadFile = function (files, action, tlp, success, error) {
       var url = '/api/stix';
-      console.log('file', files);
       var fd = new FormData();
 
       var data = {
@@ -49,40 +48,37 @@
 
       $log.debug('stixService.uploadFile data is ', data);
 
-        var deferred = $q.defer();
-         fd.append('file', files[0]);
+      var deferred = $q.defer();
+       fd.append('file', files[0]);
 
-         fd.append('data', JSON.stringify(data));
+       fd.append('data', JSON.stringify(data));
 
-          $http.post(url, fd, {
-            headers: {
-              'Content-Type' : undefined
-            },
-            transformRequest: angular.identity
-          })
-          .success(function (reply) {
-            var result;
-            console.log('data is ', reply);
-            if (data.action !== '') {
-              if (data.action === 'fileinfo' || data.action == 'json') {
-                result = JSON.parse(reply.data[data.action]);
-              } else {
-                result = reply.data[data.action].split(/\n/);
-              }
+        $http.post(url, fd, {
+          headers: {
+            'Content-Type' : undefined
+          },
+          transformRequest: angular.identity
+        })
+        .success(function (reply) {
+          var result;
+          if (data.action !== '') {
+            if (data.action === 'fileinfo' || data.action == 'json') {
+              result = JSON.parse(reply.data[data.action]);
             } else {
-              result = [];
+              result = reply.data[data.action].split(/\n/);
             }
-            _.remove(result, function (n) {
-              return n === "";
-            });
-            console.log(result);
-            return deferred.resolve(result);
-
-          })
-          .error(function (err) {
-            console.log('error is ', err);
-            return deferred.resolve(err);
+          } else {
+            result = [];
+          }
+          _.remove(result, function (n) {
+            return n === "";
           });
+          return deferred.resolve(result);
+
+        })
+        .error(function (err) {
+          return deferred.resolve(err);
+        });
 
           return deferred.promise;
 

@@ -51,15 +51,11 @@ angular.module('dimsDashboard.services')
           data: data
 
         }).success(function(data,status,headers,config){
-          console.log('Anonymized results received');
-          console.log(data);
           deferred.resolve(data);
         }).error(function(data,status,headers,config) {
-          console.log('Anonymize error ' + status);
           deferred.reject('No results. Status: '+ status);
         });
       } else {
-        console.log('No call to anonymize');
         deferred.resolve({
           data: data,
           pid: pid

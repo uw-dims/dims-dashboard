@@ -62,7 +62,6 @@ angular.module('dimsDashboard.directives').
             scope.prettyData = JSON.stringify(scope.rawData,null,2);
             scope.isRaw = false;
           } catch(e) {
-            console.log(e);
             scope.prettyMsg = 'Pretty print does not work on this data.';
           }
         }

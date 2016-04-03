@@ -63,7 +63,6 @@ angular.module('dimsDashboard.controllers').
        */
       $scope.callClient = function () {
 
-        console.log($scope.formData);
         // Initialize/reset when calling a client
         $scope.showResults = false;
         $scope.showJsonResults = false;

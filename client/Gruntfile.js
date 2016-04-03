@@ -477,10 +477,7 @@ module.exports = function (grunt) {
       'clean:dist',
       'ngconstant',
       'wiredep',
-      'less:development',
-      'ngAnnotate:development',
-      'uglify:development',
-      'concat:development'
+      'less:development'
       ]);
   });
 

@@ -35,7 +35,6 @@ angular.module('dimsDashboard.services')
   .factory('DataService', ['$http', '$q', '$log',  function ($http, $q, $log) {
 
   var getData = function(source) {
-    console.log('in DataService.getData');
 
     var deferred = $q.defer();
     $http ({
@@ -46,8 +45,6 @@ angular.module('dimsDashboard.services')
       }
     }).success(function(data,status,headers,config) {
       var result = data;
-      console.log('result in getData success method');
-      console.log(result);
       deferred.resolve(result);
     }).error(function(data,status,headers,config) {
       deferred.reject('No results. Status: ' + status);

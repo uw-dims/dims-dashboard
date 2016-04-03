@@ -54,7 +54,6 @@
       var getMitigations = function getMitigations(tg) {
         MitigationService.getMitigations(tg)
         .then(function (reply) {
-          console.log('mitigations.directive getMitigations reply, vm.mitigationsData', reply);
           vm.mitigationsData = reply;
           if (vm.mitigationsData.length === 0) {
             // No results

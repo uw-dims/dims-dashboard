@@ -32,7 +32,6 @@
 angular.module('dimsDashboard.controllers').
   controller ('UploadCtrl', ['$scope', '$http', '$timeout', '$upload', 'Utils', 'SettingsService',
     function($scope, $http, $timeout, $upload, Utils, SettingsService) {
-console.log('In UploadController');
 
   $scope.usingFlash = FileAPI && FileAPI.upload !== null;
   $scope.fileReaderSupported = window.FileReader !== null && (window.FileAPI === null || FileAPI.html5 !== false);

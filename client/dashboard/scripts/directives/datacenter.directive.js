@@ -74,7 +74,6 @@
       vm.lookupHashes = function lookupHashes(stixResult) {
         vm.showHashResult = false;
         vm.hashWaiting = 'Waiting for response from server';
-        console.log(stixResult);
         var hashArray = [];
         if (stixResult.length === 0) {
           return;
@@ -83,11 +82,8 @@
 
           if (value.observableFiles) {
             _.forEach(value.observableFiles, function (item) {
-              console.log(item);
               if (item.hashes) {
-                console.log('item has hashes', item.hashes);
                 if (item.hashes.MD5) {
-                  console.log('item has md5', item.hashes.MD5);
                   hashArray.push(item.hashes.MD5);
                 }
               }
@@ -110,7 +106,6 @@
             vm.tupeloData = reply;
             vm.showHashResult = true;
             vm.hashWaiting = '';
-            console.log(reply);
           })
           .catch(function (err) {
             $log.error('error in lookupHashes', err.toString());
@@ -118,7 +113,6 @@
             vm.tupeloData = '';
           });
         } else {
-          console.log('no data');
         }
 
       };
@@ -165,7 +159,6 @@
         vm.waiting = 'Waiting for response from server...';
         StixService.uploadFile($scope.files, vm.action, vm.tlp)
         .then(function (reply) {
-          console.log(reply);
           vm.showSourceResult = true;
           vm.showSourceForm = false;
           vm.stixResult = reply;
@@ -178,7 +171,6 @@
         })
         .catch(function (err) {
           vm.stixResult = 'There was an error';
-          console.log(err.toString());
           vm.waiting = '';
         });
       };
