@@ -56,8 +56,6 @@ module.exports = function () {
     logger.debug('in stix.extract action, path, level', action, stixPath, tlpLevel);
 
     if (!stixActions[action]) {
-      // throw new Error('Invalid action supplied');
-      // return;
       throw new Error('Invalid action supplied');
     }
 
@@ -69,10 +67,7 @@ module.exports = function () {
     inputArray.push(tlpLevel);
     inputArray.push(stixPath);
 
-    console.log('inputArray is ', inputArray);
-
     child.startProcess('bash', inputArray)
-    // child.startProcess('ls', inputArray)
     .then(function (reply) {
       logger.debug('extractSummary reply', reply);
       return deferred.resolve(reply);

@@ -77,7 +77,6 @@ module.exports = function (tools) {
     logger.debug('crosscor:list - Input to python child process: ', inputArray);
     return tools.getData('python', inputArray, id)
     .then(function (reply) {
-      console.log(reply);
       logger.debug('routes/crosscor.list - Send 200 reply');
       return res.status(200).send(reply);
     })

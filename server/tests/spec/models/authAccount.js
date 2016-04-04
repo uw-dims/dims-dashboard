@@ -68,7 +68,6 @@ var user1 = 'testuser1',
 
 
 var failOnError = function (err, assert) {
-  console.log(err);
   assert.fail(err);
   assert.end();
 };

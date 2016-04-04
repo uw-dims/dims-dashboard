@@ -56,8 +56,6 @@ module.exports = function (UserSettings, userService, auth, authAccount) {
   session.googleConnect = function (req, res, next) {
     var user = req.user;
     var account = req.account;
-    console.log('connect user is ', user);
-    console.log('connect account is ', account);
     return authAccount.createAccount(user.username, account.service, account)
     .then(function (reply) {
       res.redirect('/userinfo/accounts');
@@ -69,14 +67,11 @@ module.exports = function (UserSettings, userService, auth, authAccount) {
     if (req.user) {
       var user = req.user;
       logger.debug('session: retrieving session for ', user.username);
-      console.log('session: req.user is ', user);
       return userService.getUserSession(user.username)
       .then(function (reply) {
-        console.log('session: getUserSession reply is ', reply);
         return getSessionObject(reply);
       })
       .then(function (reply) {
-        console.log('session:  sessionObject is ', reply);
         res.status(200).send(resUtils.getSuccessReply(reply));
       })
       .catch(function (err) {
@@ -105,11 +100,9 @@ module.exports = function (UserSettings, userService, auth, authAccount) {
 
   // Construct a session object from authUserData and user settings
   function getSessionObject(authUserData) {
-    console.log('getSessionObject authUserData is ', authUserData);
     var settings = {};
     return UserSettings.getUserSettings(authUserData.username)
     .then(function (reply) {
-      console.log('getSessionObject reply', reply);
       settings = reply;
       // Make sure trust group to login to is set
       if (!settings.getSettings().hasOwnProperty('currentTg')) {
@@ -209,7 +202,6 @@ module.exports = function (UserSettings, userService, auth, authAccount) {
     // Get data to send to caller
     return userService.getUserSession(username)
     .then(function (reply) {
-      console.log('getSessionAndToken reply from getUserSession', reply);
       authUserData = reply;
       tgs = reply.loginTgs;
       token = auth.createToken(username, tgs);

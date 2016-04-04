@@ -155,13 +155,13 @@ module.exports = function (grunt) {
       },
       app: {
         src: ['<%= appConfig.app %>/index.html'],
-        exclude: ['bower_components/bootstrap/dist/js/bootstrap.js', 'bower_components/cryptojslib']
+        exclude: ['bower_components/bootstrap/dist/js/bootstrap.js', 'bower_components/cryptojslib', 'bower_components/font-awesome/css/font-awesome.css']
         //ignorePath:  /\.\.\//
       },
       less: {
         //src: ['<%= appConfig.app %>/styles/style.less'],
-        src: ['<%= appConfig.app %>/styles/themes/*.less'],
-        exclude: ['bower_components/bootstrap/dist/css/bootstrap.css']
+        src: ['<%= appConfig.app %>/styles/themes/*.less']
+        // exclude: ['bower_components/bootstrap/dist/css/bootstrap.css', 'bower_components/font-awesome/css/font-awesome.css']
         //ignorePath:  /\.\.\//
         //ignorePath: /(\.\.\/){1,2}bower_components\//
       }
@@ -240,7 +240,7 @@ module.exports = function (grunt) {
     usemin: {
       // html: ['<%= appConfig.dist %>/{,*/}*.html'],
       html: ['<%= appConfig.dist %>/*.html'],
-      css: ['<%= appConfig.dist %>/styles/{,*/}*.css'],
+      css: ['<%= appConfig.dist %>/styles/{,*/}*.css', '<%= appConfig.dist %>/vendorcss/{,*/}*.css'],
       options: {
         assetsDirs: ['<%= appConfig.dist %>', '<%= appConfig.dist %>/images']
       }
@@ -441,6 +441,11 @@ module.exports = function (grunt) {
           expand: true,
           cwd: '.',
           src: 'bower_components/bootstrap-sass-official/assets/fonts/bootstrap/*',
+          dest: '<%= appConfig.dist %>'
+        }, {
+          expand: true,
+          cwd: './bower_components/font-awesome',
+          src: 'fonts/*',
           dest: '<%= appConfig.dist %>'
         }, {
           expand: true,

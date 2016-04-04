@@ -103,7 +103,6 @@ module.exports = function () {
   var _setInputs = function (params, rpcDebug, rpcVerbose) {
 
     logger.debug('services/anonymize._setInputs start: type ', params.type, ' stats ', params.stats, 'rpcDebug', rpcDebug, 'rpcVerbose', rpcVerbose);
-    // console.log(params);
     var rpcQueuebase = config.rpcQueueNames.anon,
         rpcClientApp = 'anon_client',
         ipgrepApp = 'ipgrep',

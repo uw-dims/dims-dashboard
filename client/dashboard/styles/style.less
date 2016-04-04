@@ -31,6 +31,7 @@
 
 // bower:less
 @import "../../bower_components/bootstrap/less/bootstrap.less";
+@import "../../bower_components/font-awesome/less/font-awesome.less";
 // endbower
 
 @import "variables.less";
@@ -327,6 +328,18 @@ table.dataTable {
 
 .ngTopPanel {
   background-color: @ng-grid-top-panel-bg;
+}
+
+.ngRow.even {
+  background-color: @ng-grid-bg;
+}
+
+.ngRow.odd {
+  background-color: @ng-grid-top-panel-bg;
+}
+
+.ngVerticalBarVisible {
+  background-color: @ng-grid-bar-bg;
 }
 
 .dataPanel {

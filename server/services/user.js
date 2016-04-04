@@ -323,7 +323,6 @@ module.exports = function (UserModel, Bookshelf) {
       }
       result.trustgroups = reply.trustgroups;
       result.loginTgs = reply.loginTgs;
-      // console.log('getAuthInfo result ', result);
       return result;
     })
     .catch(function (err) {

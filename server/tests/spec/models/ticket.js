@@ -120,7 +120,6 @@ var createTickets = function createTickets() {
 
 var failOnError = function (err, assert) {
   logger.error('TEST: Error ', err);
-  console.log('TEST: Error ', err);
   assert.fail(err);
   assert.end();
 };

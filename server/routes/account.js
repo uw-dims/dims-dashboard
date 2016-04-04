@@ -73,7 +73,6 @@ module.exports = function (authAccount, access) {
 
     return authAccount.getAccounts(user)
     .then(function (reply) {
-      console.log('account.js success reply');
       res.status(200).send(resUtils.getSuccessReply(resUtils.formatResponse('accounts', reply)));
     })
     .catch(function (err) {
@@ -92,7 +91,6 @@ module.exports = function (authAccount, access) {
     }
     return authAccount.deleteAccount(access.username(req.user), req.params.service)
     .then(function (reply) {
-      console.log('account.js success reply');
       res.status(200).send(resUtils.getSuccessReply(null));
     })
     .catch(function (err) {

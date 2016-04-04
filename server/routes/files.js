@@ -206,7 +206,6 @@ module.exports = function () {
                 var buf = new Buffer((stats.size > size) ? size : stats.size);
                 fs.read(fd, buf, 0, buf.length, null, function (err, bytesRead, buffer) {
                   if (err) {
-                    console.log('fs.read error', err);
                     fs.close(fd, function (err) {
                       if (err) {
                         logger.error('Error closing file: ' + err);
@@ -303,86 +302,3 @@ module.exports = function () {
   return files;
 
 };
-
-
-// var count = 0;
-// form.on('error', function (err) {
-//     console.log('Error parsing form: ' + err.stack);
-// });
-
-// form.on('part', function (part) {
-//     if (part.filename === null || part.filename === undefined) {
-//         console.log('got field named ' + part.name);
-//         console.log(part);
-//         part.resume();
-//     } else {
-//         count++;
-//         console.log('got file named ' + part.name);
-//         console.log(part);
-
-//         part.resume();
-//     }
-
-// });
-
-// form.on('close', function () {
-//     console.log('upload complete');
-//     res.writeHead(200, {'content-type': 'text/plain'});
-//     res.end ('Received ' + count + ' files');
-// });
-
-// form.parse(req);
-
-// filename = (util.inspect(fields).destination !== "" && util.inspect(fields).newName !== undefined) ? util.inspect(fields).newName : req.files.file.name;
-// i = filename.lastIndexOf('.');
-// file_extension = (i < 0) ? '' : filename.substr(i);
-// tempPath = req.files.file.path;
-
-// Get target path
-// if (req.body.destination !== null && req.body.destination !== undefined) {
-//     for (key in directoryMapping) {
-//         if (key == req.body.destination) {
-//             targetPath = myDirectory + directoryMapping[key] + filename;
-//         }
-//     }
-// }
-
-// console.log("targetPath: " + targetPath);
-// console.log("filename: " + filename);
-
-// if((file_extension in oc(extensionAllowed)) && ((req.files.file.size /1024 ) < maxSizeOfFile)) {
-
-//     console.log("file passed validation");
-//     fs.rename(tempPath, targetPath, function (err) {
-//         if (err) {
-//             console.log('fs.rename error: ' + err);
-//             return res.status(400).send('Bad destination directory specified.');
-//         }
-//         // delete the temporary file, so that the explicitly set temporary upload dir does not get filled with unwanted files
-//         fs.unlink(tempPath, function () {
-//             if (err) {
-//             console.log('fs.unlinke error: ' + err);
-//             return res.status(500).send(err);
-//             }
-//         });
-//     });
-//     data.msg = "File uploaded sucessfully";
-//     data.path = targetPath;
-//     console.log("data sent back is");
-//     console.log(data);
-
-// }  else{
-// // delete the temporary file, so that the explicitly set temporary upload dir does not get filled with unwanted files
-//     fs.unlink(tempPath, function (err) {
-//         if (err) {
-//             console.log('fs.unlinke error: ' + err);
-//             return res.status(500).send(err);
-//         }
-//     });
-//     data.msg = "File upload failed. File extension not allowed and size must be less than "+maxSizeOfFile;
-//     data.path = "";
-//     console.log(data)
-//     res.status(400).send(data);
-//     // return res.send(200, "File upload failed.File extension not allowed and size must be less than "+maxSizeOfFile);
-// }
-// return res.status(200).send(data);

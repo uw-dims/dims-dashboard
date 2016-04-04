@@ -58,7 +58,6 @@ module.exports = function (ticketService, mitigationService, access) {
   };
 
   var getDefaultConfig = function getDefaultConfig(userAccess) {
-    console.log('ticket route getDefaultConfig, userAccess is ', userAccess);
     var config = [];
     var user = access.username(userAccess);
     _.forEach(userAccess.tgs, function (value, key) {
@@ -80,7 +79,6 @@ module.exports = function (ticketService, mitigationService, access) {
 
   ticketRoute.list = function (req, res) {
 
-    console.log('in ticketroute list. query is ', req.query);
     var userAccess,
         user,
         config = [];
@@ -121,7 +119,6 @@ module.exports = function (ticketService, mitigationService, access) {
       logger.debug('listMitigations: query', query);
       mitigationService.listMitigations(user, query)
       .then(function (reply) {
-        console.log('reply from listMitigations', reply);
         return res.status(200).send(resUtils.getSuccessReply(resUtils.formatResponse('mitigations', reply)));
       })
       .catch(function (err) {
@@ -162,7 +159,6 @@ module.exports = function (ticketService, mitigationService, access) {
           config.push(_.extend({}, {type: 'activity'}, req.query));
         }
       }
-      console.log('listTickets config is ', config);
       ticketService.listTickets(config)
       .then(function (reply) {
         reply = _.flatten(reply);
@@ -236,7 +232,6 @@ module.exports = function (ticketService, mitigationService, access) {
     user = access.username(userAccess);
     // logger.debug('LIST userAccess', userAccess);
     // Validate trust group
-    console.log(req.body);
     if (!validateTrustgroup(req, userAccess)) {
       return res.status(400).send(resUtils.getErrorReply('Requesting tickets in trustgroup that user is not authorized for'));
     }
@@ -279,8 +274,6 @@ module.exports = function (ticketService, mitigationService, access) {
       type: type,
       private: privateTicket
     });
-    // console.log('create ticket', ticket);
-    console.log('create ticket body', req.body);
 
       ticket.create()
       .then(function (reply) {
@@ -295,7 +288,6 @@ module.exports = function (ticketService, mitigationService, access) {
   // Implemented for Mitigation ticket only
   ticketRoute.update = function (req, res) {
     logger.debug('routes/ticket UPDATE');
-    console.log (req.body);
     var id = req.params.id;
     if (!req.user) {
       return res.status(500).send('Error: user is not defined in request');
@@ -306,7 +298,6 @@ module.exports = function (ticketService, mitigationService, access) {
       if (options.type === 'mitigation' && options.action === 'remediate') {
         mitigationService.remediate(id, user, options.ips)
         .then(function (reply) {
-          console.log(reply);
           res.status(200).send(resUtils.getSuccessReply(reply));
         })
         .catch(function (err) {
@@ -478,7 +469,6 @@ module.exports = function (ticketService, mitigationService, access) {
       data.topic = topic;
       data.content = reply;
       data.key = req.params.id;
-      // console.log(data);
       res.status(200).send({data: data});
     }, function (err, reply) {
         res.status(400).send(err.toString());
@@ -515,7 +505,6 @@ module.exports = function (ticketService, mitigationService, access) {
       data.topic = topic;
       data.content = content;
       data.key = req.params.id;
-      // console.log(data);
       res.status(200).send({data: data});
     }, function (err, reply) {
         res.status(400).send(err.toString());

@@ -92,7 +92,6 @@ module.exports = function Topic(store) {
     }
     // Replace spaces in name with underscores since it will be part of a key.
     // options.name = options.name.replace(/  */g, '_');
-    // console.log(options.name);
     return {
       name: options.name,
       datatype: options.datatype,

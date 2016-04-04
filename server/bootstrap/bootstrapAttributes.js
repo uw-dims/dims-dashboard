@@ -73,11 +73,6 @@ var Bookshelf = diContainer.get('Bookshelf');
     var doc;
     try {
       doc = yaml.safeLoad(fs.readFileSync(yamlPath, 'utf8'));
-      // var yamlDoc = yaml.safeDump(doc, {
-      //   flowLevel: 2
-      // });
-      // fs.writeFileSync(path.join(__dirname, './userAttributesDump.yml'), yamlDoc);
-      // console.log(yamlDoc);
     } catch (err) {
       console.error('Cannot read file at ' + yamlPath + '. Error: ', err);
       return;
