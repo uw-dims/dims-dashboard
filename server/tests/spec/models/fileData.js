@@ -54,7 +54,7 @@ client.selectAsync(10).then (function (reply) {
   console.error(err.toString());
 });
 
-var FileData = require('../../../model/fileData')(client);
+var FileData = require('../../../models/fileData')(client);
 // Bootstrap some data
 // Use pathCounter so we will get a different key for each test run
 var pathCounter = 0;
