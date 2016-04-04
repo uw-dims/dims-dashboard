@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # This shows the environment variables that are defined in /etc/dashboard/dashboard.conf
-# When the dashboard is deployed, this file is populated by ansible
+# This file at /etc/dashboard/dashboard.conf is populated by Ansible.
 export DASHBOARD_PUBLIC_HOST=www.dimsdevserver03.dev
 export DASHBOARD_PUBLIC_PORT=80
 export DASHBOARD_PUBLIC_PROTOCOL=http
