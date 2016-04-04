@@ -31,7 +31,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-VERSION=1.0.8
+VERSION=1.0.9
 
 # During development of the dashboard on a VM, this script syncs the
 # contents of the working git directory to the target location on
