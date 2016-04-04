@@ -162,12 +162,10 @@ module.exports = function (grunt) {
     },
 
     // Compiles LESS to CSS and generates necessary files if requested
-    // Override the variable for the site logo
+    // Override the variable for the site logo and font awesome font path
     less: {
-      options: {
-        modifyVars: {
-          siteLogoFile: clientConfig.siteLogo
-        }
+      modifyVars: {
+        siteLogoFile: clientConfig.siteLogo
       },
       development: {
         options: {
@@ -175,7 +173,6 @@ module.exports = function (grunt) {
           sourceMap: true,
           outputSourceFiles: true,
           paths: ['<%= appConfig.app %>/styles']
-
         },
         files: {
           //'.tmp/styles/style.css': '<%= appConfig.app %>/styles/style.less',
@@ -358,6 +355,12 @@ module.exports = function (grunt) {
         cwd: '<%= appConfig.app %>/styles',
         dest: '.tmp/styles/',
         src: '{,*/}*.css'
+      },
+      development: {
+        expand: true,
+        cwd: './bower_components/font-awesome/fonts',
+        dest: 'dashboard/fonts/',
+        src: '*'
       }
     },
 
@@ -381,7 +384,8 @@ module.exports = function (grunt) {
       'clean:dist',
       'ngconstant',
       'wiredep',
-      'less:development'
+      'less:development',
+      'copy:development'
       ]);
   });
 
