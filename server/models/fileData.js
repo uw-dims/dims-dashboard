@@ -34,6 +34,10 @@
   * file: models/fileData.js
   */
 
+// TODO - need to finish refactoring of this module to use
+// bluebird promisifying of redis client and fix tests
+// This functionality is not currently being used by the UI.
+
 var _ = require('lodash-compat'),
     stream = require('stream'),
     util = require('util'),
