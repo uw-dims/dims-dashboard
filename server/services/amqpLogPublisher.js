@@ -58,7 +58,7 @@ function AmqpLogPublisher(name, durable) {
   self.connectionCreated = 'connection-created';
   self.fanoutCreateError = 'fanout-create-error';
   // Handler
-  // self.on(self.createError, self.onFail.bind(self));
+  self.on(self.createError, self.onFail.bind(self));
   EventEmitter.call(self);
 }
 
