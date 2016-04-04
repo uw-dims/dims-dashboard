@@ -50,7 +50,6 @@
   var MitigationService = function (MitigationApi, $log, $q, $modal) {
 
     var formatData = function formatData(ticketData) {
-      console.log('formatData data', ticketData);
       var result = {
         known: [],
         all: []
@@ -66,11 +65,6 @@
       // which could be in the past, add a point for the time at
       // which this graph is being displayed - so we have the total
       // for today
-
-      // knownX.push(new Date().getTime());
-      // knownY.push(data[data.length - 1][1]);
-
-      // ticketData.data.push([new Date().getTime(), ticketData.data[ticketData.data.length - 1][1]]);
 
       _.forEach(ticketData.data, function (value, index) {
         var x = value[0];
@@ -94,7 +88,6 @@
     };
 
     var getTrendline = function getTrendline(data) {
-      console.log('in trendline, data', data);
       var knownX = [];
       var knownY = [];
       _.forEach(data, function (value) {
@@ -105,8 +98,7 @@
       // data that hasn't changed
       knownX.push(new Date().getTime());
       knownY.push(data[data.length - 1][1]);
-      console.log('knownX', knownX);
-      console.log('knownY', knownY);
+  
       return linearRegression(knownY, knownX);
     };
 
@@ -120,15 +112,7 @@
 
     var parseTicket = function parseTicket(ticketData) {
       var item = _.extend({}, ticketData);
-      // item.data = formatData(ticketData.data);
       item.data = formatData(ticketData);
-      // {
-      //     known: [],
-      //     all: [],
-      //     trendKnown: object,
-      //     trendAll: object
-     // }
-      // item.trendline = getTrendline(ticketData.data);
       $log.debug('mitigationService.parseTicket. item is ', item);
       return item;
     };

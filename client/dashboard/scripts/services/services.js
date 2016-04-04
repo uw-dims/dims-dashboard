@@ -90,7 +90,6 @@ angular.module('dimsDashboard.services')
       try {
         JSON.parse(text);
       } catch (e) {
-        console.log(e);
         return false;
       }
       return true;

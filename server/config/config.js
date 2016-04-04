@@ -83,7 +83,7 @@ config.userDBPass = process.env.USER_DB_PASS || null;
 
 config.sessionTTL = 2 * 60 * 60; //Redis session expiration. 2 hours, in seconds
 
-config.tokenTTL = config.sessionTTL;
+config.tokenTTL = process.env.DASHBOARD_TOKEN_TTL || config.sessionTTL;
 
 // Passport vars and configs
 config.tokenSecret = process.env.DASHBOARD_TOKEN_SECRET || 'djf83UhNH35CDjfjEFM3B9e01viY8fNqz3YXpb25wc0U';
@@ -124,12 +124,6 @@ config.googleAuthzStrategyConfig = {
   passReqToCallback: true
 };
 
-// config.googleJwtConfig = {
-//   clientID: config.googleClientId,
-//   clientSecret: config.googleClientSecret
-// };
-
-
 
 config.sessionSecret = process.env.DASHBOARD_SESSION_SECRET || '3xueis763$%STID47373deC!!QUsT8J4$';
 
@@ -159,10 +153,6 @@ config.data = '/opt/dims/data/dims-sample-data/';
 
 config.serverPath = __dirname;
 
-//config.userDataPath =  config.serverPath + '/mydata/';
-
-//config.demoDatastorePath = config.serverPath + '/data/';
-
 
 // /opt/dims/data in the Dashboard container will map to host
 // /data/dashboard
@@ -171,10 +161,13 @@ config.dashboardDataPath = '/opt/dims/data/dashboard/data/';
 config.uploadPath = '/opt/dims/data/dashboard/upload/';
 config.logmonPath = '/opt/dims/data/logmon/';
 
+
 config.directoryMapping = {
   'ip_lists': config.userDataPath + 'ipFiles/',
   'map_files': config.userDataPath + 'mapFiles/',
-  'data_files': config.userDataPath + 'dataFiles/'
+  'data_files': config.userDataPath + 'dataFiles/',
+  'site_resources': config.dashboardDataPath + 'siteResources/',
+  'site_data': config.dashboardDataPath + 'siteData/'
 };
 
 config.defaultMapping = {
@@ -188,12 +181,22 @@ config.rpcQueueNames = {
   'crosscor': 'crosscor'
 };
 
+config.defaultTheme = process.env.DASHBOARD_DEFAULT_THEME || 'light';
+
 config.defaultUserSettings = {
   'anonymize': false,
   'rpcDebug': true,
   'rpcVerbose': true,
   'cifbulkQueue': 'cifbulk_v1',
+  'theme': config.defaultTheme,
   'userExternals': []
+};
+
+config.defaultSiteSettings = {
+  'siteHeadline': 'University of Washington DIMS',
+  'homePageText': '',
+  'iconFile': 'UW-logo.png',
+  'siteLogo': 'UW-logo.png'
 };
 
 // The attributes we are tracking

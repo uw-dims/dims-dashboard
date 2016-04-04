@@ -100,8 +100,6 @@ module.exports = function (userService, access, authAccount) {
 
   auth.googleConnectVerify = function googleConnectVerify(req, accessToken, refreshToken, profile, done) {
     logger.debug('google-authz verify callback ', accessToken, profile.id, profile.displayName, profile.email);
-    console.log('google-authz verify callback req.user', req.user);
-    console.log('google-authz verify callback profile', profile);
     logger.debug('google-authz verify callback authorizations ', req.headers.authorization);
     logger.debug('auth.googleStrategyVerify url ', req.url);
     // Return account object
@@ -130,7 +128,6 @@ module.exports = function (userService, access, authAccount) {
   // Middleware for protecting routes with JWT
   auth.ensureAuthenticated = function ensureAuthenticated(req, res, next) {
     logger.debug('authenticating jwt route, url is ', req.url);
-    // console.log(req);
     return passport.authenticate('jwt', {session: false})(req, res, next);
   };
 
@@ -156,7 +153,6 @@ module.exports = function (userService, access, authAccount) {
     logger.debug('deserialize username', username);
     userService.getUserSession(username)
     .then(function (reply) {
-      // console.log('deserialize user ', reply);
       return done(null, reply);
     })
     .catch(function (err) {

@@ -211,28 +211,27 @@ var rpcClientOptions = {
   }
 };
 
-var constExternalSites = [{
-    externalKey: 'consul',
-    siteName: 'CONSUL',
-    siteURL: constants.consulUrl,
-    canDelete: false
-  }, {
-    externalKey: 'trident',
-    siteName: 'TRIDENT',
-    siteURL: constants.tridentUrl,
-    canDelete: false
-  }
-];
+// var constExternalSites = [{
+//     externalKey: 'consul',
+//     siteName: 'CONSUL',
+//     siteURL: constants.consulUrl,
+//     canDelete: false
+//   }, {
+//     externalKey: 'trident',
+//     siteName: 'TRIDENT',
+//     siteURL: constants.tridentUrl,
+//     canDelete: false
+//   }
+// ];
 
 var dimsDashboard = angular.module('dimsDashboard',
   ['ngRoute', 'angularFileUpload', 'ui.bootstrap', 'ui.bootstrap.showErrors', 'ngGrid', 'ngAnimate', 'ngResource',
     'http-auth-interceptor', 'btford.socket-io', 'ngSanitize', 'ngCookies', 'anguFixedHeaderTable', 'truncate',
-    'msieurtoph.ngCheckboxes', 'dimsDashboard.controllers', 'dimsDashboard.directives', 'dimsDashboard.services', 'dimsDashboard.config'])
+    'msieurtoph.ngCheckboxes', 'dimsDashboard.controllers', 'dimsDashboard.directives', 'dimsDashboard.services', 'dimsDashboard.config', 'dimsDashboard.filters'])
   .config(dimsDashboardConfig);
 
 dimsDashboard.constant(constants);
 dimsDashboard.constant(rpcClientOptions);
-dimsDashboard.constant(constExternalSites);
 
 // This is populated by Grunt
 angular.module('dimsDashboard.config', []);
@@ -241,44 +240,41 @@ angular.module('dimsDashboard.services', []);
 angular.module('dimsDashboard.directives', []);
 angular.module('dimsDashboard.filters', []);
 
-dimsDashboard.config(function ($httpProvider) {
+dimsDashboard.config(function ($httpProvider, $logProvider, ENV) {
     $httpProvider.interceptors.push('authInterceptor');
+    $logProvider.debugEnabled(ENV.DASHBOARD_NODE_ENV === 'development')
   });
 
- _.mixin(_.string.exports());
+_.mixin(_.string.exports());
 
-dimsDashboard.run(function ($rootScope, $location, $log, AuthService) {
+dimsDashboard.run(function ($rootScope, $location, $log, AuthService, ThemeService) {
+
+  ThemeService.initializeTheme();
   //watching the value of the currentUser variable.
   $rootScope.$watch('currentUser', function (currentUser) {
-    // if no currentUser and on a page that requires authorization then try to update it
-    // will trigger 401s if user does not have a valid session
+
     // socialauth path - returned from social login
     if (!currentUser && (['/socialauth'].indexOf($location.path()) === 0)) {
-      $log.debug('Run: watch currentUser handler. path is socialauth');
       AuthService.onSocialLogin($location.$$search);
+
     // No currentUser and  not on login page
     // Try to get the currentUser since might be a reload
     } else if (!currentUser && (['/login'].indexOf($location.path()) === -1)) {
-      $log.debug('Run: watch currentUser handler. First if. No currentUser and not on login page. Call AuthService.currentUser()');
       AuthService.currentUser();
+
     // Login page
     } else if (['/login'].indexOf($location.path()) === 0) {
-      $log.debug('Run: watch currentUser handler. 2nd if. currentUser is ', currentUser);
-      $log.debug('Run: watch currentUser handler. 2nd if. location ', $location.path());
       $location.path('/login');
-    // Not on login, have currentUser
-    } else {
-      $log.debug('Run: watch currentUser handler. else. currentUser is ', currentUser);
-      $log.debug('Run: watch currentUser handler. else. location ', $location.path());
     }
   });
 
   // On catching 401 errors, redirect to the login page.
   $rootScope.$on('event:auth-loginRequired', function () {
-    $log.debug('Run: auth-loginRequired event handler. Caught 401, redirect to login page');
     $location.path('/login');
     return false;
   });
+
+
 });
 
 

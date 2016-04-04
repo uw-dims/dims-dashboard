@@ -92,7 +92,6 @@ var processPython = function (python, req, res) {
       return res.status(500).json({code: code, pid: python.pid, data: output});
     }
     try {
-      console.log(output);
       var jsonOutput = JSON.parse(output);
       return res.status(200).json({pid: python.pid, data: jsonOutput});
     } catch (e) {

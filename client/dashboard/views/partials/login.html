@@ -1,5 +1,4 @@
-<div class="container" style="background-image: url(images/default/dims-graph.png);
-    background-repeat: no-repeat; background-position: 40% 80%; background-size: 42%">    
+<div class="container site-login" >    
   <div id="loginbox" style="margin-top:40px; margin-bottom:30px;" class="mainbox col-sm-4">                    
       <div class="panel panel-info" >
           <div class="panel-heading">
@@ -10,9 +9,8 @@
 
           <div class="row">
           <div class="col-sm-4">
-          <!-- <button class="btn btn-danger btn-block"><a href="/auth/google" target="_self" style="color:white;">Google</a></button> -->
           <a href="/auth/google" target="_self" class="btn btn-danger btn-block" role="button">Google</a> 
-          </div><div class="col-sm-8" style="color:#999">Sign in with Google
+          </div><div class="col-sm-8">Sign in with Google
 
           </div>
           </div>
@@ -23,19 +21,8 @@
           </div>
           <div class="row">
           <div class="col-sm-12" style="margin-bottom: 25px;margin-top:30px;">
-          <hr style="background-color:#cdcdcd;
-            height: 1px;
-            margin-top: 0px;
-            margin-bottom: 0px;" >
-          <span style="display: block;
-            position:absolute;
-            left: 50%;
-            top: -0.6em;
-            margin-left: -1.5em;
-            background-color: white;
-            color: #999;
-            width: 3em;
-            text-align: center;">or</span>
+          <hr>
+          <span class="or">or</span>
 
           </div>
           </div>
@@ -43,7 +30,7 @@
               <form id="loginform" name="form" class="form-horizontal" role="form" ng-submit="login(form)" >
 
               <div class="form-group">
-                  <div class="col-sm-12 control" style="color:#999; font-size: 90%;">
+                  <div class="col-sm-12 control" style="font-size: 90%;">
                   Use your Trident login credentials
                   </div>
                   </div>
@@ -108,8 +95,12 @@
   </div>
   <div style="margin-top:50px; margin-bottom:30px;" class="col-sm-8">
   <div style="margin-left:20px;">
-  <h3>University of Washington</h3>
+  <h3>{{ orgName }}</h3>
   <h1>Distributed Incident Management System</h1>
+  <!-- <p>{{ siteIntroText }} -->
+  <span ng-repeat="line in (siteIntroText | newlines) track by $index">
+   <p> {{ line }}</p>
+  </span>
   </div>
   </div>
   </div>

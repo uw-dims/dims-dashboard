@@ -32,27 +32,28 @@
 
 var config = require('../config/config');
 var AmqpLogPublisher = require('./amqpLogPublisher');
+var logger = require('../utils/logger')(module);
 
 module.exports = function (logExchange) {
   var exchange = logExchange;
   var amqpConnect = new AmqpLogPublisher(exchange, config.fanoutExchanges[exchange].durable);
 
   function init() {
-    console.log('[+++] amqpLogger creating connection for %s', exchange);
+    logger.info('amqpLogger creating connection for %s', exchange);
     amqpConnect.createConnection();
     amqpConnect.on('ready', function () {
-      console.log('[+++] amqpLogger received ready signal for %s', exchange);
+      logger.info('amqpLogger received ready signal for %s', exchange);
+      // Add publish function
+      amqpConnect.pub = function (msg) {
+        amqpConnect.channel.publish(exchange, '', new Buffer(msg));
+      };
       amqpConnect.emit('logger-ready-' + exchange);
     });
     amqpConnect.on('connection-close', onClose.bind(this));
-    // Add publish function
-    amqpConnect.pub = function (msg) {
-      amqpConnect.channel.publish(exchange, '', new Buffer(msg));
-    };
   }
 
   function onClose() {
-    console.log('[!!!] amqpLogger received connection-close event');
+    logger.info('amqpLogger received connection-close event');
     amqpConnect.removeAllListeners('ready');
     amqpConnect.removeAllListeners('connection-close');
     init();

@@ -70,14 +70,11 @@ var mitigationService = diContainer.get('mitigationService');
       // will fix this behavior later
       ticketKey = keyGen.ticketKey(reply.parent);
       client.quit(function (err, reply) {
-        console.log('quit reply ', reply);
       });
     })
     .catch(function (err) {
       console.log(err);
-      console.log(err.stack);
       client.quit(function (err, reply) {
-        console.log('quit reply ', reply);
       });
     })
     .done();

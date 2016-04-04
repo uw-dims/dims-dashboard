@@ -142,15 +142,9 @@ module.exports = function (Ticket, Topic) {
     });
   };
 
-
-
   var getTicketMetadata = function getTicketMetadata(id) {
     return Ticket.getTicket(id);
   };
-
-
-
-
 
   // TODO: Finish this method
   var deleteTicket = function deleteTicket(id) {
@@ -165,11 +159,9 @@ module.exports = function (Ticket, Topic) {
       return ticket.deleteTicket();
     })
     .then(function (reply) {
-      console.log('reply from ticket.deleteTicket ', reply);
       return Topic.getTopicKeys(id);
     })
     .then(function (reply) {
-      console.log('reploy from getTopicKeys', reply);
       _.forEach(reply, function (value) {
         promises.push(Topic.deleteTopic(value));
       });

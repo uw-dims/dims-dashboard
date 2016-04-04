@@ -1,23 +1,47 @@
 #!/bin/bash
 
 # This shows the environment variables that are defined in /etc/dashboard/dashboard.conf
-# When the dashboard is deployed, this file is populated by ansible
+# This file at /etc/dashboard/dashboard.conf is populated by Ansible.
+
+# fqdn of host that your users will be entering in their browser address bar.
+# So the full URL will be: $DASHBOARD_PUBLIC_PROTOCOL://$DASHBOARD_PUBLIC_HOST:$DASHBOAR_PUBLIC_PORT
+# Of course, if the port is 80, the user does not need to include it in the URL.
 export DASHBOARD_PUBLIC_HOST=www.dimsdevserver03.dev
+# Publicly exposed port of the Dashboard
 export DASHBOARD_PUBLIC_PORT=80
+# Protocol - http or https 
 export DASHBOARD_PUBLIC_PROTOCOL=http
+# Rabbitmq server host. Service must be accessible by the dashboard server via this name
 export RABBITMQ_HOST=rabbitmq.prisem.washington.edu
+# User name for Rabbitmq default user
 export RABBITMQ_DEFAULT_USER=rpc_user
+# Rabbitmq port (reachable by dashboard server)
 export RABBITMQ_PORT=5672
+# Redis server host (must be reachable by dashboard server)
 export REDIS_HOST=localhost
+# Redis server port accessible by dashboard server
 export REDIS_PORT=6379
+# Redis database number used by the dashboard for normal operations
 export REDIS_DATABASE=0
+# Trident database host
 export USER_DB_HOST=dimsdev01.dev
+# Trident database user name
 export USER_DB_USER=trident
+# Trident database name
 export USER_DATABASE=trident
+# DIMS directory
 export DIMS=/opt/dims
+# Dashboard environment - development or production. In a production environment, the log
+# level is info by default on both the server and client. The client code is minified
+# for faster loading. 
 export DASHBOARD_NODE_ENV=development
+# Internal port exposed by dashboard server. This value is needed by the NGINX server
+# that proxies requests to the dashboard
 export DASHBOARD_PORT=3000
+# Consul cluster agent host:port
 export CONSUL_AGENT=172.17.8.101:8500
+# Full URL to consul cluster (used by dashboard client)
 export CONSUL_URL=http://${CONSUL_AGENT}/ui/
+# Full URL to Trident (used by dashboard client)
 export TRIDENT_URL=http://dimsdev01.dev
 

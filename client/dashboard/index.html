@@ -12,12 +12,15 @@
 <![endif]-->
 <!-- endbuild -->
 <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-<!-- build:css styles/vendor.css -->
+<!-- build:css vendorcss/vendor.css -->
 <!-- bower:css -->
 <!-- endbower -->
 <!-- endbuild -->
-<!-- build:css styles/style.css -->
-<link rel="stylesheet" href="styles/style.css" />
+<!-- build:css styles/light.css -->
+<link rel="stylesheet" href="styles/light.css" />
+<!-- endbuild -->
+<!-- build:css styles/dark.css -->
+<link rel="stylesheet" href="styles/dark.css" />
 <!-- endbuild -->
 </head>
 <body ng-app="dimsDashboard" >
@@ -54,11 +57,10 @@
     <!-- bower:js -->
 
     <!-- endbower -->
-
+    <script src="../node_modules/angular-checkboxes/angular-checkboxes.js"></script>
     <!-- endbuild -->
 
     <!-- build:js scripts/scripts.js -->
-    <script src="../node_modules/angular-checkboxes/angular-checkboxes.js"></script>
     <script src="scripts/app.js"></script>
     <script src="scripts/config.js"></script>
     <script src="scripts/controllers/anonCtrl.js"></script>
@@ -74,7 +76,6 @@
     <script src="scripts/controllers/navbarCtrl.js"></script>
     <script src="scripts/controllers/chatCtrl.js"></script>
     <script src="scripts/controllers/userSettingsCtrl.js"></script>
-    <script src="scripts/controllers/messagingCtrl.js"></script>
     <script src="scripts/controllers/selectFiles.js"></script>
     <script src="scripts/controllers/searchForm.js"></script>
     <script src="scripts/controllers/userProfileCtrl.js"></script>
@@ -103,6 +104,7 @@
     <script src="scripts/directives/externalsites.directive.js"></script>
     <script src="scripts/directives/socialaccounts.directive.js"></script>
     <script src="scripts/directives/datacenter.directive.js"></script>
+    <script src="scripts/directives/themePicker.directive.js"></script>
     <script src="scripts/filters/filters.js"></script>
     <script src="scripts/services/services.js"></script>
     <script src="scripts/services/dataService.js"></script>
@@ -120,6 +122,7 @@
     <script src="scripts/services/authInterceptor.js"></script>
     <script src="scripts/services/stixService.js"></script>
     <script src="scripts/services/tupeloservice.js"></script>
+    <script src="scripts/services/themeService.js"></script>
     <!-- endbuild -->
 
     <script>

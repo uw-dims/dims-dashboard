@@ -29,48 +29,34 @@
  *
  */
 
-'use strict';
+(function () {
+  'use strict';
 
-// Get the app configuration
-var config = require('../config/config');
-var logger = require('./logger')(module);
-var dbConfig;
-logger.info('Setting up Bookshelf');
-logger.info('Connection to user database %s at %s with user %s',
-  config.userDatabase, config.userDBHost, config.userDBUser);
+  function themePicker(ThemeService) {
+    var directive = {
+      restrict: 'A',
+      link: linkFunc
+    };
 
-if (config.userDBPass) {
-  logger.info('Setting User database connection string with password');
-  dbConfig = {
-    client: 'postgresql',
-    connection: {
-      host: config.userDBHost,
-      user: config.userDBUser,
-      database: config.userDatabase,
-      password: config.userDBPass
+    return directive;
+    function linkFunc(scope, el, attr, ctrl) {
+
+      scope.$watch(attr.themePicker, function (value) {
+        ThemeService.setTheme(value);
+        // $cookies.currentTheme = value;
+        // _.forEach(document.getElementsByTagName('link'), function (link) {
+        //   if (link.href && link.href.indexOf('styles/') !== -1) {
+        //     link.disabled = (link.href.indexOf($cookies.currentTheme) === -1);
+        //   }
+        // });
+      }) ;
     }
-  };
-} else {
-  logger.info('Setting User database connection string without password');
-  dbConfig = {
-    client: 'postgresql',
-    connection: {
-      host: config.userDBHost,
-      user: config.userDBUser,
-      database: config.userDatabase
-    }
-  };
-}
+  }
 
+  angular
+    .module('dimsDashboard.directives')
+    .directive('themePicker', themePicker);
 
-// Initialize Bookshelf ORM and connect
-var knex = require('knex')(dbConfig);
-var Bookshelf = require('bookshelf')(knex, {debug: true});
+  themePicker.$inject = ['ThemeService'];
 
-// Add virtuals plug-in
-Bookshelf.plugin('virtuals');
-
-// export Bookshelf
-module.exports = Bookshelf;
-
-// EOF
+}());

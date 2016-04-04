@@ -54,8 +54,6 @@ module.exports = function (stixService, access) {
     logger.debug('body is ', req.body);
     var stixMeta = JSON.parse(req.body.data);
     logger.debug('files are', req.files);
-    console.log(stixMeta);
-    console.log(req.files);
     // body:
     // {
     //    action: md5, ip, fileinfo, hostname, or json

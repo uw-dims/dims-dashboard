@@ -32,7 +32,6 @@
 angular.module('dimsDashboard.controllers').
   controller('CrosscorCtrl', ['$scope', 'Utils', 'FileService', '$http', '$log', 'DateService', 'SettingsService', 'AnonService', '$location', '$routeParams',
     function ($scope, Utils, FileService, $http, $log, DateService, SettingsService, AnonService, $location, $routeParams) {
-    console.log('In crosscor controller');
 
     // Set up form data
     $scope.formData = {};
@@ -51,27 +50,7 @@ angular.module('dimsDashboard.controllers').
     $scope.showFiles = true;
     $scope.showMaps = true;
 
-    // FileService.getFileList('data_files').then(function(result) {
-    //     $scope.fileNames = result.fileNames;
-    //     $scope.filePath = result.filePath;
-    //     $scope.showFiles = true;
-    // });
-
-    // FileService.getFileList('map_files').then(function(result) {
-    //     $scope.mapNames = result.fileNames;
-    //     $scope.mapPath = result.filePath;
-    //     $scope.showMaps = true;
-    // });
-
     $scope.settings = SettingsService.get();
-
-    // SettingsService.getSettings('0').then(function(result){
-    //   console.log('getSettings result');
-    //   console.log(result);
-    //   $scope.anonymize = result.anonymize;
-    //   $scope.rpcDebug = result.rpcDebug;
-    //   $scope.rpcVerbose = result.rpcVerbose;
-    // });
 
 
     // Other setup
@@ -80,37 +59,11 @@ angular.module('dimsDashboard.controllers').
     $scope.rawData = null;
     $scope.resultsMsg = 'Results';
 
-    // Setup grid
-    // $scope.matching = [];
-    // $scope.matchGridOptions = { data: 'matching',
-    //     columnDefs: [{field: 'ip4', displayName: 'IP Address'},
-    //       {field: 'site', displayName: 'site'}
-    //     ]};
-    // $scope.nonMatching = [];
-    // $scope.nonMatchingGridOptions = { data: 'nonMatching' ,
-    //    columnDefs: [{field: 'ip4', displayName: 'IP Address'},
-    //       {field: 'site', displayName: 'site'}
-    //     ]};
-    // $scope.stats = [];
-    // $scope.statsGridOptions = { data: 'nonMatching' ,
-    //    columnDefs: [{field: 'site', displayName: 'Site'},
-    //       {field: 'count', displayName: 'Count'},
-    //       {field: 'percent', displayName:'Percent'}
-    //     ]};
-
-    // var anonymizeData = function(data,status,headers,config) {
-    //    $log.debug('Call anonymize service');
-    //    AnonService.anonymize($scope.settings.anonymize, data.data, data.pid)
-    //           .then(prepareData);
-    //         };
 
     var prepareData = function(data, status, headers, config) {
       $log.debug('crosscor returned data');
-      // $scope.rawData = data.data;
-      // $scope.pid = data.pid;
       $scope.rawData = data;
 
-      // $log.debug('crosscor pid: ' + $scope.pid);
       $log.debug('crosscor data:  ');
       $log.debug(data);
 
@@ -160,9 +113,7 @@ angular.module('dimsDashboard.controllers').
         } ).
         success(prepareData).
         error(function(data, status, headers, config) {
-          console.log('rwfind Error');
-          console.log(data);
-          console.log(status);
+          
           $scope.showFormError = true;
           $scope.formErrorMsg = 'Your request did not get a result. Status: '+status;
           $scope.resultsMsg = 'Results';

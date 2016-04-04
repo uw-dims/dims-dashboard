@@ -125,7 +125,6 @@ module.exports = function (tools) {
         return tools.getData('python', inputArray, id)
 
           .then(function (reply) {
-            console.log(reply);
             logger.debug('routes/rwfind.list - Send 200 reply');
             return res.status(200).send(reply);
           })

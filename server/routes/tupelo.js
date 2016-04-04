@@ -42,10 +42,6 @@ module.exports = function (tupeloService, access) {
   var tupelo = {};
 
   tupelo.post = function (req, res) {
-    // console.log(req);
-    console.log(req.body);
-    console.log(req.body.algorithm);
-    console.log(req.body.hashes);
     // Get the access object
     var userAccess = req.user;
     // Get the user from the access object

@@ -50,15 +50,11 @@ module.exports = function Store(client) {
   };
 
   var setMetadata = function setMetadata(key, metaData) {
-    // console.log('store.setMetadata key', key);
-    // console.log('store.setMetadata data', metaData);
     return client.hmsetAsync(key, metaData);
   };
 
   // json must be JSON?
   var setData = function setData(key, json) {
-    // console.log('setData key is ', key);
-    // console.log('setData json is ', json);
     var data = {
       data: json
     };
@@ -95,12 +91,10 @@ module.exports = function Store(client) {
         throw new Error ('existsInSet can only be called for sets and sorted sets');
       }
       sorted = (reply === sortedSetType);
-      // console.log('sorted is ', sorted);
       promise = sorted ? client.zrankAsync(setKey, item) : client.sismemberAsync(setKey, item);
       return promise;
     })
     .then(function (reply) {
-      // console.log('reply from promise', reply);
       var notExist = sorted ? null : 0;
       return reply === notExist ? false : true;
     })
@@ -147,10 +141,6 @@ module.exports = function Store(client) {
     });
   };
 
-  // var addKeyToSet = function addKeyToSet(key, setKey) {
-  //   return client.zaddAsync(setKey, timestamp(), key);
-  // };
-
   var incrCounter = function incrCounter(key) {
     return client.incrAsync(key);
   };
@@ -166,11 +156,6 @@ module.exports = function Store(client) {
     });
   };
 
-  // list all keys in a sorted set
-  // var listKeys = function listKeys(setKey) {
-  //   return client.zrangeAsync(setKey, 0, -1);
-  // };
-
   // List all items in a set or sorted set
   var listItems = function listItems(key) {
     var sorted;
@@ -181,7 +166,6 @@ module.exports = function Store(client) {
         throw new Error ('listItems can only be called for sets and sorted sets');
       }
       sorted = (reply === sortedSetType);
-      // console.log('sorted is ', sorted);
       if (sorted) {
         return client.zrangeAsync(key, 0, -1);
       } else {
@@ -256,7 +240,6 @@ module.exports = function Store(client) {
       } else {
         return getAllInSortedSets(setKeyArray)
         .then(function (reply) {
-          // console.log('intersectItems, reply from get all ', reply);
           return _.intersection.apply(_, reply);
         })
         .catch(function (err) {

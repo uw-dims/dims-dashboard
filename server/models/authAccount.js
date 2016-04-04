@@ -81,7 +81,6 @@ module.exports = function (client) {
     })
     .catch(function (err) {
       // No results
-      console.log('authAccount.getAccounts error', err);
       return q.fcall(function () {
         return [];
       });

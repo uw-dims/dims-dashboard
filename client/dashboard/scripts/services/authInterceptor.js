@@ -39,6 +39,7 @@
       request: function (config) {
         config.headers = config.headers || {};
         if ($window.sessionStorage.token) {
+          // Change to this if we use Bearer in the future
           // config.headers.Authorization = 'Bearer ' + $window.sessionStorage.token;
           config.headers.Authorization = 'JWT ' + $window.sessionStorage.token;
         }
@@ -47,7 +48,7 @@
       response: function (response) {
         if (response.status === 401) {
           // handle the case where the user is not authenticated
-          console.log('authInterceptor response is 401');
+          // doesn't need to do anything here
         }
         return response || $q.when(response);
       }

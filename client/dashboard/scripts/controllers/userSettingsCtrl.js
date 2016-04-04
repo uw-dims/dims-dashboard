@@ -49,19 +49,26 @@
       }, {
         value: 'cifbulk_v1_test',
         label: 'cifbulk_v1 - default with debug and verbose'
-      }, {
-        value: 'cifbulk_v1_demo',
-        label: 'cifbulk_v1_demo - alternate queue'
-      }, {
-        value: 'cifbulk_v1_demo_test',
-        label: 'cifbulk_v1_demo_test - alternate queue with debug and verbose'
       }];
+
+    // TODO: Put this in config
+    vm.themeValues = [{
+      value: 'light',
+      label: 'Light theme'
+    }, {
+      value: 'dark',
+      label: 'Dark theme'
+    }];
 
     vm.message = '';
 
     // Get the current settings - save in scope and in formData
     // vm.settings = SettingsService.get();
     vm.settingsFormData = SettingsService.get();
+
+    vm.changeTheme = function () {
+      $log.debug('changing theme:', vm.settingsFormData.theme);
+    };
 
 
     // Save user settings currently selected by User
@@ -75,6 +82,7 @@
       settings.cifbulkQueue = vm.settingsFormData.cifbulkQueue;
       settings.rpcDebug = vm.settingsFormData.rpcDebug;
       settings.rpcVerbose = vm.settingsFormData.rpcVerbose;
+      settings.theme = vm.settingsFormData.theme;
 
       // Call the service to save the settings
       SettingsService.update(settings).then(function (resource) {

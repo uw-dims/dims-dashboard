@@ -161,7 +161,7 @@ module.exports = function (io) {
         }
       });
       messaging.sockets[key].on('error', function (err) {
-        console.log(err);
+        logger.error(err);
       });
     });
   }

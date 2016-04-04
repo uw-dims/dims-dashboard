@@ -56,6 +56,7 @@ module.exports = function (callingModule) {
   };
 
   // Update the log level for a transport
+  // Note this capability is TBD
   var updateLogLevel = function updateLogLevel(transport, level) {
     logger.transports[transport].level = level;
   };
@@ -72,12 +73,15 @@ module.exports = function (callingModule) {
     util.inherits(CustomLogger, winston.Transport);
     CustomLogger.prototype.log = function (level, msg, meta, callback) {
       var self = this;
-      try {
-        appLogger.publish(msg);
-      } catch (err) {
-        console.log('[!!!] logger applogger error, cannot publish. error: ' + err);
-      } finally {
-        callback(null, true);
+      // Dont publish if logger not ready
+      if (appLogger.publish) {
+        try {
+          appLogger.publish(msg);
+        } catch (err) {
+          console.log('[!!!] logger applogger error, cannot publish. error: ' + err);
+        } finally {
+          callback(null, true);
+        }
       }
     };
   }
@@ -96,14 +100,14 @@ module.exports = function (callingModule) {
     logger.addFilter(dimsFormat);
   }
 
-  if (config.env === 'development' || config.env === 'test') {
-    logger.add(winston.transports.Console, {
-      level: config.logLevel,
-      handleExceptions: false,
-      json: false,
-      colorize: true
-    });
-  }
+
+  logger.add(winston.transports.Console, {
+    level: config.logLevel,
+    handleExceptions: false,
+    json: false,
+    colorize: true
+  });
+  
 
   logger.on(evChangeLevel, updateLogLevel.bind(this));
   // logger.on(evChangeExchange, updateExchange.bind(this));

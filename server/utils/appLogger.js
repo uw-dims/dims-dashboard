@@ -32,16 +32,20 @@
 'use strict';
 
 var config = require('../config/config');
+var logger = require('../utils/logger')(module);
 var amqpLogger = require('../services/amqpLogger');
 
 var appLogger = amqpLogger(config.appLogExchange);
 
 // Create publish function
 var publish = function (msg) {
-  try {
-    appLogger.pub(msg);
-  } catch (err) {
-    console.log('[!!!] appLogger publish error: ' + err);
+  // Wait for pub function to be ready
+  if (appLogger.pub) {
+    try {
+      appLogger.pub(msg);
+    } catch (err) {
+      logger.error('appLogger publish error. ' + err);
+    }
   }
 };
 

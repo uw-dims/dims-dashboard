@@ -33,7 +33,6 @@ angular.module('dimsDashboard.controllers').
   controller('GraphCtrl', ['$scope', '$log', '$http','FileService', 'DataService', '$location', '$routeParams', 'SettingsService',
       function($scope, $log, $http, FileService, DataService, $location, $routeParams, SettingsService) {
 
-    console.log('In GraphCtrl');
     $scope.settings = SettingsService.get();
     $scope.formData = {};
     $scope.fileNames = [];
@@ -56,7 +55,6 @@ angular.module('dimsDashboard.controllers').
 
       DataService.getData($scope.filePath+$scope.formData.fileName).
         then (function(result) {
-          console.log(result);
           $scope.graphDataPoints = [
             {
               'key': 'MB',
@@ -73,21 +71,10 @@ angular.module('dimsDashboard.controllers').
           $scope.showResults = true;
 
           nv.addGraph(function() {
-            console.log('in nv.addGraph');
             chart = nv.models.lineWithFocusChart()
                 // .useInteractiveGuideline(true)
                 .margin({top: 30, right: 30, bottom: 60, left: 80})
-                // .margin2({top: 0, right: 30, bottom: 60, left: 60})
-                // x: function(d,i) { return i},
-                // showXAxis: true,
-                // showYAxis: true,
-                //.transitionDuration(250)
-                // .interpolate("basis")
                 .color(d3.scale.category10().range());
-
-            // $scope.chart.dispatch.on('renderEnd', function(){
-            //       console.log('rendered');
-            //   });
 
             // chart sub-models (ie. xAxis, yAxis, etc) when accessed directly, return themselves, not the parent chart, so need to chain separately
             chart.xAxis
@@ -116,13 +103,9 @@ angular.module('dimsDashboard.controllers').
 
             //TODO: Figure out a good way to do this automatically
             nv.utils.windowResize(chart.update);
-            //nv.utils.windowResize(function() { d3.select('#chart1 svg').call(chart) });
-
-            // chart.dispatch.on('stateChange', function(e) { nv.log('New State:', JSON.stringify(e)); });
 
             return chart;
           });
-
 
       });
     };

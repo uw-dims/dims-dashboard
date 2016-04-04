@@ -50,8 +50,6 @@ var keyGen = {
   },
 
   ticketKey: function ticketKey(ticketMetadata) {
-    // console.log('ticketKey, ticket is ', ticket);
-    // console.log('ticketKey: ticket.type', ticketMetadata.type, 'ticket.num', ticketMetadata.num);
     return c.makeBase('ticket', ticketMetadata.type, ticketMetadata.num);
   },
 
@@ -91,28 +89,15 @@ var keyGen = {
   },
 
   ticketTypeKey: function ticketTypeKey(type) {
-    // if (type !== 'private') {
     return c.addSuffix(c.makeRoot('ticket'), 'type', type);
-    // } else {
-    //   return c.addSuffix(c.makeRoot('ticket'), 'type', type, owner);
-    // }
   },
 
   // Key to a topic
-  // "ticket:num:topicname:topicnum" aka key_of_parentTicket:topicname:topicnum
-  // Only includes counter if it exists
   topicKey: function topicKey(topicMeta) {
-    // var key = this.ticketKey(topic.parent) + c.delimiter + topic.type + c.delimiter + topic.name;
-    // return key;
-    // console.log('topicKey topic is ', topic);
-    // console.log('topic parent is ', topic.parent);
-    // console.log('[+++] topicKey - topicMetata = ', topicMeta);
-
     return c.addContent(this.ticketKey(topicMeta.parent), topicMeta.keyname, topicMeta.num);
   },
 
   topicMetaKey: function topicMetaKey(topicMeta) {
-    // console.log('[+++] topicMetaKey = ', topicMeta);
     return c.addSuffix(this.topicKey(topicMeta), 'metadata');
   },
 
@@ -124,8 +109,6 @@ var keyGen = {
   // Key to list or set of topics associated to a ticket
   // "ticket:type:num.__topics"
   topicSetKey: function topicSetKey(topicMeta) {
-    // console.log('[+++] topicSetKey topic', topicMeta);
-    // return c.namespace + this.ticketKey(ticket) + c.topicSuffix;
     return c.addSuffix(this.ticketKey(topicMeta.parent), 'topics');
   },
 
@@ -170,6 +153,15 @@ var keyGen = {
   },
   userSettingsSetKey: function () {
     return c.addSuffix(c.makeRoot('userSetting'), 'all');
+  },
+
+  // TODO: Use to save site settings (not user)
+  siteSettingsKey: function() {
+    return c.makeBase('sitesettings');
+  },
+
+  sitSettingsSetKey: function() {
+    return c.addSuffix(c.makeRoot('sitesettings'), 'all');
   },
 
   // Keys to attributes

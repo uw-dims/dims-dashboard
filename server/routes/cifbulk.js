@@ -23,13 +23,8 @@ module.exports = function (UserSettings, tools) {
     UserSettings.getUserSettings(id).then(function (reply) {
 
       logger.debug('cifbulk:list - settings ', reply);
-      console.log(reply.settings);
 
       var settings = reply.settings;
-
-      console.log(req.query.queue);
-      console.log(req.query.debug);
-      console.log(req.query.verbose);
 
       var rpcQueuebase = req.query.queue !== undefined ? req.query.queue : settings.cifbulkQueue,
           rpcClientApp = 'cifbulk_client',
@@ -102,7 +97,6 @@ module.exports = function (UserSettings, tools) {
             return tools.getData('python', inputArray, id)
 
             .then(function (reply) {
-              console.log(reply);
               logger.debug('routes/cifbulk.list - Send 200 reply');
               return res.status(200).send(reply);
             })

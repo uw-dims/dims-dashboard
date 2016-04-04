@@ -31,46 +31,31 @@
 
 'use strict';
 
-// Get the app configuration
-var config = require('../config/config');
-var logger = require('./logger')(module);
-var dbConfig;
-logger.info('Setting up Bookshelf');
-logger.info('Connection to user database %s at %s with user %s',
-  config.userDatabase, config.userDBHost, config.userDBUser);
+(function () {
 
-if (config.userDBPass) {
-  logger.info('Setting User database connection string with password');
-  dbConfig = {
-    client: 'postgresql',
-    connection: {
-      host: config.userDBHost,
-      user: config.userDBUser,
-      database: config.userDatabase,
-      password: config.userDBPass
-    }
+  var ThemeService = function ($cookies, siteVars) {
+    var themeService = {};
+
+    themeService.setTheme = function (themeName) {
+      $cookies.currentTheme = themeName;
+      _.forEach(document.getElementsByTagName('link'), function (link) {
+        if (link.href && link.href.indexOf('styles/') !== -1) {
+          link.disabled = (link.href.indexOf($cookies.currentTheme) === -1);
+        }
+      });
+    };
+
+    themeService.initializeTheme = function () {
+      var currentTheme = $cookies.currentTheme || siteVars.siteDefaultTheme;
+      themeService.setTheme(currentTheme);
+    };
+
+    return themeService;
   };
-} else {
-  logger.info('Setting User database connection string without password');
-  dbConfig = {
-    client: 'postgresql',
-    connection: {
-      host: config.userDBHost,
-      user: config.userDBUser,
-      database: config.userDatabase
-    }
-  };
-}
 
+  angular.module('dimsDashboard.services')
+  .factory('ThemeService', ThemeService);
 
-// Initialize Bookshelf ORM and connect
-var knex = require('knex')(dbConfig);
-var Bookshelf = require('bookshelf')(knex, {debug: true});
+  ThemeService.$inject = ['$cookies', 'ENV'];
 
-// Add virtuals plug-in
-Bookshelf.plugin('virtuals');
-
-// export Bookshelf
-module.exports = Bookshelf;
-
-// EOF
+}());

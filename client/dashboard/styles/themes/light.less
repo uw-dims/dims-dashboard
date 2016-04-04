@@ -29,48 +29,8 @@
  *
  */
 
-'use strict';
+ // Import main
 
-// Get the app configuration
-var config = require('../config/config');
-var logger = require('./logger')(module);
-var dbConfig;
-logger.info('Setting up Bookshelf');
-logger.info('Connection to user database %s at %s with user %s',
-  config.userDatabase, config.userDBHost, config.userDBUser);
+ @import "../style.less";
 
-if (config.userDBPass) {
-  logger.info('Setting User database connection string with password');
-  dbConfig = {
-    client: 'postgresql',
-    connection: {
-      host: config.userDBHost,
-      user: config.userDBUser,
-      database: config.userDatabase,
-      password: config.userDBPass
-    }
-  };
-} else {
-  logger.info('Setting User database connection string without password');
-  dbConfig = {
-    client: 'postgresql',
-    connection: {
-      host: config.userDBHost,
-      user: config.userDBUser,
-      database: config.userDatabase
-    }
-  };
-}
-
-
-// Initialize Bookshelf ORM and connect
-var knex = require('knex')(dbConfig);
-var Bookshelf = require('bookshelf')(knex, {debug: true});
-
-// Add virtuals plug-in
-Bookshelf.plugin('virtuals');
-
-// export Bookshelf
-module.exports = Bookshelf;
-
-// EOF
+ 

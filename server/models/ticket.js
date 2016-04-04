@@ -267,14 +267,6 @@ module.exports = function Ticket(store) {
       } else {
         openKey = keyGen.ticketClosedKey();
       }
-      // console.log('in Ticket.deleteTicket, metadata is ', self.metadata);
-      logger.debug('key is ', keyGen.ticketKey(self.metadata));
-      logger.debug('ticket set key is ', keyGen.ticketSetKey());
-      logger.debug('ticket tg key ', keyGen.ticketTgKey(self.metadata.tg));
-      logger.debug('owner key ', keyGen.ticketOwnerKey(self.metadata.creator));
-      logger.debug('open key ', openKey);
-      logger.debug('type key ', keyGen.ticketTypeKey(self.metadata.type));
-      logger.debug('priv key', privKey);
 
       return q.all([
         store.deleteKey(keyGen.ticketKey(self.metadata)),
@@ -426,7 +418,6 @@ module.exports = function Ticket(store) {
     var deferred = q.defer();
     validateQuery(options, function (err, query, info) {
       if (err) {
-        console.log('throw error for invalid query');
         deferred.reject(new Error(err));
       } else {
         if (!query.hasOwnProperty('type')) {
@@ -441,7 +432,7 @@ module.exports = function Ticket(store) {
             keyArray.push(keyGen.ticketPublicKey());
           }
         }
-        if (query.hasOwnProperty('open') ) {
+        if (query.hasOwnProperty('open')) {
           if (query.open) {
             keyArray.push(keyGen.ticketOpenKey());
           } else {
@@ -459,19 +450,6 @@ module.exports = function Ticket(store) {
     });
     return deferred.promise;
   };
-
-  // var completeTicket = function completeTicket(config) {
-  //   config = castMetadata(config);
-  //   var ticket = ticketFactory({
-  //     type: config.type,
-  //     description: config.description,
-  //     creator: config.creator,
-  //     private: config.private
-  //   });
-  //   _.extend(ticket.metadata, config);
-  //   ticket.key = keyGen.ticketKey(ticket.metadata);
-  //   return ticket;
-  // };
 
   // Returns ticket metadata and key
   // Does not create full ticket object with functions
@@ -502,7 +480,6 @@ module.exports = function Ticket(store) {
       return q.all(promises);
     })
     .catch(function (err) {
-      console.log('caught error in getTickets');
       throw err;
     });
   };

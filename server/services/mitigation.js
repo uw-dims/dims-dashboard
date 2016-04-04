@@ -99,7 +99,6 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
   var mapPath = config.dashboardDataPath + 'dashboard_user_attributes.yml';
 
   var listMitigations = function listMitigations(user, query) {
-    console.log('query in listMitigations', query);
     var promises = [];
     var keyArray = [];
 
@@ -120,14 +119,12 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
     return store.intersectItems(keyArray)
     .then(function (reply) {
       // Array of keys to mitigations
-      console.log('listMitigations', reply);
       _.forEach(reply, function (value, index) {
         promises.push(getMitigation(value, user));
       });
       return q.all(promises);
     })
     .catch(function (err) {
-      console.error('caught error in listMitigations', err.toString(), '- will return empty array');
       // return no items found - empty array
       return q.fcall(function () {
         return [];
@@ -162,7 +159,6 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
       result.metadata.unknownNum = reply[4];
       result.metadata.mitigatedNum = reply[5];
       result.metadata.knownNum = reply[3] - reply[4];
-      console.log(result.metadata);
       return result;
     })
     .catch(function (err) {
@@ -170,33 +166,9 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
     });
   };
 
-  // var getTickets = function getTickets() {
-  //   // Get all mitigation tickets
-  //   var promises = [];
-  //   var config = {
-  //     type: 'mitigation'
-  //   };
-  //   return Ticket.getTickets(config)
-  //   .then(function (reply) {
-  //     _.forEach(reply, function (value, key) {
-  //       var ticket = value;
-  //       promises.push(addTopics(ticket));
-  //     });
-  //     return q.all(promises);
-  //   })
-  //   .catch(function (err) {
-  //     console.log('caught error in getTickets', err);
-  //     throw err;
-  //   });
-  // };
-
-
-
   var initiateMitigation = function initiateMitigation(ipData, user, tg, ticketName, description, startTime) {
-    console.log('Initiating mitigation: user %s, tg %s, ticketName %s, description %s, startTime %s',
+    logger.debug('Initiating mitigation: user %s, tg %s, ticketName %s, description %s, startTime %s',
       user, tg, ticketName, description, startTime);
-    // console.log('ipData', ipData);
-    // var ipData = fs.readFileSync(ipPath, {encoding: 'utf-8'});
     var ticketConfig = {
       creator: user,
       type: 'mitigation',
@@ -214,7 +186,7 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
 
     if (startTime === undefined) {
       startTime = dimsUtils.createTimestamp();
-      console.log('initiateMitigation: time is undefined - using current time: ', startTime);
+      logger.debug('initiateMitigation: time is undefined - using current time: ', startTime);
     }
 
     // TODO - add userservice so we don't have to call the model directly
@@ -223,12 +195,9 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
       _.forEach(collection.toJSON(), function (value) {
         users.push(value.ident);
       });
-      console.log('initiateMitigation. all users: ', users);
       return ticket.create();
     })
     .then(function () {
-      console.log('-----------------------------------');
-      console.log('Ticket created. Now assign IPs to users who are tracking them');
       return anonService.setup({
         data: ipData,
         useFile: false,
@@ -237,26 +206,18 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
         outputType: 'json'}, 'true', 'true');
     })
     .then(function (reply) {
-      console.log('initiateMitigation. reply from anonService.setup', reply);
       var anonChild = new ChildProcess();
       return anonChild.startProcess('python', reply);
     })
     .then(function (reply) {
       binnedIps = JSON.parse(reply);
-      // console.log(binnedIps);
       return q.allSettled(_.map(users, function (user) {
         if (binnedIps.matching.hasOwnProperty(user)) {
           // Add this user's IPs to initialIPs first
           initialIps.push.apply(initialIps, ipListToArray(binnedIps.matching[user]));
           var userIps = [];
           userIps.push.apply(userIps, ipListToArray(binnedIps.matching[user]));
-          console.log('-----------------------------------');
-          console.log('Will add a topic for IPs belonging to user ', user, ' so they can be tracked.');
-          console.log('User ', user, ' is responsible for these IPs. Number: ', userIps.length);
-          console.log('-----------------------------------');
-          // console.log(binnedIps.matching[user]);
-          // console.log(userIps);
-          // Create topic to store this user's binned IPs
+      
           return Topic.topicFactory(ticket, getTopicConfig('user', user))
            .create(userIps);
         }
@@ -266,27 +227,19 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
       // Add unknown IPs to initial and to nonmatching
       initialIps.push.apply(initialIps, ipListToArray(binnedIps.nonmatching));
       unknownIps.push.apply(unknownIps, ipListToArray(binnedIps.nonmatching));
-      console.log('Number of initialIps: ', initialIps.length);
-      console.log('Number of unknownIps: ', unknownIps.length);
+
       var promises = [];
       promises.push(Topic.topicFactory(ticket, getTopicConfig('unknown')).create(unknownIps));
       promises.push(Topic.topicFactory(ticket, getTopicConfig('initial')).create(initialIps));
       promises.push(Topic.topicFactory(ticket, getTopicConfig('data')).create([0], startTime));
       return q.all(promises);
     })
-    // .then(function () {
-    //   return Topic.topicFactory(ticket, getTopicConfig('initial')).create(initialIps);
-    // })
-    // // Can't create mitigated topic yet since no IPs exist for that yet
-    // .then(function () {
-    //   return Topic.topicFactory(ticket, getTopicConfig('data')).create([0], startTime);
-    // })
+    
     .then(function () {
       // Return the key of the ticket
       return keyGen.ticketKey(ticket.metadata);
     })
     .catch(function (err) {
-      console.log(err);
       throw err;
     });
   };
@@ -328,11 +281,7 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
 
     if (time === undefined) {
       time = dimsUtils.createTimestamp();
-      console.log('***time is undefined ');
     }
-    console.log('remediate. time is ', time);
-    console.log('remediate. start. ips are ', ips);
-    console.log('remediate. start. ips length = willMitigate = ', willMitigate);
 
     // Get the ticket
     return Ticket.getTicket(ticketKey)
@@ -343,30 +292,22 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
     })
     .then(function (reply) {
       mappedKeys = reply;
-      console.log('remediate. mitigated key is ', mappedKeys.mitigated);
       if (mappedKeys.mitigated === undefined) {
         numAlreadyMitigated = 0;
-        console.log('remediate. need to create topic');
         return Topic.topicFactory(ticket, getTopicConfig('mitigated')).create(ips);
       } else {
-        console.log('remediate. already created so get count');
         return store.countItems(mappedKeys.mitigated);
       }
     })
     .then(function (reply) {
-      console.log('remediate. reply from either create or num', reply);
       if (mappedKeys.mitigated !== undefined) {
         numAlreadyMitigated = reply;
         // Add the mitigate IPs to the mitigated topic
         promises.push(store.addItem(ips, mappedKeys.mitigated));
       }
-      console.log('remediate. numAlreadyMitigated = ', numAlreadyMitigated);
       // update total number of mitigated IPs including the new ones
       totalMitigated = numAlreadyMitigated + willMitigate;
-      console.log('remediate. totalMitigated = ', totalMitigated);
-      console.log('remediate. Now user is ', user);
-      console.log('remediate. user key is ', mappedKeys[user]);
-      console.log('remediate. data key is ', mappedKeys.data);
+     
       // Remove the mitigated IPs from the user topic
       promises.push(store.removeItem(ips, mappedKeys[user]));
       // Store the current number of mitigated IPs in the data topic
@@ -393,12 +334,9 @@ module.exports = function (Ticket, Topic, anonService, Attributes, store, UserMo
   // Maybe should re-work promises so that null or undefined user is not
   // even submitted and an empty array is returned
   var getUserIps = function getUserIps(ticketKey, user) {
-    // console.log('getUserIps ', ticketKey, user);
     return mapTopicKeys(ticketKey)
     .then(function (reply) {
       var mappedKeys = reply;
-      // console.log('getUserIps ', mappedKeys);
-      // console.log('getUserIps key is ', mappedKeys[user]);
       return store.listItems(mappedKeys[user]);
     })
     .then(function (reply) {

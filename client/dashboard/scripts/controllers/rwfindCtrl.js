@@ -55,26 +55,6 @@ angular.module('dimsDashboard.controllers').
     $scope.demoNames = [];
     $scope.showDemoFiles = false;
 
-    // FileService.getFileList('ip_lists').then(function(result) {
-    //     $scope.fileNames = result.fileNames;
-    //     $scope.filePath = result.filePath;
-    //     $scope.showFiles = true;
-    // });
-
-    // FileService.getDemoList('rwfind').then(function(result) {
-    //   $scope.demoPath = result.filePath;
-    //   $scope.demoNames = result.fileNames;
-    //   $scope.showDemoFiles = true;
-    // });
-
-    // SettingsService.getSettings('0').then(function(result){
-    //   console.log('getSettings result');
-    //   console.log(result);
-    //   $scope.anonymize = result.anonymize;
-    //   $scope.rpcDebug = result.rpcDebug;
-    //   $scope.rpcVerbose = result.rpcVerbose;
-    // });
-
     // Setup date
     $scope.dateConfig = DateService.dateConfig;
 
@@ -94,29 +74,9 @@ angular.module('dimsDashboard.controllers').
     $scope.totalDataSize=0;
     $scope.query='';
 
-    // Setup grid
     $scope.flows = [];
-    // Set up ng-grid - currently this has been superseded but may be used later
-    // $scope.flowGridOptions = { data: 'flows',
-    //     columnDefs: [{field: 'sIP', displayName: 'Source IP', width:"**"},
-    //       {field: 'dIP', displayName: 'Destination IP',width:"**"},
-    //       {field: 'sPort', displayName: 'Source Port', width:"*"},
-    //       {field: 'dPort', displayName: 'Destination Port', width:"*"},
-    //       {field: 'pro', displayName: 'Protocol', width:"*"},
-    //       {field: 'packets', displayName: 'Packets', width:"*"},
-    //       {field: 'bytes', displayName: 'Bytes', width:"*"},
-    //       {field: 'flags', displayName: 'Flags', width:"*"},
-    //       {field: 'sTime', displayName: 'Start Time', width:"**"},
-    //       {field: 'dur', displayName: 'Duration', width:"*"}
-    //     ]};
+  
     $scope.flowStats = [];
-    // $scope.flowStatsGridOptions = { data: 'flowStats' };
-
-    // var anonymizeData = function(data,status,headers,config) {
-    //    $log.debug('Call anonymize service');
-    //    AnonService.anonymize($scope.settings.anonymize, data.data, data.pid)
-    //           .then(prepareData);
-    //         };
 
     var prepareData = function(data, status, headers, config) {
       $log.debug('rwfind returned data - in prepareData');
@@ -167,7 +127,6 @@ angular.module('dimsDashboard.controllers').
     };
 
     $scope.pageResults = function() {
-      // console.log("calling pageResults: start is " + $scope.start);
       var end = ($scope.start + $scope.dataSize) > $scope.totalDataSize ? $scope.totalDataSize : $scope.start + $scope.dataSize;
       // var iterationSize = ($scope.start + $scope.dataSize) > size ? size - $scope.start : $scope.dataSize;
       for (var i=$scope.start; i<end; i++ ){
@@ -176,30 +135,7 @@ angular.module('dimsDashboard.controllers').
       $scope.start = end;
     };
 
-    // var getDemo = function(file) {
-    //   console.log('in getDemo');
-    //   $scope.showResults = false;
-    //   $scope.showJsonResults = false;
-    //   $scope.data = {};
-    //   return $http({
-    //     method: 'GET',
-    //     url: '/files',
-    //     params: {
-    //       action: 'read',
-    //       file: file,
-    //       source: 'default_data'
-    //     }
-
-    //   }).success(function(data, status, headers, config) {
-    //     prepareData(data,status,headers,config)
-    //   })
-    //     .error(function(data, status, headers, config) {
-    //       console.log(data);
-    //       console.log(status);
-    //     });
-    // };
-
-
+    
     /**
      *  callClient function
      */
@@ -211,13 +147,6 @@ angular.module('dimsDashboard.controllers').
       $scope.showFormError = false;
       $scope.showJsonResults = false;
       $scope.formErrorMsg = '';
-
-      // User wants demo data - get data and return
-      // if ($scope.formData.demoName !== null && $scope.formData.demoName !== undefined) {
-      //   $scope.resultsMsg = 'Results - Waiting...';
-      //   getDemo($scope.formData.demoName);
-      //   return;
-      // }
 
       // Catch some input errors
       if (!Utils.inputPresent($scope.formData.ips) && !Utils.inputPresent($scope.formData.fileName)) {

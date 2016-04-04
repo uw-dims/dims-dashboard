@@ -64,7 +64,11 @@
       };
 
       vm.showDelete = function showDelete() {
-        return $rootScope.currentUser.isSysadmin;
+        if ($rootScope.currentUser) {
+          return $rootScope.currentUser.isSysadmin || false;
+        } else {
+          return false;
+        }
       };
 
       vm.deleteTicket = function deleteTicket(ticketKey) {
