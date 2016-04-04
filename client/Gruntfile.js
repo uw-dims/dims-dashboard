@@ -15,8 +15,6 @@ module.exports = function (grunt) {
     app: require('./bower.json').appPath,
     dist: '../public',
     tmp: '../.tmp/',
-    // Read the commented license file
-    license: grunt.file.read('./license_text'),
     clientPackage: grunt.file.readJSON('package.json'),
     serverPackage: grunt.file.readJSON('../server/package.json')
   };
@@ -156,14 +154,10 @@ module.exports = function (grunt) {
       app: {
         src: ['<%= appConfig.app %>/index.html'],
         exclude: ['bower_components/bootstrap/dist/js/bootstrap.js', 'bower_components/cryptojslib', 'bower_components/font-awesome/css/font-awesome.css']
-        //ignorePath:  /\.\.\//
       },
       less: {
-        //src: ['<%= appConfig.app %>/styles/style.less'],
         src: ['<%= appConfig.app %>/styles/themes/*.less']
-        // exclude: ['bower_components/bootstrap/dist/css/bootstrap.css', 'bower_components/font-awesome/css/font-awesome.css']
-        //ignorePath:  /\.\.\//
-        //ignorePath: /(\.\.\/){1,2}bower_components\//
+  
       }
     },
 
@@ -246,94 +240,16 @@ module.exports = function (grunt) {
       }
     },
 
-    // The following *-min tasks will produce minified files in the dist folder
-    // By default, your `index.html`'s <!-- Usemin block --> will take care of
-    // minification. These next options are pre-configured if you do not wish
-    // to use the Usemin blocks.
-    // cssmin: {
-    //   dist: {
-    //     files: {
-    //       '<%= appConfig.dist %>/styles/*.css': [
-    //         '.tmp/styles/{,*/}*.css'
-    //       ]
-    //     }
-    //   }
-    // },
     uglify: {
-      
-          options: {
-          mangle: false,  
+      options: {
+        mangle: false
       }
-        // files: {
-          // '<%= appConfig.dist %>/scripts/scripts.js': [
-          //   '<%= appConfig.dist %>/scripts/scripts.js'
-          // ],
-          // '<%= appConfig.dist %>/scripts/vendor.js': [
-          //   // '<%= appConfig.dist %>/scripts/vendor.js']
-          // '../.tmp/scripts/': [
-          //   '<%= appConfig.app %>/scripts/**/*.js'
-          // ]
-      //     files: [{
-      //       expand: true,
-      //       cwd: '<%= appConfig.app %>/scripts/',
-      //       src: ['{,*/}*.js'],
-      //       dest: '<%= appConfig.tmp %>/scripts/'
-      //     }]
-      //   },
-
-      // 'appOnly': {
-      //     options: {
-      //       mangle: false,
-      //       preserveComments: false
-      //     },
-      //     files: [{
-      //       expand: true,
-      //       cwd: '<%= appConfig.app %>/scripts/',
-      //       src: ['app.js'],
-      //       dest: '<%= appConfig.tmp %>/scripts/'
-      //     }]
-       // },
-        // }
-
-      
-      // development: {
-      //   files: [{
-      //     expand: true,
-      //     cwd: '<%= appConfig.app %>/scripts/',
-      //     src: ['{,*/}*.js'],
-      //     dest: '<%= appConfig.tmp %>/scripts/'
-      //   }]
-      // }
     },
 
     concat: {
       options: {
         separator: ';\n'
-      },
-        dist: {
-          options: {
-            stripBanners: true,
-            banner: '/*! <%= appConfig.clientPackage.name %> - ' +
-            '<%= appConfig.clientPackage.version %>  - ' +
-            '<%= grunt.template.today("yyyy-mm-dd") %> */ ' +
-            '<%= appConfig.license %>'
-          },
-          src: ['./dashboard/scripts/**/*.js'],
-          dest: './.tmp/scripts/scripts.js'
-        }
-      // dist: {
-      
-      //   // files: [{
-      //   //   expand: true,
-      //   //   cwd: '<%= appConfig.tmp %>/scripts/',
-      //   //   src: ['{,*/}*.js'],
-      //   //   dest: '<%= appConfig.dist %>/scripts/scripts.js'
-      //   // }]
-      // },
-      // development: {
-      //     src: ['../.tmp/scripts/**/*.js'],
-      //     dest: '../public/scripts/scripts.js'
-      // }
+      }
     },
 
     imagemin: {
@@ -378,21 +294,11 @@ module.exports = function (grunt) {
     },
 
     // ngAnnotate tries to make the code safe for minification automatically by
-    // using the Angular long form for dependency injection. It doesn't work on
-    // things like resolve or inject so those have to be done manually.
+    // using the Angular long form for dependency injection. 
     ngAnnotate: {
       dist: {
-        // files: [{
-        //   expand: true,
-        //   cwd: '<%= appConfig.app %>/scripts',
-        //   src: '{,*/}*.js',
-        //   dest: '.tmp/concat/scripts'
-        // }]
+      
         files: [{
-          // expand: true,
-          // // cwd: '<%= appConfig.dist %>',
-          // src: '<%= appConfig.dist %>/scripts/scripts.js',
-          // dest: 'scripts.js'
           expand: true,
           cwd: '<%= appConfig.app %>/scripts/',
           src: ['{,*/}*.js'],
@@ -409,14 +315,7 @@ module.exports = function (grunt) {
       }
     },
 
-    // // Replace Google CDN references
-    // cdnify: {
-    //   dist: {
-    //     html: ['<%= appConfig.dist %>/*.html']
-    //   }
-    // },
 
-    // Copies remaining files to places other tasks can use
     copy: {
       dist: {
         files: [{
@@ -506,8 +405,7 @@ module.exports = function (grunt) {
     'less:dist',
     'ngAnnotate:dist',
     'useminPrepare',
-    'concat:generated',
-    'concat:dist',
+    'concat',
     'copy:dist',
     'uglify',
     'cssmin',
