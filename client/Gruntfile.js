@@ -55,6 +55,7 @@ module.exports = function (grunt) {
   clientConfig = setExternalsConfig(clientConfig, 'consul', consulUrl);
   clientConfig = setExternalsConfig(clientConfig, 'trident', tridentUrl);
   clientConfig.siteIntroText = _.escape(clientConfig.siteIntroText);
+  console.log(clientConfig);
 
   // Copy the site logo to images directory before building:
   if (grunt.file.exists('/etc/dashboard/' + clientConfig.siteLogo)) {
@@ -164,9 +165,12 @@ module.exports = function (grunt) {
     // Compiles LESS to CSS and generates necessary files if requested
     // Override the variable for the site logo and font awesome font path
     less: {
-      modifyVars: {
-        siteLogoFile: clientConfig.siteLogo
+      options: {
+        modifyVars: {
+          siteLogoFile: clientConfig.siteLogo
+        }
       },
+      
       development: {
         options: {
           strictMath: true,
