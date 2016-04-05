@@ -80,7 +80,6 @@
     };
 
     var getItems = function (items) {
-      $log.debug('items in getItems are ', items);
       if (items === undefined || items === '') {
         return [];
       }
@@ -93,15 +92,13 @@
             result.push(_.trim(value));
           });
         });
-        $log.debug('result is ', result);
         return result;
       }
       return items;
     };
 
     vm.update = function update(type, addItems, removeItems) {
-      $log.debug('addItems initially ', addItems);
-      $log.debug('removeItems initially ', removeItems);
+     
       var promises = [];
       var toAdd = getItems(addItems);
       var toRemove = getItems(removeItems);

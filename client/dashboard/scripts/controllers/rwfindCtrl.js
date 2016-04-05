@@ -34,7 +34,6 @@ angular.module('dimsDashboard.controllers').
   controller('RwfindCtrl', ['$scope', 'Utils', '$http', '$log', 'FileService', 'DateService',
     'AnonService', 'SettingsService', '$location', '$routeParams',
       function ($scope, Utils, $http, $log, FileService, DateService, AnonService, SettingsService, $location, $routeParams) {
-    $log.debug('In rwfind controller');
 
     $scope.settings = SettingsService.get();
 
@@ -79,10 +78,6 @@ angular.module('dimsDashboard.controllers').
     $scope.flowStats = [];
 
     var prepareData = function(data, status, headers, config) {
-      $log.debug('rwfind returned data - in prepareData');
-      $log.debug('status: '+status);
-      $log.debug('data: ');
-      $log.debug(data);
       $scope.rawData = data;
       $scope.flowItems=[];
       var flowsFound = -1;
@@ -121,7 +116,6 @@ angular.module('dimsDashboard.controllers').
           $scope.result = data.data;
           $scope.pid = data.pid;
       }
-      $log.debug('Done processing JSON for pid: ' + $scope.pid);
       $scope.showResults = true;
       $scope.resultsMsg = (flowsFound >=0) ? 'Results - ' + flowsFound + ' flows found': 'Results';
     };
@@ -140,7 +134,6 @@ angular.module('dimsDashboard.controllers').
      *  callClient function
      */
     $scope.callClient = function() {
-      $log.debug('rwfind CallClient: User clicked button to process request. Formdata: ');
       $log.debug($scope.formData);
       // Initialize/reset when calling a client
       $scope.showResults = false;
@@ -189,10 +182,7 @@ angular.module('dimsDashboard.controllers').
       Utils.setConfig(clientConfig, $scope.settings.rpcVerbose, 'verbose');
       Utils.setConfig(clientConfig, $scope.settings.rpcDebug, 'debug');
       Utils.setConfig(clientConfig, $scope.formData.fileName, 'fileName');
-      $log.debug('rwfind CallClient. Finished processing config. clientConfig: ');
-      $log.debug(clientConfig);
-      $log.debug('rwfind CallClient: Now sending http get request');
-
+      
       $scope.resultsMsg = 'Results - Waiting...';
 
       $http(

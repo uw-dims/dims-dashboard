@@ -86,8 +86,6 @@ angular.module('dimsDashboard.controllers').
         Utils.setConfig(clientConfig, $scope.settings.rpcVerbose, 'verbose');
         Utils.setConfig(clientConfig, $scope.settings.rpcDebug, 'debug');
 
-        $log.debug('AnonCtrl.callClient. Ready to send request. clientConfig: ', clientConfig);
-
         $scope.resultsMsg = 'Results - Waiting...';
 
         $http(
@@ -96,8 +94,6 @@ angular.module('dimsDashboard.controllers').
             params: clientConfig
           }).
           success(function (data, status, headers, config) {
-            $log.debug('AnonCtrl.callClient. HTTP success callback. Status: ', status);
-            $log.debug('AnonCtrl.callClient. HTTP success callback. Data: ', data);
             $scope.rawData = data;
             $scope.showResults = true;
 

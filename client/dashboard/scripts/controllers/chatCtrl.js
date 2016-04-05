@@ -34,8 +34,6 @@ angular.module('dimsDashboard.controllers').
   controller('ChatCtrl', ['$scope', '$location', '$log', 'ChatService', '$rootScope',
     function ($scope, $location, $log, ChatService, $rootScope) {
 
-    $log.debug('chatCtrl. scope.currentUser is ', $scope.currentUser);
-
     $scope.chatMaximized = true;
     $scope.chatClass = 'chatMax';
     $scope.messages = '';
@@ -71,7 +69,6 @@ angular.module('dimsDashboard.controllers').
       $log.debug('chatCtrl.hide');
       $scope.chatMaximized = false;
       $scope.chatClass = 'chatMin';
-      $log.debug('chatCtrl hide chatMaximized class ', $scope.chatMaximized, $scope.chatClass);
     };
 
     // Show the window
@@ -87,7 +84,6 @@ angular.module('dimsDashboard.controllers').
       $scope.messages = ''; // Re-initialize messages
       // Add listener for socket:constants.chatEvent broadcast
       $scope.offListen = $scope.$on('socket:' + constants.chatExchanges.chat.event, function (event, data) {
-        $log.debug('ChatCtrl: got a message ', event.name, data);
         if (!data) {
           $log.error('ChatCtrl: Invalid message. ', 'event: ', event, 'data: ', JSON.stringify(data));
           return;

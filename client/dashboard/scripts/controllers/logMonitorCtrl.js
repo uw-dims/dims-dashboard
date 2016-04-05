@@ -39,7 +39,7 @@
     $scope.logMaximized = true;
     $scope.logClass = 'logMax';
 
-    //TODO(lparsons) - generate this programatically
+    //TODO - generate this programatically
     $scope.tabs = [
     {
       active: true
@@ -61,13 +61,6 @@
       dimstr: false
     };
 
-    // $scope.types = {
-    //   logs: 'logs',
-    //   devops: 'devops',
-    //   test: 'test',
-    //   health: 'health',
-    //   dimstr: 'dimstr'
-    // };
 
      // Close the log monitor
     $scope.close = function () {
@@ -114,20 +107,6 @@
       }
     };
 
-    // $scope.typeNames = {
-    //   logs: 'Logs',
-    //   devops: 'Devops',
-    //   test: 'CI Testing',
-    //   health: 'Health',
-    //   dimstr: 'Test Report'
-    // };
-
-    // var activateTab = function activateTab(num) {
-    //   if (num >= 0 && num <= 2) {
-    //     $scope.tabs[num].active = true;
-    //   }
-    // };
-
     var activateTab = function activateTab(type) {
       if (type !== undefined && $scope.active.hasOwnProperty(type)) {
         $log.debug('type is ', type);
@@ -137,10 +116,6 @@
 
     activateTab($routeParams.type);
 
-    // if ($routeParams.type === 'settings') {
-    //   activateTab(2);
-    // }
-
   }
 
   // Plug controller function into AngularJS
@@ -149,7 +124,6 @@
     .controller('LogMonitorCtrl', LogMonitorCtrl);
 
   LogMonitorCtrl.$inject = ['$scope', '$log', '$routeParams', '$location', '$rootScope'];
-
 
 }());
 

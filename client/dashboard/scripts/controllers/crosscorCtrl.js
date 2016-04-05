@@ -100,10 +100,6 @@ angular.module('dimsDashboard.controllers').
       Utils.setConfig(clientConfig, $scope.settings.rpcVerbose, 'verbose');
       Utils.setConfig(clientConfig, $scope.settings.rpcDebug, 'debug');
 
-      $log.debug('crosscor CallClient. Finished processing config. clientConfig: ');
-      $log.debug(clientConfig);
-      $log.debug('crosscor CallClient: Now sending http get request');
-
       $scope.resultsMsg = 'Results - Waiting...';
 
       $http(

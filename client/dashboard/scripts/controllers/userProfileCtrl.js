@@ -48,7 +48,7 @@
         vm.profile = UserService.convertToDisplay(reply);
       })
       .catch(function (err) {
-        $log.debug('userProfileCtrl.activate error from getUser is ', err);
+        $log.error('userProfileCtrl.activate error from getUser is ', err);
       });
     };
 

@@ -54,7 +54,6 @@
 
     var activateTab = function activateTab(type) {
       if (type !== undefined && $scope.active.hasOwnProperty(type)) {
-        $log.debug('type is ', type);
         $scope.active[type] = true;
       }
     };
