@@ -46,8 +46,7 @@
     };
 
     themeService.initializeTheme = function () {
-      var currentTheme = $cookies.currentTheme || siteVars.siteDefaultTheme;
-      themeService.setTheme(currentTheme);
+      var currentTheme = ($cookies.currentTheme === "undefined") ? siteVars.siteDefaultTheme : $cookies.currentTheme;      themeService.setTheme(currentTheme);
     };
 
     return themeService;
