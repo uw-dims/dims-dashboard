@@ -55,6 +55,6 @@
   angular.module('dimsDashboard.services')
   .factory('ThemeService', ThemeService);
 
-  ThemeService.$inject = ['$cookies', 'ENV'];
+  ThemeService.$inject = ['$cookies', 'siteVars'];
 
 }());
