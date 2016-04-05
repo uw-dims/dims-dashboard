@@ -1,6 +1,6 @@
 {
   "name": "dims-dashboard-client",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Client module for the DIMS Dashboard",
   "private": true,
   "dependencies": {
