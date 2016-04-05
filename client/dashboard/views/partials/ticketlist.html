@@ -1,0 +1,26 @@
+<div class="row">
+<div class="panel panel-default" >
+<div class="panel-body" >
+<div tooltip="Activities you created or are subscribed to" tooltip-append-to-body="true" tooltip-placement="right" style="float:left;">
+
+    <h2>Activities</h2></div>
+    <div style="float:right; cursor:pointer;" tooltip="Create new activity" tooltip-append-to-body="true" tooltip-placement="right"><i class="fa fa-plus fa-lg icon-style" ng-click="vm.createActivity()"></i></div>
+
+<div class="row" ng-if="vm.resultsFound">
+<div class="col-sm-12">
+
+<div class="row ticket-list" ng-repeat="ticketData in vm.result | orderBy" >
+  <ticket data="ticketData"></ticket>
+</div>
+
+</div>
+</div> 
+
+<div class="row" ng-if="!vm.resultsFound">
+<div class="col-sm-12">
+No activities found.
+</div></div>
+
+</div>
+</div>
+</div>

@@ -1,0 +1,25 @@
+<div class="modal-header">
+<h1 class="modal-title">{{title}}</h1>
+</div>
+<div class="modal-body">
+<div class="row"><div class="col-sm-12">
+<p>Enter the data for the new external site you want to add and click <strong>Submit</strong></p>
+</div></div>
+<form>
+<div class="form-group">
+<label for="name">Name</label>
+<input type="text" class="form-control" id="name" placeholder="Site name" ng-model="formData.name">
+</div>
+<div class="form-group">
+<label for="url">Full URL</label>
+<input type="text" class="form-control" id="url" placeholder="Site url" ng-model="formData.url">
+</div>
+<div class="row spacer10" style="margin-left: 10px;">
+<button type="submit" class="btn btn-primary" ng-click="submit(formData)">Submit</button></div>
+</form>
+</div>
+<div class="modal-footer">
+
+<button class="btn btn-default" ng-click="cancel()">Close</button>
+
+</div>

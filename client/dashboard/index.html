@@ -1,23 +1,26 @@
 <!DOCTYPE html>
 <html >
 <head>
+<base href="/">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="">
 <title>DIMS Dashboard</title>
-<!-- build:js(.) scripts/html5shim.js -->
+<!-- build:js scripts/html5shim.js -->
 <!--[if lt IE 9]>
-    <script src="../bower_components/html5shiv-dist/html5shiv.js"></script>
+    <script src="../bower_components/html5shiv/html5shiv.js"></script>
 <![endif]-->
 <!-- endbuild -->
 <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-<!-- build:css(.) styles/vendor.css -->
+<!-- build:css vendorcss/vendor.css -->
 <!-- bower:css -->
-
 <!-- endbower -->
 <!-- endbuild -->
-<!-- build:css(.tmp) styles/style.css -->
-<link rel="stylesheet" href="styles/style.css" />
+<!-- build:css styles/light.css -->
+<link rel="stylesheet" href="styles/light.css" />
+<!-- endbuild -->
+<!-- build:css styles/dark.css -->
+<link rel="stylesheet" href="styles/dark.css" />
 <!-- endbuild -->
 </head>
 <body ng-app="dimsDashboard" >
@@ -25,13 +28,14 @@
     <div ng-include src="'views/navbar.html'"></div>
 
     <div ng-view >
-      
+
     </div>
 
-    <div ng-include src="'views/partials/logmonitor.html'"></div>
+    <!-- <div ng-include src="'views/partials/logmonitor.html'"></div> -->
+    <div ng-include src="'views/partials/logmonitormain.html'"></div>
     <div ng-include src="'views/partials/chat.html'"></div>
-    
-    <!-- build:js(.) scripts/oldieshim.js -->
+
+    <!-- build:js scripts/oldieshim.js -->
     <!--[if lt IE 9]>
     <script src="../bower_components/es5-shim/es5-shim.js"></script>
     <script src="../bower_components/json3/lib/json3.min.js"></script>
@@ -46,23 +50,22 @@
         }
     </script>
 
-    <!-- build:js(.) scripts/vendor.js -->
+    <!-- build:js scripts/vendor.js -->
     <script src="../bower_components/regression-js/build/regression.min.js"></script>
     <script src="../bower_components/socket.io-client/socket.io.js"></script>
     <script src="../bower_components/cryptojslib/rollups/aes.js"></script>
     <!-- bower:js -->
-    
-    <!-- endbower -->
 
+    <!-- endbower -->
+    <script src="../node_modules/angular-checkboxes/angular-checkboxes.js"></script>
     <!-- endbuild -->
 
-    <!-- build:js({.tmp,app}) scripts/scripts.js -->
-    <script src="scripts/lib/truncate.js"></script>
+    <!-- build:js scripts/scripts.js -->
     <script src="scripts/app.js"></script>
     <script src="scripts/config.js"></script>
     <script src="scripts/controllers/anonCtrl.js"></script>
     <script src="scripts/controllers/rwfindCtrl.js"></script>
-    
+
     <script src="scripts/controllers/cifbulkCtrl.js"></script>
     <script src="scripts/controllers/crosscorCtrl.js"></script>
     <script src="scripts/controllers/datafilesCtrl.js"></script>
@@ -71,16 +74,37 @@
     <script src="scripts/controllers/graphCtrl.js"></script>
     <script src="scripts/controllers/loginCtrl.js"></script>
     <script src="scripts/controllers/navbarCtrl.js"></script>
-    <script src="scripts/controllers/logCtrl.js"></script>
     <script src="scripts/controllers/chatCtrl.js"></script>
-    <script src="scripts/controllers/settingsCtrl.js"></script>
-    <script src="scripts/controllers/messagingCtrl.js"></script>
+    <script src="scripts/controllers/userSettingsCtrl.js"></script>
     <script src="scripts/controllers/selectFiles.js"></script>
     <script src="scripts/controllers/searchForm.js"></script>
+    <script src="scripts/controllers/userProfileCtrl.js"></script>
+    <script src="scripts/controllers/userAttributesCtrl.js"></script>
+    <script src="scripts/controllers/userInfoCtrl.js"></script>
+    <script src="scripts/controllers/userCtrl.js"></script>
+    <script src="scripts/controllers/logMonitorCtrl.js"></script>
+    <script src="scripts/controllers/socialAuthCtrl.js"></script>
+    <script src="scripts/controllers/systemStatusCtrl.js"></script>
+    <script src="scripts/controllers/systemUpdateCtrl.js"></script>
     <script src="scripts/directives/directives.js"></script>
     <script src="scripts/directives/dimsResults.js"></script>
     <script src="scripts/directives/searchForm.directive.js"></script>
     <script src="scripts/directives/selectFiles.directive.js"></script>
+    <script src="scripts/directives/userProfile.directive.js"></script>
+    <script src="scripts/directives/userSettings.directive.js"></script>
+    <script src="scripts/directives/userAttributes.directive.js"></script>
+    <script src="scripts/directives/logMonitor.directive.js"></script>
+    <script src="scripts/directives/mitigation.directive.js"></script>
+    <script src="scripts/directives/mitigations.directive.js"></script>
+    <script src="scripts/directives/ticketlist.directive.js"></script>
+    <script src="scripts/directives/ticket.directive.js"></script>
+    <script src="scripts/directives/timeseries.directive.js"></script>
+    <script src="scripts/directives/mitigationseries.directive.js"></script>
+    <script src="scripts/directives/tgdropdown.directive.js"></script>
+    <script src="scripts/directives/externalsites.directive.js"></script>
+    <script src="scripts/directives/socialaccounts.directive.js"></script>
+    <script src="scripts/directives/datacenter.directive.js"></script>
+    <script src="scripts/directives/themePicker.directive.js"></script>
     <script src="scripts/filters/filters.js"></script>
     <script src="scripts/services/services.js"></script>
     <script src="scripts/services/dataService.js"></script>
@@ -91,58 +115,20 @@
     <script src="scripts/services/sessionService.js"></script>
     <script src="scripts/services/settingsService.js"></script>
     <script src="scripts/services/cryptoService.js"></script>
-    <script src="scripts/services/socketFactory.js"></script>
     <script src="scripts/services/ticketService.js"></script>
-    <script src="scripts/lib/owf/owf-widget-debug.js"></script>
+    <script src="scripts/services/userService.js"></script>
+    <script src="scripts/services/userAttributesService.js"></script>
+    <script src="scripts/services/mitigationService.js"></script>
+    <script src="scripts/services/authInterceptor.js"></script>
+    <script src="scripts/services/stixService.js"></script>
+    <script src="scripts/services/tupeloservice.js"></script>
+    <script src="scripts/services/themeService.js"></script>
     <!-- endbuild -->
-    
+
     <script>
 $('.dropdown-toggle').click(function(e) {
   e.preventDefault();
   e.stopPropagation();
-});
-</script> 
-
-<script>
-
-OWF.ready(function () { 
-
-    // console.log('in OWF.ready');
-    // OWF.Preferences.getCurrentUser({
-    //     onSuccess: function(result) {
-    //         // Get the session
-    //         console.log(result);
-
-    //     },
-    //     onFailure: function(error) {
-    //         console.log('Cannot retrieve OWF user ' + error);
-    //     }
-    // });
-    // Source: Neon widgets
-    var widgetState = Ozone.state.WidgetState.getInstance({
-        onStateEventReceived: function(sender, msg) {
-            var event = msg.eventName;
-
-            if(event === 'activate' || event === 'show') {
-                $(document.body).show();
-            }
-            else if(event === 'hide') {
-                $(document.body).hide();
-            }
-        }
-    });
-
-    // listen for  activate and hide events so that we can
-    // hide our body.  Some browsers, specifically Chrome, continues
-    // to render iframes with elments that use specific webkit transforms
-    // even when they are hidden.  This impact many Map packages and some
-    // SVG packages.  The work around for this is to hide our widget body
-    // on hide events.
-    widgetState.addStateEventListeners({
-        events: ['activate', 'hide', 'show']
-    });
-    
-    OWF.notifyWidgetReady();
 });
 </script>
 

@@ -1,0 +1,13 @@
+#!/bin/bash
+# This script is only for the UW demo instance
+# Run as dims user
+ACTIVATE=/opt/dims/envs/dimsenv/bin/activate
+RUNDIR=/opt/dims/srv/dims-dashboard/server
+
+# Need virtualenv since that's where pika is installed
+cd $RUNDIR && . $ACTIVATE
+# Create mitigation ticket for dims trust group
+DASHBOARD_NODE_ENV=test LOG_LEVEL=info node /opt/dims/srv/dims-dashboard/server/bootstrap/mitigation/bootstrapMitigation.js dims lparsons mboggess dittrich swarner
+# Create mitigation ticket for main trust group
+DASHBOARD_NODE_ENV=test LOG_LEVEL=info node /opt/dims/srv/dims-dashboard/server/bootstrap/mitigation/bootstrapMitigation.js main lparsons mboggess dittrich swarner
+

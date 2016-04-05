@@ -1,6 +1,6 @@
 {
   "name": "dims-dashboard",
-  "version": "1.0.0",
+  "version": "1.0.9",
   "description": "DIMS Dashboard web application",
   "private": true,
   "repository": {

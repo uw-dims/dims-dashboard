@@ -1,5 +1,5 @@
 <div class="container main">
-<h2 class="sub-header">Upload</h2>
+<h2 class="sub-header">Upload files</h2>
 
 <form role="form" class="form-horizontal" name="uploadForm">
 
@@ -34,11 +34,11 @@
   <div class="col-sm-1" ng-show="progress[$index] < 0">
     <button class="btn btn-primary btn-sm" ng-click="start($index)"  >Start</button></div>
   <div class="col-sm-2"  ng-show="progress[$index] >= 0 ">
-    <span class="progress {{progressClass[$index]}}" >           
+    <span class="progress {{progressClass[$index]}}" >
       <div style="width:{{progress[$index]}}%">{{progress[$index]}}%</div>
-    </span>     
+    </span>
   </div>
-  <div class="col-sm-1"  ng-show="hasUploader($index) && progress[$index] < 100 && progress[$index] > 0"> 
+  <div class="col-sm-1"  ng-show="hasUploader($index) && progress[$index] < 100 && progress[$index] > 0">
     <button class="btn btn-sm" ng-click="abort($index)" >Abort</button></div>
   <div class="col-sm-3 sel-file">
     {{ f.name }} - {{ f.size }} Bytes </div>

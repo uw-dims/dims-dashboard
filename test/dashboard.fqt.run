@@ -1,0 +1,119 @@
+#! /bin/bash
+VERSION=1.0.6
+
+# Run the final qualification api tests
+
+# Usage:
+# ./dashboard.fqt.run
+#
+
+# Set up common functions and variables.
+source $DIMS/bin/test_functions.sh
+
+if [ "$1" == "-h" -o "$1" == "--help" ]; then
+  cat <<EOD
+Usage: $BASE 
+           Runs fqt tests on installed dashboard at /opt/dims/bin/svr/dims-dashboard
+
+
+EOD
+  exit 1
+fi
+
+# if [ "$1" == "server" ]; then
+#   RUNDIR=/opt/dims/srv/dims-dashboard
+# elif [ "$1" == "local" ]; then
+#   RUNDIR=$PWD
+# else
+#   echo "You supplied an invalid argument. Use server or local. Exit now..."
+#   exit 1
+# fi
+
+if [ "$2" == "--no-publish" ]; then
+  PUBLISH=0
+  echo "[+++] Results are not being published to dimstr fanout"
+else
+  PUBLISH=1
+  echo "[+++] Results are being published to dimstr fanout"
+fi
+
+# Test set to run
+TESTSET=$1
+
+RUNDIR=$HOME/test
+APPDIR=/opt/dims/srv/dims-dashboard
+
+echo "[+++] Running api tests: "$TESTSET
+
+if [ $VERBOSE -eq 1 ]; then
+  echo "[+++] Verbose is on. Will output result to stdout and test fanout"
+fi
+
+if [ $DEBUG -eq 1 ]; then
+  echo "[+++] Debug is on. Will set log_level to debug. Not good for clean test"
+  echo "[+++] output, however. Use to fix problems with tests."
+fi
+
+DATE=$(iso8601dateshort)
+
+# Cleanup on exit
+trap "rm -f $TFILE" EXIT
+
+# TFILE=$(mktemp --tmpdir $$.dashboardfqttest.$RANDOM.XXXXXX)
+touch ${RUNDIR}/testresult.txt
+TFILE=${RUNDIR}/testresult.txt
+
+if [ $DEBUG -eq 1 ]; then
+  export LOG_LEVEL=debug
+else
+  export LOG_LEVEL=info
+fi
+
+export NODE_ENV=test
+VERSIONFILE=${APPDIR}/VERSION
+APPVERSION=$(cat $VERSIONFILE)
+
+TEST=${TEST:="tap"}
+
+cd $RUNDIR && . /opt/dims/envs/dimsenv/bin/activate
+
+RUNCMD='mocha spec/'${TESTSET}' --reporter tap'
+
+if [ $VERBOSE -eq 1 ]; then
+  header 2>&1 | tee -a $TFILE
+  echo "DIMS-DASHBOARD API Test Run for version $(cat $VERSIONFILE)" 2>&1 | tee -a $TFILE
+  # npm run test-$TEST 2>&1 | tee -a $TFILE
+  mocha spec/${TESTSET} --reporter tap 2>&1 | tee -a $TFILE
+  
+else
+  header > $TFILE
+  echo "DIMS-DASHBOARD API Test Run for version $(cat $VERSIONFILE)" >> $TFILE
+  # npm run test-$TEST >> $TFILE
+  mocha spec/${TESTSET} --reporter tap >> $TFILE
+fi
+
+PASSED=$(cat $TFILE | grep "# pass")
+# echo $PASSED
+PASSED=${PASSED:7}
+# echo $PASSED
+FAILED=$(cat $TFILE | grep "# fail")
+# echo $FAILED
+FAILED=${FAILED:7}
+# echo $FAILED
+
+# printresults $PASSED $FAILED
+# printresults 2 3
+
+if [ $VERBOSE -eq 1 ]; then
+  printresults $PASSED $FAILED 2>&1 | tee -a $TFILE
+else
+  printresults $PASSED $FAILED >> $TFILE
+fi
+
+if [ $PUBLISH -eq 1 ]; then
+  logmon -l dimstr -s $TFILE
+fi
+
+cat $TFILE
+
+exit 0

@@ -1,3 +1,0 @@
-80|green_http://malc0de.com/database/index.php?search=203.205.148.102|green_http://malc0de.com/database/index.php?search=203.205.148.102
-80|green_http://malc0de.com/database/index.php?search=46.108.132.140|green_http://malc0de.com/database/index.php?search=46.108.132.140
-80|green_http://malc0de.com/database/index.php?search=5.199.171.47|green_http://malc0de.com/database/index.php?search=5.199.171.47

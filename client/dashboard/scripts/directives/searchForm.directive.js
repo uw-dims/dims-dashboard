@@ -1,5 +1,33 @@
-// File: client/dashboard/scripts/directives/searchForm.directive.js
-
+/**
+ * Copyright (C) 2014, 2015, 2016 University of Washington.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ * list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ * may be used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
 (function() {
   'use strict';
   // Plug directive into AngularJS
@@ -36,17 +64,17 @@
 angular.module('dimsDashboard.directives')
 
 //   directive('dimsSearchForm', [ '$timeout', '$log', 'FileService', function($timeout, $log, FileService) {
-    
+
 //     var link = function(scope, el, attr) {
-      
+
 //       var queryItems = {
 //         'rwfind': ['startDateTime', 'endDateTime', 'numDays', 'hitLimit', 'header', 'ips', 'fileName', 'outputType'],
 //         'cifbulk': ['ips', 'fileName', 'upload'],
 //         'crosscor': ['fileName', 'mapName', 'stats', 'iff'],
 //         'anon': ['fileName', 'mapName', 'outputType', 'stats']
-//       }; 
+//       };
 
-//       // Initialize elements 
+//       // Initialize elements
 //       var initializeElements = function() {
 //         scope.formData = {};
 //         scope.outputTypes = [{
@@ -56,7 +84,7 @@ angular.module('dimsDashboard.directives')
 //           value: 'text',
 //           label: 'TEXT'
 //         }];
-        
+
 //         scope.iffs = [{
 //           value: 'friend',
 //           label: 'Friend'
@@ -64,8 +92,8 @@ angular.module('dimsDashboard.directives')
 //           value: 'foe',
 //           label: 'Foe'
 //         }];
-        
-        
+
+
 //         scope.show = {};
 
 //         scope.tooltips = {
@@ -124,7 +152,7 @@ angular.module('dimsDashboard.directives')
 //         callback: '&'
 //       }
 //     };
-    
+
 // }])
 
 .directive('dimsTestForm', [ '$timeout', '$log', 'FileService', function($timeout, $log, FileService) {
@@ -133,7 +161,7 @@ angular.module('dimsDashboard.directives')
     var queryItems = {
       'rwfind': ['ips', 'header', 'iff'],
       'cifbulk': ['ips', 'stats']
-    }; 
+    };
     var initializeShowElements = function() {
         scope.show.header = false;
         scope.show.ips = false;
@@ -191,5 +219,5 @@ angular.module('dimsDashboard.directives')
 
 }])
 ;
-    
+
 

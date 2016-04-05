@@ -1,0 +1,72 @@
+#! /bin/bash
+
+# Berkeley Three Clause License
+# =============================
+
+# Copyright (c) 2014, 2015, 2016 University of Washington. All rights reserved.
+
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+
+# 1. Redistributions of source code must retain the above copyright notice, this
+# list of conditions and the following disclaimer.
+
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+
+# 3. Neither the name of the copyright holder nor the names of its contributors
+#may be used to endorse or promote products derived from this software without
+# specific prior written permission.
+
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+
+VERSION=1.0.9
+
+# When running manually, run with sudo -u dims
+
+# Set up common functions and variables.
+source $DIMS/bin/test_functions.sh
+
+
+# virtual environment needed here since the prisem scripts
+# are only installed in virtual environment now. And pika is only
+# installed in virtual environment, which is used by scripts.
+ACTIVATE=${ACTIVATE:="/opt/dims/envs/dimsenv/bin/activate"}
+RUNDIR=${RUNDIR:="/opt/dims/srv/dims-dashboard/server"}
+
+# You can override this to provide your own defaults when developing
+CONF_FILE=${CONF_FILE:="/etc/dashboard/dashboard.conf"}
+SECRETS_FILE=${SECRETS_FILE:="/etc/dashboard/dashboard_secrets.conf"}
+EXTERNAL_SITES_FILE=${EXTERNAL_SITES_FILE:="/etc/dashboard/dashboard_client_config.json"}
+
+# Need virtualenv since that's where pika is installed
+cd $RUNDIR && . $ACTIVATE
+
+# Source configuration files which export env vars
+if [ -f $CONF_FILE ]; then
+  . $CONF_FILE
+fi
+if [ -f $SECRETS_FILE ]; then
+  . $SECRETS_FILE
+fi
+printenv
+
+# Configure the environment for the client
+if [ "$DASHBOARD_NODE_ENV" == "production" ]; then
+  cd ../client && grunt build -v
+else
+  cd ../client && grunt dev-compile -v
+fi
+cd $RUNDIR
+ianitor --port $DASHBOARD_PORT dashboard -- node app

@@ -1,170 +1,390 @@
+/**
+ * Copyright (C) 2014, 2015, 2016 University of Washington.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ * list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ * may be used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+
 'use strict';
 
-// topic model
-var config = require('../config');
-var c = require('../config/redisScheme');
-var KeyGen = require('./keyGen');
-var logger = require('../utils/logger');
-var q = require('q');
-var db = require('../utils/redisUtils');
+var keyGen = require('./keyGen'),
+    logger = require('../utils/logger')(module),
+    _ = require('lodash-compat'),
+    q = require('q');
 
+module.exports = function Topic(store) {
 
-exports = module.exports = Topic;
+  var timestamp = function () {
+    var now = new Date().getTime();
+    return now;
+  };
 
-// parent: parent Ticket
-// name: name of topic
-// type: type of ticket/topic
-function Topic(parent,type,name,dataType,shortDesc, description) {
-  var self=this;
-  self.parent = parent;
-  self.type = type;
-  self.name = name;
-  self.dataType = dataType || 'hash';
-  // self.description = description;
-  // self.shortDesc = shortDesc;
-};
+  var sanitizeName = function sanitizeName(name) {
+    //TODO
+  };
 
-Topic.prototype.setDataType = function(dataType) {
-  var self = this;
-  self.dataType = dataType;
-};
-
-Topic.prototype.getDataType = function() {
-  var self = this;
-  var deferred = q.defer();
-  logger.debug('models/Topic.getDataType topic key is ', KeyGen.topicKey(self));
-  logger.debug('models/Topic.getDataType self is ', self);
-  db.type(KeyGen.topicKey(self))
-  .then (function(reply) {
-    logger.debug('models/Topic.getDataType reply is ', reply);
-    deferred.resolve(reply);
-  }, function(err, reply) {
-    deferred.reject(err.toString());
-  });
-  return deferred.promise;
-};
-
-Topic.prototype.getTopicMetadata = function() {
-  var self = this,
-      config = {};
-  config.parent = self.parent;
-  config.type = self.type;
-  config.name = self.name;
-  config.dataType = self.dataType;
-  // config.description = self.description;
-  // config.shortDesc = self.shortDesc;
-  return config;
-};
-
-// Return readable name
-Topic.prototype.getName = function() {
-  var self = this;
-  return self.type + ':' + self.name;
-};
-
-// Get the contents stored at topic key
-Topic.prototype.getContents = function() {
-  var self = this;
-  var deferred = q.defer();
-  // Get the key for this topic
-  var key = KeyGen.topicKey(self);
-  self.getDataType().then(function(reply) {
-    self.dataType = reply;
-    return db.getAllData(key, self.dataType);
-  })
-  .then(function(reply) {
-    deferred.resolve(reply);
-  }, function(err, reply) {
-    deferred.reject(err.toString());
-  });
-  return deferred.promise;
-};
-
-// Save a new topic
-Topic.prototype.create = function(content, score) {
-  var self = this;
-  var deferred = q.defer();
-  // save the data
-  self.setData(content, score)
-  .then(function(reply) {
-
-    deferred.resolve(reply);
-  }, function(err, reply) {
-    logger.error('models/Topic.create had an err returned from redis', err, reply);
-    deferred.reject(err.toString());
-  });
-  return deferred.promise;
-};
-
-Topic.prototype.setData = function(content, score) {
-  var self = this;
-  var deferred = q.defer();
-  db.setData(KeyGen.topicKey(self), self.dataType, content, score).then(function(reply) {
-    deferred.resolve(reply);
-  }, function(err, reply) {
-    logger.error('models/Topic.setData had an err returned from redis', err, reply);
-    deferred.reject(err.toString());
-  });
-  return deferred.promise;
-};
-
-Topic.prototype.exists = function() {
-  var self = this;
-  var deferred = q.defer();
-  db.zrank(KeyGen.topicListKey(self.parent), KeyGen.topicKey(self)).then(function(reply) {
-    logger.debug('models/Topic.exists. reply from zrank ', reply);
-    if (reply === null || reply === 'undefined') {
-      logger.debug('models/Topic.exists. Topic does not exist. Resolve with false ');
-      deferred.resolve(false);
+  var topicTypes = {
+    'set': {
+      name: 'set'
+    },
+    'string': {
+      name: 'string'
     }
-    else { 
-      logger.debug('models/Topic.exists. Topic exists. Resolve with true ');
-      deferred.resolve(true);
+  };
+
+  var validOptions = {
+    datatype: 'datatype',
+    name: 'name',
+    description: 'description'
+  };
+
+  // Return true if type is valid
+  var isValidType = function (type) {
+    if (!topicTypes[type]) {
+      return false;
+    } else {
+      return true;
     }
-  }, function(err, reply) {
-    logger.error('models/Topic.exists had an err returned from redis', err, reply);
-    deferred.reject(err.toString());
-  });
-  return deferred.promise;
-};
+  };
 
-// Add incremented counter to the topic key
-// Not all topics need a counter 
-Topic.prototype.addCounter = function() {
+  // Validate an options config and return config when valid
+  // otherwise return null
+  //options:
+  // dataType: set or string
+  // name: required
+  // description: optional
+  var validateOptions = function validateOptions(options) {
+    var defaultOptions = {
+      description: ''
+    };
+    // Apply defaults
+    _.defaults(options, defaultOptions);
+    // Must contain name and dataType
+    if (!options[validOptions.name] || !options[validOptions.datatype]) {
+      return null;
+    }
+    if (!isValidType(options.datatype)) {
+      return null;
+    }
+    // Replace spaces in name with underscores since it will be part of a key.
+    // options.name = options.name.replace(/  */g, '_');
+    return {
+      name: options.name,
+      datatype: options.datatype,
+      description: options.description
+    };
+  };
 
-};
+  // Coerce types returned from store
+  // Param: metadata - metadata JSON object
+  var castMetadata = function castMetadata(metadata) {
+    metadata.createdTime = _.parseInt(metadata.createdTime);
+    metadata.modifiedTime = _.parseInt(metadata.modifiedTime);
+    metadata.num = _.parseInt(metadata.num);
+    return metadata;
+  };
 
-// Get the timestamp stored at the topic timestamp key
-Topic.prototype.getTimeStamp = function() {
-  var self = this;
-  var deferred = q.defer();
-  // Get the key for the topic timestamp
-  var key = KeyGen.topicTimestampKey(self);
-  // Get the value stored at the timestampkey
-  db.get(key).then(function(reply) {
-    deferred.resolve(reply);
-  }, function(err, reply) {
-    logger.error('models/Topic.getTimeStamp had an err returned from redis', err, reply);
-    deferred.reject(err.toString());
-  });
-  return deferred.promise;
-};
+  // TODO - no longer can get key simply from metadata
+  // since we're not storing the parent info in the metadata
+  // need to derive key from topic key
+  // Save topic metadata
+  // Param: metadata - metadata to save
+  var saveMetadata = function saveMetadata(metadata) {
+    var parent = _.create({}, metadata.parent);
+    var hash = _.create({}, metadata);
+    // stringify this since it is nested json
+    hash.parent = JSON.stringify(parent);
+    return store.setMetadata(keyGen.topicMetaKey(metadata), hash);
+  };
 
-// Used in debugging
-Topic.prototype.paramString = function() {
-  var self = this;
-  var deferred = q.defer();
-  var contents, timestamp;
-  self.getContents().then(function(reply) {
-    contents = reply;
-    return self.getTimeStamp();
-  })
-  .then(function(reply) {
-    timestamp = reply;
-    q.resolve(self.getName() + ',' + timestamp + '->' + contents);
-  }, function(err, reply) {
-    logger.error('models/Topic.paramstring had an err returned from redis', err, reply);
-      deferred.reject(err.toString());
-  });
-  return deferred.promise;
+  // Retrieve metadata from store
+  // Param: metadata key
+  var getMetadata = function getMetadata(key) {
+    return store.getMetadata(key)
+    .then(function (reply) {
+      if (reply !== null) {
+        // reply = castMetadata(reply);
+        // var parent = reply.parent;
+        var metadata = castMetadata(reply);
+        metadata.parent = JSON.parse(reply.parent);
+        return metadata;
+      } else {
+        return null;
+      }
+    })
+    .catch(function (err) {
+      throw err;
+    });
+  };
+
+  // Add setkey to a set with current time as score
+  var saveKey = function addToSet(metadata, setKey) {
+    return store.addItem(keyGen.topicKey(metadata), setKey, timestamp());
+  };
+
+  // Remove a key from a set
+  // Params: metadata - topic metadata for the key
+  //         setKey - key to remove
+  var removeKey = function removeKey(metadata, setKey) {
+    return store.removeItem(keyGen.topicKey(metadata), setKey);
+  };
+
+  // Save topic data
+  // Params: metadata - metadata describing topic
+  //         data - data to be saved
+  var saveData = function saveData(metadata, data) {
+    return store.setData(keyGen.topicKey(metadata), data);
+  };
+
+  // Get data (string) from store for a topic
+  var getData = function getData(metadata) {
+    return store.getData(keyGen.topicKey(metadata));
+  };
+
+  // Create topic object and save metadata
+  var createTopic = function createTopic(ticket, options) {
+    var topic = topicFactory(ticket, options);
+    return topic.create();
+  };
+
+  // add items to topic data. Stored as sorted set if score included.
+  var addItems = function addItems(metadata, items, score) {
+    return store.addItem(items, keyGen.topicKey(metadata), score);
+  };
+
+  // Get items (set or sorted set) from topic
+  var getItems = function getItems(metadata) {
+    return store.listItems(keyGen.topicKey(metadata));
+  };
+
+  // Remove items from set or sorted set topic data
+  var removeItems = function removeItems(metadata, items) {
+    return store.removeItem(items, keyGen.topicKey(metadata));
+  };
+
+  var updateMetdata = function updateMetadata(config) {
+    var result = {};
+    if (config.hasOwnProperty(description)) {
+      result.description = config.description;
+    }
+    if (config.hasOwnProperty(name)) {
+      result.name = config.name;
+    }
+    return result;
+  };
+
+  // Create a topic object with methods from ticket and options
+  var topicFactory = function topicFactory(ticket, options) {
+    var metadata = {};
+    if (options === null || options === undefined) {
+      throw new Error('Failed to provide options to topicFactory');
+    } else {
+      if (validateOptions(options) !== null) {
+        metadata = {
+          metadata: validateOptions(options)
+        };
+        metadata.metadata.parent = {};
+        metadata.metadata.parent.num = ticket.metadata.num;
+        metadata.metadata.parent.type = ticket.metadata.type;
+      } else {
+        throw new Error ('Invalid options supplied to topicFactory');
+      }
+
+      if (metadata.metadata.parent.type === 'mitigation') {
+        // Mitigation use name as keyname
+        metadata.metadata.keyname = metadata.metadata.name;
+      } else {
+        metadata.metadata.keyname = 'topic';
+      }
+      return (_.extend({}, topicPrototype, metadata));
+    }
+  };
+
+  var extendFactory = function extendFactory(config) {
+    
+    var topicObject = topicFactory(config.metadata.parent, {
+      name: config.metadata.name,
+      datatype: config.metadata.datatype,
+      description: config.metadata.description
+    });
+    _.extend(topicObject.metadata, config.metadata);
+    topicObject.key = config.key;
+    return topicObject;
+  };
+
+  // Get data and metadata for a topic from a topic key
+  // Returns metadata and data - not a complete topic object
+  // with functions
+  var getTopic = function getTopic(topicKey) {
+    var topic = {};
+    var metaKey = keyGen.metaKeyFromKey(topicKey);
+    return getMetadata(metaKey)
+    .then(function (reply) {
+      topic.metadata = reply;
+      topic.key = topicKey;
+      if (topic.metadata.datatype === 'string') {
+        return getData(topic.metadata);
+      } else {
+        return getItems(topic.metadata);
+      }
+    })
+    .then(function (reply) {
+      topic.data = reply;
+      return topic;
+    })
+    .catch(function (err) {
+      throw err;
+    });
+  };
+
+  // Get array of topics for a ticket - just metadata and data
+  // Input is ticket key
+  var getTopics = function getTopics(ticketKey) {
+    var promises = [];
+    // Return promise with array of topic keys
+    return store.listItems(keyGen.topicSetKeyFromTicketKey(ticketKey))
+    .then(function (reply) {
+      _.forEach(reply, function (value, index) {
+        promises.push(getTopic(value));
+      });
+      // Return array of topics
+      return q.all(promises);
+    })
+    .catch(function (err) {
+      throw err;
+    });
+  };
+
+  var getTopicKeys = function getTopicKeys(ticketKey) {
+    var promises = [];
+    // Return promise with array of topic keys
+    return store.listItems(keyGen.topicSetKeyFromTicketKey(ticketKey));
+  };
+
+  var getTopicsMetadata = function getTopicsMetadata(key) {
+    var promises = [];
+    return store.listItems(keyGen.topicSetKeyFromTicketKey(key))
+    .then(function (reply) {
+      _.forEach(reply, function (value, index) {
+        promises.push(getTopicMetadata(value));
+      });
+      return q.all(promises);
+    })
+    .catch(function (err) {
+      throw err;
+    });
+  };
+
+  // Get metadata for a topic from a topic key
+  var getTopicMetadata = function getTopicMetdata(key) {
+    var topic = {};
+    var metaKey = keyGen.metaKeyFromKey(key);
+    return getMetadata(metaKey)
+    .then(function (reply) {
+      topic.metadata = reply;
+      topic.key = key;
+      return topic;
+    })
+    .catch(function (err) {
+      throw err;
+    });
+  };
+
+  // Given a topic key, delete the topic from the store
+  var deleteTopic = function deleteTopic(key) {
+    // Get metadata from topic key so we can get all keys needed
+    logger.debug('in deleteTopic key is ', key);
+    return getTopicMetadata(key)
+    .then (function (reply) {
+      var promises = [];
+      promises.push(store.deleteKey(keyGen.topicMetaKey(reply.metadata)));
+      promises.push(store.deleteKey(keyGen.topicKey(reply.metadata)));
+      promises.push(removeKey(reply.metadata, keyGen.topicSetKey(reply.metadata)));
+      return q.all(promises);
+    })
+    .catch(function (err) {
+      logger.error('Error in deleteTopic', err);
+      throw err;
+    });
+  };
+
+
+  var topicPrototype = {
+    // score is optional
+    create: function (data, score) {
+      var self = this;
+      var promises = [];
+      self.metadata.createdTime = timestamp();
+      self.metadata.modifiedTime = self.metadata.createdTime;
+      // increment counter
+      return store.incrCounter(keyGen.topicCounterKey())
+      .then(function (reply) {
+        // Save counter value
+        self.metadata.num = reply;
+        // Save metadats
+        promises.push(saveMetadata(self.metadata));
+        // Save topic key in set of topic keys
+        promises.push(saveKey(self.metadata, keyGen.topicSetKey(self.metadata)));
+        // Save data
+        if (self.metadata.datatype === 'string') {
+          promises.push(saveData(self.metadata, data));
+        } else {
+          promises.push(addItems(self.metadata, data, score));
+        }
+        return q.all(promises);
+      })
+      .catch(function (err) {
+        logger.error('create error: ', err.toString());
+        return new Error(err.toString());
+      });
+    },
+    exists: function exists() {
+      var self = this;
+      return store.existsInSet(keyGen.topicKey(self.metadata), keyGen.topicSetKey(self.metadata));
+    }
+  };
+
+  var topic = {
+    topicFactory: topicFactory,
+    getTopic: getTopic,
+    getTopics: getTopics,
+    getTopicKeys: getTopicKeys,
+    getTopicMetadata: getTopicMetadata,
+    getTopicsMetadata: getTopicsMetadata,
+    extendFactory: extendFactory,
+    deleteTopic: deleteTopic
+  };
+
+  // if (config.env === 'test') {
+  //   topic._private = {
+  //     getTopicObject: getTopicObject
+  //   };
+  // }
+
+  return topic;
+
 };

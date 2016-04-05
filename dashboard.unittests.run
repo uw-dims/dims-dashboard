@@ -1,0 +1,184 @@
+#! /bin/bash
+
+# Berkeley Three Clause License
+# =============================
+
+# Copyright (c) 2014, 2015, 2016 University of Washington. All rights reserved.
+
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+
+# 1. Redistributions of source code must retain the above copyright notice, this
+# list of conditions and the following disclaimer.
+
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+
+# 3. Neither the name of the copyright holder nor the names of its contributors
+#may be used to endorse or promote products derived from this software without
+# specific prior written permission.
+
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+
+VERSION=1.0.9
+
+# Run the server unit/integration tests during the development cycle
+# Run as user that owns the dashboard files - your user if you are
+# running in a local directory, as dims if you are running against
+# the installation directory
+
+# Set up common functions and variables.
+source $DIMS/bin/test_functions.sh
+
+if [ "$1" == "-h" -o "$1" == "--help" -o $# -lt 1 ]; then
+  cat <<EOD
+Usage: $BASE all
+           Runs all tests on installed dashboard at /opt/dims/bin/svr/dims-dashboard.
+           Should be run by dims user.
+
+       $BASE <test_path>
+           Runs a particular test at the specified path, relative to the "spec" directory.
+           So, to run the attributes test, located at tests/spec/models/attributes.js
+           you do $BASE models/attributes. Should be run by dims user.
+
+       $BASE all --no-publish
+           Same as $BASE all, but will not publish results to logmon.
+           Should be run by dims user.
+
+       $BASE all --verbose
+            Echo output to console as well as to fanout
+
+       $BASE all --local
+            Run the script from a local copy of the dims-dashboard repo. Jenkins
+            uses this to run the tests on files in its workspace. You need to
+            run the script from dims-dashboard directory, as it will use a
+            relative path from pwd. You also need to run npm install in the server
+            directory so dependencies are installed locally.
+
+EOD
+  exit 1
+fi
+
+LOCAL=${LOCAL:-0}
+if [[ "$*" =~ "--local" ]]; then
+  LOCAL=1
+  echo "[+++] Running tests from local dims-dashboard directory. Requires "
+  echo "[+++] npm install of dependencies locally. This method used by Jenkins."
+  RUNDIR=$PWD
+else
+  RUNDIR=/opt/dims/srv/dims-dashboard
+fi
+
+TESTPATH=${RUNDIR}/server/tests/spec
+
+if [[ "$*" =~ "--spec" ]]; then
+  PRETTY=1
+else
+  PRETTY=0
+fi
+
+if [ "$1" == "all" ]; then
+  TESTPATH="${TESTPATH}/**/*.js"
+else
+  TESTPATH="${TESTPATH}/${1}.js"
+fi
+
+PUBLISH=${PUBLISH:-1}
+if [[ "$*" =~ "--no-publish" ]]; then
+  PUBLISH=0
+  echo "[+++] Results are not being published to test fanout"
+else
+  PUBLISH=1
+  echo "[+++] Results are being published to test fanout"
+fi
+
+echo "[+++] Running tests in ${TESTPATH}"
+
+if [ $VERBOSE -eq 1 ]; then
+  echo "[+++] Verbose is on. Will output result to stdout and test fanout"
+else
+  echo "[+++] Verbose is off. Output is only going to test fanout"
+fi
+
+if [ $DEBUG -eq 1 ]; then
+  echo "[+++] Debug is on. Will set log_level to debug. Not good for clean test"
+  echo "[+++] output, however. Use to fix problems with tests."
+fi
+
+DATE=$(iso8601dateshort)
+
+# Cleanup on exit
+trap "rm -f $TFILE" EXIT
+
+# TFILE=$(mktemp --tmpdir $$.dashboardtest.$RANDOM.XXXXXX)
+
+if [ $DEBUG -eq 1 ]; then
+  export LOG_LEVEL=debug
+else
+  export LOG_LEVEL=info
+fi
+
+# Use local WORKON_HOME if defined, otherwise use /opt/dims/envs
+WORKON_HOME=${WORKON_HOME:-/opt/dims/envs}
+
+export DASHBOARD_NODE_ENV=test
+VERSIONFILE=${RUNDIR}/VERSION
+APPVERSION=$(cat $VERSIONFILE)
+
+cd $RUNDIR && . ${WORKON_HOME}/dimsenv/bin/activate
+cd server
+
+if [ $VERBOSE -eq 1 ]; then
+  header 2>&1 | tee -a $TFILE
+  echo "DIMS-DASHBOARD Test Run for version $(cat $VERSIONFILE)" 2>&1 | tee -a $TFILE
+  # npm run test-$TEST 2>&1 | tee -a $TFILE
+  if [ $PRETTY -eq 1 ]; then
+    npm test -- $TESTPATH | ${RUNDIR}/server/node_modules/.bin/tap-spec 2>&1 | tee -a $TFILE
+  else
+    npm test -- $TESTPATH 2>&1 | tee -a $TFILE
+  fi
+else
+  header > $TFILE
+  echo "DIMS-DASHBOARD Test Run for version $(cat $VERSIONFILE)" >> $TFILE
+  # npm run test-$TEST >> $TFILE
+  if [ $PRETTY -eq 1 ]; then
+    npm test -- $TESTPATH | ${RUNDIR}/server/node_modules/.bin/tap-spec >> $TFILE
+  else
+    npm test -- $TESTPATH >> $TFILE
+  fi
+fi
+if [ $PRETTY -eq 0 ]; then
+  PASSED=$(cat $TFILE | grep "# pass")
+  PASSED=${PASSED:8}
+  FAILED=$(cat $TFILE | grep "# fail")
+  FAILED=${FAILED:8}
+else
+  PASSED=$(cat $TFILE | grep "passing:")
+  PASSED=${PASSED:11}
+  TOTAL=$(cat $TFILE | grep "total:")
+  TOTAL=${TOTAL:11}
+  FAILED=$(($TOTAL - $PASSED))
+fi
+
+if [ $VERBOSE -eq 1 ]; then
+  printresults $PASSED $FAILED 2>&1 | tee -a $TFILE
+else
+  printresults $PASSED $FAILED >> $TFILE
+fi
+
+if [ $PUBLISH -eq 1 ]; then
+  logmon -l test -s $TFILE
+fi
+
+exit 0

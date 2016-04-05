@@ -1,0 +1,10 @@
+{
+  "name": "dims-rest-tester",
+  "main": "rest_service_spec.js",
+  "version": "0.0.1",
+  "dependencies":
+  {
+    "joi": "6.10.0",
+    "icedfrisby": "^0.2.4"
+  }
+}

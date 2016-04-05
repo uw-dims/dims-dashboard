@@ -9,3 +9,9 @@ bower_components/*
 */dist/*
 .DS_Store
 logs/
+style.css
+public/
+npm-debug.log
+logmon.log
+*/coverage/*
+docs/build/*

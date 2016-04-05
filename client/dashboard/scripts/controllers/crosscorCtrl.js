@@ -1,8 +1,37 @@
+/**
+ * Copyright (C) 2014, 2015, 2016 University of Washington.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ * list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ * may be used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller('CrosscorCtrl', ['$scope', 'Utils', 'FileService', '$http', '$log', 'DateService', 'SettingsService', 'AnonService', '$location', '$routeParams', 
+  controller('CrosscorCtrl', ['$scope', 'Utils', 'FileService', '$http', '$log', 'DateService', 'SettingsService', 'AnonService', '$location', '$routeParams',
     function ($scope, Utils, FileService, $http, $log, DateService, SettingsService, AnonService, $location, $routeParams) {
-    console.log('In crosscor controller');
 
     // Set up form data
     $scope.formData = {};
@@ -21,28 +50,8 @@ angular.module('dimsDashboard.controllers').
     $scope.showFiles = true;
     $scope.showMaps = true;
 
-    // FileService.getFileList('data_files').then(function(result) {
-    //     $scope.fileNames = result.fileNames;
-    //     $scope.filePath = result.filePath;
-    //     $scope.showFiles = true;
-    // });
-
-    // FileService.getFileList('map_files').then(function(result) {
-    //     $scope.mapNames = result.fileNames;
-    //     $scope.mapPath = result.filePath;
-    //     $scope.showMaps = true;
-    // });
-
     $scope.settings = SettingsService.get();
 
-    // SettingsService.getSettings('0').then(function(result){
-    //   console.log('getSettings result');
-    //   console.log(result);
-    //   $scope.anonymize = result.anonymize;
-    //   $scope.rpcDebug = result.rpcDebug;
-    //   $scope.rpcVerbose = result.rpcVerbose;
-    // });
-    
 
     // Other setup
     $scope.showResults = false;
@@ -50,41 +59,16 @@ angular.module('dimsDashboard.controllers').
     $scope.rawData = null;
     $scope.resultsMsg = 'Results';
 
-    // Setup grid
-    // $scope.matching = [];
-    // $scope.matchGridOptions = { data: 'matching',
-    //     columnDefs: [{field: 'ip4', displayName: 'IP Address'},
-    //       {field: 'site', displayName: 'site'}
-    //     ]};
-    // $scope.nonMatching = [];
-    // $scope.nonMatchingGridOptions = { data: 'nonMatching' ,
-    //    columnDefs: [{field: 'ip4', displayName: 'IP Address'},
-    //       {field: 'site', displayName: 'site'}
-    //     ]};
-    // $scope.stats = [];
-    // $scope.statsGridOptions = { data: 'nonMatching' ,
-    //    columnDefs: [{field: 'site', displayName: 'Site'},
-    //       {field: 'count', displayName: 'Count'},
-    //       {field: 'percent', displayName:'Percent'}
-    //     ]};
-    
-    // var anonymizeData = function(data,status,headers,config) {
-    //    $log.debug('Call anonymize service');
-    //    AnonService.anonymize($scope.settings.anonymize, data.data, data.pid)
-    //           .then(prepareData);
-    //         };
 
     var prepareData = function(data, status, headers, config) {
       $log.debug('crosscor returned data');
-      $scope.rawData = data.data;
-      $scope.pid = data.pid;
+      $scope.rawData = data;
 
-      $log.debug('crosscor pid: ' + $scope.pid);
       $log.debug('crosscor data:  ');
       $log.debug(data);
-     
+
       $scope.showResults = true;
-      $scope.resultsMsg = 'Results';   
+      $scope.resultsMsg = 'Results';
     };
 
     /**
@@ -108,7 +92,7 @@ angular.module('dimsDashboard.controllers').
 
       // Setup the config to send to the server
       var clientConfig = {};
-     
+
       Utils.setConfig(clientConfig, $scope.formData.stats, 'stats');
       Utils.setConfig(clientConfig, $scope.formData.iff, 'iff');
       Utils.setConfig(clientConfig, $scope.formData.mapName, 'mapName');
@@ -116,22 +100,16 @@ angular.module('dimsDashboard.controllers').
       Utils.setConfig(clientConfig, $scope.settings.rpcVerbose, 'verbose');
       Utils.setConfig(clientConfig, $scope.settings.rpcDebug, 'debug');
 
-      $log.debug('crosscor CallClient. Finished processing config. clientConfig: ');
-      $log.debug(clientConfig);
-      $log.debug('crosscor CallClient: Now sending http get request');
-
       $scope.resultsMsg = 'Results - Waiting...';
-      
+
       $http(
         { method: 'GET',
-          url: '/crosscor', 
+          url: '/crosscor',
           params: clientConfig
         } ).
         success(prepareData).
         error(function(data, status, headers, config) {
-          console.log('rwfind Error');
-          console.log(data);
-          console.log(status);
+          
           $scope.showFormError = true;
           $scope.formErrorMsg = 'Your request did not get a result. Status: '+status;
           $scope.resultsMsg = 'Results';

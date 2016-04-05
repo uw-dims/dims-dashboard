@@ -1,9 +1,40 @@
+/**
+ * Copyright (C) 2014, 2015, 2016 University of Washington.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ * list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ * may be used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+
 /*global angular */
 'use strict';
 
-var dimsDashboardConfig = function($provide, $routeProvider, $locationProvider, datepickerConfig, datepickerPopupConfig) {
+var dimsDashboardConfig = function ($routeProvider, $locationProvider, datepickerConfig, datepickerPopupConfig) {
   $routeProvider.when('/', {
-    controller: 'MainCtrl',
+    controller: 'MainCtrl as vm',
     templateUrl: 'views/partials/main.html'
   }).
   when('/uploadfile', {
@@ -15,7 +46,7 @@ var dimsDashboardConfig = function($provide, $routeProvider, $locationProvider, 
     templateUrl: 'views/partials/data_files.html'
   }).
   when('/ipgrep_client', {
-    controller:'IpgrepCtrl',
+    controller: 'IpgrepCtrl',
     templateUrl: '/views/partials/ipgrep.html'
   }).
   when('/anon_client', {
@@ -38,9 +69,29 @@ var dimsDashboardConfig = function($provide, $routeProvider, $locationProvider, 
     controller: 'GraphCtrl',
     templateUrl: 'views/partials/graph.html'
   }).
+  when('/userinfo', {
+    controller: 'UserInfoCtrl',
+    templateUrl: 'views/partials/userinfo.html'
+  }).
+  when('/userinfo/:type', {
+    controller: 'UserInfoCtrl',
+    templateUrl: 'views/partials/userinfo.html'
+  }).
+  when('/users', {
+    controller: 'UserCtrl as vm',
+    templateUrl: '/views/partials/users.html'
+  }).
   when('/login', {
     controller: 'LoginCtrl',
     templateUrl: 'views/partials/login.html'
+  }).
+  when('/viewstatus', {
+    controller: 'SystemStatusCtrl',
+    templateUrl: 'views/partials/systemstatus.html'
+  }).
+  when('/updatesystem', {
+    controller: 'SystemUpdateCtrl',
+    templateUrl: 'views/partials/systemupdate.html'
   }).
   otherwise({
     redirectTo: '/'
@@ -66,36 +117,67 @@ var constants = {
       { value: 'ip_lists', label: 'List of IPs, CIDR, or Domains' },
       { value: 'map_files', label: 'Mapping Files' },
       { value: 'data_files', label: 'Any Data Files' }
-    ] ,
+    ],
   'maxFileUpload': 10,
   'SILK' : 'rwfind',
   'CIF' : 'cifbulk',
   'CORRELATE' : 'crosscor',
   'ANONYMIZE' : 'anon',
-  // 'SOCKETIO_URL' : 'https://lpsrv1:3030',
-  'PASS_SECRET' : '84jd$#lk903jcy2AUEI2j4nsKLJ!lIY'
+  'PASS_SECRET' : '84jd$#lk903jcy2AUEI2j4nsKLJ!lIY',
+  'chatExchanges': {
+    'chat': {
+      'name': 'chat',
+      'event': 'chat:data',
+      'sendEvent': 'chat:client'
+    }
+  },
+  'fanoutExchanges': {
+    'logs': {
+      'name': 'logs',
+      'event': 'logs:data'
+    },
+    'health': {
+      'name': 'health',
+      'event': 'health:data'
+    },
+    'devops': {
+      'name': 'devops',
+      'event': 'devops:data'
+    },
+    'test': {
+      'name': 'test',
+      'event': 'test:data'
+    },
+    'dimstr': {
+      'name': 'dimstr',
+      'event': 'dimstr:data'
+    }
+  },
+  'logoURL': 'images/default/UW-logo.png',
+  'consulUrl': 'http://10.142.29.117:8500/ui/#/dc1/nodes',
+  'tridentUrl': 'https://demo.trident.li/'
 };
 
 var rpcClientOptions = {
   'searchFile' : {
     'flag': '-r',
     'short': true,
-    'clients': [constants.ANON, constants.SILK, constants.CIF, constants.CORRELATE]
+    'clients': [constants.ANONYMIZE, constants.SILK, constants.CIF, constants.CORRELATE]
   },
   'mapFile': {
     'flag': '-m',
     'short': true,
-    'clients': [constants.ANON, constants.CORRELATE]
+    'clients': [constants.ANONYMIZE, constants.CORRELATE]
   },
   'showJson': {
     'flag': '-J',
     'short': true,
-    'clients': [constants.ANON, constants.SILK]
+    'clients': [constants.ANONYMIZE, constants.SILK]
   },
   'showStats': {
     'flag': '-s',
     'short': true,
-    'clients': [constants.ANON, constants.CIF, constants.CORRELATE]
+    'clients': [constants.ANONYMIZE, constants.CIF, constants.CORRELATE]
   },
   'noHeader': {
     'flag': '-H',
@@ -129,49 +211,70 @@ var rpcClientOptions = {
   }
 };
 
-var dimsDashboard = angular.module('dimsDashboard', 
-  ['ngRoute','angularFileUpload','ui.bootstrap','ui.bootstrap.showErrors','ngGrid', 'ngAnimate', 'ngResource','http-auth-interceptor',
-    'ngCookies','anguFixedHeaderTable', 'truncate', 'dimsDashboard.controllers', 'dimsDashboard.directives', 'dimsDashboard.services','dimsDashboard.config'])
+// var constExternalSites = [{
+//     externalKey: 'consul',
+//     siteName: 'CONSUL',
+//     siteURL: constants.consulUrl,
+//     canDelete: false
+//   }, {
+//     externalKey: 'trident',
+//     siteName: 'TRIDENT',
+//     siteURL: constants.tridentUrl,
+//     canDelete: false
+//   }
+// ];
+
+var dimsDashboard = angular.module('dimsDashboard',
+  ['ngRoute', 'angularFileUpload', 'ui.bootstrap', 'ui.bootstrap.showErrors', 'ngGrid', 'ngAnimate', 'ngResource',
+    'http-auth-interceptor', 'btford.socket-io', 'ngSanitize', 'ngCookies', 'anguFixedHeaderTable', 'truncate',
+    'msieurtoph.ngCheckboxes', 'dimsDashboard.controllers', 'dimsDashboard.directives', 'dimsDashboard.services', 'dimsDashboard.config', 'dimsDashboard.filters'])
   .config(dimsDashboardConfig);
 
 dimsDashboard.constant(constants);
 dimsDashboard.constant(rpcClientOptions);
 
 // This is populated by Grunt
-angular.module('dimsDashboard.config',[]);
+angular.module('dimsDashboard.config', []);
 angular.module('dimsDashboard.controllers', []);
 angular.module('dimsDashboard.services', []);
 angular.module('dimsDashboard.directives', []);
 angular.module('dimsDashboard.filters', []);
 
- _.mixin(_.string.exports());
+dimsDashboard.config(function ($httpProvider, $logProvider, ENV) {
+    $httpProvider.interceptors.push('authInterceptor');
+    $logProvider.debugEnabled(ENV.DASHBOARD_NODE_ENV === 'development')
+  });
 
-dimsDashboard.run(function($rootScope, $location, $log, AuthService) {
+_.mixin(_.string.exports());
+
+dimsDashboard.run(function ($rootScope, $location, $log, AuthService, ThemeService) {
+
+  ThemeService.initializeTheme();
   //watching the value of the currentUser variable.
-  $rootScope.$watch('currentUser', function(currentUser) {
-    // if no currentUser and on a page that requires authorization then try to update it
-    // will trigger 401s if user does not have a valid session
-    $log.debug('Run: watch currentUser handler. currentUser is ',currentUser);
-    $log.debug('Run: watch currentUser handler. path is ', $location.path());
-    if (!currentUser && (['/login'].indexOf($location.path()) === -1 )) {
-      $log.debug('Run: watch currentUser handler. First if. No currentUser and not on login page. Call AuthService.currentUser()');
+  $rootScope.$watch('currentUser', function (currentUser) {
+
+    // socialauth path - returned from social login
+    if (!currentUser && (['/socialauth'].indexOf($location.path()) === 0)) {
+      AuthService.onSocialLogin($location.$$search);
+
+    // No currentUser and  not on login page
+    // Try to get the currentUser since might be a reload
+    } else if (!currentUser && (['/login'].indexOf($location.path()) === -1)) {
       AuthService.currentUser();
-    } else if (['/login'].indexOf($location.path()) === 0 ) {
-      $log.debug('Run: watch currentUser handler. 2nd if. currentUser is ', currentUser);
-      $log.debug('Run: watch currentUser handler. 2nd if. location ', $location.path());
+
+    // Login page
+    } else if (['/login'].indexOf($location.path()) === 0) {
       $location.path('/login');
-    } else {
-      $log.debug('Run: watch currentUser handler. else. currentUser is ', currentUser);
-      $log.debug('Run: watch currentUser handler. else. location ', $location.path());
     }
   });
 
   // On catching 401 errors, redirect to the login page.
-  $rootScope.$on('event:auth-loginRequired', function() {
-    $log.debug('Run: auth-loginRequired event handler. Caught 401, redirect to login page');
+  $rootScope.$on('event:auth-loginRequired', function () {
     $location.path('/login');
     return false;
   });
+
+
 });
 
 

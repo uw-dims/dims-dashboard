@@ -1,0 +1,32 @@
+<div class="row ticket-item">
+  <div class="col-sm-12">
+
+  <div class="row">
+  <div class="col-sm-11">  
+
+    <h3 style="margin-bottom:4px">DIMS-{{vm.data.metadata.num}} {{ vm.data.metadata.name }}</h3>
+    <p style="font-size:10px;">
+    Created by {{ vm.data.metadata.creator }} &nbsp; &nbsp; Last updated: {{ vm.data.metadata.modifiedTime | date : 'medium' }}</p>
+    <hr />
+    <p>Current status: {{vm.data.metadata.mitigatedNum}} out of {{vm.data.metadata.knownNum}} known items ({{vm.data.metadata.initialNum}} total items) have been mitigated. {{vm.statusMessage}} {{vm.userMessage}} </p>
+    </div>
+  <div class="col-sm-1">
+    <div style="float:right; cursor:pointer;" tooltip="Delete activity" tooltip-append-to-body="true" tooltip-placement="right" ng-if="vm.showDelete()"><i class="fa fa-trash fa-lg icon-style" ng-click="vm.deleteTicket(vm.data.key)"></i></div>
+  </div>
+</div>
+    </div>
+</div>
+
+<div class="row ticket-item-footer">
+<div class="col-sm-2" ng-if="vm.showGraph">
+<i class="fa fa-line-chart icon-style"></i><a style="cursor:pointer;" ng-click="vm.toggleProgress()">{{vm.progressText}}</a>
+</div>
+
+<div class="col-sm-4" ng-if="vm.showUserIps">
+  <i class="fa fa-eye icon-style"></i><a style="cursor:pointer;" ng-click="vm.showIps(vm.data.ips.data, vm.data.key)">View/update your remaining items</a>
+</div>
+
+</div>
+<div class="row ticket-item" ng-if="vm.showProgress">
+<mitigationseries options="vm.graphOptions" data="vm.data" num="vm.data.metadata.num" metadata></mitigationseries>
+</div>

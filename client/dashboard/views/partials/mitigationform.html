@@ -1,0 +1,38 @@
+<div class="modal-header">
+<h1 class="modal-title">Create new remediation activity</h1>
+</div>
+<div class="modal-body">
+
+<div class="row"><div class="col-sm-12">
+
+<form>
+<div style="margin:0 10px;">
+<div class="form-group">
+<label>Name this remediation activity</label>
+<input type="text" class="form-control" placeholder="Name" ng-model="mitigation.name">
+</div>
+<div class="form-group">
+<label>Description</label>
+<textarea class="form-control" rows="3" ng-model="mitigation.description" placeholder="Description"></textarea>
+</div>
+<div class="form-group">
+<label>Paste items needing remediation and click Submit</label>
+<textarea class="form-control" rows="15" ng-model="mitigation.list" placeholder="Items to mitigate"></textarea>
+
+</div>
+
+<div class="row spacer10" style="margin-left: 10px">
+<button type="submit" class="btn btn-primary" ng-click="submitMitigation(mitigation)">Submit</button></div>
+
+</div>
+</form>
+
+</div></div>
+
+</div>
+
+<div class="modal-footer">
+
+<button class="btn btn-default" ng-click="cancel()">Close</button>
+
+</div>

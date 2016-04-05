@@ -1,6 +1,6 @@
 <div ng-controller="ChatCtrl">
 <div class="{{ chatClass }}">
-<div class="popup-box chat-popup" ng-show="chatOn">
+<div class="popup-box chat-popup" ng-show="chatOn()">
     <div class="popup-head">
         <div class="popup-head-left">Chat</div>
         <div class="popup-head-right">
@@ -19,7 +19,7 @@
 <!--             <button type="submit" class="btn btn-primary btn-sm" ng-click="send()">Send</button>
  -->    </div></form>
     	</div>
-   
+
     </div>
 </div>
 </div>

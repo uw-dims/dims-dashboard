@@ -1,5 +1,5 @@
 
-<div class="navbar navbar-inverse navbar-fixed-top" role="navigation" ng-controller="NavbarCtrl as vm">
+<div class="navbar navbar-default navbar-fixed-top" role="navigation" ng-controller="NavbarCtrl as vm">
   <div class="container">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
@@ -8,11 +8,23 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="/" ng-if="currentUser">DIMS</a>
-      <p class="navbar-text" ng-hide="currentUser">DIMS</p>
+
+      <div ng-if="currentUser">
+      <a href="/" class="pull-left site-logo" ></a>
+      <a class="navbar-brand-dims navbar-brand" href="/" style="margin-right:10px"> DIMS</a>
+      </div>
+
+      <!-- <div class="pull-left" style="margin-bottom:0px;" ng-hide="currentUser" ><img src='images/default/UW-logo.png' style="height:50px;margin-right: 20px;"><span style="font-size:18px; color:#777;">University of Washington DIMS</span></div> -->
+
+       <div class="pull-left" style="margin-bottom:0px;" ng-hide="currentUser" >
+        <span class="site-logo pull-left" ></span>
+        <span class="pull-left site-header" >{{ vm.siteOrg }}</span></div>
+
     </div>
     <div class="navbar-collapse collapse">
       <ul class="nav navbar-nav" ng-show="currentUser">
+        <li><a href="/"><i class="fa fa-home" style="padding-right:3px;"></i>Home</a></li>
+        <!--
         <li class="dropdown" >
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tracking <span class="caret"></span></a>
           <ul class="dropdown-menu" role="menu">
@@ -22,7 +34,36 @@
             <li class="divider"></li>
             <li><a href="#">Notifications</a></li>
           </ul>
+        </li> -->
+        <!-- <li><a href="/">Tracking</a></li> -->
+        <!-- <li><a href="/">Data</a></li> -->
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Users<span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="/users">Find DIMS users</a></li>
+            <!-- <li><a ng-click="vm.openSite('opstrust')">Ops-Trust portal</a></li>
+            <li><a ng-click="vm.openSite('opstrustwiki')">Wiki</a></li> -->
+          </ul>
         </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="/datafiles">View files</a></li>
+            <li><a href="/uploadfile">Upload files</a></li>
+          </ul>
+        </li>
+        <!-- <li>
+        <a ng-click="vm.logMonitor()">Log Monitor</a>
+        <a href="/logmonitor/">Log Monitor</a>
+        </li> -->
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Logging <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+            <li><a ng-click="vm.logMonitor()">Live log streaming</a></li>
+          </ul>
+        </li>
+        <!-- <li><a href="/">Admin</a></li> -->
+
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tools <span class="caret"></span></a>
           <ul class="dropdown-menu" role="menu">
@@ -32,29 +73,58 @@
             <li><a href="/anon_client/">Anonymize</a></li>
           </ul>
         </li>
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Files <span class="caret"></span></a>
+
+        <li class="dropdown" ng-if="currentUser.trustgroups[currentUser.currentTg].admin || currentUser.isSysadmin">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">System <span class="caret"></span></a>
           <ul class="dropdown-menu" role="menu">
-            <li><a href="/datafiles">View</a></li>
-            <li><a href="/uploadfile">Upload</a></li>
+            <li><a href="/viewstatus/" ng-if="currentUser.trustgroups[currentUser.currentTg].admin || currentUser.isSysadmin">View status</a></li>
+            <li><a href="/updatesystem/"ng-if="currentUser.isSysadmin">Make updates</a></li>
           </ul>
         </li>
-        <li class="dropdown">
+        <!-- <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Demos <span class="caret"></span></a>
           <ul class="dropdown-menu" role="menu">
             <li><a href="/graph">Graph Demo</a></li>
           </ul>
+        </li> -->
+        <li><a href="/userinfo/settings"><i class="fa fa-cog fa-lg"></i></a>
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li ng-show="currentUser"><a ng-click="vm.chat()"><i class="fa fa-comments fa-lg"></i></a></li>
+        <li ng-show="currentUser"><a ng-click=""><i class="fa fa-bell fa-lg"></i></a>
+        </li>
+        <!-- <li ng-show="currentUser" class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-bell fa-lg"></i> <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="/">New notifications</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="/">Notification 1</a></li>
+            <li><a href="/">Notification 2</a></li>
+          </ul>
+        </li> -->
+        <!--<li ng-show="currentUser"><a ng-click="vm.logout()"> Logout</a></li> -->
+        <!-- <li ng-show="currentUser" class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{currentUser.trustgroups[currentUser.currentTg].tgDescription}} <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="/userinfo">Profile</a></li>
+            <li><a ng-click="vm.logout()">Logout</a></li>
+          </ul>
+        </li> -->
+        <li ng-show="currentUser" class="dropdown" tg-dropdown>
+        </li>
+        <li ng-show="currentUser" class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{currentUser.username}} <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="/userinfo">Profile</a></li>
+            <li><a href="/userinfo/accounts">Account</a></li>
+            <li><a ng-click="vm.logout()">Logout</a></li>
+          </ul>
         </li>
       </ul>
-      
+      <!-- <p class="navbar-right navbar-text" ng-show="currentUser">&nbsp;</p>
+      <p class="navbar-right navbar-text" ng-show="currentUser">Welcome, {{currentUser.id}}</p>
       <ul class="nav navbar-nav navbar-right">
-        <li ng-show="currentUser"><a ng-click="vm.messaging()">Messaging</a></li>
-        <li ng-show="currentUser"><a ng-click="vm.settings()">Settings</a></li>
-        <li ng-show="currentUser"><a ng-click="vm.logout()"> Logout</a></li>
-      </ul>
-      <p class="navbar-right navbar-text" ng-show="currentUser">&nbsp;</p>
-      <p class="navbar-right navbar-text" ng-show="currentUser">Welcome, {{currentUser.name}}</p>
-      <!-- <ul class="nav navbar-nav navbar-right">
         <li><a href="../navbar/">Default</a></li>
         <li><a href="../navbar-static-top/">Static top</a></li>
         <li class="active"><a href="./">Fixed top</a></li>

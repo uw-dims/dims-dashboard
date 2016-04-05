@@ -1,0 +1,5 @@
+.git
+.sublime-*
+*/node_modules
+*/bower_components
+initial_data

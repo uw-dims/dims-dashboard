@@ -1,49 +1,68 @@
+/**
+ * Copyright (C) 2014, 2015, 2016 University of Washington.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ * list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ * may be used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
 'use strict';
 angular.module('dimsDashboard.controllers').
-  controller('LoginCtrl', ['$scope', 'AuthService', '$location', '$log','$rootScope', 'CryptoService','SettingsService', 
-      function($scope, AuthService, $location, $log, $rootScope, CryptoService, SettingsService) {
+  controller('LoginCtrl', ['$scope', 'AuthService', '$location', '$log', '$rootScope', '$routeParams', 'siteVars',
+      function ($scope, AuthService, $location, $log, $rootScope, $routeParams, siteVars) {
     $scope.error = '';
     $scope.user = {};
+    $scope.siteOrg = siteVars.siteOrg;
+    $scope.siteIntroText = siteVars.siteIntroText;
 
-    $log.debug('LoginCtrl controller');
+    $log.debug('loginCtrl routeParams', $routeParams);
 
-    // var validInputs = function() {
-    //   valid = false;
-    //   if ($scope.user !== null && $scope.user !== undefined) {
-    //     if ($scope.)
-    //   }
-    //   ($scope.user.password === '' || $scope.user.username === '')
-    // }
+    if ($routeParams.error) {
+      $scope.errorHtml = $routeParams.error;
+      $scope.showErrorHtml = true;
+    } else {
+      $scope.errorHtml = '';
+      $scope.showErrorHtml = false;
+    }
 
-    $scope.login = function(form) {
+    $scope.login = function (form) {
       if ($scope.user.password === '' || $scope.user.username === '') {
         $scope.error = 'Enter a username and password';
-
       } else {
-
-        var userPass = $scope.user.password.toString();
-        var encPass = CryptoService.encryptAES(userPass, constants.PASS_SECRET);
-        
         AuthService.login('password', {
           'username': $scope.user.username,
-          'password': encPass
+          // 'password': encPass
+          'password': $scope.user.password
         },
-        function(err) {
-
-          if (!err) {
-            $location.path('/');
-            // Emit event so socket can resolve
-            $log.debug('LoginCtrl.login: Broadcast authenticated');
-            $rootScope.$broadcast('authenticated');
-            
-          } else {
+        // Callback
+        function (err) {
+          if (err) {
             $scope.error = err;
-            $log.debug('LoginCtrl login error', err);
+            $log.error('LoginCtrl login error', err);
           }
         });
-
       }
-      
     };
-
   }]);

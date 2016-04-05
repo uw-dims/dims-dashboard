@@ -1,0 +1,46 @@
+<div ng-controller="LogMonitorCtrl">
+<div class="{{ logClass}}">
+<div class="popup-box chat-popup" ng-show="logWindowOn">
+    <div class="popup-head">
+        <div class="popup-head-left">Live log streaming&nbsp;</div>
+        <div class="popup-head-right-logs">
+          <span class="glyphicon glyphicon-chevron-down popup-btn" ng-click="hide()" ng-show="logMaximized"></span>
+          <span class="glyphicon glyphicon-chevron-up popup-btn" ng-click="show()" ng-hide="logMaximized"></span>
+          <span class="glyphicon glyphicon-remove popup-btn" ng-click="close()"></span>
+        <!-- </div> --></div>
+        <div style="clear: both"></div>
+    </div>
+    <div class="popup-messages" ng-show="logMaximized">
+    <!-- <h2 >Log Monitors</h2> -->
+      <div class="spacer5">
+        <div class="row">
+          <div class="col-sm-12">
+            <tabset type="tabs">
+              <tab heading="Devops" active="active.devops">
+              <log-monitor exchange="types.devops">
+              </log-monitor>
+              </tab>
+              <tab heading="Health" active="active.health">
+              <log-monitor exchange="types.health">
+              </log-monitor>
+              </tab>
+              <tab heading="Logs" active="active.logs">
+              <log-monitor exchange="types.logs">
+              </log-monitor>
+              </tab>
+              <tab heading="Test Report" active="active.dimstr">
+              <log-monitor exchange="types.dimstr">
+              </log-monitor>
+              </tab>
+              <tab heading="CI Testing" active="active.test">
+              <log-monitor exchange="types.test">
+              </log-monitor>
+              </tab>
+            </tabset>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+</div>
+</div>

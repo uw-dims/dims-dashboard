@@ -1,0 +1,15 @@
+<div class="spacer10">
+<div class="panel panel-default">
+<div class="panel-body">
+  <!-- <div ng-repeat="(label, value) in vm.profile" class="row"> -->
+  <div ng-repeat="key in vm.keys(vm.profile)" class="row">
+    <div class="col-md-3">
+     <label> {{ key }}</label>
+    </div>
+    <div class="col-md-9">
+      {{ vm.profile[key] }}
+    </div>
+  </div>
+</div>
+</div>
+</div>
