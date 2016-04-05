@@ -57,7 +57,6 @@ angular.module('dimsDashboard.services')
   var parseTimeSeries = function(data) {
     var initialArray = data.split('\n');
     var finalArray = [];
-    $log.debug('DataService.parseTimeSeries. initialArray is ', initialArray);
     for (var i=0; i< initialArray.length; i++) {
       var lineArray = initialArray[i].split(' ');
       var finalLineArray = [];
@@ -68,7 +67,6 @@ angular.module('dimsDashboard.services')
       finalArray.push(finalLineArray);
     }
 
-    $log.debug('DataService.parseTimeSeries. finalArray is ', finalArray);
     return finalArray;
 
   };

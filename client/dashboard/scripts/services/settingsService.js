@@ -48,14 +48,13 @@ angular.module('dimsDashboard.services')
       },
 
       update: function (settings) {
-        $log.debug('settingsService update: settings', settings);
         var deferred = $q.defer();
         $resource('/settings/').save({settings: settings},
           function (resource) {
           SettingsService.set(settings);
           deferred.resolve(resource);
         }, function (err) {
-          $log.debug('SettingsService.update error is ', err);
+          $log.error('SettingsService.update error is ', err);
           deferred.reject(err);
         });
         return deferred.promise;

@@ -42,8 +42,6 @@ angular.module('dimsDashboard.services')
       };
 
       if (anonymize === 'true')  {
-        $log.debug('services/anonService: Call anonymize function');
-        $log.debug('service/anonService. params ', config, ', data: ', data);
         $http ({
           method: 'POST',
           url: '/anon',

@@ -113,7 +113,6 @@
     var parseTicket = function parseTicket(ticketData) {
       var item = _.extend({}, ticketData);
       item.data = formatData(ticketData);
-      $log.debug('mitigationService.parseTicket. item is ', item);
       return item;
     };
 
@@ -141,7 +140,6 @@
 
     var mitigationService = {
       getMitigations: function (tg) {
-        $log.debug('MitigationService.getMitigation');
         var deferred = $q.defer();
         MitigationApi.get({
           type: 'mitigation',
@@ -166,11 +164,10 @@
           type: 'mitigation'
         },
         function (resource) {
-          $log.debug('MitigationService.getMitigation success ', resource);
           deferred.resolve(parseTicket(resource.data.mitigation));
         },
         function (err) {
-          $log.debug('MitigationService.getMitigation error callback', err);
+          $log.error('MitigationService.getMitigation error callback', err);
           deferred.reject(err);
         });
         return deferred.promise;
@@ -178,7 +175,6 @@
 
       create: function (ips, name, description, tg) {
         var deferred = $q.defer();
-        $log.debug('mitigation create ips', ips);
         MitigationApi.save({},
           {
             type: 'mitigation',
@@ -188,19 +184,16 @@
             content: ips
           },
         function (resource) {
-          $log.debug('MitigationService.create success ', resource);
           deferred.resolve(resource);
         },
         function (err) {
-          $log.debug('MitigationService.create error callback', err);
+          $log.error('MitigationService.create error callback', err);
           deferred.reject(err);
         });
         return deferred.promise;
       },
 
       remediate: function (id, ips) {
-        $log.debug('remediate id is ', id);
-        $log.debug('ips are ', ips);
         var deferred = $q.defer();
         MitigationApi.update({
           id: id},
@@ -209,11 +202,10 @@
           ips: ips
         },
         function (resource) {
-          $log.debug('MitigationService.remediate success ', resource);
           deferred.resolve(resource);
         },
         function (err) {
-          $log.debug('MitigationService.remediate error callback', err);
+          $log.error('MitigationService.remediate error callback', err);
           deferred.reject(err);
         });
         return deferred.promise;

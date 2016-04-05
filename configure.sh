@@ -58,7 +58,7 @@ sudo chown -R $USER:$USER ${DEST}/dims-dashboard
 cd ${DEST}/dims-dashboard/client
 npm install
 bower install
-grunt build
+grunt build -v
 
 cd ../server
 npm install

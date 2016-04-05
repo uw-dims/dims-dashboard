@@ -48,7 +48,7 @@ RUNDIR=${RUNDIR:="/opt/dims/srv/dims-dashboard/server"}
 # You can override this to provide your own defaults when developing
 CONF_FILE=${CONF_FILE:="/etc/dashboard/dashboard.conf"}
 SECRETS_FILE=${SECRETS_FILE:="/etc/dashboard/dashboard_secrets.conf"}
-EXTERNAL_SITES_FILE=${EXTERNAL_SITES_FILE:="/etc/dashboard/external_sites_config.json"}
+EXTERNAL_SITES_FILE=${EXTERNAL_SITES_FILE:="/etc/dashboard/dashboard_client_config.json"}
 
 # Need virtualenv since that's where pika is installed
 cd $RUNDIR && . $ACTIVATE
@@ -64,9 +64,9 @@ printenv
 
 # Configure the environment for the client
 if [ "$DASHBOARD_NODE_ENV" == "production" ]; then
-  cd ../client && grunt build
+  cd ../client && grunt build -v
 else
-  cd ../client && grunt dev-compile
+  cd ../client && grunt dev-compile -v
 fi
 cd $RUNDIR
 ianitor --port $DASHBOARD_PORT dashboard -- node app

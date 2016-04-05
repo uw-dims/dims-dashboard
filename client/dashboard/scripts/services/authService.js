@@ -92,7 +92,6 @@
     authService.getSocialAccounts = function (callback) {
       var cb = callback || angular.noop;
       ConnectApi.get(function (resource) {
-        $log.debug('successful return from ConnectApi', resource);
         authService.socialAccounts = angular.copy(resource.data.accounts);
         return cb();
       },
@@ -109,7 +108,6 @@
     authService.disconnectSocialAccount = function (service, callback) {
       var cb = callback || angular.noop;
       ConnectApi.delete({service: service }, function (resource) {
-        $log.debug('authService.disconnectSocialAccount returned success from api', resource);
         return cb();
       },
       function (err) {
@@ -135,7 +133,6 @@
       logout();
       // Stop the chat service - what about logs?
       AuthApi.delete(function (res) {
-        $log.debug('authService.logout returned success from api');
         return cb();
       },
       function (err) {

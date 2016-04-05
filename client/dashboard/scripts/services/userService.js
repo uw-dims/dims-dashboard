@@ -101,7 +101,7 @@ angular.module('dimsDashboard.services')
         function (resource) {
           deferred.resolve(resource.data);
         }, function (err) {
-          $log.debug('UserService.getUsers failure callback err: ', err);
+          $log.error('UserService.getUsers failure callback err: ', err);
           deferred.reject(err);
         });
       return deferred.promise;
@@ -116,7 +116,7 @@ angular.module('dimsDashboard.services')
         function (resource) {
           deferred.resolve(resource.data);
         }, function (err) {
-          $log.debug('UserService.getUser failure callback err: ', err);
+          $log.error('UserService.getUser failure callback err: ', err);
           deferred.reject(err);
         });
       return deferred.promise;

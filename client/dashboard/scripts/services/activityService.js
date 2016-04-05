@@ -45,7 +45,6 @@
         var deferred = $q.defer();
         MitigationApi.get({},
           function (resource) {
-            $log.debug('MitigationService.getMitigation success callback data', resource.data);
             deferred.resolve(resource.data);
           },
           function (err) {

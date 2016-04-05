@@ -49,12 +49,11 @@
           hashes: hashes
           },
         function (resource) {
-          $log.debug('TupeloService.post success ', resource);
           var result = JSON.parse(resource.data['tupelo']);
           deferred.resolve(result);
         },
         function (err) {
-          $log.debug('TupeloService.post error callback', err);
+          $log.error('TupeloService.post error callback', err);
           deferred.reject(err);
         });
 

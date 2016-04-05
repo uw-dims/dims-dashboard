@@ -48,14 +48,12 @@
 
     var ticketService = {
       getTickets: function (tg) {
-        $log.debug('TicketService.getTickets tg is ', tg);
         var deferred = $q.defer();
         TicketApi.get({
           type: 'activity',
           tg: tg
         },
           function (resource) {
-            $log.debug('TicketService.getTickets success callback data', resource.data);
             var result = resource.data.tickets.reverse();
             deferred.resolve(result);
           },
@@ -66,13 +64,11 @@
         return deferred.promise;
       },
       deleteTicket: function (id) {
-        $log.debug('TicketService.deleteTickets id is ', id);
         var deferred = $q.defer();
         TicketApi.delete({
           id: id
         },
           function (resource) {
-            $log.debug('TicketService.deleteTicket success callback ', resource);
             deferred.resolve('ok');
           },
           function (err) {

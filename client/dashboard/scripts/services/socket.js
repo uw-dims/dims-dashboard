@@ -47,17 +47,14 @@
     // Connect to a socket described by an exchange (can add token later as another argument)
     function connect(exchange) {
       var url = ENV.DASHBOARD_PUBLIC_PROTOCOL + '://' + ENV.DASHBOARD_PUBLIC_HOST + ':' + ENV.DASHBOARD_PUBLIC_PORT + '/' + exchange.name;
-      // $log.debug('ClientSockets.connect: Exchange ', exchange, ' Connecting with ', url);
       var thisSocket = {};
       thisSocket.ioSocket = io.connect(url, {forceNew: true});
       thisSocket.ioSocket.on('connect', function () {
-        // $log.debug('ClientSocket.connect: ioSocket connected to ', exchange.name);
       });
       return thisSocket;
     }
 
     function runFactory(ioSocket) {
-      $log.debug('ClientSockets.runfactory start', ioSocket);
       var thisSocket = socketFactory({
         ioSocket: ioSocket
       });
@@ -90,12 +87,10 @@
     });
 
     $rootScope.$on('logout', function () {
-      // $log.debug('ClientSockets logout handler');
       // Disconnect each socket
       try {
         _.forEach(['chatExchanges', 'fanoutExchanges'], function (value, index) {
           _.forEach(constants[value], function (value, key) {
-            $log.debug('ClientSockets logout handler. value.name', value.name);
             appSockets[value.name].socket.removeAllListeners(value.event);
             appSockets[value.name].socket.disconnect();
           });
@@ -172,7 +167,6 @@
         var socket = ClientSockets.getSocket(constants.chatExchanges.chat);
         socket.emit(constants.chatExchanges.chat.sendEvent, { message: message},
             function (message) {
-              $log.debug('ChatService emitted message', message);
             });
       }
     };
@@ -192,22 +186,16 @@
         logs[value.name].running = false;
         observerCallbacks[value.name] = [];
         // Setup the collection of notify functions via currying
-        // $log.debug('LogService: init - value.name ', value.name);
         notifyObservers[value.name] = notify(value.name);
-        // $log.debug('LogService: show notifyObservers object in init');
-        // $log.debug(notifyObservers);
       });
     };
 
     init();
 
     function notify(name) {
-      // $log.debug('LogService: in notify name', name);
       return function (args) {
-        // $log.debug('LogService: in notify, name, args', name, args);
         args = args || '';
         angular.forEach(observerCallbacks[name], function (callback) {
-          // $log.debug('LogService notify in forEach', callback);
           callback(args);
         });
       };
@@ -228,8 +216,6 @@
 
     var logService = {
       // True if logging running ($scope is listening on socket) or false if it is not
-      //running: false,
-      // Getter for running
       isRunning: function isRunning (name) {
         return logs[name].running;
       },

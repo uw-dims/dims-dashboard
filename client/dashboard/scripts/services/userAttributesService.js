@@ -109,7 +109,6 @@ angular.module('dimsDashboard.services')
         items: values
       },
         function (resource) {
-          $log.debug('UserAttributesService.updateAttribute success ', resource);
           deferred.resolve(resource);
         },
         function (err) {
