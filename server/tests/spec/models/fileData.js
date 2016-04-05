@@ -79,7 +79,7 @@ var fileMeta2 = function (pathCounter) {
   };
 };
 
-test('models/fileData.js: FileData.fileDataFactory should return file object', function (assert) {
+test.skip('models/fileData.js: FileData.fileDataFactory should return file object', function (assert) {
   setTimeout(function () {
     var newFile = FileData.fileDataFactory(fileMeta1(pathCounter));
     assert.equal(typeof (newFile.save), 'function', 'Object should have save function');
@@ -93,7 +93,7 @@ test('models/fileData.js: FileData.fileDataFactory should return file object', f
   }, 1000);
 });
 
-test('models/fileData.js: FileData.fileDataFactory should validate config and options should override defaults', function (assert) {
+test.skip('models/fileData.js: FileData.fileDataFactory should validate config and options should override defaults', function (assert) {
   var newFile = FileData.fileDataFactory();
   assert.ok(newFile instanceof Error, 'Empty options should return error object');
   newFile = FileData.fileDataFactory({
@@ -135,7 +135,7 @@ test('models/fileData.js: FileData.fileDataFactory should validate config and op
   assert.end();
 });
 
-test('models/fileData.js: FileData create should save file contents and key', function (assert) {
+test.skip('models/fileData.js: FileData create should save file contents and key', function (assert) {
 
   var newFile = FileData.fileDataFactory(fileMeta1(pathCounter));
 
@@ -169,7 +169,7 @@ test('models/fileData.js: FileData create should save file contents and key', fu
 
 });
 
-test('models/fileData.js: FileData.getContent should return content from the database', function (assert) {
+test.skip('models/fileData.js: FileData.getContent should return content from the database', function (assert) {
   pathCounter++;
   var newFile = FileData.fileDataFactory(fileMeta2(pathCounter));
   return newFile.create(contents2)
@@ -186,7 +186,7 @@ test('models/fileData.js: FileData.getContent should return content from the dat
   });
 });
 
-test('models/fileData.js: Filedata.exists should return true if the key exists in the database', function (assert) {
+test.skip('models/fileData.js: Filedata.exists should return true if the key exists in the database', function (assert) {
   pathCounter++;
   var newFile = FileData.fileDataFactory(fileMeta2(pathCounter));
   return newFile.create(contents2)
@@ -210,7 +210,7 @@ test('models/fileData.js: Filedata.exists should return true if the key exists i
   });
 });
 
-test('models/fileData.js: FileData.getConfig should return the config object', function (assert) {
+test.skip('models/fileData.js: FileData.getConfig should return the config object', function (assert) {
   pathCounter++;
   var newFile = FileData.fileDataFactory(fileMeta2(pathCounter));
   var config = newFile.getConfig();
@@ -230,7 +230,7 @@ test('models/fileData.js: FileData.getConfig should return the config object', f
   });
 });
 
-test('models/fileData.js: FileData.getMetadata should return metadata from database', function (assert) {
+test.skip('models/fileData.js: FileData.getMetadata should return metadata from database', function (assert) {
   pathCounter++;
   var newFile = FileData.fileDataFactory(fileMeta2(pathCounter));
   return newFile.create(contents2)
@@ -250,7 +250,7 @@ test('models/fileData.js: FileData.getMetadata should return metadata from datab
   });
 });
 
-test('models/fileData.js: FileData content should handle stream', function (assert) {
+test.skip('models/fileData.js: FileData content should handle stream', function (assert) {
   pathCounter++;
   var source = stream.PassThrough();
   var newFile = FileData.fileDataFactory(fileMeta1(pathCounter));
@@ -273,7 +273,7 @@ test('models/fileData.js: FileData content should handle stream', function (asse
   source.end();
 });
 
-test('models/fileData.js: FileData should handle content from file via stream', function (assert) {
+test.skip('models/fileData.js: FileData should handle content from file via stream', function (assert) {
   pathCounter++;
   var newFile = FileData.fileDataFactory(fileMeta1(pathCounter));
   var testFilePath = path.join(ROOT_DIR, '/tests/testData/response.json');
