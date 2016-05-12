@@ -19,7 +19,8 @@ import shlex
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, '/opt/dims/etc')
 
 # -- General configuration ------------------------------------------------
 
@@ -47,7 +48,10 @@ templates_path = ['_templates']
 source_suffix = '.rst'
 
 # The encoding of source files.
-#source_encoding = 'utf-8-sig'
+source_encoding = 'utf-8-sig'
+
+# Include todos
+source_include_todos = True
 
 # The master toctree document.
 master_doc = 'index'
@@ -81,7 +85,7 @@ release = version
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['build']
+exclude_patterns = ['_build']
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -108,7 +112,7 @@ pygments_style = 'sphinx'
 #keep_warnings = False
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
-#todo_include_todos = True
+todo_include_todos = True
 
 
 # -- Options for HTML output ----------------------------------------------
@@ -223,9 +227,10 @@ latex_elements = {
 # https://github.com/rtfd/readthedocs.org/issues/416
 #
 'preamble': "".join((
-    '\DeclareUnicodeCharacter{00A0}{ }',  # NO-BREAK SPACE
-    '\DeclareUnicodeCharacter{251C}{+}',  # BOX DRAWINGS LIGHT VERTICAL AND RIGHT
-    '\DeclareUnicodeCharacter{2514}{+}',  # BOX DRAWINGS LIGHT UP AND RIGHT
+    '\DeclareUnicodeCharacter{00A0}{ }',     # NO-BREAK SPACE
+    '\DeclareUnicodeCharacter{2014}{\dash}', # LONG DASH
+    '\DeclareUnicodeCharacter{251C}{+}',     # BOX DRAWINGS LIGHT VERTICAL AND RIGHT
+    '\DeclareUnicodeCharacter{2514}{+}',     # BOX DRAWINGS LIGHT UP AND RIGHT
 )),
 
 # Latex figure (float) alignment
@@ -255,7 +260,7 @@ latex_logo = 'UW-logo.png'
 #latex_show_urls = False
 
 # Documents to append as an appendix to all manuals.
-#latex_appendices = []
+latex_appendices = ['appendices']
 
 # If false, no module index is generated.
 #latex_domain_indices = True
@@ -297,8 +302,6 @@ texinfo_documents = [
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
 
-
-# Example configuration for intersphinx: refer to the Python standard library.
 os.environ['GITBRANCH'] = "develop"
 
 if os.environ.get('DOCSURL') is None:
