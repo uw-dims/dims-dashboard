@@ -5,8 +5,8 @@ Using the Dashboard
 
 This section will introduce basic usage of the DIMS Dashboard.
 
-Currently this section contains a demo runthrough with commentary. The following
-sub-sections will go through the:
+Currently this section contains a demo of the dashboard with commentary. The following
+sub-sections will go through:
 
 #. Mitigation Scenario
 #. System health
@@ -24,7 +24,7 @@ on that page (to make sure your client has the latest version).
 Mitigation Scenario
 -------------------
 
-Go to ``demo.prisem.washington.edu`` and log in using your ops-trust username
+Go to ``demo.prisem.washington.edu`` and log in using your ``ops-trust`` username
 and password.
 
 The main dashboard will display.
@@ -39,7 +39,7 @@ The main dashboard will display.
 **Remediations** are mitigation activities in the system where the logged in
 user (lparsons in the screenshots) has IPs that are compromised and
 need to be remediated.
-Currently the system contains one of these
+Currently, the system contains one of these
 "Mitigation scenario" activities which was bootstrapped programmatically.
 
 **Hover over the graph to display data points.** Note the number of mitigated IPs
@@ -54,7 +54,7 @@ screenshot):
 
 
 Click **View my IPs needing mitigation** link to display a modal window where you can
-submit IPs that have been mitigated. Right now the UI for this consists of the modal
+submit IPs that have been mitigated. Right now, the UI for this consists of the modal
 displaying all remaining IPs you need to address.
 
 .. figure:: demo/view_my_ips.png
@@ -149,8 +149,6 @@ and the Consul UI will open in a new tab with the
 
 ..
 
-(You can demonstrate the Consul UI at this point if desired.)
-
 Live log streaming
 ------------------
 
@@ -177,8 +175,8 @@ site (e.g. new page load).
    ..
 
 
-   There are tabs for the log exchanges the server monitors. Each tab has a button to turn on/
-   turn off that particular log monitor. The user can clear the buffer using the “Clear” button.
+   There are tabs for the log exchanges the server monitors. Each tab has a button to turn on and
+   turn off that particular log monitor. The user can clear the buffer using the *Clear* button.
    The user can hide the window by clicking the minimize button (down arrow in title bar),
    and then maximize it by
    clicking the maximize button (up arrow).  Clicking the close button (X) turns off all monitors and
@@ -307,7 +305,7 @@ User display and trust groups
    The system remembers your last selection. If you have never selected a trust group,
    it will choose the first one in your list of trust groups when you first log in.
 
-2. Display your profile information by selecting ``dittrich > Profile`` in the nav bar.
+2. Display your profile information by selecting ``lparsons > Profile`` in the nav bar.
    Note that the trust group info now displays in the profile.
 
    .. figure:: demo/dimstrustgroupinprofile.png

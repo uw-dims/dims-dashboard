@@ -23,7 +23,7 @@ General ticket structure
 A *ticket* is described
 
 * A Redis key/value pair where the value is a 1-level hash
-* Zero or more associated "topi"
+* Zero or more associated "topics"
 
 
 Topics
@@ -49,11 +49,18 @@ Topics are stored in redis as follows:
 
     ..
 
+.. TODO(mboggess):
+.. todo::
 
-We currently restrict the metadata saved for a topic. We do not allow user-defined metadata.
-Should we change this behavior?
+    .. note::
 
-Metadata provided by calling method
+        We currently restrict the metadata saved for a topic. We do not allow user-defined metadata.
+        Should we change this behavior?
+ 
+    ..
+..
+
+Metadata provided by calling method:
 
 .. code-block:: none
 

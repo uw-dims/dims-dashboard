@@ -125,7 +125,7 @@ Requests that do not send back data (such as delete) will return with
 
 ..
 
-Unsuccessful requests will return JSON with an error message
+Unsuccessful requests will return JSON with an error ``message``
 and a status of ``error``:
 
 .. code-block:: none
@@ -195,6 +195,13 @@ following request returns with 400:
 Retrieve a list of tickets
 --------------------------
 
+.. TODO(mboggess):
+.. todo::
+
+    Does this section need more information?
+
+..
+
 Returns list of tickets
 
 No parameters
@@ -208,16 +215,17 @@ When no parameters are provided, the system defaults to the following parameters
 
 ..
 
-
-
 This will return all public activities plus any private activities belonging
-to the calling user.
-
-Invoked via GET http://dashboard_url/api/ticket/
-Returns HTTP status code and string reply
+to the calling user. Invoked via GET http://dashboard_url/api/ticket/, returns
+HTTP status code and string reply.
 
 Using curl:
-  curl -k https://dashboard_url/api/ticket/
+
+.. code-block:: none
+
+    curl -k https://dashboard_url/api/ticket/
+
+..
 
 Sample response:
 
