@@ -2,6 +2,14 @@
 
 This repo contains the server and client code for the DIMS Dashboard web application.
 
+* GitHub repo: https://github.com/uw-dims/dims-dashboard/
+* Documentation: https://dims-dashboard.readthedocs.io/
+* License: Berkeley Three Clause License
+
+## Contact
+
+Dave Dittrich dittrich@u.washington.edu
+
 ## Getting started
 
 The Dashboard is installed on a machine (virtual or otherwise) using Ansible. These instructions assume you have access to the DIMS Ansible playbooks and development tools.
