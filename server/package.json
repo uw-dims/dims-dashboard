@@ -38,7 +38,7 @@
     "crypto-js": "3.1.5",
     "csurf": "1.8.3",
     "csvtojson": "0.4.5",
-    "ejs": "1.0.0",
+    "ejs": "2.5.5",
     "errorhandler": "1.4.2",
     "express": "4.13.3",
     "express-json": "1.0.0",
