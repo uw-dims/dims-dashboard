@@ -317,5 +317,5 @@ intersphinx_mapping = {
         'dimsdevguide': ("{}/dims-devguide".format(os.environ['DOCSURL']), None),
         'dimspacker': ("{}/dims-packer".format(os.environ['DOCSURL']), None),
         'dittrich': ('https://staff.washington.edu/dittrich/home/', None),
-        'ansibleplaybooks': ("{}/ansible-playbooks".format(os.environ['DOCSURL']),None)
+        'ansible_dims_playbooks': ("{}/ansible-dims--playbooks".format(os.environ['DOCSURL']),None)
 }
